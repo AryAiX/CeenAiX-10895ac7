@@ -31,12 +31,12 @@ export const Auth: React.FC = () => {
         if (!fullName.trim()) {
           throw new Error('Full name is required');
         }
-        await signUp(email, password, fullName, role);
-        const redirectPath = role === 'doctor' ? '/doctor/dashboard' : '/patient/dashboard';
+        const userRole = await signUp(email, password, fullName, role);
+        const redirectPath = userRole === 'doctor' ? '/doctor/dashboard' : '/patient/dashboard';
         navigate(redirectPath);
       } else {
-        await signIn(email, password);
-        const redirectPath = role === 'doctor' ? '/doctor/dashboard' : '/patient/dashboard';
+        const userRole = await signIn(email, password);
+        const redirectPath = userRole === 'doctor' ? '/doctor/dashboard' : '/patient/dashboard';
         navigate(redirectPath);
       }
     } catch (err) {

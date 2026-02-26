@@ -21,8 +21,8 @@ interface AuthContextType {
   user: User | null;
   userProfile: UserProfile | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, role: UserRole) => Promise<void>;
-  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, fullName: string, role: UserRole) => Promise<UserRole>;
+  signIn: (email: string, password: string) => Promise<UserRole>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   isAuthenticated: boolean;
@@ -90,7 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signUp = async (email: string, password: string, fullName: string, role: UserRole) => {
+  const signUp = async (email: string, password: string, fullName: string, role: UserRole): Promise<UserRole> => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -124,20 +124,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       await fetchUserProfile(data.user.id);
+      return role;
     } catch (error) {
       console.error('Sign up error:', error);
       throw error;
     }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string): Promise<UserRole> => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
+      if (!data.user) throw new Error('Sign in failed');
+
+      // Fetch user profile to get role
+      const { data: profile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', data.user.id)
+        .maybeSingle();
+
+      if (profileError) throw profileError;
+      if (!profile) throw new Error('User profile not found');
+
+      await fetchUserProfile(data.user.id);
+      return profile.role;
     } catch (error) {
       console.error('Sign in error:', error);
       throw error;
