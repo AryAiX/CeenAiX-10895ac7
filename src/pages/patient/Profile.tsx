@@ -92,132 +92,175 @@ export const Profile: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
       <Navigation role="patient" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-          <p className="text-gray-600 mt-2">Manage your personal information and health records</p>
+        <div className="mb-10">
+          <h1 className="text-4xl font-bold text-gray-900 tracking-tight">My Profile</h1>
+          <p className="text-gray-600 mt-3 text-lg">Manage your personal information and health records</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100/50 backdrop-blur-sm sticky top-8">
               <div className="text-center">
-                <div className="relative inline-block">
-                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center overflow-hidden border-4 border-white shadow-lg">
+                <div className="relative inline-block group">
+                  <div className="w-36 h-36 rounded-full bg-gradient-to-br from-blue-500 via-blue-400 to-cyan-400 flex items-center justify-center overflow-hidden border-4 border-white shadow-2xl ring-4 ring-blue-50">
                     {profileImage ? (
                       <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
-                      <User className="w-16 h-16 text-blue-500" />
+                      <User className="w-20 h-20 text-white" />
                     )}
                   </div>
                   <button
                     onClick={() => handleImageUpload('profile')}
-                    className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-600 transition-colors"
+                    className="absolute bottom-0 right-0 bg-gradient-to-br from-blue-600 to-blue-700 text-white p-3 rounded-full shadow-xl hover:shadow-2xl hover:scale-110 transition-all duration-200 ring-4 ring-white"
                   >
                     <Camera className="w-4 h-4" />
                   </button>
+                  <div className="absolute inset-0 rounded-full bg-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
-                <h2 className="mt-4 text-xl font-bold text-gray-900">{personalInfo.fullName || 'Add Your Name'}</h2>
-                <p className="text-gray-600 text-sm">Patient ID: {personalInfo.emiratesId || 'Not Set'}</p>
+                <h2 className="mt-6 text-2xl font-bold text-gray-900 tracking-tight">{personalInfo.fullName || 'Add Your Name'}</h2>
+                <p className="text-gray-500 text-sm mt-2 font-medium">ID: {personalInfo.emiratesId || 'Not Set'}</p>
               </div>
 
-              <div className="mt-6 space-y-3">
-                <div className="bg-blue-50 rounded-lg p-3 cursor-pointer hover:bg-blue-100 transition-colors" onClick={() => setIsEditingPersonal(true)}>
-                  <p className="text-sm text-gray-600">Blood Type</p>
-                  <p className="font-semibold text-gray-900">{personalInfo.bloodType || 'Not Set'}</p>
-                  {!isEditingPersonal && <p className="text-xs text-blue-600 mt-1">Click to edit</p>}
+              <div className="mt-8 space-y-4">
+                <div
+                  className="group relative overflow-hidden bg-gradient-to-br from-rose-50 to-red-50 rounded-xl p-4 cursor-pointer hover:shadow-lg transition-all duration-300 border border-red-100/50 hover:border-red-200"
+                  onClick={() => setIsEditingPersonal(true)}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-red-600 uppercase tracking-wide mb-1">Blood Type</p>
+                      <p className="text-lg font-bold text-gray-900">{personalInfo.bloodType || 'Not Set'}</p>
+                    </div>
+                    {!isEditingPersonal && (
+                      <div className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Edit2 className="w-4 h-4" />
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="bg-cyan-50 rounded-lg p-3 cursor-pointer hover:bg-cyan-100 transition-colors" onClick={() => setIsEditingPersonal(true)}>
-                  <p className="text-sm text-gray-600">Date of Birth</p>
-                  <p className="font-semibold text-gray-900">{personalInfo.dateOfBirth || 'Not Set'}</p>
-                  {!isEditingPersonal && <p className="text-xs text-cyan-600 mt-1">Click to edit</p>}
+
+                <div
+                  className="group relative overflow-hidden bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 cursor-pointer hover:shadow-lg transition-all duration-300 border border-blue-100/50 hover:border-blue-200"
+                  onClick={() => setIsEditingPersonal(true)}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Date of Birth</p>
+                      <p className="text-lg font-bold text-gray-900">{personalInfo.dateOfBirth || 'Not Set'}</p>
+                    </div>
+                    {!isEditingPersonal && (
+                      <div className="text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Edit2 className="w-4 h-4" />
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="bg-red-50 rounded-lg p-3 cursor-pointer hover:bg-red-100 transition-colors" onClick={() => setIsEditingPersonal(true)}>
-                  <p className="text-sm text-gray-600">Emergency Contact</p>
-                  <p className="font-semibold text-gray-900">{personalInfo.emergencyContactName || 'Not Set'}</p>
-                  <p className="text-sm text-gray-600">{personalInfo.emergencyContactPhone}</p>
-                  {!isEditingPersonal && <p className="text-xs text-red-600 mt-1">Click to edit</p>}
+
+                <div
+                  className="group relative overflow-hidden bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 cursor-pointer hover:shadow-lg transition-all duration-300 border border-orange-100/50 hover:border-orange-200"
+                  onClick={() => setIsEditingPersonal(true)}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-orange-600 uppercase tracking-wide mb-1">Emergency Contact</p>
+                      <p className="text-lg font-bold text-gray-900">{personalInfo.emergencyContactName || 'Not Set'}</p>
+                      {personalInfo.emergencyContactPhone && (
+                        <p className="text-sm text-gray-600 mt-1">{personalInfo.emergencyContactPhone}</p>
+                      )}
+                    </div>
+                    {!isEditingPersonal && (
+                      <div className="text-orange-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Edit2 className="w-4 h-4" />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
-              <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                  <div className="bg-blue-100 p-2 rounded-lg">
-                    <User className="w-5 h-5 text-blue-600" />
+          <div className="lg:col-span-2 space-y-8">
+            <div className="bg-white rounded-3xl shadow-xl border border-gray-100/50 overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-600 to-cyan-600 p-6 flex justify-between items-center">
+                <div className="flex items-center space-x-4">
+                  <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl">
+                    <User className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">Personal Information</h3>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white tracking-tight">Personal Information</h3>
+                    <p className="text-blue-100 text-sm mt-1">Your basic details and health information</p>
+                  </div>
                 </div>
                 <button
                   onClick={() => setIsEditingPersonal(!isEditingPersonal)}
-                  className="flex items-center space-x-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                  className="flex items-center space-x-2 px-5 py-2.5 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
                 >
-                  {isEditingPersonal ? <Save className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
-                  <span>{isEditingPersonal ? 'Save' : 'Edit'}</span>
+                  {isEditingPersonal ? <Save className="w-5 h-5" /> : <Edit2 className="w-5 h-5" />}
+                  <span>{isEditingPersonal ? 'Save Changes' : 'Edit Profile'}</span>
                 </button>
               </div>
               <div className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Full Name</label>
                     <div className="relative">
                       <input
                         type="text"
                         disabled={!isEditingPersonal}
                         value={personalInfo.fullName}
                         onChange={(e) => setPersonalInfo({ ...personalInfo, fullName: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
+                        placeholder="Enter your full name"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Emirates ID</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Emirates ID</label>
                     <div className="relative">
                       <input
                         type="text"
                         disabled={!isEditingPersonal}
                         value={personalInfo.emiratesId}
                         onChange={(e) => setPersonalInfo({ ...personalInfo, emiratesId: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
+                        placeholder="784-XXXX-XXXXXXX-X"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Date of Birth</label>
                     <div className="relative group">
                       <input
                         type="date"
                         disabled={!isEditingPersonal}
                         value={personalInfo.dateOfBirth}
                         onChange={(e) => setPersonalInfo({ ...personalInfo, dateOfBirth: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
                       />
                       {!isEditingPersonal && (
                         <button
                           onClick={() => setIsEditingPersonal(true)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-gray-200 transition-colors opacity-0 group-hover:opacity-100"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-blue-50 transition-all duration-200 opacity-0 group-hover:opacity-100"
                         >
-                          <Edit2 className="w-4 h-4 text-gray-600" />
+                          <Edit2 className="w-4 h-4 text-blue-600" />
                         </button>
                       )}
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Blood Type</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Blood Type</label>
                     <div className="relative group">
                       <select
                         disabled={!isEditingPersonal}
                         value={personalInfo.bloodType}
                         onChange={(e) => setPersonalInfo({ ...personalInfo, bloodType: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium appearance-none bg-white"
                       >
-                        <option value="">Select</option>
+                        <option value="">Select Blood Type</option>
                         <option value="A+">A+</option>
                         <option value="A-">A-</option>
                         <option value="B+">B+</option>
@@ -230,71 +273,73 @@ export const Profile: React.FC = () => {
                       {!isEditingPersonal && (
                         <button
                           onClick={() => setIsEditingPersonal(true)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-gray-200 transition-colors opacity-0 group-hover:opacity-100"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-blue-50 transition-all duration-200 opacity-0 group-hover:opacity-100"
                         >
-                          <Edit2 className="w-4 h-4 text-gray-600" />
+                          <Edit2 className="w-4 h-4 text-blue-600" />
                         </button>
                       )}
                     </div>
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Allergies</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Allergies</label>
                     <textarea
                       disabled={!isEditingPersonal}
                       value={personalInfo.allergies}
                       onChange={(e) => setPersonalInfo({ ...personalInfo, allergies: e.target.value })}
-                      rows={2}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
-                      placeholder="List any allergies (e.g., Penicillin, Peanuts)"
+                      rows={3}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 resize-none font-medium"
+                      placeholder="List any allergies (e.g., Penicillin, Peanuts, Latex)"
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Chronic Conditions</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Chronic Conditions</label>
                     <textarea
                       disabled={!isEditingPersonal}
                       value={personalInfo.chronicConditions}
                       onChange={(e) => setPersonalInfo({ ...personalInfo, chronicConditions: e.target.value })}
-                      rows={2}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
-                      placeholder="List any chronic conditions (e.g., Diabetes, Hypertension)"
+                      rows={3}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 resize-none font-medium"
+                      placeholder="List any chronic conditions (e.g., Diabetes, Hypertension, Asthma)"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Emergency Contact Name</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Emergency Contact Name</label>
                     <div className="relative group">
                       <input
                         type="text"
                         disabled={!isEditingPersonal}
                         value={personalInfo.emergencyContactName}
                         onChange={(e) => setPersonalInfo({ ...personalInfo, emergencyContactName: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
+                        placeholder="Contact person name"
                       />
                       {!isEditingPersonal && (
                         <button
                           onClick={() => setIsEditingPersonal(true)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-gray-200 transition-colors opacity-0 group-hover:opacity-100"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-blue-50 transition-all duration-200 opacity-0 group-hover:opacity-100"
                         >
-                          <Edit2 className="w-4 h-4 text-gray-600" />
+                          <Edit2 className="w-4 h-4 text-blue-600" />
                         </button>
                       )}
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Emergency Contact Phone</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Emergency Contact Phone</label>
                     <div className="relative group">
                       <input
                         type="tel"
                         disabled={!isEditingPersonal}
                         value={personalInfo.emergencyContactPhone}
                         onChange={(e) => setPersonalInfo({ ...personalInfo, emergencyContactPhone: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
+                        placeholder="+971 XX XXX XXXX"
                       />
                       {!isEditingPersonal && (
                         <button
                           onClick={() => setIsEditingPersonal(true)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-gray-200 transition-colors opacity-0 group-hover:opacity-100"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-blue-50 transition-all duration-200 opacity-0 group-hover:opacity-100"
                         >
-                          <Edit2 className="w-4 h-4 text-gray-600" />
+                          <Edit2 className="w-4 h-4 text-blue-600" />
                         </button>
                       )}
                     </div>
@@ -303,52 +348,65 @@ export const Profile: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
-              <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                  <div className="bg-green-100 p-2 rounded-lg">
-                    <Camera className="w-5 h-5 text-green-600" />
+            <div className="bg-white rounded-3xl shadow-xl border border-gray-100/50 overflow-hidden">
+              <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-6 flex justify-between items-center">
+                <div className="flex items-center space-x-4">
+                  <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl">
+                    <Camera className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">Emirates ID Documents</h3>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white tracking-tight">Emirates ID Documents</h3>
+                    <p className="text-emerald-100 text-sm mt-1">Upload or scan your Emirates ID card</p>
+                  </div>
                 </div>
                 <button
                   onClick={handleScanEmiratesId}
-                  className="flex items-center space-x-2 px-4 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors"
+                  className="flex items-center space-x-2 px-5 py-2.5 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
                 >
-                  <Camera className="w-4 h-4" />
+                  <Camera className="w-5 h-5" />
                   <span>Scan ID</span>
                 </button>
               </div>
-              <div className="p-6">
+              <div className="p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">Front Side</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Front Side</label>
                     <div
                       onClick={() => handleImageUpload('emiratesFront')}
-                      className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-green-500 hover:bg-green-50 transition-all"
+                      className="group relative border-2 border-dashed border-gray-300 rounded-2xl p-10 text-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/50 transition-all duration-300"
                     >
                       {emiratesIdFront ? (
-                        <img src={emiratesIdFront} alt="Emirates ID Front" className="max-h-40 mx-auto rounded" />
+                        <img src={emiratesIdFront} alt="Emirates ID Front" className="max-h-48 mx-auto rounded-xl shadow-lg" />
                       ) : (
-                        <div>
-                          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-600">Click to upload front side</p>
+                        <div className="space-y-3">
+                          <div className="w-16 h-16 mx-auto bg-gray-100 rounded-2xl flex items-center justify-center group-hover:bg-emerald-100 transition-colors duration-300">
+                            <Upload className="w-8 h-8 text-gray-400 group-hover:text-emerald-600 transition-colors duration-300" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-700">Click to upload</p>
+                            <p className="text-xs text-gray-500 mt-1">Front side of Emirates ID</p>
+                          </div>
                         </div>
                       )}
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">Back Side</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Back Side</label>
                     <div
                       onClick={() => handleImageUpload('emiratesBack')}
-                      className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-green-500 hover:bg-green-50 transition-all"
+                      className="group relative border-2 border-dashed border-gray-300 rounded-2xl p-10 text-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/50 transition-all duration-300"
                     >
                       {emiratesIdBack ? (
-                        <img src={emiratesIdBack} alt="Emirates ID Back" className="max-h-40 mx-auto rounded" />
+                        <img src={emiratesIdBack} alt="Emirates ID Back" className="max-h-48 mx-auto rounded-xl shadow-lg" />
                       ) : (
-                        <div>
-                          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-600">Click to upload back side</p>
+                        <div className="space-y-3">
+                          <div className="w-16 h-16 mx-auto bg-gray-100 rounded-2xl flex items-center justify-center group-hover:bg-emerald-100 transition-colors duration-300">
+                            <Upload className="w-8 h-8 text-gray-400 group-hover:text-emerald-600 transition-colors duration-300" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-700">Click to upload</p>
+                            <p className="text-xs text-gray-500 mt-1">Back side of Emirates ID</p>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -357,100 +415,109 @@ export const Profile: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
-              <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                  <div className="bg-purple-100 p-2 rounded-lg">
-                    <Shield className="w-5 h-5 text-purple-600" />
+            <div className="bg-white rounded-3xl shadow-xl border border-gray-100/50 overflow-hidden">
+              <div className="bg-gradient-to-r from-violet-600 to-fuchsia-600 p-6 flex justify-between items-center">
+                <div className="flex items-center space-x-4">
+                  <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl">
+                    <Shield className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">Insurance Information</h3>
-                    <p className="text-sm text-gray-600">Optional</p>
+                    <h3 className="text-2xl font-bold text-white tracking-tight">Insurance Information</h3>
+                    <p className="text-violet-100 text-sm mt-1">Optional - Add your insurance details</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsEditingInsurance(!isEditingInsurance)}
-                  className="flex items-center space-x-2 px-4 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors"
+                  className="flex items-center space-x-2 px-5 py-2.5 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
                 >
-                  {isEditingInsurance ? <Save className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
-                  <span>{isEditingInsurance ? 'Save' : 'Edit'}</span>
+                  {isEditingInsurance ? <Save className="w-5 h-5" /> : <Edit2 className="w-5 h-5" />}
+                  <span>{isEditingInsurance ? 'Save Changes' : 'Edit Insurance'}</span>
                 </button>
               </div>
-              <div className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Insurance Provider</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Insurance Provider</label>
                     <input
                       type="text"
                       disabled={!isEditingInsurance}
                       value={insuranceInfo.provider}
                       onChange={(e) => setInsuranceInfo({ ...insuranceInfo, provider: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-50"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
+                      placeholder="e.g., AXA, Daman, MetLife"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Policy Number</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Policy Number</label>
                     <input
                       type="text"
                       disabled={!isEditingInsurance}
                       value={insuranceInfo.policyNumber}
                       onChange={(e) => setInsuranceInfo({ ...insuranceInfo, policyNumber: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-50"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
+                      placeholder="Policy number"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Member ID</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Member ID</label>
                     <input
                       type="text"
                       disabled={!isEditingInsurance}
                       value={insuranceInfo.memberId}
                       onChange={(e) => setInsuranceInfo({ ...insuranceInfo, memberId: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-50"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
+                      placeholder="Member ID"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Group Number</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Group Number</label>
                     <input
                       type="text"
                       disabled={!isEditingInsurance}
                       value={insuranceInfo.groupNumber}
                       onChange={(e) => setInsuranceInfo({ ...insuranceInfo, groupNumber: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-50"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
+                      placeholder="Group number"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Coverage Type</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Coverage Type</label>
                     <input
                       type="text"
                       disabled={!isEditingInsurance}
                       value={insuranceInfo.coverageType}
                       onChange={(e) => setInsuranceInfo({ ...insuranceInfo, coverageType: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-50"
-                      placeholder="e.g., Premium, Basic"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
+                      placeholder="e.g., Premium, Basic, Gold"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Valid Until</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Valid Until</label>
                     <input
                       type="date"
                       disabled={!isEditingInsurance}
                       value={insuranceInfo.validUntil}
                       onChange={(e) => setInsuranceInfo({ ...insuranceInfo, validUntil: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-50"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-3">Insurance Card Image</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Insurance Card Image</label>
                     <div
                       onClick={() => isEditingInsurance && handleImageUpload('insurance')}
-                      className={`border-2 border-dashed border-gray-300 rounded-lg p-6 text-center ${isEditingInsurance ? 'cursor-pointer hover:border-purple-500 hover:bg-purple-50' : 'cursor-not-allowed'} transition-all`}
+                      className={`group border-2 border-dashed border-gray-300 rounded-2xl p-10 text-center transition-all duration-300 ${isEditingInsurance ? 'cursor-pointer hover:border-violet-500 hover:bg-violet-50/50' : 'cursor-not-allowed opacity-75'}`}
                     >
                       {insuranceInfo.cardImage ? (
-                        <img src={insuranceInfo.cardImage} alt="Insurance Card" className="max-h-40 mx-auto rounded" />
+                        <img src={insuranceInfo.cardImage} alt="Insurance Card" className="max-h-48 mx-auto rounded-xl shadow-lg" />
                       ) : (
-                        <div>
-                          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-600">Click to upload insurance card</p>
+                        <div className="space-y-3">
+                          <div className={`w-16 h-16 mx-auto bg-gray-100 rounded-2xl flex items-center justify-center transition-colors duration-300 ${isEditingInsurance ? 'group-hover:bg-violet-100' : ''}`}>
+                            <Upload className={`w-8 h-8 text-gray-400 transition-colors duration-300 ${isEditingInsurance ? 'group-hover:text-violet-600' : ''}`} />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-700">Click to upload</p>
+                            <p className="text-xs text-gray-500 mt-1">Insurance card image (front or back)</p>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -459,53 +526,60 @@ export const Profile: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
-              <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                  <div className="bg-orange-100 p-2 rounded-lg">
-                    <Users className="w-5 h-5 text-orange-600" />
+            <div className="bg-white rounded-3xl shadow-xl border border-gray-100/50 overflow-hidden">
+              <div className="bg-gradient-to-r from-orange-600 to-amber-600 p-6 flex justify-between items-center">
+                <div className="flex items-center space-x-4">
+                  <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl">
+                    <Users className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">Family Chart</h3>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white tracking-tight">Family Chart</h3>
+                    <p className="text-orange-100 text-sm mt-1">Manage your family members' profiles</p>
+                  </div>
                 </div>
                 <button
                   onClick={() => setShowAddFamily(true)}
-                  className="flex items-center space-x-2 px-4 py-2 bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100 transition-colors"
+                  className="flex items-center space-x-2 px-5 py-2.5 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-5 h-5" />
                   <span>Add Member</span>
                 </button>
               </div>
-              <div className="p-6">
+              <div className="p-8">
                 {familyMembers.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <Users className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                    <p>No family members added yet</p>
-                    <p className="text-sm">Add your family members to manage their health records</p>
+                  <div className="text-center py-16 text-gray-500">
+                    <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-orange-100 to-amber-100 rounded-3xl flex items-center justify-center">
+                      <Users className="w-10 h-10 text-orange-500" />
+                    </div>
+                    <p className="text-lg font-semibold text-gray-700">No family members added yet</p>
+                    <p className="text-sm text-gray-500 mt-2">Add your family members to manage their health records</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {familyMembers.map((member) => (
-                      <div key={member.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div key={member.id} className="group border-2 border-gray-200 rounded-2xl p-5 hover:shadow-xl hover:border-orange-200 transition-all duration-300 bg-gradient-to-br from-white to-orange-50/30">
                         <div className="flex items-start justify-between">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-orange-400 to-amber-400 flex items-center justify-center ring-4 ring-orange-100 group-hover:ring-orange-200 transition-all duration-300">
                               {member.profileImage ? (
                                 <img src={member.profileImage} alt={member.name} className="w-full h-full rounded-full object-cover" />
                               ) : (
-                                <User className="w-6 h-6 text-orange-600" />
+                                <User className="w-7 h-7 text-white" />
                               )}
                             </div>
                             <div>
-                              <h4 className="font-semibold text-gray-900">{member.name}</h4>
-                              <p className="text-sm text-gray-600">{member.relationship}</p>
-                              <p className="text-xs text-gray-500">{member.dateOfBirth}</p>
+                              <h4 className="font-bold text-gray-900 text-lg">{member.name}</h4>
+                              <p className="text-sm text-orange-600 font-medium">{member.relationship}</p>
+                              {member.dateOfBirth && (
+                                <p className="text-xs text-gray-500 mt-1">{member.dateOfBirth}</p>
+                              )}
                             </div>
                           </div>
                           <button
                             onClick={() => removeFamilyMember(member.id)}
-                            className="text-red-500 hover:text-red-700 transition-colors"
+                            className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-5 h-5" />
                           </button>
                         </div>
                       </div>
@@ -514,26 +588,27 @@ export const Profile: React.FC = () => {
                 )}
 
                 {showAddFamily && (
-                  <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <h4 className="font-semibold text-gray-900 mb-4">Add Family Member</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="mt-6 p-6 bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl border-2 border-orange-200">
+                    <h4 className="font-bold text-gray-900 mb-5 text-lg">Add Family Member</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Name</label>
                         <input
                           type="text"
                           value={newFamilyMember.name || ''}
                           onChange={(e) => setNewFamilyMember({ ...newFamilyMember, name: e.target.value })}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          className="w-full px-4 py-3 border-2 border-orange-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white font-medium"
+                          placeholder="Enter name"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Relationship</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Relationship</label>
                         <select
                           value={newFamilyMember.relationship || ''}
                           onChange={(e) => setNewFamilyMember({ ...newFamilyMember, relationship: e.target.value })}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          className="w-full px-4 py-3 border-2 border-orange-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white font-medium"
                         >
-                          <option value="">Select</option>
+                          <option value="">Select Relationship</option>
                           <option value="Spouse">Spouse</option>
                           <option value="Child">Child</option>
                           <option value="Parent">Parent</option>
@@ -542,28 +617,29 @@ export const Profile: React.FC = () => {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Date of Birth</label>
                         <input
                           type="date"
                           value={newFamilyMember.dateOfBirth || ''}
                           onChange={(e) => setNewFamilyMember({ ...newFamilyMember, dateOfBirth: e.target.value })}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          className="w-full px-4 py-3 border-2 border-orange-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white font-medium"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Emirates ID</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Emirates ID</label>
                         <input
                           type="text"
                           value={newFamilyMember.emiratesId || ''}
                           onChange={(e) => setNewFamilyMember({ ...newFamilyMember, emiratesId: e.target.value })}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          className="w-full px-4 py-3 border-2 border-orange-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white font-medium"
+                          placeholder="784-XXXX-XXXXXXX-X"
                         />
                       </div>
                     </div>
-                    <div className="flex space-x-3 mt-4">
+                    <div className="flex space-x-3 mt-6">
                       <button
                         onClick={addFamilyMember}
-                        className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                        className="px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold"
                       >
                         Add Member
                       </button>
@@ -572,7 +648,7 @@ export const Profile: React.FC = () => {
                           setShowAddFamily(false);
                           setNewFamilyMember({});
                         }}
-                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                        className="px-6 py-3 bg-white text-gray-700 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 font-semibold"
                       >
                         Cancel
                       </button>
