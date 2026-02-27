@@ -139,7 +139,7 @@ export const LinkFamily: React.FC = () => {
   };
 
   const handleFinish = () => {
-    const redirectPath = userProfile?.role === 'doctor' ? '/doctor/dashboard' : '/patient/dashboard';
+    const redirectPath = userProfile?.role === 'doctor' ? '/doctor/profile' : '/patient/profile';
     navigate(redirectPath);
   };
 
@@ -292,7 +292,7 @@ export const LinkFamily: React.FC = () => {
               onClick={handleFinish}
               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors"
             >
-              {linkedMembers.length > 0 ? 'Finish & Go to Dashboard' : 'Skip for Now'}
+              {linkedMembers.length > 0 ? 'Continue to Profile' : 'Skip & Go to Profile'}
             </button>
           </div>
 
