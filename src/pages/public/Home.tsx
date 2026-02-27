@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MessageSquare, Search, Building2, Shield, BookOpen, Calendar } from 'lucide-react';
+import { MessageSquare, Search, Building2, Shield, BookOpen, User, Stethoscope } from 'lucide-react';
 import { GeometricBackground } from '../../components/GeometricBackground';
 
 export const Home: React.FC = () => {
@@ -43,11 +43,18 @@ export const Home: React.FC = () => {
       gradient: 'from-ceenai-cyan to-ceenai-blue-light',
     },
     {
-      icon: Calendar,
-      title: 'Book Appointment',
-      description: 'Schedule consultations with healthcare providers',
-      action: () => navigate('/auth'),
+      icon: User,
+      title: 'Patient Profile',
+      description: 'Manage your health information and medical history',
+      action: () => navigate('/patient/profile'),
       gradient: 'from-ceenai-blue to-ceenai-cyan',
+    },
+    {
+      icon: Stethoscope,
+      title: 'Doctor Profile',
+      description: 'Professional profile for healthcare providers',
+      action: () => navigate('/doctor/profile'),
+      gradient: 'from-ceenai-navy to-ceenai-blue',
     },
   ];
 
@@ -67,12 +74,20 @@ export const Home: React.FC = () => {
                 CeenAiX
               </span>
             </div>
-            <button
-              onClick={() => navigate('/auth')}
-              className="px-6 py-2 bg-gradient-to-r from-ceenai-cyan to-ceenai-blue hover:from-ceenai-cyan-dark hover:to-ceenai-blue-dark text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg"
-            >
-              Sign In
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => navigate('/patient/profile')}
+                className="px-4 py-2 bg-gradient-to-r from-ceenai-cyan to-ceenai-blue hover:from-ceenai-cyan-dark hover:to-ceenai-blue-dark text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg"
+              >
+                Patient
+              </button>
+              <button
+                onClick={() => navigate('/doctor/profile')}
+                className="px-4 py-2 bg-gradient-to-r from-ceenai-navy to-ceenai-blue hover:from-ceenai-navy-dark hover:to-ceenai-blue-dark text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg"
+              >
+                Doctor
+              </button>
+            </div>
           </div>
         </div>
       </nav>
@@ -131,12 +146,20 @@ export const Home: React.FC = () => {
               Join thousands of patients and healthcare providers using CeenAiX for smarter,
               faster, and more personalized care.
             </p>
-            <button
-              onClick={() => navigate('/auth')}
-              className="px-8 py-4 bg-white text-ceenai-blue hover:bg-gray-50 font-bold rounded-xl transition-all text-lg shadow-xl hover:shadow-2xl hover:scale-105"
-            >
-              Create Free Account
-            </button>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={() => navigate('/patient/profile')}
+                className="px-8 py-4 bg-white text-ceenai-blue hover:bg-gray-50 font-bold rounded-xl transition-all text-lg shadow-xl hover:shadow-2xl hover:scale-105"
+              >
+                Patient Portal
+              </button>
+              <button
+                onClick={() => navigate('/doctor/profile')}
+                className="px-8 py-4 bg-white text-ceenai-navy hover:bg-gray-50 font-bold rounded-xl transition-all text-lg shadow-xl hover:shadow-2xl hover:scale-105"
+              >
+                Doctor Portal
+              </button>
+            </div>
           </div>
         </div>
       </div>
