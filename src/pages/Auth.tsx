@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, UserRole } from '../context/AuthContext';
-import { Mail, Lock, User, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, User, AlertCircle, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { TermsModal } from '../components/TermsModal';
 import { PrivacyModal } from '../components/PrivacyModal';
 import { OnboardingCarousel } from '../components/OnboardingCarousel';
@@ -78,6 +78,14 @@ export const Auth: React.FC = () => {
         </div>
 
         <div className="w-full max-w-md relative z-10 my-8 animate-fade-in">
+          <button
+            onClick={() => navigate('/')}
+            className="group flex items-center space-x-2 text-gray-600 hover:text-cyan-600 mb-6 transition-all duration-300 transform hover:-translate-x-1"
+          >
+            <ArrowLeft className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+            <span className="text-sm font-medium">Back to Home</span>
+          </button>
+
           <div className="text-center mb-8 transform transition-all duration-500 hover:scale-105">
             <div className="flex items-center justify-center mb-6">
               <img
