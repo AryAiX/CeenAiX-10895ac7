@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, UserRole } from '../context/AuthContext';
 import { Heart, Mail, Lock, User, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { TermsModal } from '../components/TermsModal';
+import { PrivacyModal } from '../components/PrivacyModal';
 
 export const Auth: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -13,6 +15,8 @@ export const Auth: React.FC = () => {
   const [role, setRole] = useState<UserRole>('patient');
   const [showPassword, setShowPassword] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -204,13 +208,27 @@ export const Auth: React.FC = () => {
                   />
                   <label htmlFor="terms" className="text-sm text-gray-700">
                     I accept the{' '}
-                    <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowTermsModal(true);
+                      }}
+                      className="text-blue-600 hover:text-blue-700 font-medium underline"
+                    >
                       Terms and Conditions
-                    </a>{' '}
+                    </button>{' '}
                     and{' '}
-                    <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowPrivacyModal(true);
+                      }}
+                      className="text-blue-600 hover:text-blue-700 font-medium underline"
+                    >
                       Privacy Policy
-                    </a>
+                    </button>
                   </label>
                 </div>
               </>
@@ -300,6 +318,9 @@ export const Auth: React.FC = () => {
           Secure healthcare platform with AI-powered insights
         </p>
       </div>
+
+      <TermsModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
+      <PrivacyModal isOpen={showPrivacyModal} onClose={() => setShowPrivacyModal(false)} />
     </div>
   );
 };
