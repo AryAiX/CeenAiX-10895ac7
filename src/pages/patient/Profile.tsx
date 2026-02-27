@@ -125,18 +125,21 @@ export const Profile: React.FC = () => {
               </div>
 
               <div className="mt-6 space-y-3">
-                <div className="bg-blue-50 rounded-lg p-3">
+                <div className="bg-blue-50 rounded-lg p-3 cursor-pointer hover:bg-blue-100 transition-colors" onClick={() => setIsEditingPersonal(true)}>
                   <p className="text-sm text-gray-600">Blood Type</p>
                   <p className="font-semibold text-gray-900">{personalInfo.bloodType || 'Not Set'}</p>
+                  {!isEditingPersonal && <p className="text-xs text-blue-600 mt-1">Click to edit</p>}
                 </div>
-                <div className="bg-cyan-50 rounded-lg p-3">
+                <div className="bg-cyan-50 rounded-lg p-3 cursor-pointer hover:bg-cyan-100 transition-colors" onClick={() => setIsEditingPersonal(true)}>
                   <p className="text-sm text-gray-600">Date of Birth</p>
                   <p className="font-semibold text-gray-900">{personalInfo.dateOfBirth || 'Not Set'}</p>
+                  {!isEditingPersonal && <p className="text-xs text-cyan-600 mt-1">Click to edit</p>}
                 </div>
-                <div className="bg-red-50 rounded-lg p-3">
+                <div className="bg-red-50 rounded-lg p-3 cursor-pointer hover:bg-red-100 transition-colors" onClick={() => setIsEditingPersonal(true)}>
                   <p className="text-sm text-gray-600">Emergency Contact</p>
                   <p className="font-semibold text-gray-900">{personalInfo.emergencyContactName || 'Not Set'}</p>
                   <p className="text-sm text-gray-600">{personalInfo.emergencyContactPhone}</p>
+                  {!isEditingPersonal && <p className="text-xs text-red-600 mt-1">Click to edit</p>}
                 </div>
               </div>
             </div>
