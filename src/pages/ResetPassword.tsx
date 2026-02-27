@@ -1,25 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Heart, Lock, AlertCircle, CheckCircle } from 'lucide-react';
 
 export const ResetPassword: React.FC = () => {
-  const [searchParams] = useSearchParams();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [validToken, setValidToken] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const accessToken = searchParams.get('access_token');
-    const type = searchParams.get('type');
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
 
-    if (!accessToken || type !== 'recovery') {
-      setError('Invalid or expired reset link. Please request a new password reset.');
-    }
-  }, [searchParams]);
+      if (session) {
+        setValidToken(true);
+      } else {
+        setError('Invalid or expired reset link. Please request a new password reset.');
+      }
+    };
+
+    checkSession();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,6 +98,12 @@ export const ResetPassword: React.FC = () => {
             </div>
           )}
 
+          {!validToken && !error && (
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">Verifying reset link...</p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-2">
@@ -132,7 +143,7 @@ export const ResetPassword: React.FC = () => {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !validToken}
               className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2.5 rounded-lg transition-colors mt-6"
             >
               {loading ? 'Updating...' : 'Update Password'}
