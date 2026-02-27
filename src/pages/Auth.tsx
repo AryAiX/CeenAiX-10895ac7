@@ -65,35 +65,36 @@ export const Auth: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white flex overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex overflow-hidden">
       <div className="hidden lg:flex lg:w-1/2 xl:w-3/5">
         <OnboardingCarousel />
       </div>
 
-      <div className="w-full lg:w-1/2 xl:w-2/5 flex items-center justify-center p-8 bg-gradient-to-br from-white via-ceenai-cyan/5 to-ceenai-blue/5 relative overflow-y-auto">
+      <div className="w-full lg:w-1/2 xl:w-2/5 flex items-center justify-center p-8 bg-gradient-to-br from-white via-slate-50/30 to-white relative overflow-y-auto">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 right-20 w-64 h-64 bg-gradient-to-br from-ceenai-cyan/10 to-ceenai-blue/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 left-20 w-64 h-64 bg-gradient-to-tl from-ceenai-blue/10 to-ceenai-cyan/10 rounded-full blur-3xl" />
+          <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-cyan-100/30 to-blue-100/30 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
+          <div className="absolute bottom-20 left-20 w-96 h-96 bg-gradient-to-tl from-blue-100/30 to-teal-100/30 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-r from-emerald-100/20 to-cyan-100/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }} />
         </div>
 
-        <div className="w-full max-w-md relative z-10 my-8">
-          <div className="text-center mb-8">
+        <div className="w-full max-w-md relative z-10 my-8 animate-fade-in">
+          <div className="text-center mb-8 transform transition-all duration-500 hover:scale-105">
             <div className="flex items-center justify-center mb-6">
               <img
                 src="/ChatGPT_Image_Feb_27,_2026,_11_30_50_AM.png"
                 alt="CeenAiX Logo"
-                className="h-20 w-auto"
+                className="h-20 w-auto drop-shadow-lg transition-transform duration-500 hover:scale-110"
               />
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-ceenai-cyan to-ceenai-blue bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-600 via-blue-600 to-teal-600 bg-clip-text text-transparent mb-2 transition-all duration-300">
               {isSignUp ? 'Create Account' : isForgotPassword ? 'Reset Password' : 'Welcome Back'}
             </h1>
-            <p className="text-gray-600 mt-2">
+            <p className="text-gray-600 mt-2 text-base">
               {isSignUp ? 'Join CeenAiX today' : isForgotPassword ? 'We\'ll send you a reset link' : 'Sign in to continue'}
             </p>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-ceenai-cyan/20">
+          <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-cyan-100/40 transform transition-all duration-500 hover:shadow-cyan-100/50 hover:border-cyan-200/60 hover:bg-white/80">
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-3">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -123,7 +124,7 @@ export const Auth: React.FC = () => {
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         placeholder="First name"
-                        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ceenai-cyan"
+                        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-300"
                         required
                       />
                     </div>
@@ -137,7 +138,7 @@ export const Auth: React.FC = () => {
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       placeholder="Last name"
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ceenai-cyan"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-300"
                       required
                     />
                   </div>
@@ -156,7 +157,7 @@ export const Auth: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ceenai-cyan"
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-300"
                   required
                 />
               </div>
@@ -174,7 +175,7 @@ export const Auth: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ceenai-cyan"
+                    className="w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-300"
                     required
                   />
                   <button
@@ -204,10 +205,10 @@ export const Auth: React.FC = () => {
                         key={r.value}
                         type="button"
                         onClick={() => setRole(r.value)}
-                        className={`p-3 rounded-lg border-2 transition-all text-sm ${
+                        className={`p-3 rounded-xl border-2 transition-all duration-300 text-sm transform hover:scale-105 ${
                           role === r.value
-                            ? 'border-ceenai-cyan bg-ceenai-cyan/10 font-medium text-ceenai-blue-dark'
-                            : 'border-gray-300 bg-white text-gray-700 hover:border-ceenai-cyan/40'
+                            ? 'border-cyan-500 bg-gradient-to-r from-cyan-50 to-blue-50 font-semibold text-cyan-700 shadow-md shadow-cyan-100'
+                            : 'border-gray-300 bg-white text-gray-700 hover:border-cyan-300 hover:shadow-sm'
                         }`}
                       >
                         {r.label}
@@ -256,7 +257,7 @@ export const Auth: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-ceenai-cyan to-ceenai-blue hover:from-ceenai-cyan-dark hover:to-ceenai-blue-dark disabled:bg-gray-400 text-white font-medium py-2.5 rounded-lg transition-colors mt-6"
+              className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 rounded-xl transition-all duration-300 mt-6 transform hover:scale-[1.02] hover:shadow-lg hover:shadow-cyan-200/50 active:scale-[0.98]"
             >
               {loading
                 ? 'Processing...'
