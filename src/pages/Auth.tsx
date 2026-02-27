@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, UserRole } from '../context/AuthContext';
-import { Heart, Mail, Lock, User, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, User, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { TermsModal } from '../components/TermsModal';
 import { PrivacyModal } from '../components/PrivacyModal';
+import { GeometricBackground } from '../components/GeometricBackground';
 
 export const Auth: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -64,17 +65,24 @@ export const Auth: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-100 flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-ceenai-cyan/10 via-white to-ceenai-blue/10 flex items-center justify-center px-4 relative overflow-hidden">
+      <GeometricBackground />
+      <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <Heart className="w-12 h-12 text-blue-600" />
+          <div className="flex items-center justify-center mb-6">
+            <img
+              src="/ChatGPT_Image_Feb_27,_2026,_11_30_50_AM.png"
+              alt="CeenAiX Logo"
+              className="h-24 w-auto"
+            />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">CeenAiX</h1>
-          <p className="text-gray-600 mt-2">Smart Healthcare Platform</p>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-ceenai-cyan to-ceenai-blue bg-clip-text text-transparent">
+            CeenAiX
+          </h1>
+          <p className="text-gray-700 mt-2 font-medium">AI That Sees Health</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-ceenai-cyan/20">
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-3">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -104,7 +112,7 @@ export const Auth: React.FC = () => {
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         placeholder="First name"
-                        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ceenai-cyan"
                         required
                       />
                     </div>
@@ -118,7 +126,7 @@ export const Auth: React.FC = () => {
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       placeholder="Last name"
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ceenai-cyan"
                       required
                     />
                   </div>
@@ -137,7 +145,7 @@ export const Auth: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ceenai-cyan"
                   required
                 />
               </div>
@@ -155,7 +163,7 @@ export const Auth: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ceenai-cyan"
                     required
                   />
                   <button
@@ -187,8 +195,8 @@ export const Auth: React.FC = () => {
                         onClick={() => setRole(r.value)}
                         className={`p-3 rounded-lg border-2 transition-all text-sm ${
                           role === r.value
-                            ? 'border-blue-500 bg-blue-50 font-medium text-blue-900'
-                            : 'border-gray-300 bg-white text-gray-700 hover:border-blue-200'
+                            ? 'border-ceenai-cyan bg-ceenai-cyan/10 font-medium text-ceenai-blue-dark'
+                            : 'border-gray-300 bg-white text-gray-700 hover:border-ceenai-cyan/40'
                         }`}
                       >
                         {r.label}
@@ -203,7 +211,7 @@ export const Auth: React.FC = () => {
                     id="terms"
                     checked={termsAccepted}
                     onChange={(e) => setTermsAccepted(e.target.checked)}
-                    className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    className="mt-1 w-4 h-4 text-ceenai-blue border-gray-300 rounded focus:ring-blue-500"
                     required
                   />
                   <label htmlFor="terms" className="text-sm text-gray-700">
@@ -214,7 +222,7 @@ export const Auth: React.FC = () => {
                         e.preventDefault();
                         setShowTermsModal(true);
                       }}
-                      className="text-blue-600 hover:text-blue-700 font-medium underline"
+                      className="text-ceenai-blue hover:text-ceenai-blue-dark font-medium underline"
                     >
                       Terms and Conditions
                     </button>{' '}
@@ -225,7 +233,7 @@ export const Auth: React.FC = () => {
                         e.preventDefault();
                         setShowPrivacyModal(true);
                       }}
-                      className="text-blue-600 hover:text-blue-700 font-medium underline"
+                      className="text-ceenai-blue hover:text-ceenai-blue-dark font-medium underline"
                     >
                       Privacy Policy
                     </button>
@@ -237,7 +245,7 @@ export const Auth: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2.5 rounded-lg transition-colors mt-6"
+              className="w-full bg-gradient-to-r from-ceenai-cyan to-ceenai-blue hover:from-ceenai-cyan-dark hover:to-ceenai-blue-dark disabled:bg-gray-400 text-white font-medium py-2.5 rounded-lg transition-colors mt-6"
             >
               {loading
                 ? 'Processing...'
@@ -257,7 +265,7 @@ export const Auth: React.FC = () => {
                   setError('');
                   setSuccess('');
                 }}
-                className="text-sm text-blue-600 hover:text-blue-700"
+                className="text-sm text-ceenai-blue hover:text-ceenai-blue-dark"
               >
                 Forgot password?
               </button>
@@ -276,7 +284,7 @@ export const Auth: React.FC = () => {
                       setError('');
                       setSuccess('');
                     }}
-                    className="text-blue-600 hover:text-blue-700 font-medium"
+                    className="text-ceenai-blue hover:text-ceenai-blue-dark font-medium"
                   >
                     Sign In
                   </button>
@@ -290,7 +298,7 @@ export const Auth: React.FC = () => {
                       setError('');
                       setSuccess('');
                     }}
-                    className="text-blue-600 hover:text-blue-700 font-medium"
+                    className="text-ceenai-blue hover:text-ceenai-blue-dark font-medium"
                   >
                     Sign In
                   </button>
@@ -304,7 +312,7 @@ export const Auth: React.FC = () => {
                       setError('');
                       setSuccess('');
                     }}
-                    className="text-blue-600 hover:text-blue-700 font-medium"
+                    className="text-ceenai-blue hover:text-ceenai-blue-dark font-medium"
                   >
                     Sign Up
                   </button>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, MessageSquare, Search, Building2, Shield, BookOpen, Calendar } from 'lucide-react';
+import { MessageSquare, Search, Building2, Shield, BookOpen, Calendar } from 'lucide-react';
+import { GeometricBackground } from '../../components/GeometricBackground';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -11,57 +12,64 @@ export const Home: React.FC = () => {
       title: 'AI Health Chat',
       description: 'Get instant medical guidance from our AI-powered health assistant',
       action: () => navigate('/ai-chat'),
-      color: 'blue',
+      gradient: 'from-ceenai-cyan to-ceenai-blue',
     },
     {
       icon: Search,
       title: 'Find a Doctor',
       description: 'Browse specialists by expertise, location, and availability',
       action: () => navigate('/find-doctor'),
-      color: 'green',
+      gradient: 'from-ceenai-blue to-ceenai-navy',
     },
     {
       icon: Building2,
       title: 'Find Clinics',
       description: 'Discover healthcare facilities near you',
       action: () => navigate('/find-clinic'),
-      color: 'purple',
+      gradient: 'from-ceenai-cyan-light to-ceenai-cyan',
     },
     {
       icon: Shield,
       title: 'Insurance Plans',
       description: 'Compare coverage options and find the right plan',
       action: () => navigate('/insurance'),
-      color: 'orange',
+      gradient: 'from-ceenai-blue-dark to-ceenai-blue',
     },
     {
       icon: BookOpen,
       title: 'Health Education',
       description: 'Access medical articles and preventive care guides',
       action: () => navigate('/health-education'),
-      color: 'cyan',
+      gradient: 'from-ceenai-cyan to-ceenai-blue-light',
     },
     {
       icon: Calendar,
       title: 'Book Appointment',
       description: 'Schedule consultations with healthcare providers',
       action: () => navigate('/auth'),
-      color: 'red',
+      gradient: 'from-ceenai-blue to-ceenai-cyan',
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
-      <nav className="bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-50">
+    <div className="min-h-screen bg-gradient-to-br from-ceenai-cyan/5 via-white to-ceenai-blue/5 relative overflow-hidden">
+      <GeometricBackground />
+      <nav className="bg-white/90 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-ceenai-cyan/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <Heart className="w-8 h-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">CeenAiX</span>
+              <img
+                src="/ChatGPT_Image_Feb_27,_2026,_11_30_50_AM.png"
+                alt="CeenAiX Logo"
+                className="h-10 w-auto"
+              />
+              <span className="text-2xl font-bold bg-gradient-to-r from-ceenai-cyan to-ceenai-blue bg-clip-text text-transparent">
+                CeenAiX
+              </span>
             </div>
             <button
               onClick={() => navigate('/auth')}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+              className="px-6 py-2 bg-gradient-to-r from-ceenai-cyan to-ceenai-blue hover:from-ceenai-cyan-dark hover:to-ceenai-blue-dark text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg"
             >
               Sign In
             </button>
@@ -69,13 +77,20 @@ export const Home: React.FC = () => {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
         <div className="text-center mb-16">
+          <div className="flex justify-center mb-8">
+            <img
+              src="/ChatGPT_Image_Feb_27,_2026,_11_30_50_AM.png"
+              alt="CeenAiX Logo"
+              className="h-32 w-auto animate-float"
+            />
+          </div>
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
             Your Health,
-            <span className="text-blue-600"> Reimagined</span>
+            <span className="bg-gradient-to-r from-ceenai-cyan to-ceenai-blue bg-clip-text text-transparent"> Reimagined</span>
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed font-medium">
             Experience healthcare powered by AI. Get instant medical insights, connect with top specialists,
             and manage your health journey all in one intelligent platform.
           </p>
@@ -84,25 +99,17 @@ export const Home: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
           {features.map((feature, index) => {
             const Icon = feature.icon;
-            const colorClasses = {
-              blue: 'bg-blue-50 text-blue-600 hover:bg-blue-100',
-              green: 'bg-green-50 text-green-600 hover:bg-green-100',
-              purple: 'bg-purple-50 text-purple-600 hover:bg-purple-100',
-              orange: 'bg-orange-50 text-orange-600 hover:bg-orange-100',
-              cyan: 'bg-cyan-50 text-cyan-600 hover:bg-cyan-100',
-              red: 'bg-red-50 text-red-600 hover:bg-red-100',
-            }[feature.color];
 
             return (
               <button
                 key={index}
                 onClick={feature.action}
-                className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all p-8 text-left group"
+                className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all p-8 text-left group border border-ceenai-cyan/20 hover:border-ceenai-cyan/50 hover:-translate-y-1"
               >
-                <div className={`w-14 h-14 rounded-xl ${colorClasses} flex items-center justify-center mb-4 transition-colors`}>
-                  <Icon className="w-7 h-7" />
+                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 shadow-md group-hover:scale-110 transition-transform`}>
+                  <Icon className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:bg-gradient-to-r group-hover:from-ceenai-cyan group-hover:to-ceenai-blue group-hover:bg-clip-text group-hover:text-transparent transition-all">
                   {feature.title}
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
@@ -113,18 +120,24 @@ export const Home: React.FC = () => {
           })}
         </div>
 
-        <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-3xl p-12 text-center text-white shadow-xl">
-          <h2 className="text-3xl font-bold mb-4">Ready to Transform Your Healthcare?</h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of patients and healthcare providers using CeenAiX for smarter,
-            faster, and more personalized care.
-          </p>
-          <button
-            onClick={() => navigate('/auth')}
-            className="px-8 py-4 bg-white text-blue-600 hover:bg-blue-50 font-bold rounded-xl transition-colors text-lg shadow-lg"
-          >
-            Create Free Account
-          </button>
+        <div className="bg-gradient-to-r from-ceenai-cyan via-ceenai-blue to-ceenai-navy rounded-3xl p-12 text-center text-white shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-white rounded-full blur-3xl" />
+          </div>
+          <div className="relative z-10">
+            <h2 className="text-3xl font-bold mb-4">Ready to Transform Your Healthcare?</h2>
+            <p className="text-xl text-ceenai-cyan-light mb-8 max-w-2xl mx-auto">
+              Join thousands of patients and healthcare providers using CeenAiX for smarter,
+              faster, and more personalized care.
+            </p>
+            <button
+              onClick={() => navigate('/auth')}
+              className="px-8 py-4 bg-white text-ceenai-blue hover:bg-gray-50 font-bold rounded-xl transition-all text-lg shadow-xl hover:shadow-2xl hover:scale-105"
+            >
+              Create Free Account
+            </button>
+          </div>
         </div>
       </div>
 

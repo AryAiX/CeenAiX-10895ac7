@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
-import { Heart, Search, Users, AlertCircle, Plus, X, CheckCircle } from 'lucide-react';
+import { Search, Users, AlertCircle, Plus, X, CheckCircle } from 'lucide-react';
+import { GeometricBackground } from '../components/GeometricBackground';
 
 interface SearchResult {
   user_id: string;
@@ -144,19 +145,26 @@ export const LinkFamily: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-100 flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-3xl">
+    <div className="min-h-screen bg-gradient-to-br from-ceenai-cyan/10 via-white to-ceenai-blue/10 flex items-center justify-center px-4 py-8 relative overflow-hidden">
+      <GeometricBackground />
+      <div className="w-full max-w-3xl relative z-10">
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <Heart className="w-12 h-12 text-blue-600" />
+          <div className="flex items-center justify-center mb-6">
+            <img
+              src="/ChatGPT_Image_Feb_27,_2026,_11_30_50_AM.png"
+              alt="CeenAiX Logo"
+              className="h-20 w-auto"
+            />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Link Family Members</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-ceenai-cyan to-ceenai-blue bg-clip-text text-transparent">
+            Link Family Members
+          </h1>
+          <p className="text-gray-700 mt-2">
             Connect with family members to share medical history and information
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-ceenai-cyan/20">
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-3">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -184,13 +192,13 @@ export const LinkFamily: React.FC = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search by name, email, or Emirates ID"
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ceenai-cyan"
                 />
               </div>
               <button
                 type="submit"
                 disabled={searching || !searchTerm.trim()}
-                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors"
+                className="px-6 py-2.5 bg-gradient-to-r from-ceenai-cyan to-ceenai-blue hover:from-ceenai-cyan-dark hover:to-ceenai-blue-dark shadow-lg hover:shadow-xl disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors"
               >
                 {searching ? 'Searching...' : 'Search'}
               </button>
@@ -205,7 +213,7 @@ export const LinkFamily: React.FC = () => {
                 {searchResults.map((result) => (
                   <div
                     key={result.user_id}
-                    className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors"
+                    className="p-4 border border-gray-200 rounded-lg hover:border-ceenai-cyan/50 transition-colors"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -226,7 +234,7 @@ export const LinkFamily: React.FC = () => {
                               [result.user_id]: e.target.value,
                             })
                           }
-                          className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ceenai-cyan"
                         >
                           <option value="">Select relationship</option>
                           {relationshipOptions.map((rel) => (
@@ -255,14 +263,14 @@ export const LinkFamily: React.FC = () => {
           {linkedMembers.length > 0 && (
             <div className="mb-8">
               <div className="flex items-center space-x-2 mb-3">
-                <Users className="w-5 h-5 text-blue-600" />
+                <Users className="w-5 h-5 text-ceenai-cyan" />
                 <h3 className="text-sm font-semibold text-gray-900">Linked Family Members</h3>
               </div>
               <div className="space-y-2">
                 {linkedMembers.map((member) => (
                   <div
                     key={member.linked_user_id}
-                    className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between"
+                    className="p-3 bg-gradient-to-r from-ceenai-cyan/10 to-ceenai-blue/10 border border-ceenai-cyan/30 rounded-lg flex items-center justify-between"
                   >
                     <div>
                       <h4 className="font-medium text-gray-900">
@@ -290,7 +298,7 @@ export const LinkFamily: React.FC = () => {
           <div className="flex space-x-3">
             <button
               onClick={handleFinish}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors"
+              className="flex-1 bg-gradient-to-r from-ceenai-cyan to-ceenai-blue hover:from-ceenai-cyan-dark hover:to-ceenai-blue-dark shadow-lg hover:shadow-xl text-white font-medium py-3 rounded-lg transition-colors"
             >
               {linkedMembers.length > 0 ? 'Continue to Profile' : 'Skip & Go to Profile'}
             </button>

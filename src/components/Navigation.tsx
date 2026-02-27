@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Menu, X, Heart } from 'lucide-react';
+import { LogOut, Menu, X } from 'lucide-react';
 
 export const Navigation: React.FC = () => {
   const navigate = useNavigate();
@@ -45,15 +45,21 @@ export const Navigation: React.FC = () => {
   const navLinks = getNavLinks();
 
   return (
-    <nav className="bg-white shadow-sm sticky top-0 z-40">
+    <nav className="bg-white/95 backdrop-blur-sm shadow-lg sticky top-0 z-40 border-b border-ceenai-cyan/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div
-            className="flex items-center cursor-pointer"
+            className="flex items-center cursor-pointer space-x-3"
             onClick={() => navigate('/')}
           >
-            <Heart className="w-8 h-8 text-blue-600 mr-2" />
-            <span className="text-xl font-bold text-gray-900">CeenAiX</span>
+            <img
+              src="/ChatGPT_Image_Feb_27,_2026,_11_30_50_AM.png"
+              alt="CeenAiX Logo"
+              className="h-10 w-auto"
+            />
+            <span className="text-xl font-bold bg-gradient-to-r from-ceenai-cyan to-ceenai-blue bg-clip-text text-transparent">
+              CeenAiX
+            </span>
           </div>
 
           <div className="hidden md:flex items-center space-x-1">
@@ -61,7 +67,7 @@ export const Navigation: React.FC = () => {
               <button
                 key={link.href}
                 onClick={() => navigate(link.href)}
-                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors"
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-ceenai-cyan hover:bg-gray-50 transition-colors"
               >
                 {link.label}
               </button>
@@ -98,7 +104,7 @@ export const Navigation: React.FC = () => {
                   navigate(link.href);
                   setMobileMenuOpen(false);
                 }}
-                className="block w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                className="block w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-ceenai-cyan hover:bg-gray-50"
               >
                 {link.label}
               </button>

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
-import { Heart, CreditCard, FileText, AlertCircle, Calendar, ArrowRight } from 'lucide-react';
+import { CreditCard, FileText, AlertCircle, Calendar, ArrowRight } from 'lucide-react';
+import { GeometricBackground } from '../components/GeometricBackground';
 
 export const CompleteProfile: React.FC = () => {
   const [uaeIdNumber, setUaeIdNumber] = useState('');
@@ -57,17 +58,24 @@ export const CompleteProfile: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-100 flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-2xl">
+    <div className="min-h-screen bg-gradient-to-br from-ceenai-cyan/10 via-white to-ceenai-blue/10 flex items-center justify-center px-4 py-8 relative overflow-hidden">
+      <GeometricBackground />
+      <div className="w-full max-w-2xl relative z-10">
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <Heart className="w-12 h-12 text-blue-600" />
+          <div className="flex items-center justify-center mb-6">
+            <img
+              src="/ChatGPT_Image_Feb_27,_2026,_11_30_50_AM.png"
+              alt="CeenAiX Logo"
+              className="h-20 w-auto"
+            />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Complete Your Profile</h1>
-          <p className="text-gray-600 mt-2">Please provide your identification and insurance details</p>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-ceenai-cyan to-ceenai-blue bg-clip-text text-transparent">
+            Complete Your Profile
+          </h1>
+          <p className="text-gray-700 mt-2">Please provide your identification and insurance details</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-ceenai-cyan/20">
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-3">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -79,7 +87,7 @@ export const CompleteProfile: React.FC = () => {
             {/* UAE ID Section */}
             <div className="border-b border-gray-200 pb-6">
               <div className="flex items-center space-x-2 mb-4">
-                <CreditCard className="w-5 h-5 text-blue-600" />
+                <CreditCard className="w-5 h-5 text-ceenai-cyan" />
                 <h2 className="text-lg font-semibold text-gray-900">Emirates ID Information</h2>
               </div>
 
@@ -93,7 +101,7 @@ export const CompleteProfile: React.FC = () => {
                     value={uaeIdNumber}
                     onChange={(e) => setUaeIdNumber(e.target.value)}
                     placeholder="784-YYYY-NNNNNNN-N"
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ceenai-cyan"
                     required
                   />
                   <p className="text-xs text-gray-500 mt-1">Format: 784-YYYY-NNNNNNN-N</p>
@@ -109,7 +117,7 @@ export const CompleteProfile: React.FC = () => {
                       type="date"
                       value={uaeIdExpiry}
                       onChange={(e) => setUaeIdExpiry(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ceenai-cyan"
                       required
                     />
                   </div>
@@ -120,7 +128,7 @@ export const CompleteProfile: React.FC = () => {
             {/* Insurance Section */}
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <FileText className="w-5 h-5 text-blue-600" />
+                <FileText className="w-5 h-5 text-ceenai-cyan" />
                 <h2 className="text-lg font-semibold text-gray-900">Insurance Information</h2>
                 <span className="text-sm text-gray-500">(Optional)</span>
               </div>
@@ -135,7 +143,7 @@ export const CompleteProfile: React.FC = () => {
                     value={insuranceProvider}
                     onChange={(e) => setInsuranceProvider(e.target.value)}
                     placeholder="e.g., Daman, AXA, Oman Insurance"
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ceenai-cyan"
                   />
                 </div>
 
@@ -148,7 +156,7 @@ export const CompleteProfile: React.FC = () => {
                     value={insurancePolicyNumber}
                     onChange={(e) => setInsurancePolicyNumber(e.target.value)}
                     placeholder="Enter your policy number"
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ceenai-cyan"
                   />
                 </div>
 
@@ -162,7 +170,7 @@ export const CompleteProfile: React.FC = () => {
                       type="date"
                       value={insuranceExpiry}
                       onChange={(e) => setInsuranceExpiry(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ceenai-cyan"
                     />
                   </div>
                 </div>
@@ -172,7 +180,7 @@ export const CompleteProfile: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center space-x-2"
+              className="w-full bg-gradient-to-r from-ceenai-cyan to-ceenai-blue hover:from-ceenai-cyan-dark hover:to-ceenai-blue-dark disabled:bg-gray-400 text-white font-medium py-3 rounded-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
             >
               <span>{loading ? 'Saving...' : 'Continue to Family Linking'}</span>
               <ArrowRight className="w-5 h-5" />
