@@ -166,52 +166,76 @@ export const Profile: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                    <input
-                      type="text"
-                      disabled={!isEditingPersonal}
-                      value={personalInfo.fullName}
-                      onChange={(e) => setPersonalInfo({ ...personalInfo, fullName: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        disabled={!isEditingPersonal}
+                        value={personalInfo.fullName}
+                        onChange={(e) => setPersonalInfo({ ...personalInfo, fullName: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Emirates ID</label>
-                    <input
-                      type="text"
-                      disabled={!isEditingPersonal}
-                      value={personalInfo.emiratesId}
-                      onChange={(e) => setPersonalInfo({ ...personalInfo, emiratesId: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        disabled={!isEditingPersonal}
+                        value={personalInfo.emiratesId}
+                        onChange={(e) => setPersonalInfo({ ...personalInfo, emiratesId: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
-                    <input
-                      type="date"
-                      disabled={!isEditingPersonal}
-                      value={personalInfo.dateOfBirth}
-                      onChange={(e) => setPersonalInfo({ ...personalInfo, dateOfBirth: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
-                    />
+                    <div className="relative group">
+                      <input
+                        type="date"
+                        disabled={!isEditingPersonal}
+                        value={personalInfo.dateOfBirth}
+                        onChange={(e) => setPersonalInfo({ ...personalInfo, dateOfBirth: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                      />
+                      {!isEditingPersonal && (
+                        <button
+                          onClick={() => setIsEditingPersonal(true)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-gray-200 transition-colors opacity-0 group-hover:opacity-100"
+                        >
+                          <Edit2 className="w-4 h-4 text-gray-600" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Blood Type</label>
-                    <select
-                      disabled={!isEditingPersonal}
-                      value={personalInfo.bloodType}
-                      onChange={(e) => setPersonalInfo({ ...personalInfo, bloodType: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
-                    >
-                      <option value="">Select</option>
-                      <option value="A+">A+</option>
-                      <option value="A-">A-</option>
-                      <option value="B+">B+</option>
-                      <option value="B-">B-</option>
-                      <option value="AB+">AB+</option>
-                      <option value="AB-">AB-</option>
-                      <option value="O+">O+</option>
-                      <option value="O-">O-</option>
-                    </select>
+                    <div className="relative group">
+                      <select
+                        disabled={!isEditingPersonal}
+                        value={personalInfo.bloodType}
+                        onChange={(e) => setPersonalInfo({ ...personalInfo, bloodType: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                      >
+                        <option value="">Select</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                      </select>
+                      {!isEditingPersonal && (
+                        <button
+                          onClick={() => setIsEditingPersonal(true)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-gray-200 transition-colors opacity-0 group-hover:opacity-100"
+                        >
+                          <Edit2 className="w-4 h-4 text-gray-600" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Allergies</label>
@@ -237,23 +261,43 @@ export const Profile: React.FC = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Emergency Contact Name</label>
-                    <input
-                      type="text"
-                      disabled={!isEditingPersonal}
-                      value={personalInfo.emergencyContactName}
-                      onChange={(e) => setPersonalInfo({ ...personalInfo, emergencyContactName: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
-                    />
+                    <div className="relative group">
+                      <input
+                        type="text"
+                        disabled={!isEditingPersonal}
+                        value={personalInfo.emergencyContactName}
+                        onChange={(e) => setPersonalInfo({ ...personalInfo, emergencyContactName: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                      />
+                      {!isEditingPersonal && (
+                        <button
+                          onClick={() => setIsEditingPersonal(true)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-gray-200 transition-colors opacity-0 group-hover:opacity-100"
+                        >
+                          <Edit2 className="w-4 h-4 text-gray-600" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Emergency Contact Phone</label>
-                    <input
-                      type="tel"
-                      disabled={!isEditingPersonal}
-                      value={personalInfo.emergencyContactPhone}
-                      onChange={(e) => setPersonalInfo({ ...personalInfo, emergencyContactPhone: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
-                    />
+                    <div className="relative group">
+                      <input
+                        type="tel"
+                        disabled={!isEditingPersonal}
+                        value={personalInfo.emergencyContactPhone}
+                        onChange={(e) => setPersonalInfo({ ...personalInfo, emergencyContactPhone: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+                      />
+                      {!isEditingPersonal && (
+                        <button
+                          onClick={() => setIsEditingPersonal(true)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-gray-200 transition-colors opacity-0 group-hover:opacity-100"
+                        >
+                          <Edit2 className="w-4 h-4 text-gray-600" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
