@@ -4,7 +4,7 @@ import { useAuth, UserRole } from '../context/AuthContext';
 import { Mail, Lock, User, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { TermsModal } from '../components/TermsModal';
 import { PrivacyModal } from '../components/PrivacyModal';
-import { GeometricBackground } from '../components/GeometricBackground';
+import { OnboardingCarousel } from '../components/OnboardingCarousel';
 
 export const Auth: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -65,24 +65,35 @@ export const Auth: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ceenai-cyan/10 via-white to-ceenai-blue/10 flex items-center justify-center px-4 relative overflow-hidden">
-      <GeometricBackground />
-      <div className="w-full max-w-md relative z-10">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-6">
-            <img
-              src="/ChatGPT_Image_Feb_27,_2026,_11_30_50_AM.png"
-              alt="CeenAiX Logo"
-              className="h-24 w-auto"
-            />
-          </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-ceenai-cyan to-ceenai-blue bg-clip-text text-transparent">
-            CeenAiX
-          </h1>
-          <p className="text-gray-700 mt-2 font-medium">AI That Sees Health</p>
+    <div className="min-h-screen bg-white flex overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 xl:w-3/5">
+        <OnboardingCarousel />
+      </div>
+
+      <div className="w-full lg:w-1/2 xl:w-2/5 flex items-center justify-center p-8 bg-gradient-to-br from-white via-ceenai-cyan/5 to-ceenai-blue/5 relative overflow-y-auto">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 right-20 w-64 h-64 bg-gradient-to-br from-ceenai-cyan/10 to-ceenai-blue/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 left-20 w-64 h-64 bg-gradient-to-tl from-ceenai-blue/10 to-ceenai-cyan/10 rounded-full blur-3xl" />
         </div>
 
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-ceenai-cyan/20">
+        <div className="w-full max-w-md relative z-10 my-8">
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center mb-6">
+              <img
+                src="/ChatGPT_Image_Feb_27,_2026,_11_30_50_AM.png"
+                alt="CeenAiX Logo"
+                className="h-20 w-auto"
+              />
+            </div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-ceenai-cyan to-ceenai-blue bg-clip-text text-transparent">
+              {isSignUp ? 'Create Account' : isForgotPassword ? 'Reset Password' : 'Welcome Back'}
+            </h1>
+            <p className="text-gray-600 mt-2">
+              {isSignUp ? 'Join CeenAiX today' : isForgotPassword ? 'We\'ll send you a reset link' : 'Sign in to continue'}
+            </p>
+          </div>
+
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-ceenai-cyan/20">
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-3">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -322,13 +333,14 @@ export const Auth: React.FC = () => {
           </div>
         </div>
 
-        <p className="text-center text-gray-600 text-xs mt-8">
-          Secure healthcare platform with AI-powered insights
-        </p>
-      </div>
+          <p className="text-center text-gray-500 text-xs mt-6">
+            Secure healthcare platform with AI-powered insights
+          </p>
+        </div>
 
-      <TermsModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
-      <PrivacyModal isOpen={showPrivacyModal} onClose={() => setShowPrivacyModal(false)} />
+        <TermsModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
+        <PrivacyModal isOpen={showPrivacyModal} onClose={() => setShowPrivacyModal(false)} />
+      </div>
     </div>
   );
 };
