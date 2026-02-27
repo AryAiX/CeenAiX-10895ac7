@@ -21,7 +21,7 @@ interface AuthContextType {
   user: User | null;
   userProfile: UserProfile | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, role: UserRole) => Promise<UserRole>;
+  signUp: (email: string, password: string, firstName: string, lastName: string, role: UserRole) => Promise<void>;
   signIn: (email: string, password: string) => Promise<UserRole>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -96,7 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signUp = async (email: string, password: string, fullName: string, role: UserRole): Promise<UserRole> => {
+  const signUp = async (email: string, password: string, firstName: string, lastName: string, role: UserRole): Promise<void> => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -112,8 +112,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           {
             user_id: data.user.id,
             role,
-            full_name: fullName,
+            first_name: firstName,
+            last_name: lastName,
+            full_name: `${firstName} ${lastName}`,
             email,
+            terms_accepted: true,
+            terms_accepted_at: new Date().toISOString(),
+            profile_completed: false,
           },
         ]);
 
@@ -130,7 +135,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       await fetchUserProfile(data.user.id);
-      return role;
     } catch (error) {
       console.error('Sign up error:', error);
       throw error;

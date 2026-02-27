@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, UserRole } from '../context/AuthContext';
-import { Heart, Mail, Lock, User, AlertCircle } from 'lucide-react';
+import { Heart, Mail, Lock, User, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export const Auth: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [role, setRole] = useState<UserRole>('patient');
+  const [showPassword, setShowPassword] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,12 +31,14 @@ export const Auth: React.FC = () => {
         setSuccess('Password reset link sent! Check your email.');
         setEmail('');
       } else if (isSignUp) {
-        if (!fullName.trim()) {
-          throw new Error('Full name is required');
+        if (!firstName.trim() || !lastName.trim()) {
+          throw new Error('First name and last name are required');
         }
-        const userRole = await signUp(email, password, fullName, role);
-        const redirectPath = userRole === 'doctor' ? '/doctor/dashboard' : '/patient/dashboard';
-        navigate(redirectPath);
+        if (!termsAccepted) {
+          throw new Error('You must accept the terms and conditions');
+        }
+        await signUp(email, password, firstName, lastName, role);
+        navigate('/complete-profile');
       } else {
         const userRole = await signIn(email, password);
         const redirectPath = userRole === 'doctor' ? '/doctor/dashboard' : '/patient/dashboard';
@@ -82,22 +87,39 @@ export const Auth: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {isSignUp && !isForgotPassword && (
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Enter your full name"
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 mb-2">
+                      First Name
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                      <input
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="First name"
+                        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 mb-2">
+                      Last Name
+                    </label>
+                    <input
+                      type="text"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      placeholder="Last name"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
+              </>
             )}
 
             <div>
@@ -125,39 +147,73 @@ export const Auth: React.FC = () => {
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
                 </div>
               </div>
             )}
 
             {isSignUp && !isForgotPassword && (
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-3">
-                  Account Type
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {roles.map((r) => (
-                    <button
-                      key={r.value}
-                      type="button"
-                      onClick={() => setRole(r.value)}
-                      className={`p-3 rounded-lg border-2 transition-all text-sm ${
-                        role === r.value
-                          ? 'border-blue-500 bg-blue-50 font-medium text-blue-900'
-                          : 'border-gray-300 bg-white text-gray-700 hover:border-blue-200'
-                      }`}
-                    >
-                      {r.label}
-                    </button>
-                  ))}
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-3">
+                    Account Type
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {roles.map((r) => (
+                      <button
+                        key={r.value}
+                        type="button"
+                        onClick={() => setRole(r.value)}
+                        className={`p-3 rounded-lg border-2 transition-all text-sm ${
+                          role === r.value
+                            ? 'border-blue-500 bg-blue-50 font-medium text-blue-900'
+                            : 'border-gray-300 bg-white text-gray-700 hover:border-blue-200'
+                        }`}
+                      >
+                        {r.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+
+                <div className="flex items-start space-x-3 pt-2">
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                    className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    required
+                  />
+                  <label htmlFor="terms" className="text-sm text-gray-700">
+                    I accept the{' '}
+                    <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
+                      Terms and Conditions
+                    </a>{' '}
+                    and{' '}
+                    <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
+                      Privacy Policy
+                    </a>
+                  </label>
+                </div>
+              </>
             )}
 
             <button

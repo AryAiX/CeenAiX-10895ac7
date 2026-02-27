@@ -8,6 +8,8 @@ import { FindClinic } from '../pages/public/FindClinic';
 import { Insurance } from '../pages/public/Insurance';
 import { HealthEducation } from '../pages/public/HealthEducation';
 import { Auth } from '../pages/Auth';
+import { CompleteProfile } from '../pages/CompleteProfile';
+import { LinkFamily } from '../pages/LinkFamily';
 import { PatientDashboard } from '../pages/patient/Dashboard';
 import { PatientAppointments } from '../pages/patient/Appointments';
 import { PatientPrescriptions } from '../pages/patient/Prescriptions';
@@ -85,6 +87,22 @@ export const router = createBrowserRouter([
   {
     path: '/reset-password',
     element: <ResetPassword />,
+  },
+  {
+    path: '/complete-profile',
+    element: (
+      <ProtectedRoute>
+        <CompleteProfile />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/link-family',
+    element: (
+      <ProtectedRoute>
+        <LinkFamily />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/patient/dashboard',
