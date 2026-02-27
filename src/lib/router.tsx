@@ -10,7 +10,7 @@ import { PatientAppointments } from '../pages/patient/Appointments';
 import { PatientPrescriptions } from '../pages/patient/Prescriptions';
 import { PatientRecords } from '../pages/patient/Records';
 import { PatientMessages } from '../pages/patient/Messages';
-import { PatientProfile } from '../pages/patient/Profile';
+import { Profile as PatientProfile } from '../pages/patient/Profile';
 import { DoctorDashboard } from '../pages/doctor/Dashboard';
 import { DoctorAppointments } from '../pages/doctor/Appointments';
 import { DoctorPrescriptions } from '../pages/doctor/Prescriptions';
