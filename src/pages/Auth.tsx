@@ -66,11 +66,7 @@ export const Auth: React.FC = () => {
 
   return (
     <div className="min-h-screen flex overflow-hidden">
-      <div className="hidden lg:flex lg:w-1/2 xl:w-3/5 relative">
-        <OnboardingCarousel />
-      </div>
-
-      <div className="w-full lg:w-1/2 xl:w-2/5 flex items-center justify-center p-6 sm:p-8 md:p-12 bg-white relative overflow-y-auto">
+      <div className="w-full lg:w-1/2 xl:w-2/5 flex items-center justify-center p-6 sm:p-8 md:p-12 bg-white relative overflow-y-auto order-2 lg:order-1">
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-50/30 via-white to-blue-50/30 pointer-events-none" />
 
         <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
@@ -352,6 +348,10 @@ export const Auth: React.FC = () => {
 
         <TermsModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
         <PrivacyModal isOpen={showPrivacyModal} onClose={() => setShowPrivacyModal(false)} />
+      </div>
+
+      <div className="hidden lg:flex lg:w-1/2 xl:w-3/5 relative order-1 lg:order-2">
+        <OnboardingCarousel />
       </div>
     </div>
   );
