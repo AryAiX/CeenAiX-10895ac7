@@ -55,23 +55,23 @@ const slides: Slide[] = [
     icon: Bot,
     title: 'AI Agent Support',
     description: 'Your intelligent 24/7 health companion. Get instant medical answers, medication reminders, health tips, and personalized wellness guidance whenever you need it.',
-    gradient: 'from-violet-400 to-purple-500',
+    gradient: 'from-amber-400 to-yellow-500',
     illustration: (
       <svg viewBox="0 0 400 300" className="w-full h-56">
-        <rect x="145" y="105" width="110" height="130" rx="18" fill="#8b5cf6" opacity="0.9" />
-        <rect x="155" y="88" width="90" height="25" rx="12" fill="#a78bfa" />
+        <rect x="145" y="105" width="110" height="130" rx="18" fill="#f59e0b" opacity="0.9" />
+        <rect x="155" y="88" width="90" height="25" rx="12" fill="#fbbf24" />
         <circle cx="175" cy="135" r="11" fill="white" className="animate-pulse" />
         <circle cx="225" cy="135" r="11" fill="white" className="animate-pulse" style={{ animationDelay: '0.2s' }} />
         <rect x="172" y="160" width="56" height="7" rx="3.5" fill="white" opacity="0.6" />
         <rect x="165" y="173" width="70" height="5" rx="2.5" fill="white" opacity="0.4" />
         <rect x="168" y="185" width="64" height="5" rx="2.5" fill="white" opacity="0.4" />
         <rect x="172" y="197" width="56" height="5" rx="2.5" fill="white" opacity="0.4" />
-        <circle cx="115" cy="135" r="5" fill="#c4b5fd" className="animate-bounce" />
-        <circle cx="285" cy="135" r="5" fill="#c4b5fd" className="animate-bounce" style={{ animationDelay: '0.5s' }} />
-        <circle cx="120" cy="170" r="4" fill="#c4b5fd" className="animate-bounce" style={{ animationDelay: '0.3s' }} />
-        <circle cx="280" cy="170" r="4" fill="#c4b5fd" className="animate-bounce" style={{ animationDelay: '0.7s' }} />
-        <circle cx="125" cy="200" r="3" fill="#c4b5fd" className="animate-bounce" style={{ animationDelay: '0.9s' }} />
-        <circle cx="275" cy="200" r="3" fill="#c4b5fd" className="animate-bounce" style={{ animationDelay: '1.1s' }} />
+        <circle cx="115" cy="135" r="5" fill="#fde68a" className="animate-bounce" />
+        <circle cx="285" cy="135" r="5" fill="#fde68a" className="animate-bounce" style={{ animationDelay: '0.5s' }} />
+        <circle cx="120" cy="170" r="4" fill="#fde68a" className="animate-bounce" style={{ animationDelay: '0.3s' }} />
+        <circle cx="280" cy="170" r="4" fill="#fde68a" className="animate-bounce" style={{ animationDelay: '0.7s' }} />
+        <circle cx="125" cy="200" r="3" fill="#fde68a" className="animate-bounce" style={{ animationDelay: '0.9s' }} />
+        <circle cx="275" cy="200" r="3" fill="#fde68a" className="animate-bounce" style={{ animationDelay: '1.1s' }} />
       </svg>
     ),
   },
@@ -158,11 +158,11 @@ export const OnboardingCarousel: React.FC = () => {
   const CurrentIcon = slides[currentSlide].icon;
 
   return (
-    <div className="relative h-full flex flex-col justify-center items-center p-12 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+    <div className="relative h-full flex flex-col justify-center items-center p-12 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-900 overflow-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-violet-500/20 to-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-emerald-500/15 to-teal-500/15 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }} />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-teal-500/20 to-emerald-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-500/15 to-cyan-500/15 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }} />
       </div>
 
       <div className="relative z-10 w-full max-w-xl">
