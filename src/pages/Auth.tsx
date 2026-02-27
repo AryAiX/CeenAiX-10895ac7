@@ -37,15 +37,15 @@ export const Auth: React.FC = () => {
         setEmail('');
       } else if (isSignUp) {
         if (!firstName.trim()) {
-          throw new Error('Full name is required');
+          throw new Error('First name is required');
+        }
+        if (!lastName.trim()) {
+          throw new Error('Last name is required');
         }
         if (!termsAccepted) {
           throw new Error('You must accept the terms and conditions');
         }
-        const nameParts = firstName.trim().split(' ');
-        const fName = nameParts[0];
-        const lName = nameParts.slice(1).join(' ') || nameParts[0];
-        await signUp(email, password, fName, lName, role);
+        await signUp(email, password, firstName.trim(), lastName.trim(), role);
         navigate('/complete-profile');
       } else {
         const userRole = await signIn(email, password);
@@ -128,22 +128,40 @@ export const Auth: React.FC = () => {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               {isSignUp && !isForgotPassword && (
-                <div className="animate-slide-in">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Full Name
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-500" />
-                    <input
-                      type="text"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      placeholder="John Doe"
-                      className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 focus:bg-white transition-all duration-300 text-gray-900 placeholder:text-gray-400 hover:border-cyan-300"
-                      required
-                    />
+                <>
+                  <div className="animate-slide-in">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      First Name
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-500" />
+                      <input
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="John"
+                        className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 focus:bg-white transition-all duration-300 text-gray-900 placeholder:text-gray-400 hover:border-cyan-300"
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
+                  <div className="animate-slide-in" style={{ animationDelay: '0.05s' }}>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Last Name
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-500" />
+                      <input
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder="Doe"
+                        className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 focus:bg-white transition-all duration-300 text-gray-900 placeholder:text-gray-400 hover:border-cyan-300"
+                        required
+                      />
+                    </div>
+                  </div>
+                </>
               )}
 
               <div className="animate-slide-in" style={{ animationDelay: '0.1s' }}>
@@ -195,9 +213,6 @@ export const Auth: React.FC = () => {
 
               {isSignUp && !isForgotPassword && (
                 <>
-                  {lastName && (
-                    <input type="hidden" value={lastName} />
-                  )}
                   <div className="animate-slide-in" style={{ animationDelay: '0.3s' }}>
                     <label className="block text-sm font-semibold text-gray-700 mb-3">
                       I am a
