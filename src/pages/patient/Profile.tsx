@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Navigation } from '../../components/Navigation';
+import { PageHeader } from '../../components/PageHeader';
 import { Upload, Camera, User, Shield, Users, Plus, Trash2, Edit2, Save } from 'lucide-react';
 
 interface FamilyMember {
@@ -94,12 +95,14 @@ export const Profile: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
       <Navigation role="patient" />
+      <PageHeader
+        title="My Profile"
+        subtitle="Manage your personal information and health records"
+        icon={<User className="w-6 h-6 text-white" />}
+        backTo="/patient/dashboard"
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-10">
-          <h1 className="text-4xl font-bold text-gray-900 tracking-tight">My Profile</h1>
-          <p className="text-gray-600 mt-3 text-lg">Manage your personal information and health records</p>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1 space-y-6">
