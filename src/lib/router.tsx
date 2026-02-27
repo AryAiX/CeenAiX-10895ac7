@@ -21,6 +21,7 @@ import { DoctorPatients } from '../pages/doctor/Patients';
 import { DoctorMessages } from '../pages/doctor/Messages';
 import { DoctorProfile } from '../pages/doctor/Profile';
 import { Navigation } from '../components/Navigation';
+import { ResetPassword } from '../pages/ResetPassword';
 
 const ProtectedRoute: React.FC<{
   children: React.ReactNode;
@@ -80,6 +81,10 @@ export const router = createBrowserRouter([
   {
     path: '/auth',
     element: <Auth />,
+  },
+  {
+    path: '/reset-password',
+    element: <ResetPassword />,
   },
   {
     path: '/patient/dashboard',
