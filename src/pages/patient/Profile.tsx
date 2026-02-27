@@ -1,16 +1,16 @@
 import React from 'react';
-import { useAuth } from '../../context/AuthContext';
 import { User, Mail, Phone, Calendar, UserCircle, Shield } from 'lucide-react';
 
 export const PatientProfile: React.FC = () => {
-  const { userProfile, user } = useAuth();
+  const userProfile = null;
+  const user = null;
 
   const infoItems = [
-    { icon: Mail, label: 'Email', value: userProfile?.email || 'Not provided' },
-    { icon: Phone, label: 'Phone', value: userProfile?.phone || 'Not provided' },
-    { icon: Calendar, label: 'Date of Birth', value: userProfile?.date_of_birth ? new Date(userProfile.date_of_birth).toLocaleDateString() : 'Not provided' },
-    { icon: UserCircle, label: 'Gender', value: userProfile?.gender || 'Not provided' },
-    { icon: Shield, label: 'User ID', value: user?.id || 'N/A' },
+    { icon: Mail, label: 'Email', value: 'Not provided' },
+    { icon: Phone, label: 'Phone', value: 'Not provided' },
+    { icon: Calendar, label: 'Date of Birth', value: 'Not provided' },
+    { icon: UserCircle, label: 'Gender', value: 'Not provided' },
+    { icon: Shield, label: 'User ID', value: 'N/A' },
   ];
 
   return (
@@ -26,9 +26,9 @@ export const PatientProfile: React.FC = () => {
                 <User className="w-12 h-12 text-blue-600" />
               </div>
               <div className="text-white">
-                <h2 className="text-3xl font-bold">{userProfile?.full_name || 'User'}</h2>
+                <h2 className="text-3xl font-bold">User</h2>
                 <p className="text-blue-100 mt-1 capitalize">
-                  {userProfile?.role || 'Patient'} Account
+                  Patient Account
                 </p>
               </div>
             </div>
@@ -52,37 +52,6 @@ export const PatientProfile: React.FC = () => {
             </div>
           </div>
 
-          {/* Debug Section */}
-          {userProfile && (
-            <div className="px-8 py-6 bg-gray-50 border-t border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Profile Data</h3>
-              <div className="bg-white rounded-lg p-4 border border-gray-200">
-                <pre className="text-xs text-gray-600 overflow-x-auto">
-                  {JSON.stringify(userProfile, null, 2)}
-                </pre>
-              </div>
-            </div>
-          )}
-
-          {/* Session Info */}
-          {user && (
-            <div className="px-8 py-6 bg-blue-50 border-t border-blue-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Session Information</h3>
-              <div className="space-y-2 text-sm">
-                <p className="text-gray-700">
-                  <span className="font-medium">Logged in as:</span> {user.email}
-                </p>
-                <p className="text-gray-700">
-                  <span className="font-medium">Last sign in:</span>{' '}
-                  {user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : 'N/A'}
-                </p>
-                <p className="text-gray-700">
-                  <span className="font-medium">Account created:</span>{' '}
-                  {user.created_at ? new Date(user.created_at).toLocaleString() : 'N/A'}
-                </p>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

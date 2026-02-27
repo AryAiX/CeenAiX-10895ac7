@@ -1,17 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { supabase } from '../../lib/supabase';
+import React from 'react';
 import { Activity, Heart, Calendar, TrendingUp } from 'lucide-react';
 
 export const PatientDashboard: React.FC = () => {
-  const { userProfile } = useAuth();
-  const [loading, setLoading] = useState(false);
-
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Welcome, {userProfile?.full_name}
+          Welcome, Patient
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="bg-white rounded-lg shadow p-6">

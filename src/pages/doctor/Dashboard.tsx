@@ -1,15 +1,12 @@
 import React from 'react';
-import { useAuth } from '../../context/AuthContext';
 import { Activity, Users, Calendar, FileText } from 'lucide-react';
 
 export const DoctorDashboard: React.FC = () => {
-  const { userProfile } = useAuth();
-
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Welcome, Dr. {userProfile?.full_name}
+          Welcome, Dr. Doctor
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="bg-white rounded-lg shadow p-6">

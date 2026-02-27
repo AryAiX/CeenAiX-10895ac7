@@ -1,15 +1,10 @@
-import React from 'react';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { createBrowserRouter } from 'react-router-dom';
 import { Home } from '../pages/public/Home';
 import { AIChat } from '../pages/public/AIChat';
 import { FindDoctor } from '../pages/public/FindDoctor';
 import { FindClinic } from '../pages/public/FindClinic';
 import { Insurance } from '../pages/public/Insurance';
 import { HealthEducation } from '../pages/public/HealthEducation';
-import { Auth } from '../pages/Auth';
-import { CompleteProfile } from '../pages/CompleteProfile';
-import { LinkFamily } from '../pages/LinkFamily';
 import { PatientDashboard } from '../pages/patient/Dashboard';
 import { PatientAppointments } from '../pages/patient/Appointments';
 import { PatientPrescriptions } from '../pages/patient/Prescriptions';
@@ -22,38 +17,6 @@ import { DoctorPrescriptions } from '../pages/doctor/Prescriptions';
 import { DoctorPatients } from '../pages/doctor/Patients';
 import { DoctorMessages } from '../pages/doctor/Messages';
 import { DoctorProfile } from '../pages/doctor/Profile';
-import { Navigation } from '../components/Navigation';
-import { ResetPassword } from '../pages/ResetPassword';
-
-const ProtectedRoute: React.FC<{
-  children: React.ReactNode;
-  requiredRole?: string[];
-}> = ({ children, requiredRole }) => {
-  const { isAuthenticated, userProfile, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  if (requiredRole && !requiredRole.includes(userProfile?.role || '')) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  return (
-    <>
-      <Navigation />
-      {children}
-    </>
-  );
-};
 
 export const router = createBrowserRouter([
   {
@@ -81,123 +44,51 @@ export const router = createBrowserRouter([
     element: <HealthEducation />,
   },
   {
-    path: '/auth',
-    element: <Auth />,
-  },
-  {
-    path: '/reset-password',
-    element: <ResetPassword />,
-  },
-  {
-    path: '/complete-profile',
-    element: (
-      <ProtectedRoute>
-        <CompleteProfile />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/link-family',
-    element: (
-      <ProtectedRoute>
-        <LinkFamily />
-      </ProtectedRoute>
-    ),
-  },
-  {
     path: '/patient/dashboard',
-    element: (
-      <ProtectedRoute requiredRole={['patient']}>
-        <PatientDashboard />
-      </ProtectedRoute>
-    ),
+    element: <PatientDashboard />,
   },
   {
     path: '/patient/appointments',
-    element: (
-      <ProtectedRoute requiredRole={['patient']}>
-        <PatientAppointments />
-      </ProtectedRoute>
-    ),
+    element: <PatientAppointments />,
   },
   {
     path: '/patient/prescriptions',
-    element: (
-      <ProtectedRoute requiredRole={['patient']}>
-        <PatientPrescriptions />
-      </ProtectedRoute>
-    ),
+    element: <PatientPrescriptions />,
   },
   {
     path: '/patient/records',
-    element: (
-      <ProtectedRoute requiredRole={['patient']}>
-        <PatientRecords />
-      </ProtectedRoute>
-    ),
+    element: <PatientRecords />,
   },
   {
     path: '/patient/messages',
-    element: (
-      <ProtectedRoute requiredRole={['patient']}>
-        <PatientMessages />
-      </ProtectedRoute>
-    ),
+    element: <PatientMessages />,
   },
   {
     path: '/patient/profile',
-    element: (
-      <ProtectedRoute requiredRole={['patient']}>
-        <PatientProfile />
-      </ProtectedRoute>
-    ),
+    element: <PatientProfile />,
   },
   {
     path: '/doctor/dashboard',
-    element: (
-      <ProtectedRoute requiredRole={['doctor']}>
-        <DoctorDashboard />
-      </ProtectedRoute>
-    ),
+    element: <DoctorDashboard />,
   },
   {
     path: '/doctor/appointments',
-    element: (
-      <ProtectedRoute requiredRole={['doctor']}>
-        <DoctorAppointments />
-      </ProtectedRoute>
-    ),
+    element: <DoctorAppointments />,
   },
   {
     path: '/doctor/patients',
-    element: (
-      <ProtectedRoute requiredRole={['doctor']}>
-        <DoctorPatients />
-      </ProtectedRoute>
-    ),
+    element: <DoctorPatients />,
   },
   {
     path: '/doctor/prescriptions',
-    element: (
-      <ProtectedRoute requiredRole={['doctor']}>
-        <DoctorPrescriptions />
-      </ProtectedRoute>
-    ),
+    element: <DoctorPrescriptions />,
   },
   {
     path: '/doctor/messages',
-    element: (
-      <ProtectedRoute requiredRole={['doctor']}>
-        <DoctorMessages />
-      </ProtectedRoute>
-    ),
+    element: <DoctorMessages />,
   },
   {
     path: '/doctor/profile',
-    element: (
-      <ProtectedRoute requiredRole={['doctor']}>
-        <DoctorProfile />
-      </ProtectedRoute>
-    ),
+    element: <DoctorProfile />,
   },
 ]);
