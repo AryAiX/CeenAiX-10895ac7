@@ -73,7 +73,7 @@ export const Auth: React.FC = () => {
         <OnboardingCarousel />
       </div>
 
-      <div className="w-full lg:w-1/2 xl:w-2/5 flex items-center justify-center bg-white relative overflow-y-auto">
+      <div className="w-full lg:w-1/2 xl:w-2/5 flex items-center justify-center bg-white relative min-h-screen">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-96 h-96 bg-cyan-400/20 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
@@ -87,32 +87,31 @@ export const Auth: React.FC = () => {
           <div className="absolute top-2/3 right-1/4 w-3 h-3 bg-blue-400 rounded-full animate-float" style={{ animationDelay: '3s' }}></div>
         </div>
 
-        <div className="w-full max-w-md relative z-10 px-6 py-8 animate-scale-in">
-          <button
-            onClick={() => navigate('/')}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-gray-50 rounded-full text-sm font-medium text-gray-700 hover:text-gray-900 transition-all duration-300 mb-8 shadow-lg hover:shadow-xl border border-gray-200"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Home</span>
-          </button>
-
+        <div className="w-full max-w-md relative z-10 px-6 animate-scale-in">
           <div className="bg-white rounded-3xl shadow-2xl border border-cyan-100/50 overflow-hidden backdrop-blur-xl relative">
             <div className="absolute inset-0 bg-gradient-to-br from-cyan-50/50 via-blue-50/30 to-white pointer-events-none"></div>
 
             <div className="relative p-8 sm:p-10">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 mb-6 shadow-lg animate-bounce-slow">
-                <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
+              <button
+                onClick={() => navigate('/')}
+                className="absolute top-6 left-6 inline-flex items-center gap-2 text-gray-400 hover:text-gray-600 transition-colors duration-300"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+
+              <div className="text-center mb-8">
+                <img
+                  src="/ChatGPT_Image_Feb_27,_2026,_11_30_50_AM.png"
+                  alt="CeenAiX Logo"
+                  className="h-16 mx-auto mb-6 animate-bounce-slow"
+                />
+                <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent mb-2">
+                  {isSignUp ? 'Create Account' : isForgotPassword ? 'Reset Password' : 'Welcome Back'}
+                </h1>
+                <p className="text-gray-600 text-sm">
+                  {isSignUp ? 'Join CeenAiX today and experience healthcare reimagined' : isForgotPassword ? 'We\'ll send you a reset link' : 'Sign in to continue your health journey'}
+                </p>
               </div>
-              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent mb-2">
-                {isSignUp ? 'Create Account' : isForgotPassword ? 'Reset Password' : 'Welcome Back'}
-              </h1>
-              <p className="text-gray-600 text-sm">
-                {isSignUp ? 'Join CeenAiX today and experience healthcare reimagined' : isForgotPassword ? 'We\'ll send you a reset link' : 'Sign in to continue your health journey'}
-              </p>
-            </div>
             {error && (
               <div className="mb-5 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start space-x-3 animate-shake">
                 <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -328,32 +327,32 @@ export const Auth: React.FC = () => {
                   </button>
                 </>
               )}
-            </div>
-            </div>
-          </div>
+              </div>
 
-          <div className="text-center mt-8">
-            <button
-              type="button"
-              className="text-xs text-gray-500 hover:text-cyan-600 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                setShowTermsModal(true);
-              }}
-            >
-              Terms & Conditions
-            </button>
-            <span className="mx-2 text-gray-300">•</span>
-            <button
-              type="button"
-              className="text-xs text-gray-500 hover:text-cyan-600 transition-colors"
-              onClick={(e) => {
-                e.preventDefault();
-                setShowPrivacyModal(true);
-              }}
-            >
-              Privacy Policy
-            </button>
+              <div className="text-center mt-8 pt-6 border-t border-gray-100">
+                <button
+                  type="button"
+                  className="text-xs text-gray-500 hover:text-cyan-600 transition-colors"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowTermsModal(true);
+                  }}
+                >
+                  Terms & Conditions
+                </button>
+                <span className="mx-2 text-gray-300">•</span>
+                <button
+                  type="button"
+                  className="text-xs text-gray-500 hover:text-cyan-600 transition-colors"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowPrivacyModal(true);
+                  }}
+                >
+                  Privacy Policy
+                </button>
+              </div>
+            </div>
           </div>
 
           <TermsModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
