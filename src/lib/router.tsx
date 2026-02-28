@@ -21,11 +21,11 @@ import { DoctorProfile } from '../pages/doctor/Profile';
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <PatientDashboard />,
+    element: <Home />,
   },
   {
-    path: '/home',
-    element: <Home />,
+    path: '/patient/dashboard',
+    element: <PatientDashboard />,
   },
   {
     path: '/ai-chat',
@@ -46,10 +46,6 @@ export const router = createBrowserRouter([
   {
     path: '/health-education',
     element: <HealthEducation />,
-  },
-  {
-    path: '/patient/dashboard',
-    element: <PatientDashboard />,
   },
   {
     path: '/patient/appointments',
