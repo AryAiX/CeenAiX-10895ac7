@@ -21,6 +21,10 @@ import { DoctorProfile } from '../pages/doctor/Profile';
 export const router = createBrowserRouter([
   {
     path: '/',
+    element: <PatientDashboard />,
+  },
+  {
+    path: '/home',
     element: <Home />,
   },
   {
