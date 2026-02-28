@@ -1,9 +1,29 @@
-import React from 'react';
-import { Calendar, Clock, MapPin, Video, Plus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calendar, Clock, MapPin, Video, Plus, Search, X, ChevronLeft, ChevronRight, Stethoscope, Star } from 'lucide-react';
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
 
+interface Doctor {
+  id: number;
+  name: string;
+  specialty: string;
+  rating: number;
+  reviews: number;
+  location: string;
+  image: string;
+  availableSlots: number;
+  acceptsVideo: boolean;
+}
+
 export const PatientAppointments: React.FC = () => {
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [appointmentType, setAppointmentType] = useState<'in-person' | 'video'>('in-person');
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+
   const upcomingAppointments = [
     {
       id: 1,
@@ -40,6 +60,135 @@ export const PatientAppointments: React.FC = () => {
     }
   ];
 
+  const doctors: Doctor[] = [
+    {
+      id: 1,
+      name: 'Dr. Sarah Ahmed',
+      specialty: 'General Medicine',
+      rating: 4.9,
+      reviews: 234,
+      location: 'Dubai Healthcare City',
+      image: 'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=200',
+      availableSlots: 12,
+      acceptsVideo: true
+    },
+    {
+      id: 2,
+      name: 'Dr. Mohammed Hassan',
+      specialty: 'Cardiology',
+      rating: 4.8,
+      reviews: 189,
+      location: 'Al Zahra Hospital',
+      image: 'https://images.pexels.com/photos/5452293/pexels-photo-5452293.jpeg?auto=compress&cs=tinysrgb&w=200',
+      availableSlots: 8,
+      acceptsVideo: true
+    },
+    {
+      id: 3,
+      name: 'Dr. Fatima Al-Rashid',
+      specialty: 'Dermatology',
+      rating: 4.9,
+      reviews: 312,
+      location: 'Mediclinic City Hospital',
+      image: 'https://images.pexels.com/photos/5327584/pexels-photo-5327584.jpeg?auto=compress&cs=tinysrgb&w=200',
+      availableSlots: 15,
+      acceptsVideo: false
+    },
+    {
+      id: 4,
+      name: 'Dr. Ahmed Khalil',
+      specialty: 'Orthopedics',
+      rating: 4.7,
+      reviews: 156,
+      location: 'NMC Royal Hospital',
+      image: 'https://images.pexels.com/photos/5452201/pexels-photo-5452201.jpeg?auto=compress&cs=tinysrgb&w=200',
+      availableSlots: 6,
+      acceptsVideo: true
+    }
+  ];
+
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 8; hour < 18; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        const period = hour >= 12 ? 'PM' : 'AM';
+        const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+        const displayTime = `${displayHour}:${minute.toString().padStart(2, '0')} ${period}`;
+        slots.push({ value: time, display: displayTime });
+      }
+    }
+    return slots;
+  };
+
+  const timeSlots = generateTimeSlots();
+
+  const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+
+    const days = [];
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null);
+    }
+    for (let i = 1; i <= daysInMonth; i++) {
+      days.push(new Date(year, month, i));
+    }
+    return days;
+  };
+
+  const filteredDoctors = doctors.filter(doctor =>
+    doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    doctor.specialty.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleBookAppointment = () => {
+    setShowBookingModal(true);
+  };
+
+  const handleDoctorSelect = (doctor: Doctor) => {
+    setSelectedDoctor(doctor);
+    setSelectedDate(null);
+    setSelectedTime(null);
+  };
+
+  const handleDateSelect = (date: Date) => {
+    setSelectedDate(date);
+    setSelectedTime(null);
+  };
+
+  const handleConfirmBooking = () => {
+    console.log('Booking confirmed:', {
+      doctor: selectedDoctor,
+      date: selectedDate,
+      time: selectedTime,
+      type: appointmentType
+    });
+    setShowBookingModal(false);
+    setSelectedDoctor(null);
+    setSelectedDate(null);
+    setSelectedTime(null);
+  };
+
+  const goToPreviousMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
+  };
+
+  const goToNextMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
+  };
+
+  const isDateDisabled = (date: Date | null) => {
+    if (!date) return true;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date < today;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation role="patient" />
@@ -49,7 +198,7 @@ export const PatientAppointments: React.FC = () => {
         icon={<Calendar className="w-6 h-6 text-white" />}
         backTo="/patient/dashboard"
         actions={
-          <button className="flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold">
+          <button onClick={handleBookAppointment} className="flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold">
             <Plus className="w-5 h-5" />
             <span>Book Appointment</span>
           </button>
@@ -58,7 +207,6 @@ export const PatientAppointments: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
-          {/* Upcoming Appointments */}
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">Upcoming Appointments</h2>
@@ -151,7 +299,6 @@ export const PatientAppointments: React.FC = () => {
             </div>
           </div>
 
-          {/* Past Appointments */}
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">Past Appointments</h2>
@@ -204,6 +351,259 @@ export const PatientAppointments: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {showBookingModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl my-8">
+            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 p-6 rounded-t-2xl flex items-center justify-between">
+              <div>
+                <h3 className="text-2xl font-bold text-white">Book an Appointment</h3>
+                <p className="text-blue-100 text-sm mt-1">Find a doctor and schedule your visit</p>
+              </div>
+              <button onClick={() => setShowBookingModal(false)} className="p-2 hover:bg-white/20 rounded-lg transition-colors">
+                <X className="w-6 h-6 text-white" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              {!selectedDoctor ? (
+                <div>
+                  <div className="mb-6">
+                    <div className="relative">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search by doctor name or specialty..."
+                        className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
+                    {filteredDoctors.map((doctor) => (
+                      <div
+                        key={doctor.id}
+                        onClick={() => handleDoctorSelect(doctor)}
+                        className="bg-gradient-to-br from-gray-50 to-white border-2 border-gray-200 rounded-xl p-4 hover:border-blue-500 hover:shadow-lg transition-all cursor-pointer"
+                      >
+                        <div className="flex items-start space-x-4">
+                          <img src={doctor.image} alt={doctor.name} className="w-16 h-16 rounded-xl object-cover" />
+                          <div className="flex-1">
+                            <h4 className="font-bold text-gray-900">{doctor.name}</h4>
+                            <p className="text-sm text-gray-600 flex items-center mt-1">
+                              <Stethoscope className="w-3 h-3 mr-1" />
+                              {doctor.specialty}
+                            </p>
+                            <div className="flex items-center space-x-2 mt-2">
+                              <div className="flex items-center space-x-1">
+                                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                                <span className="text-sm font-semibold text-gray-900">{doctor.rating}</span>
+                                <span className="text-xs text-gray-500">({doctor.reviews})</span>
+                              </div>
+                              {doctor.acceptsVideo && (
+                                <span className="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full font-medium">
+                                  Video
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2 flex items-center">
+                              <MapPin className="w-3 h-3 mr-1" />
+                              {doctor.location}
+                            </p>
+                            <p className="text-xs text-green-600 font-semibold mt-1">
+                              {doctor.availableSlots} slots available
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : !selectedDate ? (
+                <div>
+                  <button onClick={() => setSelectedDoctor(null)} className="flex items-center text-blue-600 hover:text-blue-700 mb-4 font-semibold">
+                    <ChevronLeft className="w-4 h-4" />
+                    Back to doctors
+                  </button>
+
+                  <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 mb-6 border border-blue-100">
+                    <div className="flex items-center space-x-4">
+                      <img src={selectedDoctor.image} alt={selectedDoctor.name} className="w-16 h-16 rounded-xl object-cover" />
+                      <div>
+                        <h4 className="font-bold text-gray-900">{selectedDoctor.name}</h4>
+                        <p className="text-sm text-gray-600">{selectedDoctor.specialty}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {selectedDoctor.acceptsVideo && (
+                    <div className="mb-6">
+                      <label className="block text-sm font-semibold text-gray-900 mb-3">Appointment Type</label>
+                      <div className="grid grid-cols-2 gap-4">
+                        <button
+                          onClick={() => setAppointmentType('in-person')}
+                          className={`p-4 rounded-xl border-2 transition-all ${
+                            appointmentType === 'in-person'
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-200 bg-white hover:border-gray-300'
+                          }`}
+                        >
+                          <MapPin className={`w-6 h-6 mx-auto mb-2 ${appointmentType === 'in-person' ? 'text-blue-600' : 'text-gray-400'}`} />
+                          <p className={`font-semibold text-sm ${appointmentType === 'in-person' ? 'text-blue-900' : 'text-gray-700'}`}>
+                            In-Person Visit
+                          </p>
+                        </button>
+                        <button
+                          onClick={() => setAppointmentType('video')}
+                          className={`p-4 rounded-xl border-2 transition-all ${
+                            appointmentType === 'video'
+                              ? 'border-purple-500 bg-purple-50'
+                              : 'border-gray-200 bg-white hover:border-gray-300'
+                          }`}
+                        >
+                          <Video className={`w-6 h-6 mx-auto mb-2 ${appointmentType === 'video' ? 'text-purple-600' : 'text-gray-400'}`} />
+                          <p className={`font-semibold text-sm ${appointmentType === 'video' ? 'text-purple-900' : 'text-gray-700'}`}>
+                            Video Consultation
+                          </p>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <button onClick={goToPreviousMonth} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <ChevronLeft className="w-5 h-5 text-gray-600" />
+                      </button>
+                      <h4 className="font-bold text-gray-900">
+                        {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                      </h4>
+                      <button onClick={goToNextMonth} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <ChevronRight className="w-5 h-5 text-gray-600" />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-7 gap-2">
+                      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                        <div key={day} className="text-center text-xs font-semibold text-gray-600 py-2">
+                          {day}
+                        </div>
+                      ))}
+                      {getDaysInMonth(currentMonth).map((date, index) => (
+                        <button
+                          key={index}
+                          onClick={() => date && !isDateDisabled(date) && handleDateSelect(date)}
+                          disabled={!date || isDateDisabled(date)}
+                          className={`aspect-square rounded-lg text-sm font-medium transition-all ${
+                            !date
+                              ? 'invisible'
+                              : isDateDisabled(date)
+                              ? 'text-gray-300 cursor-not-allowed'
+                              : 'hover:bg-blue-100 hover:text-blue-900 cursor-pointer text-gray-900'
+                          }`}
+                        >
+                          {date?.getDate()}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : !selectedTime ? (
+                <div>
+                  <button onClick={() => setSelectedDate(null)} className="flex items-center text-blue-600 hover:text-blue-700 mb-4 font-semibold">
+                    <ChevronLeft className="w-4 h-4" />
+                    Back to calendar
+                  </button>
+
+                  <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 mb-6 border border-blue-100">
+                    <p className="text-sm text-gray-600 mb-1">Selected Date</p>
+                    <p className="text-lg font-bold text-gray-900">
+                      {selectedDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    </p>
+                  </div>
+
+                  <h4 className="font-bold text-gray-900 mb-4">Available Time Slots</h4>
+                  <div className="grid grid-cols-4 gap-3 max-h-96 overflow-y-auto">
+                    {timeSlots.map((slot) => (
+                      <button
+                        key={slot.value}
+                        onClick={() => setSelectedTime(slot.display)}
+                        className="p-3 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all text-sm font-semibold text-gray-900"
+                      >
+                        {slot.display}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <button onClick={() => setSelectedTime(null)} className="flex items-center text-blue-600 hover:text-blue-700 mb-6 font-semibold">
+                    <ChevronLeft className="w-4 h-4" />
+                    Back to time slots
+                  </button>
+
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200 mb-6">
+                    <h4 className="font-bold text-gray-900 mb-4 text-lg">Appointment Summary</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <Stethoscope className="w-5 h-5 text-green-600" />
+                        <div>
+                          <p className="text-xs text-gray-600">Doctor</p>
+                          <p className="font-semibold text-gray-900">{selectedDoctor.name}</p>
+                          <p className="text-sm text-gray-600">{selectedDoctor.specialty}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Calendar className="w-5 h-5 text-green-600" />
+                        <div>
+                          <p className="text-xs text-gray-600">Date</p>
+                          <p className="font-semibold text-gray-900">
+                            {selectedDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Clock className="w-5 h-5 text-green-600" />
+                        <div>
+                          <p className="text-xs text-gray-600">Time</p>
+                          <p className="font-semibold text-gray-900">{selectedTime}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        {appointmentType === 'video' ? <Video className="w-5 h-5 text-green-600" /> : <MapPin className="w-5 h-5 text-green-600" />}
+                        <div>
+                          <p className="text-xs text-gray-600">Type</p>
+                          <p className="font-semibold text-gray-900">{appointmentType === 'video' ? 'Video Consultation' : 'In-Person Visit'}</p>
+                          {appointmentType === 'in-person' && (
+                            <p className="text-sm text-gray-600">{selectedDoctor.location}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => setShowBookingModal(false)}
+                      className="flex-1 px-6 py-3 border-2 border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-all font-semibold"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleConfirmBooking}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:shadow-lg transition-all font-semibold"
+                    >
+                      Confirm Booking
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
