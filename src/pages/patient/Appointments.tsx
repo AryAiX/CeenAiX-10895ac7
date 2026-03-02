@@ -55,11 +55,25 @@ export const PatientAppointments: React.FC = () => {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
   const [bookingReason, setBookingReason] = useState('');
+  const [creatingDemo, setCreatingDemo] = useState(false);
 
   useEffect(() => {
     fetchDoctors();
     fetchAppointments();
   }, []);
+
+  const createSampleAppointments = async () => {
+    setCreatingDemo(true);
+    const { error } = await supabase.rpc('create_sample_appointments');
+
+    if (error) {
+      console.error('Error creating sample appointments:', error);
+      alert('Failed to create sample appointments. Please try again.');
+    } else {
+      await fetchAppointments();
+    }
+    setCreatingDemo(false);
+  };
 
   const fetchDoctors = async () => {
     const { data, error } = await supabase
@@ -426,13 +440,22 @@ export const PatientAppointments: React.FC = () => {
               {upcomingAppointments.length === 0 ? (
                 <div className="bg-white rounded-2xl shadow border border-gray-100 p-8 text-center">
                   <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-600">No upcoming appointments</p>
-                  <button
-                    onClick={handleBookAppointment}
-                    className="mt-4 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 font-semibold"
-                  >
-                    Book Your First Appointment
-                  </button>
+                  <p className="text-gray-600 mb-4">No upcoming appointments</p>
+                  <div className="flex items-center justify-center gap-3">
+                    <button
+                      onClick={handleBookAppointment}
+                      className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 font-semibold"
+                    >
+                      Book Your First Appointment
+                    </button>
+                    <button
+                      onClick={createSampleAppointments}
+                      disabled={creatingDemo}
+                      className="px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 font-semibold disabled:opacity-50"
+                    >
+                      {creatingDemo ? 'Creating...' : 'Load Demo Data'}
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="grid gap-6">
