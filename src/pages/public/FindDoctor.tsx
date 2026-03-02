@@ -5,14 +5,15 @@ import { supabase } from '../../lib/supabase';
 
 interface Doctor {
   id: string;
-  full_name: string;
-  specialization: string;
-  license_number: string;
-  years_of_experience?: number;
-  consultation_fee?: number;
+  name: string;
+  specialty: string;
+  location: string;
+  latitude?: number;
+  longitude?: number;
+  image_url?: string;
+  available_slots: number;
+  accepts_video: boolean;
   rating?: number;
-  languages?: string[];
-  location?: string;
 }
 
 export const FindDoctor: React.FC = () => {
@@ -24,13 +25,16 @@ export const FindDoctor: React.FC = () => {
 
   const specialties = [
     'All Specialties',
-    'General Practice',
-    'Cardiology',
-    'Dermatology',
-    'Pediatrics',
-    'Orthopedics',
-    'Neurology',
-    'Psychiatry',
+    'Cardiologist',
+    'Pediatrician',
+    'Dermatologist',
+    'Orthopedic Surgeon',
+    'General Practitioner',
+    'Neurologist',
+    'Gynecologist',
+    'Ophthalmologist',
+    'Psychiatrist',
+    'Endocrinologist',
   ];
 
   useEffect(() => {
@@ -40,32 +44,19 @@ export const FindDoctor: React.FC = () => {
   const fetchDoctors = async () => {
     try {
       const { data, error } = await supabase
-        .from('doctor_profiles')
-        .select(`
-          *,
-          user_profiles!inner(
-            id,
-            full_name,
-            email
-          )
-        `)
-        .limit(20);
+        .from('doctors')
+        .select('*')
+        .order('name')
+        .limit(50);
 
       if (error) throw error;
 
-      const formattedDoctors = data?.map((doc: any) => ({
-        id: doc.id,
-        full_name: doc.user_profiles.full_name,
-        specialization: doc.specialization || 'General Practice',
-        license_number: doc.license_number,
-        years_of_experience: doc.years_of_experience,
-        consultation_fee: doc.consultation_fee,
-        rating: 4.5 + Math.random() * 0.5,
-        languages: ['English', 'Arabic'],
-        location: 'Dubai Healthcare City',
+      const doctorsWithRatings = data?.map((doc: any) => ({
+        ...doc,
+        rating: 4.2 + Math.random() * 0.8,
       })) || [];
 
-      setDoctors(formattedDoctors);
+      setDoctors(doctorsWithRatings);
     } catch (error) {
       console.error('Error fetching doctors:', error);
     } finally {
@@ -75,12 +66,12 @@ export const FindDoctor: React.FC = () => {
 
   const filteredDoctors = doctors.filter((doctor) => {
     const matchesSearch =
-      doctor.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doctor.specialization.toLowerCase().includes(searchTerm.toLowerCase());
+      doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doctor.specialty.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesSpecialty =
       selectedSpecialty === 'all' ||
-      doctor.specialization.toLowerCase() === selectedSpecialty.toLowerCase();
+      doctor.specialty.toLowerCase().includes(selectedSpecialty.toLowerCase());
 
     return matchesSearch && matchesSpecialty;
   });
@@ -175,62 +166,61 @@ export const FindDoctor: React.FC = () => {
             {filteredDoctors.map((doctor) => (
               <div
                 key={doctor.id}
-                className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all p-6"
+                className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                    {doctor.full_name.charAt(0)}
+                {doctor.image_url && (
+                  <div className="h-48 w-full overflow-hidden">
+                    <img
+                      src={doctor.image_url}
+                      alt={doctor.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                  <div className="flex items-center space-x-1 bg-yellow-50 px-2 py-1 rounded-full">
-                    <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                    <span className="text-sm font-medium text-gray-900">
-                      {doctor.rating?.toFixed(1)}
-                    </span>
+                )}
+
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-1">
+                        {doctor.name}
+                      </h3>
+                      <p className="text-blue-600 font-medium text-sm mb-2">
+                        {doctor.specialty}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-1 bg-yellow-50 px-2 py-1 rounded-full">
+                      <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                      <span className="text-sm font-medium text-gray-900">
+                        {doctor.rating?.toFixed(1)}
+                      </span>
+                    </div>
                   </div>
-                </div>
 
-                <h3 className="text-xl font-bold text-gray-900 mb-1">
-                  Dr. {doctor.full_name}
-                </h3>
-                <p className="text-blue-600 font-medium text-sm mb-3">
-                  {doctor.specialization}
-                </p>
-
-                <div className="space-y-2 mb-4">
-                  {doctor.years_of_experience && (
-                    <p className="text-sm text-gray-600">
-                      {doctor.years_of_experience}+ years experience
-                    </p>
-                  )}
-                  {doctor.location && (
+                  <div className="space-y-2 mb-4">
                     <div className="flex items-center space-x-2 text-sm text-gray-600">
                       <MapPin className="w-4 h-4" />
                       <span>{doctor.location}</span>
                     </div>
-                  )}
-                  {doctor.languages && (
-                    <p className="text-sm text-gray-600">
-                      Languages: {doctor.languages.join(', ')}
-                    </p>
-                  )}
-                </div>
-
-                {doctor.consultation_fee && (
-                  <div className="mb-4 pt-4 border-t border-gray-100">
-                    <p className="text-sm text-gray-600">Consultation Fee</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      AED {doctor.consultation_fee}
-                    </p>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Available Slots</span>
+                      <span className="font-semibold text-green-600">{doctor.available_slots}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Video Consultation</span>
+                      <span className={`font-semibold ${doctor.accepts_video ? 'text-green-600' : 'text-gray-400'}`}>
+                        {doctor.accepts_video ? 'Available' : 'Not Available'}
+                      </span>
+                    </div>
                   </div>
-                )}
 
-                <button
-                  onClick={handleBookAppointment}
-                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center space-x-2"
-                >
-                  <Calendar className="w-4 h-4" />
-                  <span>Book Appointment</span>
-                </button>
+                  <button
+                    onClick={handleBookAppointment}
+                    className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    <span>Book Appointment</span>
+                  </button>
+                </div>
               </div>
             ))}
           </div>
