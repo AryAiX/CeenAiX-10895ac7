@@ -438,115 +438,145 @@ export const PatientAppointments: React.FC = () => {
               </div>
 
               {upcomingAppointments.length === 0 ? (
-                <div className="bg-white rounded-2xl shadow border border-gray-100 p-8 text-center">
-                  <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-600 mb-4">No upcoming appointments</p>
-                  <div className="flex items-center justify-center gap-3">
+                <div className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 rounded-3xl shadow-lg border border-blue-100 p-12 text-center">
+                  <div className="bg-gradient-to-br from-blue-500 to-cyan-500 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                    <Calendar className="w-10 h-10 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">No Upcoming Appointments</h3>
+                  <p className="text-gray-600 mb-8 max-w-md mx-auto">Schedule your first appointment with our experienced healthcare providers</p>
+                  <div className="flex items-center justify-center gap-4">
                     <button
                       onClick={handleBookAppointment}
-                      className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 font-semibold"
+                      className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold flex items-center space-x-2"
                     >
-                      Book Your First Appointment
+                      <Plus className="w-5 h-5" />
+                      <span>Book Appointment</span>
                     </button>
                     <button
                       onClick={createSampleAppointments}
                       disabled={creatingDemo}
-                      className="px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 font-semibold disabled:opacity-50"
+                      className="px-6 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl hover:border-gray-300 hover:shadow-lg transition-all duration-200 font-semibold disabled:opacity-50"
                     >
-                      {creatingDemo ? 'Creating...' : 'Load Demo Data'}
+                      {creatingDemo ? 'Loading...' : 'Load Demo Data'}
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="grid gap-6">
+                <div className="grid lg:grid-cols-2 gap-6">
                   {upcomingAppointments.map((appointment) => (
-                <div key={appointment.id} className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-200">
-                  <div className={`p-4 ${appointment.type === 'video' ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-gradient-to-r from-blue-500 to-cyan-500'}`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg">
-                          {appointment.type === 'video' ? (
-                            <Video className="w-5 h-5 text-white" />
-                          ) : (
-                            <MapPin className="w-5 h-5 text-white" />
-                          )}
+                <div key={appointment.id} className="group bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
+                  <div className="relative h-32 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-cyan-600/20"></div>
+                    <div className="absolute inset-0" style={{
+                      backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)',
+                      backgroundSize: '32px 32px'
+                    }}></div>
+
+                    <div className="relative h-full flex items-center justify-between px-6">
+                      <div className="flex items-center space-x-4">
+                        <div className="bg-white/10 backdrop-blur-md border border-white/20 p-3 rounded-2xl">
+                          <Stethoscope className="w-8 h-8 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold text-white">{appointment.doctor_name}</h3>
-                          <p className="text-white/90 text-sm">{appointment.specialty}</p>
+                          <h3 className="text-xl font-bold text-white mb-1">{appointment.doctor_name}</h3>
+                          <p className="text-blue-200 text-sm font-medium">{appointment.specialty}</p>
                         </div>
                       </div>
-                      <span className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold uppercase">
-                        {appointment.type === 'video' ? 'Video Call' : 'In-Person'}
-                      </span>
+
+                      <div className={`px-4 py-2 rounded-full backdrop-blur-md border flex items-center space-x-2 ${
+                        appointment.type === 'video'
+                          ? 'bg-purple-500/20 border-purple-300/30'
+                          : 'bg-cyan-500/20 border-cyan-300/30'
+                      }`}>
+                        {appointment.type === 'video' ? (
+                          <Video className="w-4 h-4 text-white" />
+                        ) : (
+                          <MapPin className="w-4 h-4 text-white" />
+                        )}
+                        <span className="text-white text-xs font-bold uppercase tracking-wide">
+                          {appointment.type === 'video' ? 'Video' : 'In-Person'}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
                   <div className="p-6">
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="space-y-3">
-                        <div className="flex items-center space-x-3">
-                          <div className="bg-blue-100 p-2 rounded-lg">
-                            <Calendar className="w-4 h-4 text-blue-600" />
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-4 border border-blue-100">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <div className="bg-blue-600 p-2 rounded-lg">
+                            <Calendar className="w-4 h-4 text-white" />
                           </div>
-                          <div>
-                            <p className="text-xs text-gray-500 font-medium">Date</p>
-                            <p className="text-sm font-semibold text-gray-900">
-                              {new Date(appointment.appointment_date).toLocaleDateString('en-US', {
-                                weekday: 'short',
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                              })}
-                            </p>
-                          </div>
+                          <span className="text-xs font-bold text-blue-900 uppercase tracking-wide">Date</span>
                         </div>
+                        <p className="text-sm font-bold text-gray-900 leading-tight">
+                          {new Date(appointment.appointment_date).toLocaleDateString('en-US', {
+                            weekday: 'short',
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </p>
+                        <p className="text-xs text-gray-600 mt-0.5">
+                          {new Date(appointment.appointment_date).toLocaleDateString('en-US', { year: 'numeric' })}
+                        </p>
+                      </div>
 
-                        <div className="flex items-center space-x-3">
-                          <div className="bg-green-100 p-2 rounded-lg">
-                            <Clock className="w-4 h-4 text-green-600" />
+                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-100">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <div className="bg-green-600 p-2 rounded-lg">
+                            <Clock className="w-4 h-4 text-white" />
                           </div>
-                          <div>
-                            <p className="text-xs text-gray-500 font-medium">Time</p>
-                            <p className="text-sm font-semibold text-gray-900">
-                              {new Date(`2000-01-01T${appointment.appointment_time}`).toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                                hour12: true
-                              })}
-                            </p>
-                          </div>
+                          <span className="text-xs font-bold text-green-900 uppercase tracking-wide">Time</span>
+                        </div>
+                        <p className="text-sm font-bold text-gray-900">
+                          {new Date(`2000-01-01T${appointment.appointment_time}`).toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true
+                          })}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4 mb-6">
+                      <div className="flex items-start space-x-3">
+                        <div className="bg-gray-100 p-2 rounded-lg mt-0.5">
+                          <MapPin className="w-4 h-4 text-gray-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Location</p>
+                          <p className="text-sm text-gray-900 font-medium leading-snug">{appointment.location}</p>
                         </div>
                       </div>
 
-                      <div className="space-y-3">
-                        <div>
-                          <p className="text-xs text-gray-500 font-medium mb-1">Location</p>
-                          <p className="text-sm text-gray-700">{appointment.location}</p>
+                      <div className="flex items-start space-x-3">
+                        <div className="bg-gray-100 p-2 rounded-lg mt-0.5">
+                          <Calendar className="w-4 h-4 text-gray-600" />
                         </div>
-                        <div>
-                          <p className="text-xs text-gray-500 font-medium mb-1">Reason</p>
-                          <p className="text-sm text-gray-700">{appointment.reason}</p>
+                        <div className="flex-1">
+                          <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Reason for Visit</p>
+                          <p className="text-sm text-gray-900 font-medium">{appointment.reason}</p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex space-x-3 mt-6 pt-6 border-t border-gray-100">
+                    <div className="grid grid-cols-3 gap-3">
                       <button
                         onClick={() => appointment.type === 'video' ? null : handleGetDirections(appointment)}
-                        className="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 font-semibold"
+                        className="col-span-3 px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 font-bold flex items-center justify-center space-x-2"
                       >
-                        {appointment.type === 'video' ? 'Join Video Call' : 'Get Directions'}
+                        <NavigationIcon className="w-4 h-4" />
+                        <span>{appointment.type === 'video' ? 'Join Video Call' : 'Get Directions'}</span>
                       </button>
                       <button
                         onClick={() => handleRescheduleAppointment(appointment)}
-                        className="px-4 py-2.5 border-2 border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 font-semibold"
+                        className="col-span-3 sm:col-span-1 sm:col-start-2 px-4 py-2.5 bg-white border-2 border-gray-200 text-gray-700 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 font-semibold text-sm"
                       >
                         Reschedule
                       </button>
                       <button
                         onClick={() => handleCancelAppointment(appointment)}
-                        className="px-4 py-2.5 border-2 border-red-200 text-red-600 rounded-xl hover:bg-red-50 transition-all duration-200 font-semibold"
+                        className="col-span-3 sm:col-span-1 px-4 py-2.5 bg-white border-2 border-red-200 text-red-600 rounded-xl hover:border-red-300 hover:bg-red-50 transition-all duration-200 font-semibold text-sm"
                       >
                         Cancel
                       </button>
@@ -567,42 +597,46 @@ export const PatientAppointments: React.FC = () => {
             </div>
 
 {pastAppointments.length === 0 ? (
-                <div className="bg-white rounded-2xl shadow border border-gray-100 p-8 text-center">
-                  <Clock className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-600">No past appointments</p>
+                <div className="bg-gradient-to-br from-gray-50 to-white rounded-3xl shadow border border-gray-200 p-12 text-center">
+                  <div className="bg-gray-200 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Clock className="w-8 h-8 text-gray-500" />
+                  </div>
+                  <p className="text-gray-600 font-medium">No past appointments</p>
                 </div>
               ) : (
-                <div className="grid gap-6">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {pastAppointments.map((appointment) => (
-                    <div key={appointment.id} className="bg-white rounded-2xl shadow border border-gray-100 overflow-hidden">
-                      <div className="bg-gray-100 p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <div className="bg-gray-200 p-2 rounded-lg">
-                              <Calendar className="w-5 h-5 text-gray-600" />
+                    <div key={appointment.id} className="bg-white rounded-2xl shadow border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200">
+                      <div className="bg-gradient-to-r from-gray-100 to-gray-50 p-4 border-b border-gray-200">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center space-x-2">
+                            <div className="bg-gray-300 p-1.5 rounded-lg">
+                              <Stethoscope className="w-4 h-4 text-gray-700" />
                             </div>
-                            <div>
-                              <h3 className="text-lg font-bold text-gray-900">{appointment.doctor_name}</h3>
-                              <p className="text-gray-600 text-sm">{appointment.specialty}</p>
-                            </div>
+                            <span className="bg-gray-300 text-gray-700 px-2 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide">
+                              Completed
+                            </span>
                           </div>
-                          <span className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs font-semibold">
-                            COMPLETED
-                          </span>
                         </div>
+                        <h3 className="text-base font-bold text-gray-900 mb-1">{appointment.doctor_name}</h3>
+                        <p className="text-gray-600 text-xs font-medium">{appointment.specialty}</p>
                       </div>
 
-                      <div className="p-6">
-                        <div className="grid md:grid-cols-3 gap-4 text-sm mb-4">
+                      <div className="p-4">
+                        <div className="grid grid-cols-2 gap-3 mb-4">
                           <div>
-                            <p className="text-gray-500 font-medium">Date</p>
-                            <p className="text-gray-900 font-semibold">
-                              {new Date(appointment.appointment_date).toLocaleDateString()}
+                            <p className="text-xs text-gray-500 font-bold uppercase tracking-wide mb-1">Date</p>
+                            <p className="text-sm text-gray-900 font-semibold">
+                              {new Date(appointment.appointment_date).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric'
+                              })}
                             </p>
                           </div>
                           <div>
-                            <p className="text-gray-500 font-medium">Time</p>
-                            <p className="text-gray-900 font-semibold">
+                            <p className="text-xs text-gray-500 font-bold uppercase tracking-wide mb-1">Time</p>
+                            <p className="text-sm text-gray-900 font-semibold">
                               {new Date(`2000-01-01T${appointment.appointment_time}`).toLocaleTimeString('en-US', {
                                 hour: 'numeric',
                                 minute: '2-digit',
@@ -610,32 +644,34 @@ export const PatientAppointments: React.FC = () => {
                               })}
                             </p>
                           </div>
-                          <div>
-                            <p className="text-gray-500 font-medium">Reason</p>
-                            <p className="text-gray-900 font-semibold">{appointment.reason}</p>
+                        </div>
+
+                        <div className="mb-4">
+                          <p className="text-xs text-gray-500 font-bold uppercase tracking-wide mb-1">Reason</p>
+                          <p className="text-sm text-gray-900 font-medium">{appointment.reason}</p>
+                        </div>
+
+                        {appointment.rating ? (
+                          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
+                            <p className="text-xs text-gray-600 font-medium mb-2">Your Rating</p>
+                            <div className="flex items-center space-x-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className={`w-5 h-5 ${star <= appointment.rating! ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                                />
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                    {appointment.rating ? (
-                      <div className="flex items-center space-x-2 pt-4 border-t border-gray-100">
-                        <span className="text-sm text-gray-600">Your Rating:</span>
-                        <div className="flex items-center space-x-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star
-                              key={star}
-                              className={`w-4 h-4 ${star <= appointment.rating! ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => handleRateDoctor(appointment)}
-                        className="w-full mt-4 pt-4 border-t border-gray-100 flex items-center justify-center space-x-2 text-blue-600 hover:text-blue-700 font-semibold"
-                      >
-                        <Star className="w-4 h-4" />
-                        <span>Rate this doctor</span>
-                      </button>
-                    )}
+                        ) : (
+                          <button
+                            onClick={() => handleRateDoctor(appointment)}
+                            className="w-full px-4 py-2.5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl hover:shadow-lg transition-all font-semibold text-sm flex items-center justify-center space-x-2"
+                          >
+                            <Star className="w-4 h-4" />
+                            <span>Rate Doctor</span>
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}
