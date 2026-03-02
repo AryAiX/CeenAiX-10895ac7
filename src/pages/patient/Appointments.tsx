@@ -1,31 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, MapPin, Video, Plus, Search, X, ChevronLeft, ChevronRight, Stethoscope, Star, AlertTriangle, Navigation as NavigationIcon } from 'lucide-react';
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
+import { supabase } from '../../lib/supabase';
 
 interface Doctor {
-  id: number;
+  id: string;
   name: string;
   specialty: string;
   rating: number;
   reviews: number;
   location: string;
-  coordinates: { lat: number; lng: number };
-  image: string;
-  availableSlots: number;
-  acceptsVideo: boolean;
+  latitude: number;
+  longitude: number;
+  image_url: string;
+  available_slots: number;
+  accepts_video: boolean;
 }
 
 interface Appointment {
-  id: number;
-  doctor: string;
+  id: string;
+  user_id: string;
+  doctor_id: string;
+  doctor_name: string;
   specialty: string;
-  date: string;
-  time: string;
+  appointment_date: string;
+  appointment_time: string;
   type: 'in-person' | 'video';
   location: string;
-  coordinates?: { lat: number; lng: number };
+  latitude?: number;
+  longitude?: number;
   reason: string;
+  status: 'scheduled' | 'completed' | 'cancelled';
   rating?: number;
 }
 
@@ -45,95 +51,101 @@ export const PatientAppointments: React.FC = () => {
   const [appointmentType, setAppointmentType] = useState<'in-person' | 'video'>('in-person');
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [rescheduleMonth, setRescheduleMonth] = useState(new Date());
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [bookingReason, setBookingReason] = useState('');
 
-  const upcomingAppointments: Appointment[] = [
-    {
-      id: 1,
-      doctor: 'Dr. Sarah Ahmed',
-      specialty: 'General Medicine',
-      date: '2026-03-02',
-      time: '10:00 AM',
-      type: 'in-person',
-      location: 'Dubai Healthcare City, Building 27',
-      coordinates: { lat: 25.1172, lng: 55.2082 },
-      reason: 'Annual Checkup'
-    },
-    {
-      id: 2,
-      doctor: 'Dr. Mohammed Hassan',
-      specialty: 'Cardiology',
-      date: '2026-03-05',
-      time: '2:30 PM',
-      type: 'video',
-      location: 'Video Consultation',
-      reason: 'Follow-up Consultation'
-    }
-  ];
+  useEffect(() => {
+    fetchDoctors();
+    fetchAppointments();
+  }, []);
 
-  const pastAppointments: Appointment[] = [
-    {
-      id: 3,
-      doctor: 'Dr. Sarah Ahmed',
-      specialty: 'General Medicine',
-      date: '2026-02-15',
-      time: '11:00 AM',
-      type: 'in-person',
-      location: 'Dubai Healthcare City, Building 27',
-      coordinates: { lat: 25.1172, lng: 55.2082 },
-      reason: 'Flu Symptoms'
-    }
-  ];
+  const fetchDoctors = async () => {
+    const { data, error } = await supabase
+      .from('doctors')
+      .select(`
+        *,
+        doctor_ratings_summary(total_reviews, average_rating)
+      `);
 
-  const doctors: Doctor[] = [
-    {
-      id: 1,
-      name: 'Dr. Sarah Ahmed',
-      specialty: 'General Medicine',
-      rating: 4.9,
-      reviews: 234,
-      location: 'Dubai Healthcare City',
-      coordinates: { lat: 25.1172, lng: 55.2082 },
-      image: 'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=200',
-      availableSlots: 12,
-      acceptsVideo: true
-    },
-    {
-      id: 2,
-      name: 'Dr. Mohammed Hassan',
-      specialty: 'Cardiology',
-      rating: 4.8,
-      reviews: 189,
-      location: 'Al Zahra Hospital',
-      coordinates: { lat: 25.2048, lng: 55.2708 },
-      image: 'https://images.pexels.com/photos/5452293/pexels-photo-5452293.jpeg?auto=compress&cs=tinysrgb&w=200',
-      availableSlots: 8,
-      acceptsVideo: true
-    },
-    {
-      id: 3,
-      name: 'Dr. Fatima Al-Rashid',
-      specialty: 'Dermatology',
-      rating: 4.9,
-      reviews: 312,
-      location: 'Mediclinic City Hospital',
-      coordinates: { lat: 25.1280, lng: 55.2090 },
-      image: 'https://images.pexels.com/photos/5327584/pexels-photo-5327584.jpeg?auto=compress&cs=tinysrgb&w=200',
-      availableSlots: 15,
-      acceptsVideo: false
-    },
-    {
-      id: 4,
-      name: 'Dr. Ahmed Khalil',
-      specialty: 'Orthopedics',
-      rating: 4.7,
-      reviews: 156,
-      location: 'NMC Royal Hospital',
-      coordinates: { lat: 25.2244, lng: 55.2819 },
-      image: 'https://images.pexels.com/photos/5452201/pexels-photo-5452201.jpeg?auto=compress&cs=tinysrgb&w=200',
-      availableSlots: 6,
-      acceptsVideo: true
+    if (error) {
+      console.error('Error fetching doctors:', error);
+      return;
     }
-  ];
+
+    if (data) {
+      const doctorsWithRatings = data.map(doctor => ({
+        ...doctor,
+        rating: doctor.doctor_ratings_summary?.[0]?.average_rating || 0,
+        reviews: doctor.doctor_ratings_summary?.[0]?.total_reviews || 0
+      }));
+      setDoctors(doctorsWithRatings);
+    }
+  };
+
+  const fetchAppointments = async () => {
+    setLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    const { data: appointmentsData, error: appointmentsError } = await supabase
+      .from('appointments')
+      .select(`
+        *,
+        doctors(name, specialty)
+      `)
+      .eq('user_id', user.id)
+      .in('status', ['scheduled', 'completed'])
+      .order('appointment_date', { ascending: true });
+
+    if (appointmentsError) {
+      console.error('Error fetching appointments:', appointmentsError);
+      setLoading(false);
+      return;
+    }
+
+    const { data: ratingsData } = await supabase
+      .from('doctor_ratings')
+      .select('appointment_id, rating')
+      .eq('user_id', user.id);
+
+    const ratingsMap = new Map(ratingsData?.map(r => [r.appointment_id, r.rating]) || []);
+
+    const formattedAppointments = appointmentsData?.map(apt => ({
+      id: apt.id,
+      user_id: apt.user_id,
+      doctor_id: apt.doctor_id,
+      doctor_name: apt.doctors.name,
+      specialty: apt.doctors.specialty,
+      appointment_date: apt.appointment_date,
+      appointment_time: apt.appointment_time,
+      type: apt.type,
+      location: apt.location,
+      latitude: apt.latitude,
+      longitude: apt.longitude,
+      reason: apt.reason,
+      status: apt.status,
+      rating: ratingsMap.get(apt.id)
+    })) || [];
+
+    setAppointments(formattedAppointments);
+    setLoading(false);
+  };
+
+  const upcomingAppointments = appointments.filter(apt => {
+    const aptDate = new Date(`${apt.appointment_date}T${apt.appointment_time}`);
+    return apt.status === 'scheduled' && aptDate >= new Date();
+  });
+
+  const pastAppointments = appointments.filter(apt => {
+    const aptDate = new Date(`${apt.appointment_date}T${apt.appointment_time}`);
+    return apt.status === 'completed' || (apt.status === 'scheduled' && aptDate < new Date());
+  });
 
   const generateTimeSlots = () => {
     const slots = [];
@@ -189,17 +201,46 @@ export const PatientAppointments: React.FC = () => {
     setSelectedTime(null);
   };
 
-  const handleConfirmBooking = () => {
-    console.log('Booking confirmed:', {
-      doctor: selectedDoctor,
-      date: selectedDate,
-      time: selectedTime,
-      type: appointmentType
-    });
+  const handleConfirmBooking = async () => {
+    if (!selectedDoctor || !selectedDate || !selectedTime) return;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      alert('Please log in to book an appointment');
+      return;
+    }
+
+    const timeIn24h = convertTo24Hour(selectedTime);
+
+    const appointmentData = {
+      user_id: user.id,
+      doctor_id: selectedDoctor.id,
+      appointment_date: selectedDate.toISOString().split('T')[0],
+      appointment_time: timeIn24h,
+      type: appointmentType,
+      location: appointmentType === 'video' ? 'Video Consultation' : selectedDoctor.location,
+      latitude: appointmentType === 'in-person' ? selectedDoctor.latitude : null,
+      longitude: appointmentType === 'in-person' ? selectedDoctor.longitude : null,
+      reason: bookingReason || 'General Consultation',
+      status: 'scheduled'
+    };
+
+    const { error } = await supabase
+      .from('appointments')
+      .insert(appointmentData);
+
+    if (error) {
+      console.error('Error booking appointment:', error);
+      alert('Failed to book appointment. Please try again.');
+      return;
+    }
+
+    await fetchAppointments();
     setShowBookingModal(false);
     setSelectedDoctor(null);
     setSelectedDate(null);
     setSelectedTime(null);
+    setBookingReason('');
   };
 
   const goToPreviousMonth = () => {
@@ -222,8 +263,21 @@ export const PatientAppointments: React.FC = () => {
     setShowCancelModal(true);
   };
 
-  const confirmCancelAppointment = () => {
-    console.log('Appointment cancelled:', selectedAppointment);
+  const confirmCancelAppointment = async () => {
+    if (!selectedAppointment) return;
+
+    const { error } = await supabase
+      .from('appointments')
+      .update({ status: 'cancelled' })
+      .eq('id', selectedAppointment.id);
+
+    if (error) {
+      console.error('Error cancelling appointment:', error);
+      alert('Failed to cancel appointment. Please try again.');
+      return;
+    }
+
+    await fetchAppointments();
     setShowCancelModal(false);
     setSelectedAppointment(null);
   };
@@ -235,16 +289,44 @@ export const PatientAppointments: React.FC = () => {
     setSelectedTime(null);
   };
 
-  const confirmReschedule = () => {
-    console.log('Appointment rescheduled:', {
-      appointment: selectedAppointment,
-      newDate: selectedDate,
-      newTime: selectedTime
-    });
+  const confirmReschedule = async () => {
+    if (!selectedAppointment || !selectedDate || !selectedTime) return;
+
+    const timeIn24h = convertTo24Hour(selectedTime);
+
+    const { error } = await supabase
+      .from('appointments')
+      .update({
+        appointment_date: selectedDate.toISOString().split('T')[0],
+        appointment_time: timeIn24h,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', selectedAppointment.id);
+
+    if (error) {
+      console.error('Error rescheduling appointment:', error);
+      alert('Failed to reschedule appointment. Please try again.');
+      return;
+    }
+
+    await fetchAppointments();
     setShowRescheduleModal(false);
     setSelectedAppointment(null);
     setSelectedDate(null);
     setSelectedTime(null);
+  };
+
+  const convertTo24Hour = (time12h: string): string => {
+    const [time, period] = time12h.split(' ');
+    let [hours, minutes] = time.split(':');
+
+    if (period === 'PM' && hours !== '12') {
+      hours = String(parseInt(hours) + 12);
+    } else if (period === 'AM' && hours === '12') {
+      hours = '00';
+    }
+
+    return `${hours.padStart(2, '0')}:${minutes}:00`;
   };
 
   const handleGetDirections = (appointment: Appointment) => {
@@ -254,15 +336,15 @@ export const PatientAppointments: React.FC = () => {
   };
 
   const openGoogleMaps = () => {
-    if (!selectedAppointment?.coordinates) return;
-    const { lat, lng } = selectedAppointment.coordinates;
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank');
+    if (!selectedAppointment?.latitude || !selectedAppointment?.longitude) return;
+    const { latitude, longitude } = selectedAppointment;
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`, '_blank');
   };
 
   const openWaze = () => {
-    if (!selectedAppointment?.coordinates) return;
-    const { lat, lng } = selectedAppointment.coordinates;
-    window.open(`https://waze.com/ul?ll=${lat},${lng}&navigate=yes`, '_blank');
+    if (!selectedAppointment?.latitude || !selectedAppointment?.longitude) return;
+    const { latitude, longitude } = selectedAppointment;
+    window.open(`https://waze.com/ul?ll=${latitude},${longitude}&navigate=yes`, '_blank');
   };
 
   const handleRateDoctor = (appointment: Appointment) => {
@@ -271,11 +353,29 @@ export const PatientAppointments: React.FC = () => {
     setShowRatingModal(true);
   };
 
-  const submitRating = () => {
-    console.log('Rating submitted:', {
-      appointment: appointmentToRate,
-      rating: selectedRating
-    });
+  const submitRating = async () => {
+    if (!appointmentToRate || selectedRating === 0) return;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('doctor_ratings')
+      .insert({
+        user_id: user.id,
+        doctor_id: appointmentToRate.doctor_id,
+        appointment_id: appointmentToRate.id,
+        rating: selectedRating
+      });
+
+    if (error) {
+      console.error('Error submitting rating:', error);
+      alert('Failed to submit rating. Please try again.');
+      return;
+    }
+
+    await fetchAppointments();
+    await fetchDoctors();
     setShowRatingModal(false);
     setAppointmentToRate(null);
     setSelectedRating(0);
@@ -306,17 +406,37 @@ export const PatientAppointments: React.FC = () => {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Upcoming Appointments</h2>
-              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                {upcomingAppointments.length} Scheduled
-              </span>
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading appointments...</p>
             </div>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Upcoming Appointments</h2>
+                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                  {upcomingAppointments.length} Scheduled
+                </span>
+              </div>
 
-            <div className="grid gap-6">
-              {upcomingAppointments.map((appointment) => (
+              {upcomingAppointments.length === 0 ? (
+                <div className="bg-white rounded-2xl shadow border border-gray-100 p-8 text-center">
+                  <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <p className="text-gray-600">No upcoming appointments</p>
+                  <button
+                    onClick={handleBookAppointment}
+                    className="mt-4 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 font-semibold"
+                  >
+                    Book Your First Appointment
+                  </button>
+                </div>
+              ) : (
+                <div className="grid gap-6">
+                  {upcomingAppointments.map((appointment) => (
                 <div key={appointment.id} className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-200">
                   <div className={`p-4 ${appointment.type === 'video' ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-gradient-to-r from-blue-500 to-cyan-500'}`}>
                     <div className="flex items-center justify-between">
@@ -329,7 +449,7 @@ export const PatientAppointments: React.FC = () => {
                           )}
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold text-white">{appointment.doctor}</h3>
+                          <h3 className="text-lg font-bold text-white">{appointment.doctor_name}</h3>
                           <p className="text-white/90 text-sm">{appointment.specialty}</p>
                         </div>
                       </div>
@@ -349,7 +469,7 @@ export const PatientAppointments: React.FC = () => {
                           <div>
                             <p className="text-xs text-gray-500 font-medium">Date</p>
                             <p className="text-sm font-semibold text-gray-900">
-                              {new Date(appointment.date).toLocaleDateString('en-US', {
+                              {new Date(appointment.appointment_date).toLocaleDateString('en-US', {
                                 weekday: 'short',
                                 year: 'numeric',
                                 month: 'short',
@@ -365,7 +485,13 @@ export const PatientAppointments: React.FC = () => {
                           </div>
                           <div>
                             <p className="text-xs text-gray-500 font-medium">Time</p>
-                            <p className="text-sm font-semibold text-gray-900">{appointment.time}</p>
+                            <p className="text-sm font-semibold text-gray-900">
+                              {new Date(`2000-01-01T${appointment.appointment_time}`).toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: '2-digit',
+                                hour12: true
+                              })}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -405,54 +531,67 @@ export const PatientAppointments: React.FC = () => {
                   </div>
                 </div>
               ))}
+                </div>
+              )}
             </div>
-          </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Past Appointments</h2>
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Past Appointments</h2>
               <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
                 {pastAppointments.length} Completed
               </span>
             </div>
 
-            <div className="grid gap-6">
-              {pastAppointments.map((appointment) => (
-                <div key={appointment.id} className="bg-white rounded-2xl shadow border border-gray-100 overflow-hidden">
-                  <div className="bg-gray-100 p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="bg-gray-200 p-2 rounded-lg">
-                          <Calendar className="w-5 h-5 text-gray-600" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-bold text-gray-900">{appointment.doctor}</h3>
-                          <p className="text-gray-600 text-sm">{appointment.specialty}</p>
+{pastAppointments.length === 0 ? (
+                <div className="bg-white rounded-2xl shadow border border-gray-100 p-8 text-center">
+                  <Clock className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <p className="text-gray-600">No past appointments</p>
+                </div>
+              ) : (
+                <div className="grid gap-6">
+                  {pastAppointments.map((appointment) => (
+                    <div key={appointment.id} className="bg-white rounded-2xl shadow border border-gray-100 overflow-hidden">
+                      <div className="bg-gray-100 p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="bg-gray-200 p-2 rounded-lg">
+                              <Calendar className="w-5 h-5 text-gray-600" />
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-bold text-gray-900">{appointment.doctor_name}</h3>
+                              <p className="text-gray-600 text-sm">{appointment.specialty}</p>
+                            </div>
+                          </div>
+                          <span className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs font-semibold">
+                            COMPLETED
+                          </span>
                         </div>
                       </div>
-                      <span className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs font-semibold">
-                        COMPLETED
-                      </span>
-                    </div>
-                  </div>
 
-                  <div className="p-6">
-                    <div className="grid md:grid-cols-3 gap-4 text-sm mb-4">
-                      <div>
-                        <p className="text-gray-500 font-medium">Date</p>
-                        <p className="text-gray-900 font-semibold">
-                          {new Date(appointment.date).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500 font-medium">Time</p>
-                        <p className="text-gray-900 font-semibold">{appointment.time}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500 font-medium">Reason</p>
-                        <p className="text-gray-900 font-semibold">{appointment.reason}</p>
-                      </div>
-                    </div>
+                      <div className="p-6">
+                        <div className="grid md:grid-cols-3 gap-4 text-sm mb-4">
+                          <div>
+                            <p className="text-gray-500 font-medium">Date</p>
+                            <p className="text-gray-900 font-semibold">
+                              {new Date(appointment.appointment_date).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-gray-500 font-medium">Time</p>
+                            <p className="text-gray-900 font-semibold">
+                              {new Date(`2000-01-01T${appointment.appointment_time}`).toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: '2-digit',
+                                hour12: true
+                              })}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-gray-500 font-medium">Reason</p>
+                            <p className="text-gray-900 font-semibold">{appointment.reason}</p>
+                          </div>
+                        </div>
                     {appointment.rating ? (
                       <div className="flex items-center space-x-2 pt-4 border-t border-gray-100">
                         <span className="text-sm text-gray-600">Your Rating:</span>
@@ -474,12 +613,14 @@ export const PatientAppointments: React.FC = () => {
                         <span>Rate this doctor</span>
                       </button>
                     )}
-                  </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {showBookingModal && (
@@ -519,7 +660,7 @@ export const PatientAppointments: React.FC = () => {
                         className="bg-gradient-to-br from-gray-50 to-white border-2 border-gray-200 rounded-xl p-4 hover:border-blue-500 hover:shadow-lg transition-all cursor-pointer"
                       >
                         <div className="flex items-start space-x-4">
-                          <img src={doctor.image} alt={doctor.name} className="w-16 h-16 rounded-xl object-cover" />
+                          <img src={doctor.image_url} alt={doctor.name} className="w-16 h-16 rounded-xl object-cover" />
                           <div className="flex-1">
                             <h4 className="font-bold text-gray-900">{doctor.name}</h4>
                             <p className="text-sm text-gray-600 flex items-center mt-1">
@@ -529,10 +670,10 @@ export const PatientAppointments: React.FC = () => {
                             <div className="flex items-center space-x-2 mt-2">
                               <div className="flex items-center space-x-1">
                                 <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                <span className="text-sm font-semibold text-gray-900">{doctor.rating}</span>
+                                <span className="text-sm font-semibold text-gray-900">{doctor.rating.toFixed(1)}</span>
                                 <span className="text-xs text-gray-500">({doctor.reviews})</span>
                               </div>
-                              {doctor.acceptsVideo && (
+                              {doctor.accepts_video && (
                                 <span className="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full font-medium">
                                   Video
                                 </span>
@@ -543,7 +684,7 @@ export const PatientAppointments: React.FC = () => {
                               {doctor.location}
                             </p>
                             <p className="text-xs text-green-600 font-semibold mt-1">
-                              {doctor.availableSlots} slots available
+                              {doctor.available_slots} slots available
                             </p>
                           </div>
                         </div>
@@ -560,7 +701,7 @@ export const PatientAppointments: React.FC = () => {
 
                   <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 mb-6 border border-blue-100">
                     <div className="flex items-center space-x-4">
-                      <img src={selectedDoctor.image} alt={selectedDoctor.name} className="w-16 h-16 rounded-xl object-cover" />
+                      <img src={selectedDoctor.image_url} alt={selectedDoctor.name} className="w-16 h-16 rounded-xl object-cover" />
                       <div>
                         <h4 className="font-bold text-gray-900">{selectedDoctor.name}</h4>
                         <p className="text-sm text-gray-600">{selectedDoctor.specialty}</p>
@@ -568,7 +709,7 @@ export const PatientAppointments: React.FC = () => {
                     </div>
                   </div>
 
-                  {selectedDoctor.acceptsVideo && (
+                  {selectedDoctor.accepts_video && (
                     <div className="mb-6">
                       <label className="block text-sm font-semibold text-gray-900 mb-3">Appointment Type</label>
                       <div className="grid grid-cols-2 gap-4">
@@ -747,9 +888,15 @@ export const PatientAppointments: React.FC = () => {
             </div>
             <div className="p-6">
               <p className="text-gray-700 mb-4">
-                Are you sure you want to cancel your appointment with <strong>{selectedAppointment.doctor}</strong> on{' '}
-                <strong>{new Date(selectedAppointment.date).toLocaleDateString()}</strong> at{' '}
-                <strong>{selectedAppointment.time}</strong>?
+                Are you sure you want to cancel your appointment with <strong>{selectedAppointment.doctor_name}</strong> on{' '}
+                <strong>{new Date(selectedAppointment.appointment_date).toLocaleDateString()}</strong> at{' '}
+                <strong>
+                  {new Date(`2000-01-01T${selectedAppointment.appointment_time}`).toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                  })}
+                </strong>?
               </p>
               <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
                 <p className="text-sm text-orange-800">
@@ -782,7 +929,7 @@ export const PatientAppointments: React.FC = () => {
               <div>
                 <h3 className="text-2xl font-bold text-white">Reschedule Appointment</h3>
                 <p className="text-blue-100 text-sm mt-1">
-                  {selectedAppointment.doctor} - {selectedAppointment.specialty}
+                  {selectedAppointment.doctor_name} - {selectedAppointment.specialty}
                 </p>
               </div>
               <button
@@ -802,7 +949,12 @@ export const PatientAppointments: React.FC = () => {
                 <div>
                   <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
                     <p className="text-sm text-blue-800">
-                      <strong>Current Appointment:</strong> {new Date(selectedAppointment.date).toLocaleDateString()} at {selectedAppointment.time}
+                      <strong>Current Appointment:</strong> {new Date(selectedAppointment.appointment_date).toLocaleDateString()} at{' '}
+                      {new Date(`2000-01-01T${selectedAppointment.appointment_time}`).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                      })}
                     </p>
                   </div>
 
@@ -882,7 +1034,7 @@ export const PatientAppointments: React.FC = () => {
                     <div className="space-y-3">
                       <div>
                         <p className="text-xs text-gray-600">Doctor</p>
-                        <p className="font-semibold text-gray-900">{selectedAppointment.doctor}</p>
+                        <p className="font-semibold text-gray-900">{selectedAppointment.doctor_name}</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-600">New Date</p>
@@ -938,7 +1090,12 @@ export const PatientAppointments: React.FC = () => {
                   <strong>{selectedAppointment.location}</strong>
                 </p>
                 <p className="text-xs text-gray-600 mt-1">
-                  {new Date(selectedAppointment.date).toLocaleDateString()} at {selectedAppointment.time}
+                  {new Date(selectedAppointment.appointment_date).toLocaleDateString()} at{' '}
+                  {new Date(`2000-01-01T${selectedAppointment.appointment_time}`).toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                  })}
                 </p>
               </div>
 
@@ -995,10 +1152,15 @@ export const PatientAppointments: React.FC = () => {
             </div>
             <div className="p-6">
               <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
-                <p className="font-bold text-gray-900">{appointmentToRate.doctor}</p>
+                <p className="font-bold text-gray-900">{appointmentToRate.doctor_name}</p>
                 <p className="text-sm text-gray-600">{appointmentToRate.specialty}</p>
                 <p className="text-xs text-gray-500 mt-2">
-                  {new Date(appointmentToRate.date).toLocaleDateString()} at {appointmentToRate.time}
+                  {new Date(appointmentToRate.appointment_date).toLocaleDateString()} at{' '}
+                  {new Date(`2000-01-01T${appointmentToRate.appointment_time}`).toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                  })}
                 </p>
               </div>
 
