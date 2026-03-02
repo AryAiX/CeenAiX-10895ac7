@@ -429,254 +429,256 @@ export const PatientAppointments: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-8">
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Upcoming Appointments</h2>
-                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                  {upcomingAppointments.length} Scheduled
-                </span>
+            <div className="grid lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-3xl font-bold text-gray-900">Scheduled Appointments</h2>
+                  <span className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+                    {upcomingAppointments.length} Upcoming
+                  </span>
+                </div>
+
+                {upcomingAppointments.length === 0 ? (
+                  <div className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 rounded-3xl shadow-lg border border-blue-100 p-12 text-center">
+                    <div className="bg-gradient-to-br from-blue-500 to-cyan-500 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                      <Calendar className="w-10 h-10 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">No Upcoming Appointments</h3>
+                    <p className="text-gray-600 mb-8 max-w-md mx-auto">Schedule your first appointment with our experienced healthcare providers</p>
+                    <div className="flex items-center justify-center gap-4">
+                      <button
+                        onClick={handleBookAppointment}
+                        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold flex items-center space-x-2"
+                      >
+                        <Plus className="w-5 h-5" />
+                        <span>Book Appointment</span>
+                      </button>
+                      <button
+                        onClick={createSampleAppointments}
+                        disabled={creatingDemo}
+                        className="px-6 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl hover:border-gray-300 hover:shadow-lg transition-all duration-200 font-semibold disabled:opacity-50"
+                      >
+                        {creatingDemo ? 'Loading...' : 'Load Demo Data'}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {upcomingAppointments.slice(0, 2).map((appointment) => (
+                      <div key={appointment.id} className="group bg-white rounded-3xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-2xl transition-all duration-300">
+                        <div className="relative h-24 bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 to-cyan-600/30"></div>
+                          <div className="absolute inset-0 opacity-30" style={{
+                            backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.2) 1px, transparent 0)',
+                            backgroundSize: '24px 24px'
+                          }}></div>
+
+                          <div className="relative h-full flex items-center justify-between px-6">
+                            <div className="flex items-center space-x-4">
+                              <div className="bg-white/20 backdrop-blur-sm border border-white/30 p-3 rounded-xl">
+                                <Stethoscope className="w-6 h-6 text-white" />
+                              </div>
+                              <div>
+                                <h3 className="text-xl font-bold text-white">{appointment.doctor_name}</h3>
+                                <p className="text-cyan-200 text-sm font-medium">{appointment.specialty}</p>
+                              </div>
+                            </div>
+
+                            <div className={`px-3 py-1.5 rounded-full backdrop-blur-sm border flex items-center space-x-2 ${
+                              appointment.type === 'video'
+                                ? 'bg-purple-500/30 border-purple-300/40'
+                                : 'bg-cyan-500/30 border-cyan-300/40'
+                            }`}>
+                              {appointment.type === 'video' ? (
+                                <Video className="w-4 h-4 text-white" />
+                              ) : (
+                                <MapPin className="w-4 h-4 text-white" />
+                              )}
+                              <span className="text-white text-xs font-bold uppercase">
+                                {appointment.type === 'video' ? 'Video' : 'In-Person'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-6">
+                          <div className="flex items-center space-x-4 mb-6">
+                            <div className="flex-1 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-4 border border-blue-200">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <Calendar className="w-4 h-4 text-blue-700" />
+                                <span className="text-xs font-bold text-blue-900 uppercase tracking-wide">Date</span>
+                              </div>
+                              <p className="text-lg font-bold text-gray-900">
+                                {new Date(appointment.appointment_date).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric'
+                                })}
+                              </p>
+                              <p className="text-xs text-gray-600">
+                                {new Date(appointment.appointment_date).toLocaleDateString('en-US', { year: 'numeric' })}
+                              </p>
+                            </div>
+
+                            <div className="flex-1 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-4 border border-emerald-200">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <Clock className="w-4 h-4 text-emerald-700" />
+                                <span className="text-xs font-bold text-emerald-900 uppercase tracking-wide">Time</span>
+                              </div>
+                              <p className="text-lg font-bold text-gray-900">
+                                {new Date(`2000-01-01T${appointment.appointment_time}`).toLocaleTimeString('en-US', {
+                                  hour: 'numeric',
+                                  minute: '2-digit',
+                                  hour12: true
+                                })}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="bg-gray-50 rounded-2xl p-4 mb-6 space-y-3">
+                            <div className="flex items-start space-x-3">
+                              <MapPin className="w-5 h-5 text-gray-500 mt-0.5" />
+                              <div className="flex-1">
+                                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Location</p>
+                                <p className="text-sm text-gray-900 font-semibold">{appointment.location}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-start space-x-3">
+                              <Calendar className="w-5 h-5 text-gray-500 mt-0.5" />
+                              <div className="flex-1">
+                                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Reason</p>
+                                <p className="text-sm text-gray-900 font-semibold">{appointment.reason}</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-3">
+                            <button
+                              onClick={() => appointment.type === 'video' ? null : handleGetDirections(appointment)}
+                              className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 font-bold text-sm flex items-center justify-center space-x-2"
+                            >
+                              <NavigationIcon className="w-4 h-4" />
+                              <span>{appointment.type === 'video' ? 'Join Call' : 'Directions'}</span>
+                            </button>
+                            <button
+                              onClick={() => handleRescheduleAppointment(appointment)}
+                              className="px-4 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 font-semibold text-sm"
+                            >
+                              Reschedule
+                            </button>
+                            <button
+                              onClick={() => handleCancelAppointment(appointment)}
+                              className="px-4 py-3 bg-white border-2 border-red-300 text-red-600 rounded-xl hover:border-red-400 hover:bg-red-50 transition-all duration-200 font-semibold text-sm"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {upcomingAppointments.length === 0 ? (
-                <div className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 rounded-3xl shadow-lg border border-blue-100 p-12 text-center">
-                  <div className="bg-gradient-to-br from-blue-500 to-cyan-500 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                    <Calendar className="w-10 h-10 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">No Upcoming Appointments</h3>
-                  <p className="text-gray-600 mb-8 max-w-md mx-auto">Schedule your first appointment with our experienced healthcare providers</p>
-                  <div className="flex items-center justify-center gap-4">
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">Recent History</h2>
+
+                  {pastAppointments.length === 0 ? (
+                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow border border-gray-200 p-8 text-center">
+                      <div className="bg-gray-200 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <Clock className="w-6 h-6 text-gray-500" />
+                      </div>
+                      <p className="text-gray-600 font-medium text-sm">No past appointments</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {pastAppointments.slice(0, 1).map((appointment) => (
+                        <div key={appointment.id} className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200">
+                          <div className="bg-gradient-to-r from-gray-100 to-gray-50 p-4 border-b border-gray-200">
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="bg-gray-300 text-gray-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+                                Completed
+                              </span>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                              <div className="bg-gray-300 p-2 rounded-lg">
+                                <Stethoscope className="w-5 h-5 text-gray-700" />
+                              </div>
+                              <div>
+                                <h3 className="text-lg font-bold text-gray-900">{appointment.doctor_name}</h3>
+                                <p className="text-gray-600 text-sm font-medium">{appointment.specialty}</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="p-4">
+                            <div className="space-y-3 mb-4">
+                              <div>
+                                <p className="text-xs text-gray-500 font-bold uppercase tracking-wide mb-1">Date & Time</p>
+                                <p className="text-sm text-gray-900 font-semibold">
+                                  {new Date(appointment.appointment_date).toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                  })} at {new Date(`2000-01-01T${appointment.appointment_time}`).toLocaleTimeString('en-US', {
+                                    hour: 'numeric',
+                                    minute: '2-digit',
+                                    hour12: true
+                                  })}
+                                </p>
+                              </div>
+
+                              <div>
+                                <p className="text-xs text-gray-500 font-bold uppercase tracking-wide mb-1">Reason</p>
+                                <p className="text-sm text-gray-900 font-medium">{appointment.reason}</p>
+                              </div>
+                            </div>
+
+                            {appointment.rating ? (
+                              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
+                                <p className="text-xs text-gray-600 font-medium mb-2">Your Rating</p>
+                                <div className="flex items-center space-x-1">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star
+                                      key={star}
+                                      className={`w-5 h-5 ${star <= appointment.rating! ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => handleRateDoctor(appointment)}
+                                className="w-full px-4 py-2.5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl hover:shadow-lg transition-all font-semibold text-sm flex items-center justify-center space-x-2"
+                              >
+                                <Star className="w-4 h-4" />
+                                <span>Rate Doctor</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-2xl p-6 border border-cyan-200">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
+                  <div className="space-y-3">
                     <button
                       onClick={handleBookAppointment}
-                      className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold flex items-center space-x-2"
+                      className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-lg transition-all font-semibold flex items-center justify-center space-x-2"
                     >
                       <Plus className="w-5 h-5" />
-                      <span>Book Appointment</span>
+                      <span>New Appointment</span>
                     </button>
-                    <button
-                      onClick={createSampleAppointments}
-                      disabled={creatingDemo}
-                      className="px-6 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl hover:border-gray-300 hover:shadow-lg transition-all duration-200 font-semibold disabled:opacity-50"
-                    >
-                      {creatingDemo ? 'Loading...' : 'Load Demo Data'}
+                    <button className="w-full px-4 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all font-semibold flex items-center justify-center space-x-2">
+                      <Calendar className="w-5 h-5" />
+                      <span>View All History</span>
                     </button>
                   </div>
                 </div>
-              ) : (
-                <div className="grid lg:grid-cols-2 gap-6">
-                  {upcomingAppointments.map((appointment) => (
-                <div key={appointment.id} className="group bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
-                  <div className="relative h-32 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-cyan-600/20"></div>
-                    <div className="absolute inset-0" style={{
-                      backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)',
-                      backgroundSize: '32px 32px'
-                    }}></div>
-
-                    <div className="relative h-full flex items-center justify-between px-6">
-                      <div className="flex items-center space-x-4">
-                        <div className="bg-white/10 backdrop-blur-md border border-white/20 p-3 rounded-2xl">
-                          <Stethoscope className="w-8 h-8 text-white" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-white mb-1">{appointment.doctor_name}</h3>
-                          <p className="text-blue-200 text-sm font-medium">{appointment.specialty}</p>
-                        </div>
-                      </div>
-
-                      <div className={`px-4 py-2 rounded-full backdrop-blur-md border flex items-center space-x-2 ${
-                        appointment.type === 'video'
-                          ? 'bg-purple-500/20 border-purple-300/30'
-                          : 'bg-cyan-500/20 border-cyan-300/30'
-                      }`}>
-                        {appointment.type === 'video' ? (
-                          <Video className="w-4 h-4 text-white" />
-                        ) : (
-                          <MapPin className="w-4 h-4 text-white" />
-                        )}
-                        <span className="text-white text-xs font-bold uppercase tracking-wide">
-                          {appointment.type === 'video' ? 'Video' : 'In-Person'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-6">
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-4 border border-blue-100">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <div className="bg-blue-600 p-2 rounded-lg">
-                            <Calendar className="w-4 h-4 text-white" />
-                          </div>
-                          <span className="text-xs font-bold text-blue-900 uppercase tracking-wide">Date</span>
-                        </div>
-                        <p className="text-sm font-bold text-gray-900 leading-tight">
-                          {new Date(appointment.appointment_date).toLocaleDateString('en-US', {
-                            weekday: 'short',
-                            month: 'short',
-                            day: 'numeric'
-                          })}
-                        </p>
-                        <p className="text-xs text-gray-600 mt-0.5">
-                          {new Date(appointment.appointment_date).toLocaleDateString('en-US', { year: 'numeric' })}
-                        </p>
-                      </div>
-
-                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-100">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <div className="bg-green-600 p-2 rounded-lg">
-                            <Clock className="w-4 h-4 text-white" />
-                          </div>
-                          <span className="text-xs font-bold text-green-900 uppercase tracking-wide">Time</span>
-                        </div>
-                        <p className="text-sm font-bold text-gray-900">
-                          {new Date(`2000-01-01T${appointment.appointment_time}`).toLocaleTimeString('en-US', {
-                            hour: 'numeric',
-                            minute: '2-digit',
-                            hour12: true
-                          })}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4 mb-6">
-                      <div className="flex items-start space-x-3">
-                        <div className="bg-gray-100 p-2 rounded-lg mt-0.5">
-                          <MapPin className="w-4 h-4 text-gray-600" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Location</p>
-                          <p className="text-sm text-gray-900 font-medium leading-snug">{appointment.location}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start space-x-3">
-                        <div className="bg-gray-100 p-2 rounded-lg mt-0.5">
-                          <Calendar className="w-4 h-4 text-gray-600" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Reason for Visit</p>
-                          <p className="text-sm text-gray-900 font-medium">{appointment.reason}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3">
-                      <button
-                        onClick={() => appointment.type === 'video' ? null : handleGetDirections(appointment)}
-                        className="col-span-3 px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 font-bold flex items-center justify-center space-x-2"
-                      >
-                        <NavigationIcon className="w-4 h-4" />
-                        <span>{appointment.type === 'video' ? 'Join Video Call' : 'Get Directions'}</span>
-                      </button>
-                      <button
-                        onClick={() => handleRescheduleAppointment(appointment)}
-                        className="col-span-3 sm:col-span-1 sm:col-start-2 px-4 py-2.5 bg-white border-2 border-gray-200 text-gray-700 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 font-semibold text-sm"
-                      >
-                        Reschedule
-                      </button>
-                      <button
-                        onClick={() => handleCancelAppointment(appointment)}
-                        className="col-span-3 sm:col-span-1 px-4 py-2.5 bg-white border-2 border-red-200 text-red-600 rounded-xl hover:border-red-300 hover:bg-red-50 transition-all duration-200 font-semibold text-sm"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Past Appointments</h2>
-              <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
-                {pastAppointments.length} Completed
-              </span>
-            </div>
-
-{pastAppointments.length === 0 ? (
-                <div className="bg-gradient-to-br from-gray-50 to-white rounded-3xl shadow border border-gray-200 p-12 text-center">
-                  <div className="bg-gray-200 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Clock className="w-8 h-8 text-gray-500" />
-                  </div>
-                  <p className="text-gray-600 font-medium">No past appointments</p>
-                </div>
-              ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {pastAppointments.map((appointment) => (
-                    <div key={appointment.id} className="bg-white rounded-2xl shadow border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200">
-                      <div className="bg-gradient-to-r from-gray-100 to-gray-50 p-4 border-b border-gray-200">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center space-x-2">
-                            <div className="bg-gray-300 p-1.5 rounded-lg">
-                              <Stethoscope className="w-4 h-4 text-gray-700" />
-                            </div>
-                            <span className="bg-gray-300 text-gray-700 px-2 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide">
-                              Completed
-                            </span>
-                          </div>
-                        </div>
-                        <h3 className="text-base font-bold text-gray-900 mb-1">{appointment.doctor_name}</h3>
-                        <p className="text-gray-600 text-xs font-medium">{appointment.specialty}</p>
-                      </div>
-
-                      <div className="p-4">
-                        <div className="grid grid-cols-2 gap-3 mb-4">
-                          <div>
-                            <p className="text-xs text-gray-500 font-bold uppercase tracking-wide mb-1">Date</p>
-                            <p className="text-sm text-gray-900 font-semibold">
-                              {new Date(appointment.appointment_date).toLocaleDateString('en-US', {
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric'
-                              })}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 font-bold uppercase tracking-wide mb-1">Time</p>
-                            <p className="text-sm text-gray-900 font-semibold">
-                              {new Date(`2000-01-01T${appointment.appointment_time}`).toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                                hour12: true
-                              })}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="mb-4">
-                          <p className="text-xs text-gray-500 font-bold uppercase tracking-wide mb-1">Reason</p>
-                          <p className="text-sm text-gray-900 font-medium">{appointment.reason}</p>
-                        </div>
-
-                        {appointment.rating ? (
-                          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
-                            <p className="text-xs text-gray-600 font-medium mb-2">Your Rating</p>
-                            <div className="flex items-center space-x-1">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <Star
-                                  key={star}
-                                  className={`w-5 h-5 ${star <= appointment.rating! ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => handleRateDoctor(appointment)}
-                            className="w-full px-4 py-2.5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl hover:shadow-lg transition-all font-semibold text-sm flex items-center justify-center space-x-2"
-                          >
-                            <Star className="w-4 h-4" />
-                            <span>Rate Doctor</span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              </div>
             </div>
           </div>
         )}
