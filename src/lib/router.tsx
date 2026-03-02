@@ -17,11 +17,16 @@ import { DoctorPrescriptions } from '../pages/doctor/Prescriptions';
 import { DoctorPatients } from '../pages/doctor/Patients';
 import { DoctorMessages } from '../pages/doctor/Messages';
 import { DoctorProfile } from '../pages/doctor/Profile';
+import { AppointmentDesignShowcase } from '../pages/AppointmentDesignShowcase';
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <Home />,
+  },
+  {
+    path: '/appointment-showcase',
+    element: <AppointmentDesignShowcase />,
   },
   {
     path: '/patient/dashboard',
