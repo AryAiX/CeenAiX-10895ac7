@@ -64,7 +64,7 @@ export const PatientAppointments: React.FC = () => {
 
   const createSampleAppointments = async () => {
     setCreatingDemo(true);
-    const { error } = await supabase.rpc('create_sample_appointments');
+    const { error } = await supabase.rpc('create_upcoming_appointments');
 
     if (error) {
       console.error('Error creating sample appointments:', error);
