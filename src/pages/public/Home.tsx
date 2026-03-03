@@ -128,8 +128,14 @@ export const Home: React.FC = () => {
               <button onClick={() => navigate('/find-clinic')} className="text-gray-700 hover:text-ceenai-blue font-medium transition-colors">
                 Clinics
               </button>
-              <button onClick={() => navigate('/health-education')} className="text-gray-700 hover:text-ceenai-blue font-medium transition-colors">
-                Health Tips
+              <button onClick={() => navigate('/pharmacy')} className="text-gray-700 hover:text-ceenai-blue font-medium transition-colors">
+                Pharmacy
+              </button>
+              <button onClick={() => navigate('/laboratories')} className="text-gray-700 hover:text-ceenai-blue font-medium transition-colors">
+                Laboratories
+              </button>
+              <button onClick={() => navigate('/insurance')} className="text-gray-700 hover:text-ceenai-blue font-medium transition-colors">
+                Insurance
               </button>
             </div>
 
