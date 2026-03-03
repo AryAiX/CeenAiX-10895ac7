@@ -5,7 +5,7 @@ import {
   Filter, X, Building2, Users, Calendar, Mail,
   ChevronDown, ChevronUp,
   CheckCircle2, Ambulance, ParkingCircle, Shield, Navigation,
-  Sparkles, Award, TrendingUp, Stethoscope
+  Sparkles, Award, TrendingUp, Stethoscope, Heart
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { Header } from '../../components/Header';
