@@ -3,6 +3,7 @@ import { Pill, Calendar, Clock, AlertCircle, Package, MapPin, RefreshCw, CheckCi
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
 import { supabase } from '../../lib/supabase';
+import { useLocation } from 'react-router-dom';
 
 interface Prescription {
   id: string;
@@ -36,10 +37,13 @@ interface Pharmacy {
 }
 
 export const PatientPrescriptions: React.FC = () => {
+  const location = useLocation();
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [doctors, setDoctors] = useState<Record<string, Doctor>>({});
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'prescriptions' | 'pharmacy'>('prescriptions');
+  const [activeTab, setActiveTab] = useState<'prescriptions' | 'pharmacy'>(
+    location.pathname === '/pharmacy' ? 'pharmacy' : 'prescriptions'
+  );
   const [selectedMedication, setSelectedMedication] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
 
