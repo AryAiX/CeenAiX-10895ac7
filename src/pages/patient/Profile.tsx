@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
+import { FamilyTree } from '../../components/FamilyTree';
 import { Upload, Camera, User, Shield, Users, Plus, Trash2, Edit2, Save } from 'lucide-react';
 
 interface FamilyMember {
@@ -549,44 +550,50 @@ export const Profile: React.FC = () => {
                 </button>
               </div>
               <div className="p-8">
-                {familyMembers.length === 0 ? (
-                  <div className="text-center py-16 text-gray-500">
-                    <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-orange-100 to-amber-100 rounded-3xl flex items-center justify-center">
-                      <Users className="w-10 h-10 text-orange-500" />
-                    </div>
-                    <p className="text-lg font-semibold text-gray-700">No family members added yet</p>
-                    <p className="text-sm text-gray-500 mt-2">Add your family members to manage their health records</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    {familyMembers.map((member) => (
-                      <div key={member.id} className="group border-2 border-gray-200 rounded-2xl p-5 hover:shadow-xl hover:border-orange-200 transition-all duration-300 bg-gradient-to-br from-white to-orange-50/30">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center space-x-4">
-                            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-orange-400 to-amber-400 flex items-center justify-center ring-4 ring-orange-100 group-hover:ring-orange-200 transition-all duration-300">
-                              {member.profileImage ? (
-                                <img src={member.profileImage} alt={member.name} className="w-full h-full rounded-full object-cover" />
-                              ) : (
-                                <User className="w-7 h-7 text-white" />
-                              )}
+                <FamilyTree
+                  members={familyMembers}
+                  primaryUser={{
+                    name: personalInfo.fullName || 'You',
+                    profileImage: profileImage,
+                  }}
+                />
+
+                {familyMembers.length > 0 && (
+                  <div className="mt-12 pt-8 border-t-2 border-gray-100">
+                    <h4 className="font-bold text-gray-900 mb-6 text-lg flex items-center gap-2">
+                      <Users className="w-5 h-5 text-orange-600" />
+                      Family Members List
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      {familyMembers.map((member) => (
+                        <div key={member.id} className="group border-2 border-gray-200 rounded-2xl p-5 hover:shadow-xl hover:border-orange-200 transition-all duration-300 bg-gradient-to-br from-white to-orange-50/30">
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center space-x-4">
+                              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-orange-400 to-amber-400 flex items-center justify-center ring-4 ring-orange-100 group-hover:ring-orange-200 transition-all duration-300">
+                                {member.profileImage ? (
+                                  <img src={member.profileImage} alt={member.name} className="w-full h-full rounded-full object-cover" />
+                                ) : (
+                                  <User className="w-7 h-7 text-white" />
+                                )}
+                              </div>
+                              <div>
+                                <h4 className="font-bold text-gray-900 text-lg">{member.name}</h4>
+                                <p className="text-sm text-orange-600 font-medium">{member.relationship}</p>
+                                {member.dateOfBirth && (
+                                  <p className="text-xs text-gray-500 mt-1">{member.dateOfBirth}</p>
+                                )}
+                              </div>
                             </div>
-                            <div>
-                              <h4 className="font-bold text-gray-900 text-lg">{member.name}</h4>
-                              <p className="text-sm text-orange-600 font-medium">{member.relationship}</p>
-                              {member.dateOfBirth && (
-                                <p className="text-xs text-gray-500 mt-1">{member.dateOfBirth}</p>
-                              )}
-                            </div>
+                            <button
+                              onClick={() => removeFamilyMember(member.id)}
+                              className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
                           </div>
-                          <button
-                            onClick={() => removeFamilyMember(member.id)}
-                            className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 )}
 
