@@ -4,7 +4,7 @@ import {
   Heart, Search, ArrowLeft, MapPin, Star, Clock, Phone,
   Filter, X, Building2, Users, Calendar, Mail,
   Stethoscope, ChevronDown, ChevronUp,
-  CheckCircle2, Ambulance, ParkingCircle, Shield
+  CheckCircle2, Ambulance, ParkingCircle, Shield, Navigation
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -26,6 +26,8 @@ interface Hospital {
   parking_available: boolean;
   insurance_accepted: string[];
   operating_hours: Record<string, string>;
+  latitude: number;
+  longitude: number;
 }
 
 interface Doctor {
@@ -48,6 +50,7 @@ export const FindClinic: React.FC = () => {
   const [selectedType, setSelectedType] = useState<string>('all');
   const [selectedCity, setSelectedCity] = useState<string>('all');
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>('all');
+  const [minRating, setMinRating] = useState<number>(0);
   const [showEmergencyOnly, setShowEmergencyOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [expandedHospital, setExpandedHospital] = useState<string | null>(null);
@@ -127,6 +130,16 @@ export const FindClinic: React.FC = () => {
     new Set(hospitals.flatMap(h => h.specialties || []))
   ).sort();
 
+  const openGoogleMaps = (hospital: Hospital) => {
+    const url = `https://www.google.com/maps/search/?api=1&query=${hospital.latitude},${hospital.longitude}`;
+    window.open(url, '_blank');
+  };
+
+  const openWaze = (hospital: Hospital) => {
+    const url = `https://waze.com/ul?ll=${hospital.latitude},${hospital.longitude}&navigate=yes`;
+    window.open(url, '_blank');
+  };
+
   const filteredHospitals = hospitals
     .filter(hospital => {
       const matchesSearch =
@@ -139,8 +152,9 @@ export const FindClinic: React.FC = () => {
       const matchesSpecialty = selectedSpecialty === 'all' ||
         hospital.specialties?.includes(selectedSpecialty);
       const matchesEmergency = !showEmergencyOnly || hospital.emergency_services;
+      const matchesRating = hospital.rating >= minRating;
 
-      return matchesSearch && matchesType && matchesCity && matchesSpecialty && matchesEmergency;
+      return matchesSearch && matchesType && matchesCity && matchesSpecialty && matchesEmergency && matchesRating;
     })
     .sort((a, b) => {
       if (sortBy === 'rating') return b.rating - a.rating;
@@ -214,72 +228,105 @@ export const FindClinic: React.FC = () => {
           </div>
 
           {showFilters && (
-            <div className="mt-6 pt-6 border-t border-gray-200 grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Type</label>
-                <select
-                  value={selectedType}
-                  onChange={(e) => setSelectedType(e.target.value)}
-                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="all">All Types</option>
-                  <option value="hospital">Hospitals</option>
-                  <option value="clinic">Clinics</option>
-                </select>
+            <div className="mt-6 pt-6 border-t border-gray-200 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Type</label>
+                  <select
+                    value={selectedType}
+                    onChange={(e) => setSelectedType(e.target.value)}
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="all">All Types</option>
+                    <option value="hospital">Hospitals</option>
+                    <option value="clinic">Clinics</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">City</label>
+                  <select
+                    value={selectedCity}
+                    onChange={(e) => setSelectedCity(e.target.value)}
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="all">All Cities</option>
+                    {allCities.map(city => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Specialty</label>
+                  <select
+                    value={selectedSpecialty}
+                    onChange={(e) => setSelectedSpecialty(e.target.value)}
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="all">All Specialties</option>
+                    {allSpecialties.map(specialty => (
+                      <option key={specialty} value={specialty}>{specialty}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Sort By</label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as 'rating' | 'name')}
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="rating">Highest Rated</option>
+                    <option value="name">Name (A-Z)</option>
+                  </select>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">City</label>
-                <select
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.target.value)}
-                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="all">All Cities</option>
-                  {allCities.map(city => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Minimum Rating: {minRating === 0 ? 'All' : `${minRating}+ Stars`}
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="0"
+                      max="5"
+                      step="0.5"
+                      value={minRating}
+                      onChange={(e) => setMinRating(parseFloat(e.target.value))}
+                      className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                    />
+                    <div className="flex items-center gap-1 min-w-[120px]">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className={`w-4 h-4 ${
+                            star <= minRating
+                              ? 'text-yellow-500 fill-current'
+                              : 'text-gray-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Specialty</label>
-                <select
-                  value={selectedSpecialty}
-                  onChange={(e) => setSelectedSpecialty(e.target.value)}
-                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="all">All Specialties</option>
-                  {allSpecialties.map(specialty => (
-                    <option key={specialty} value={specialty}>{specialty}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Sort By</label>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as 'rating' | 'name')}
-                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="rating">Highest Rated</option>
-                  <option value="name">Name (A-Z)</option>
-                </select>
-              </div>
-
-              <div className="flex items-center">
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={showEmergencyOnly}
-                    onChange={(e) => setShowEmergencyOnly(e.target.checked)}
-                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm font-medium text-gray-700">
-                    24/7 Emergency Only
-                  </span>
-                </label>
+                <div className="flex items-end">
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={showEmergencyOnly}
+                      onChange={(e) => setShowEmergencyOnly(e.target.checked)}
+                      className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="ml-2 text-sm font-medium text-gray-700">
+                      24/7 Emergency Only
+                    </span>
+                  </label>
+                </div>
               </div>
             </div>
           )}
@@ -391,48 +438,62 @@ export const FindClinic: React.FC = () => {
                     )}
 
                     {hospital.insurance_accepted && hospital.insurance_accepted.length > 0 && (
-                      <div className="mb-4">
-                        <p className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide flex items-center gap-1">
-                          <Shield className="w-3.5 h-3.5" />
-                          Insurance Accepted
+                      <div className="mb-4 bg-green-50 border-2 border-green-200 rounded-xl p-4">
+                        <p className="text-sm font-bold text-green-900 mb-3 flex items-center gap-2">
+                          <Shield className="w-5 h-5 text-green-600" />
+                          Insurance Accepted ({hospital.insurance_accepted.length})
                         </p>
                         <div className="flex flex-wrap gap-2">
-                          {hospital.insurance_accepted.slice(0, 4).map((insurance, index) => (
+                          {hospital.insurance_accepted.map((insurance, index) => (
                             <span
                               key={index}
-                              className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-medium"
+                              className="bg-white border border-green-300 text-green-800 px-3 py-1.5 rounded-lg text-sm font-semibold shadow-sm"
                             >
                               {insurance}
                             </span>
                           ))}
-                          {hospital.insurance_accepted.length > 4 && (
-                            <span className="text-xs text-gray-500 px-2 py-1">
-                              +{hospital.insurance_accepted.length - 4} more
-                            </span>
-                          )}
                         </div>
                       </div>
                     )}
 
-                    <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
-                      <button
-                        onClick={() => toggleHospitalExpansion(hospital.id)}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg"
-                      >
-                        <Users className="w-4 h-4" />
-                        {expandedHospital === hospital.id ? 'Hide' : 'View'} Doctors
-                        {expandedHospital === hospital.id ?
-                          <ChevronUp className="w-4 h-4" /> :
-                          <ChevronDown className="w-4 h-4" />
-                        }
-                      </button>
-                      <button
-                        onClick={() => navigate('/patient/appointments')}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold rounded-lg transition-all"
-                      >
-                        <Calendar className="w-4 h-4" />
-                        Book Appointment
-                      </button>
+                    <div className="space-y-3 pt-4 border-t border-gray-200">
+                      <div className="flex flex-wrap gap-3">
+                        <button
+                          onClick={() => toggleHospitalExpansion(hospital.id)}
+                          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg"
+                        >
+                          <Users className="w-4 h-4" />
+                          {expandedHospital === hospital.id ? 'Hide' : 'View'} Doctors
+                          {expandedHospital === hospital.id ?
+                            <ChevronUp className="w-4 h-4" /> :
+                            <ChevronDown className="w-4 h-4" />
+                          }
+                        </button>
+                        <button
+                          onClick={() => navigate('/patient/appointments')}
+                          className="flex items-center gap-2 px-5 py-2.5 bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold rounded-lg transition-all"
+                        >
+                          <Calendar className="w-4 h-4" />
+                          Book Appointment
+                        </button>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={() => openGoogleMaps(hospital)}
+                          className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 hover:border-blue-500 text-gray-700 hover:text-blue-600 font-medium rounded-lg transition-all"
+                        >
+                          <Navigation className="w-4 h-4" />
+                          Google Maps
+                        </button>
+                        <button
+                          onClick={() => openWaze(hospital)}
+                          className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 hover:border-blue-500 text-gray-700 hover:text-blue-600 font-medium rounded-lg transition-all"
+                        >
+                          <Navigation className="w-4 h-4" />
+                          Waze
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
