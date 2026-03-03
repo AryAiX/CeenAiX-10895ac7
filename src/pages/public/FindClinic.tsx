@@ -648,120 +648,55 @@ export const FindClinic: React.FC = () => {
         )}
       </div>
 
-      <footer className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white mt-16 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent animate-shimmer"></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="relative">
-                  <Building2 className="w-8 h-8 text-cyan-400" />
-                  <div className="absolute -inset-1 bg-cyan-400 rounded-full blur opacity-30 animate-pulse-subtle"></div>
-                </div>
-                <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                  Healthcare Finder
-                </h3>
+      <footer className="bg-gray-900 text-gray-300 py-12 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center space-x-3 mb-4">
+                <img
+                  src="/ChatGPT_Image_Feb_27,_2026,_11_30_50_AM.png"
+                  alt="CeenAiX Logo"
+                  className="h-10 w-auto"
+                />
+                <span className="text-xl font-bold text-white">CeenAiX</span>
               </div>
-              <p className="text-slate-300 leading-relaxed mb-4">
-                Your trusted platform for discovering top-rated healthcare facilities and medical professionals. We connect you with quality healthcare services across the region.
+              <p className="text-gray-400 leading-relaxed">
+                Secure healthcare platform with AI-powered insights
               </p>
-              <div className="flex gap-3">
-                <a href="#" className="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg flex items-center justify-center transition-all hover:scale-110 hover:shadow-lg hover:shadow-blue-500/50">
-                  <Heart className="w-5 h-5" />
-                </a>
-                <a href="#" className="w-10 h-10 bg-slate-800 hover:bg-cyan-600 rounded-lg flex items-center justify-center transition-all hover:scale-110 hover:shadow-lg hover:shadow-cyan-500/50">
-                  <Mail className="w-5 h-5" />
-                </a>
-                <a href="#" className="w-10 h-10 bg-slate-800 hover:bg-teal-600 rounded-lg flex items-center justify-center transition-all hover:scale-110 hover:shadow-lg hover:shadow-teal-500/50">
-                  <Phone className="w-5 h-5" />
-                </a>
-              </div>
             </div>
 
             <div>
-              <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <Stethoscope className="w-5 h-5 text-cyan-400" />
-                Quick Links
-              </h4>
+              <h4 className="text-white font-bold mb-4">Services</h4>
               <ul className="space-y-2">
-                <li>
-                  <a href="#" className="text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1 h-1 bg-cyan-400 rounded-full group-hover:w-2 transition-all"></span>
-                    Find Hospitals
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1 h-1 bg-cyan-400 rounded-full group-hover:w-2 transition-all"></span>
-                    Find Clinics
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1 h-1 bg-cyan-400 rounded-full group-hover:w-2 transition-all"></span>
-                    Find Doctors
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1 h-1 bg-cyan-400 rounded-full group-hover:w-2 transition-all"></span>
-                    Book Appointment
-                  </a>
-                </li>
+                <li><button onClick={() => navigate('/find-doctor')} className="hover:text-ceenai-cyan transition-colors">Find Doctors</button></li>
+                <li><button onClick={() => navigate('/find-clinic')} className="hover:text-ceenai-cyan transition-colors">Find Clinics</button></li>
+                <li><button onClick={() => navigate('/ai-chat')} className="hover:text-ceenai-cyan transition-colors">AI Health Chat</button></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <Shield className="w-5 h-5 text-cyan-400" />
-                Support
-              </h4>
+              <h4 className="text-white font-bold mb-4">Resources</h4>
               <ul className="space-y-2">
-                <li>
-                  <a href="#" className="text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1 h-1 bg-cyan-400 rounded-full group-hover:w-2 transition-all"></span>
-                    Help Center
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1 h-1 bg-cyan-400 rounded-full group-hover:w-2 transition-all"></span>
-                    Contact Us
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1 h-1 bg-cyan-400 rounded-full group-hover:w-2 transition-all"></span>
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1 h-1 bg-cyan-400 rounded-full group-hover:w-2 transition-all"></span>
-                    Terms of Service
-                  </a>
-                </li>
+                <li><button onClick={() => navigate('/health-education')} className="hover:text-ceenai-cyan transition-colors">Health Education</button></li>
+                <li><button onClick={() => navigate('/insurance')} className="hover:text-ceenai-cyan transition-colors">Insurance</button></li>
+                <li><a href="#" className="hover:text-ceenai-cyan transition-colors">Help Center</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-white font-bold mb-4">Contact</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>support@ceenaix.com</li>
+                <li>1-800-CEENAIX</li>
+                <li>Available 24/7</li>
               </ul>
             </div>
           </div>
 
-          <div className="pt-8 border-t border-slate-700/50">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-slate-400 text-sm">
-                © 2026 Healthcare Finder. All rights reserved.
-              </p>
-              <div className="flex items-center gap-2 text-sm text-slate-400">
-                <CheckCircle2 className="w-4 h-4 text-green-400" />
-                <span>Trusted by <span className="text-cyan-400 font-semibold">10,000+</span> patients</span>
-              </div>
-            </div>
+          <div className="border-t border-gray-800 pt-8 text-center">
+            <p className="text-sm text-gray-400">© 2026 CeenAiX. DHA-compliant healthcare technology. All rights reserved.</p>
           </div>
         </div>
-
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 animate-gradient-x"></div>
       </footer>
 
       <style>{`
@@ -834,21 +769,6 @@ export const FindClinic: React.FC = () => {
         }
         .animate-draw-line {
           animation: draw-line 4s ease-in-out forwards;
-        }
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        .animate-shimmer {
-          animation: shimmer 3s infinite;
-        }
-        @keyframes gradient-x {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-        .animate-gradient-x {
-          background-size: 200% 200%;
-          animation: gradient-x 3s ease infinite;
         }
       `}</style>
     </div>
