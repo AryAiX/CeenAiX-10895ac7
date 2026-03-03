@@ -171,6 +171,29 @@ export const FindClinic: React.FC = () => {
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
         <div className="absolute top-0 left-0 w-96 h-96 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
         <div className="absolute bottom-0 right-1/2 w-96 h-96 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+
+        <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-blue-400"/>
+            </pattern>
+            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3"/>
+              <stop offset="50%" stopColor="#06b6d4" stopOpacity="0.5"/>
+              <stop offset="100%" stopColor="#14b8a6" stopOpacity="0.3"/>
+            </linearGradient>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+          <path className="animate-draw-line" d="M0,100 Q400,50 800,100 T1600,100" fill="none" stroke="url(#lineGradient)" strokeWidth="2" strokeDasharray="1600" strokeDashoffset="1600"/>
+          <path className="animate-draw-line animation-delay-1000" d="M0,300 Q400,250 800,300 T1600,300" fill="none" stroke="url(#lineGradient)" strokeWidth="2" strokeDasharray="1600" strokeDashoffset="1600"/>
+          <path className="animate-draw-line animation-delay-2000" d="M0,500 Q400,450 800,500 T1600,500" fill="none" stroke="url(#lineGradient)" strokeWidth="2" strokeDasharray="1600" strokeDashoffset="1600"/>
+        </svg>
+
+        <div className="absolute top-1/4 left-10 w-2 h-2 bg-blue-400 rounded-full animate-float"></div>
+        <div className="absolute top-1/3 right-20 w-3 h-3 bg-cyan-400 rounded-full animate-float animation-delay-1000"></div>
+        <div className="absolute top-2/3 left-1/4 w-2 h-2 bg-teal-400 rounded-full animate-float animation-delay-2000"></div>
+        <div className="absolute top-1/2 right-1/3 w-2 h-2 bg-blue-500 rounded-full animate-float animation-delay-3000"></div>
+        <div className="absolute bottom-1/4 left-1/2 w-3 h-3 bg-cyan-500 rounded-full animate-float animation-delay-4000"></div>
       </div>
 
       <nav className="bg-white/80 backdrop-blur-lg shadow-sm border-b border-gray-200/50 sticky top-0 z-50 relative">
@@ -625,6 +648,122 @@ export const FindClinic: React.FC = () => {
         )}
       </div>
 
+      <footer className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white mt-16 overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent animate-shimmer"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div className="col-span-1 md:col-span-2">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="relative">
+                  <Building2 className="w-8 h-8 text-cyan-400" />
+                  <div className="absolute -inset-1 bg-cyan-400 rounded-full blur opacity-30 animate-pulse-subtle"></div>
+                </div>
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                  Healthcare Finder
+                </h3>
+              </div>
+              <p className="text-slate-300 leading-relaxed mb-4">
+                Your trusted platform for discovering top-rated healthcare facilities and medical professionals. We connect you with quality healthcare services across the region.
+              </p>
+              <div className="flex gap-3">
+                <a href="#" className="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-lg flex items-center justify-center transition-all hover:scale-110 hover:shadow-lg hover:shadow-blue-500/50">
+                  <Heart className="w-5 h-5" />
+                </a>
+                <a href="#" className="w-10 h-10 bg-slate-800 hover:bg-cyan-600 rounded-lg flex items-center justify-center transition-all hover:scale-110 hover:shadow-lg hover:shadow-cyan-500/50">
+                  <Mail className="w-5 h-5" />
+                </a>
+                <a href="#" className="w-10 h-10 bg-slate-800 hover:bg-teal-600 rounded-lg flex items-center justify-center transition-all hover:scale-110 hover:shadow-lg hover:shadow-teal-500/50">
+                  <Phone className="w-5 h-5" />
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <Stethoscope className="w-5 h-5 text-cyan-400" />
+                Quick Links
+              </h4>
+              <ul className="space-y-2">
+                <li>
+                  <a href="#" className="text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 group">
+                    <span className="w-1 h-1 bg-cyan-400 rounded-full group-hover:w-2 transition-all"></span>
+                    Find Hospitals
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 group">
+                    <span className="w-1 h-1 bg-cyan-400 rounded-full group-hover:w-2 transition-all"></span>
+                    Find Clinics
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 group">
+                    <span className="w-1 h-1 bg-cyan-400 rounded-full group-hover:w-2 transition-all"></span>
+                    Find Doctors
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 group">
+                    <span className="w-1 h-1 bg-cyan-400 rounded-full group-hover:w-2 transition-all"></span>
+                    Book Appointment
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-cyan-400" />
+                Support
+              </h4>
+              <ul className="space-y-2">
+                <li>
+                  <a href="#" className="text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 group">
+                    <span className="w-1 h-1 bg-cyan-400 rounded-full group-hover:w-2 transition-all"></span>
+                    Help Center
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 group">
+                    <span className="w-1 h-1 bg-cyan-400 rounded-full group-hover:w-2 transition-all"></span>
+                    Contact Us
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 group">
+                    <span className="w-1 h-1 bg-cyan-400 rounded-full group-hover:w-2 transition-all"></span>
+                    Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-slate-300 hover:text-cyan-400 transition-colors flex items-center gap-2 group">
+                    <span className="w-1 h-1 bg-cyan-400 rounded-full group-hover:w-2 transition-all"></span>
+                    Terms of Service
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-slate-700/50">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <p className="text-slate-400 text-sm">
+                © 2026 Healthcare Finder. All rights reserved.
+              </p>
+              <div className="flex items-center gap-2 text-sm text-slate-400">
+                <CheckCircle2 className="w-4 h-4 text-green-400" />
+                <span>Trusted by <span className="text-cyan-400 font-semibold">10,000+</span> patients</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 animate-gradient-x"></div>
+      </footer>
+
       <style>{`
         @keyframes blob {
           0%, 100% { transform: translate(0, 0) scale(1); }
@@ -634,8 +773,14 @@ export const FindClinic: React.FC = () => {
         .animate-blob {
           animation: blob 7s infinite;
         }
+        .animation-delay-1000 {
+          animation-delay: 1s;
+        }
         .animation-delay-2000 {
           animation-delay: 2s;
+        }
+        .animation-delay-3000 {
+          animation-delay: 3s;
         }
         .animation-delay-4000 {
           animation-delay: 4s;
@@ -673,6 +818,37 @@ export const FindClinic: React.FC = () => {
         }
         .animate-bounce-subtle {
           animation: bounce-subtle 2s ease-in-out infinite;
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          33% { transform: translateY(-20px) translateX(10px); }
+          66% { transform: translateY(-10px) translateX(-10px); }
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        @keyframes draw-line {
+          to {
+            stroke-dashoffset: 0;
+          }
+        }
+        .animate-draw-line {
+          animation: draw-line 4s ease-in-out forwards;
+        }
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        .animate-shimmer {
+          animation: shimmer 3s infinite;
+        }
+        @keyframes gradient-x {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+        .animate-gradient-x {
+          background-size: 200% 200%;
+          animation: gradient-x 3s ease infinite;
         }
       `}</style>
     </div>
