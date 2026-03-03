@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Heart, Search, ArrowLeft, MapPin, Star, Clock, Phone,
+  Search, MapPin, Star, Clock, Phone,
   Filter, X, Building2, Users, Calendar, Mail,
-  Stethoscope, ChevronDown, ChevronUp,
+  ChevronDown, ChevronUp,
   CheckCircle2, Ambulance, ParkingCircle, Shield, Navigation,
   Sparkles, Award, TrendingUp
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { Header } from '../../components/Header';
+import { Footer } from '../../components/Footer';
 
 interface Hospital {
   id: string;
@@ -196,34 +198,7 @@ export const FindClinic: React.FC = () => {
         <div className="absolute bottom-1/4 left-1/2 w-3 h-3 bg-cyan-500 rounded-full animate-float animation-delay-4000"></div>
       </div>
 
-      <nav className="bg-white/80 backdrop-blur-lg shadow-sm border-b border-gray-200/50 sticky top-0 z-50 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-all hover:scale-105"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="font-medium">Back</span>
-            </button>
-            <div className="flex items-center space-x-3">
-              <div className="relative">
-                <Building2 className="w-7 h-7 text-blue-600" />
-                <Sparkles className="w-3 h-3 text-cyan-500 absolute -top-1 -right-1 animate-pulse" />
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                Healthcare Facilities
-              </span>
-            </div>
-            <button
-              onClick={() => navigate('/patient/dashboard')}
-              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg text-sm transform hover:scale-105"
-            >
-              Dashboard
-            </button>
-          </div>
-        </div>
-      </nav>
+      <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
         <div className="mb-8 text-center animate-fade-in">

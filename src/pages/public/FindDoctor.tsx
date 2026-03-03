@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Search, ArrowLeft, MapPin, Star, Filter, Video, Clock, Award } from 'lucide-react';
+import { Search, MapPin, Star, Filter, Video, Clock } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { GeometricBackground } from '../../components/GeometricBackground';
+import { Header } from '../../components/Header';
+import { Footer } from '../../components/Footer';
 
 interface Doctor {
   id: string;
@@ -94,10 +96,7 @@ export const FindDoctor: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-ceenai-cyan/5 relative">
       <GeometricBackground />
-
-      <nav className="bg-white/95 backdrop-blur-lg shadow-soft border-b border-gray-100 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
+      <Header />
             <button
               onClick={() => navigate('/')}
               className="flex items-center space-x-2 text-gray-600 hover:text-ceenai-blue font-medium transition-colors group"
@@ -105,23 +104,6 @@ export const FindDoctor: React.FC = () => {
               <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
               <span>Back to Home</span>
             </button>
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-ceenai-cyan to-ceenai-blue rounded-xl flex items-center justify-center shadow-md">
-                <Heart className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-ceenai-cyan to-ceenai-blue bg-clip-text text-transparent">
-                Find a Doctor
-              </span>
-            </div>
-            <button
-              onClick={() => navigate('/patient/profile')}
-              className="px-6 py-2.5 bg-gradient-to-r from-ceenai-cyan to-ceenai-blue text-white rounded-xl font-semibold shadow-md hover:shadow-lg hover:scale-105 transition-all"
-            >
-              Sign In
-            </button>
-          </div>
-        </div>
-      </nav>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
         <div className="text-center mb-12 animate-slide-up">
@@ -273,6 +255,7 @@ export const FindDoctor: React.FC = () => {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 };

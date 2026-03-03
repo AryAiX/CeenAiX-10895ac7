@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, ArrowLeft, BookOpen, Search } from 'lucide-react';
+import { BookOpen, Search } from 'lucide-react';
+import { Header } from '../../components/Header';
+import { Footer } from '../../components/Footer';
 
 interface Article {
   id: string;
@@ -83,29 +85,7 @@ export const HealthEducation: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Back</span>
-            </button>
-            <div className="flex items-center space-x-3">
-              <Heart className="w-7 h-7 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">Health Education</span>
-            </div>
-            <button
-              onClick={() => navigate('/auth')}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors text-sm"
-            >
-              Sign In
-            </button>
-          </div>
-        </div>
-      </nav>
+      <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
@@ -205,6 +185,7 @@ export const HealthEducation: React.FC = () => {
           </button>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
