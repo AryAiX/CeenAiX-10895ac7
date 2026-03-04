@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Star, Filter, Video, Clock } from 'lucide-react';
+import { Search, MapPin, Star, Filter, Video, Clock, ArrowLeft, Award } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { GeometricBackground } from '../../components/GeometricBackground';
 import { Header } from '../../components/Header';
