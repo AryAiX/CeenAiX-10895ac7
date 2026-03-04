@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, Calendar, UserCircle, MapPin, Save, Edit2, X, Stethoscope, FileText } from 'lucide-react';
+import { Navigation } from '../../components/Navigation';
 import { supabase } from '../../lib/supabase';
 
 interface ProfileData {
@@ -117,15 +118,20 @@ export const DoctorProfile: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gray-50">
+        <Navigation role="doctor" />
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-50">
+      <Navigation role="doctor" />
+      <div className="py-8">
+        <div className="max-w-4xl mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
           {!isEditing && (
@@ -360,6 +366,7 @@ export const DoctorProfile: React.FC = () => {
               </div>
             )}
           </div>
+        </div>
         </div>
       </div>
     </div>
