@@ -217,101 +217,111 @@ export const Insurance: React.FC = () => {
           </button>
         </div>
 
-        {showComparison && selectedPlans.length > 0 && (
+        {showComparison && (
           <div className="mb-8 bg-white rounded-2xl shadow-2xl overflow-hidden">
             <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-4">
               <h2 className="text-2xl font-bold text-center">Plan Comparison</h2>
-              <p className="text-center text-sm mt-1">Select up to 3 plans to compare</p>
+              <p className="text-center text-sm mt-1">Click "Compare" on any plan card below to add it (up to 3 plans)</p>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Features</th>
-                    {selectedPlanObjects.map((plan) => (
-                      <th key={plan.id} className="px-6 py-4 text-center">
-                        <div className="flex flex-col items-center">
-                          <span className="font-bold text-gray-900">{plan.name}</span>
-                          <span className="text-xs text-gray-600 mt-1">{plan.provider}</span>
-                          <button
-                            onClick={() => togglePlanSelection(plan.id)}
-                            className="mt-2 text-red-600 hover:text-red-700"
-                          >
-                            <X className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  <tr className="bg-blue-50">
-                    <td className="px-6 py-4 font-semibold text-gray-900">Monthly Premium</td>
-                    {selectedPlanObjects.map((plan) => (
-                      <td key={plan.id} className="px-6 py-4 text-center">
-                        <span className="text-2xl font-bold text-blue-600">AED {plan.monthlyPremium}</span>
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 font-semibold text-gray-900">Coverage Limit</td>
-                    {selectedPlanObjects.map((plan) => (
-                      <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
-                        {plan.coverageLimit}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr className="bg-gray-50">
-                    <td className="px-6 py-4 font-semibold text-gray-900">Inpatient Coverage</td>
-                    {selectedPlanObjects.map((plan) => (
-                      <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
-                        {plan.inpatientCoverage}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 font-semibold text-gray-900">Outpatient Coverage</td>
-                    {selectedPlanObjects.map((plan) => (
-                      <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
-                        {plan.outpatientCoverage}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr className="bg-gray-50">
-                    <td className="px-6 py-4 font-semibold text-gray-900">Emergency Care</td>
-                    {selectedPlanObjects.map((plan) => (
-                      <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
-                        {plan.emergencyCare}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 font-semibold text-gray-900">Maternity Care</td>
-                    {selectedPlanObjects.map((plan) => (
-                      <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
-                        {plan.maternityCare}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr className="bg-gray-50">
-                    <td className="px-6 py-4 font-semibold text-gray-900">Dental & Optical</td>
-                    {selectedPlanObjects.map((plan) => (
-                      <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
-                        {plan.dentalOptical}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 font-semibold text-gray-900">Pharmacy Coverage</td>
-                    {selectedPlanObjects.map((plan) => (
-                      <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
-                        {plan.pharmacyCoverage}
-                      </td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+
+            {selectedPlans.length === 0 ? (
+              <div className="p-12 text-center">
+                <ArrowLeftRight className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">No Plans Selected</h3>
+                <p className="text-gray-600">Click the "Compare" button on the plan cards below to start comparing</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Features</th>
+                      {selectedPlanObjects.map((plan) => (
+                        <th key={plan.id} className="px-6 py-4 text-center min-w-[200px]">
+                          <div className="flex flex-col items-center">
+                            <span className="font-bold text-gray-900">{plan.name}</span>
+                            <span className="text-xs text-gray-600 mt-1">{plan.provider}</span>
+                            <button
+                              onClick={() => togglePlanSelection(plan.id)}
+                              className="mt-2 text-red-600 hover:text-red-700 flex items-center gap-1"
+                            >
+                              <X className="w-4 h-4" />
+                              <span className="text-xs">Remove</span>
+                            </button>
+                          </div>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    <tr className="bg-blue-50">
+                      <td className="px-6 py-4 font-semibold text-gray-900">Monthly Premium</td>
+                      {selectedPlanObjects.map((plan) => (
+                        <td key={plan.id} className="px-6 py-4 text-center">
+                          <span className="text-2xl font-bold text-blue-600">AED {plan.monthlyPremium}</span>
+                        </td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <td className="px-6 py-4 font-semibold text-gray-900">Coverage Limit</td>
+                      {selectedPlanObjects.map((plan) => (
+                        <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
+                          {plan.coverageLimit}
+                        </td>
+                      ))}
+                    </tr>
+                    <tr className="bg-gray-50">
+                      <td className="px-6 py-4 font-semibold text-gray-900">Inpatient Coverage</td>
+                      {selectedPlanObjects.map((plan) => (
+                        <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
+                          {plan.inpatientCoverage}
+                        </td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <td className="px-6 py-4 font-semibold text-gray-900">Outpatient Coverage</td>
+                      {selectedPlanObjects.map((plan) => (
+                        <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
+                          {plan.outpatientCoverage}
+                        </td>
+                      ))}
+                    </tr>
+                    <tr className="bg-gray-50">
+                      <td className="px-6 py-4 font-semibold text-gray-900">Emergency Care</td>
+                      {selectedPlanObjects.map((plan) => (
+                        <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
+                          {plan.emergencyCare}
+                        </td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <td className="px-6 py-4 font-semibold text-gray-900">Maternity Care</td>
+                      {selectedPlanObjects.map((plan) => (
+                        <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
+                          {plan.maternityCare}
+                        </td>
+                      ))}
+                    </tr>
+                    <tr className="bg-gray-50">
+                      <td className="px-6 py-4 font-semibold text-gray-900">Dental & Optical</td>
+                      {selectedPlanObjects.map((plan) => (
+                        <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
+                          {plan.dentalOptical}
+                        </td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <td className="px-6 py-4 font-semibold text-gray-900">Pharmacy Coverage</td>
+                      {selectedPlanObjects.map((plan) => (
+                        <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
+                          {plan.pharmacyCoverage}
+                        </td>
+                      ))}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 
