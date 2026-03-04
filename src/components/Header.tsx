@@ -1,8 +1,17 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const menuItems = [
+    { label: 'Doctors', path: '/find-doctor' },
+    { label: 'Clinics', path: '/find-clinic' },
+    { label: 'Pharmacy', path: '/pharmacy' },
+    { label: 'Laboratories', path: '/laboratories' },
+    { label: 'Insurance', path: '/insurance' },
+  ];
 
   return (
     <nav className="bg-white/95 backdrop-blur-lg shadow-soft sticky top-0 z-50 border-b border-gray-100">
@@ -20,21 +29,21 @@ export const Header: React.FC = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-8">
-            <button onClick={() => navigate('/find-doctor')} className="text-gray-700 hover:text-ceenai-blue font-medium transition-colors">
-              Doctors
-            </button>
-            <button onClick={() => navigate('/find-clinic')} className="text-gray-700 hover:text-ceenai-blue font-medium transition-colors">
-              Clinics
-            </button>
-            <button onClick={() => navigate('/pharmacy')} className="text-gray-700 hover:text-ceenai-blue font-medium transition-colors">
-              Pharmacy
-            </button>
-            <button onClick={() => navigate('/laboratories')} className="text-gray-700 hover:text-ceenai-blue font-medium transition-colors">
-              Laboratories
-            </button>
-            <button onClick={() => navigate('/insurance')} className="text-gray-700 hover:text-ceenai-blue font-medium transition-colors">
-              Insurance
-            </button>
+            {menuItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => navigate(item.path)}
+                  className="relative text-gray-700 hover:text-ceenai-blue font-medium transition-colors py-2"
+                >
+                  {item.label}
+                  {isActive && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-ceenai-cyan to-ceenai-blue rounded-full" />
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           <div className="flex gap-3">
