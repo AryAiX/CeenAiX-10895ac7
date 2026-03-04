@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Phone, Calendar, UserCircle, MapPin, Save, Edit2, X, Stethoscope, FileText } from 'lucide-react';
+import { User, Mail, Phone, Calendar, CircleUser as UserCircle, MapPin, Save, CreditCard as Edit2, X, Stethoscope, FileText } from 'lucide-react';
 import { Navigation } from '../../components/Navigation';
 import { supabase } from '../../lib/supabase';
 
