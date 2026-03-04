@@ -10,6 +10,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
+import { BookingModal } from '../../components/BookingModal';
 
 interface Hospital {
   id: string;
@@ -36,9 +37,12 @@ interface Hospital {
 interface Doctor {
   id: string;
   name: string;
-  specialization: string;
+  specialty: string;
+  location: string;
   image_url: string;
-  experience_years: number;
+  average_rating: number;
+  total_ratings: number;
+  accepts_video: boolean;
   is_available: boolean;
   consultation_days: string[];
   consultation_hours: string;
@@ -60,6 +64,8 @@ export const FindClinic: React.FC = () => {
   const [hospitalDoctors, setHospitalDoctors] = useState<Record<string, Doctor[]>>({});
   const [sortBy, setSortBy] = useState<'rating' | 'name'>('rating');
   const [showNavMenu, setShowNavMenu] = useState<string | null>(null);
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   useEffect(() => {
     fetchHospitals();
@@ -93,9 +99,12 @@ export const FindClinic: React.FC = () => {
           doctor:doctors (
             id,
             name,
-            specialization,
+            specialty,
+            location,
             image_url,
-            experience_years
+            average_rating,
+            total_ratings,
+            accepts_video
           )
         `)
         .eq('hospital_id', hospitalId);
@@ -105,9 +114,12 @@ export const FindClinic: React.FC = () => {
       const doctors = data?.map(hd => ({
         id: hd.doctor.id,
         name: hd.doctor.name,
-        specialization: hd.doctor.specialization,
+        specialty: hd.doctor.specialty,
+        location: hd.doctor.location,
         image_url: hd.doctor.image_url,
-        experience_years: hd.doctor.experience_years,
+        average_rating: hd.doctor.average_rating || 0,
+        total_ratings: hd.doctor.total_ratings || 0,
+        accepts_video: hd.doctor.accepts_video,
         is_available: hd.is_available,
         consultation_days: hd.consultation_days || [],
         consultation_hours: hd.consultation_hours || '',
@@ -561,11 +573,16 @@ export const FindClinic: React.FC = () => {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <h5 className="font-bold text-gray-900 mb-1">{doctor.name}</h5>
-                                <p className="text-sm text-blue-600 font-medium">{doctor.specialization}</p>
-                                <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                                  <Award className="w-3 h-3" />
-                                  {doctor.experience_years}+ years experience
-                                </p>
+                                <p className="text-sm text-blue-600 font-medium">{doctor.specialty}</p>
+                                <div className="flex items-center gap-1 mt-1">
+                                  <Star className="w-3.5 h-3.5 text-yellow-500 fill-current" />
+                                  <span className="text-xs font-bold text-gray-900">
+                                    {doctor.average_rating > 0 ? doctor.average_rating.toFixed(1) : 'New'}
+                                  </span>
+                                  {doctor.total_ratings > 0 && (
+                                    <span className="text-xs text-gray-500">({doctor.total_ratings})</span>
+                                  )}
+                                </div>
                               </div>
                             </div>
 
@@ -593,7 +610,10 @@ export const FindClinic: React.FC = () => {
                             </div>
 
                             <button
-                              onClick={() => navigate('/patient/appointments')}
+                              onClick={() => {
+                                setSelectedDoctor(doctor);
+                                setShowBookingModal(true);
+                              }}
                               className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-medium rounded-lg transition-all text-sm shadow-md hover:shadow-lg transform hover:scale-105"
                             >
                               Book with Dr. {doctor.name.split(' ')[doctor.name.split(' ').length - 1]}
@@ -673,6 +693,19 @@ export const FindClinic: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {showBookingModal && selectedDoctor && (
+        <BookingModal
+          doctor={selectedDoctor}
+          onClose={() => {
+            setShowBookingModal(false);
+            setSelectedDoctor(null);
+          }}
+          onBookingComplete={() => {
+            fetchHospitals();
+          }}
+        />
+      )}
 
       <style>{`
         @keyframes blob {
