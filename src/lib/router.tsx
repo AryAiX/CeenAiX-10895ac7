@@ -6,6 +6,7 @@ import { FindClinic } from '../pages/public/FindClinic';
 import { Insurance } from '../pages/public/Insurance';
 import { HealthEducation } from '../pages/public/HealthEducation';
 import { Laboratories } from '../pages/public/Laboratories';
+import { Pharmacy } from '../pages/public/Pharmacy';
 import { PatientDashboard } from '../pages/patient/Dashboard';
 import { PatientAppointments } from '../pages/patient/Appointments';
 import { PatientPrescriptions } from '../pages/patient/Prescriptions';
@@ -67,7 +68,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/pharmacy',
-    element: <PatientPrescriptions />,
+    element: <Pharmacy />,
   },
   {
     path: '/patient/records',
