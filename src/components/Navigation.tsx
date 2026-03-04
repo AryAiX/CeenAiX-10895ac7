@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
 interface NavigationProps {
@@ -8,6 +8,7 @@ interface NavigationProps {
 
 export const Navigation: React.FC<NavigationProps> = ({ role }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const getNavLinks = () => {
@@ -58,15 +59,22 @@ export const Navigation: React.FC<NavigationProps> = ({ role }) => {
           </div>
 
           <div className="hidden md:flex items-center space-x-1">
-            {navLinks.map((link) => (
-              <button
-                key={link.href}
-                onClick={() => navigate(link.href)}
-                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-ceenai-cyan hover:bg-gray-50 transition-colors"
-              >
-                {link.label}
-              </button>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = location.pathname === link.href;
+              return (
+                <button
+                  key={link.href}
+                  onClick={() => navigate(link.href)}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'text-ceenai-cyan bg-ceenai-cyan/10 font-semibold'
+                      : 'text-gray-700 hover:text-ceenai-cyan hover:bg-gray-50'
+                  }`}
+                >
+                  {link.label}
+                </button>
+              );
+            })}
           </div>
 
           <div className="flex items-center space-x-4">
@@ -81,18 +89,25 @@ export const Navigation: React.FC<NavigationProps> = ({ role }) => {
 
         {mobileMenuOpen && (
           <div className="md:hidden pb-4 space-y-2">
-            {navLinks.map((link) => (
-              <button
-                key={link.href}
-                onClick={() => {
-                  navigate(link.href);
-                  setMobileMenuOpen(false);
-                }}
-                className="block w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-ceenai-cyan hover:bg-gray-50"
-              >
-                {link.label}
-              </button>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = location.pathname === link.href;
+              return (
+                <button
+                  key={link.href}
+                  onClick={() => {
+                    navigate(link.href);
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`block w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
+                    isActive
+                      ? 'text-ceenai-cyan bg-ceenai-cyan/10 font-semibold'
+                      : 'text-gray-700 hover:text-ceenai-cyan hover:bg-gray-50'
+                  }`}
+                >
+                  {link.label}
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
