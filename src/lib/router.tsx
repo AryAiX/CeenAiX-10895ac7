@@ -5,6 +5,7 @@ import { FindDoctor } from '../pages/public/FindDoctor';
 import { FindClinic } from '../pages/public/FindClinic';
 import { Insurance } from '../pages/public/Insurance';
 import { HealthEducation } from '../pages/public/HealthEducation';
+import { Laboratories } from '../pages/public/Laboratories';
 import { PatientDashboard } from '../pages/patient/Dashboard';
 import { PatientAppointments } from '../pages/patient/Appointments';
 import { PatientPrescriptions } from '../pages/patient/Prescriptions';
@@ -51,6 +52,10 @@ export const router = createBrowserRouter([
   {
     path: '/health-education',
     element: <HealthEducation />,
+  },
+  {
+    path: '/laboratories',
+    element: <Laboratories />,
   },
   {
     path: '/patient/appointments',
