@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogOut } from 'lucide-react';
 
 interface NavigationProps {
   role?: 'patient' | 'doctor';
@@ -38,10 +38,40 @@ export const Navigation: React.FC<NavigationProps> = ({ role }) => {
     }
   };
 
+  const getTheme = () => {
+    if (role === 'doctor') {
+      return {
+        bg: 'bg-gradient-to-r from-teal-600 to-emerald-600',
+        text: 'text-white',
+        activeText: 'text-white',
+        activeBg: 'bg-white/20',
+        hoverBg: 'hover:bg-white/10',
+        underline: 'bg-white',
+        logoText: 'text-white',
+        mobileActiveBg: 'bg-white/20',
+        mobileActiveText: 'text-white',
+        mobileText: 'text-white/90',
+      };
+    }
+    return {
+      bg: 'bg-white/95 backdrop-blur-sm border-b border-ceenai-cyan/20',
+      text: 'text-gray-700',
+      activeText: 'text-ceenai-cyan',
+      activeBg: 'bg-ceenai-cyan/10',
+      hoverBg: 'hover:bg-gray-50',
+      underline: 'bg-gradient-to-r from-ceenai-cyan to-ceenai-blue',
+      logoText: 'bg-gradient-to-r from-ceenai-cyan to-ceenai-blue bg-clip-text text-transparent',
+      mobileActiveBg: 'bg-ceenai-cyan/10',
+      mobileActiveText: 'text-ceenai-cyan',
+      mobileText: 'text-gray-700',
+    };
+  };
+
   const navLinks = getNavLinks();
+  const theme = getTheme();
 
   return (
-    <nav className="bg-white/95 backdrop-blur-sm shadow-lg sticky top-0 z-40 border-b border-ceenai-cyan/20">
+    <nav className={`${theme.bg} shadow-lg sticky top-0 z-40`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div
@@ -53,8 +83,8 @@ export const Navigation: React.FC<NavigationProps> = ({ role }) => {
               alt="CeenAiX Logo"
               className="h-10 w-auto"
             />
-            <span className="text-xl font-bold bg-gradient-to-r from-ceenai-cyan to-ceenai-blue bg-clip-text text-transparent">
-              CeenAiX
+            <span className={`text-xl font-bold ${theme.logoText}`}>
+              CeenAiX {role === 'doctor' ? '| Doctor Portal' : role === 'patient' ? '| Patient Portal' : ''}
             </span>
           </div>
 
@@ -65,15 +95,15 @@ export const Navigation: React.FC<NavigationProps> = ({ role }) => {
                 <button
                   key={link.href}
                   onClick={() => navigate(link.href)}
-                  className={`relative px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`relative px-4 py-2 text-sm font-medium transition-all ${
                     isActive
-                      ? 'text-ceenai-cyan bg-ceenai-cyan/10 font-semibold'
-                      : 'text-gray-700 hover:text-ceenai-cyan hover:bg-gray-50'
+                      ? `${theme.activeText} ${theme.activeBg} font-semibold`
+                      : `${theme.text} ${theme.hoverBg} hover:${theme.activeText}`
                   }`}
                 >
                   {link.label}
                   {isActive && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-ceenai-cyan to-ceenai-blue rounded-full" />
+                    <div className={`absolute bottom-0 left-0 right-0 h-0.5 ${theme.underline} rounded-full`} />
                   )}
                 </button>
               );
@@ -82,8 +112,15 @@ export const Navigation: React.FC<NavigationProps> = ({ role }) => {
 
           <div className="flex items-center space-x-4">
             <button
+              onClick={() => navigate('/')}
+              className={`hidden md:flex items-center space-x-2 px-4 py-2 ${theme.text} ${theme.hoverBg} rounded-lg transition-all font-medium`}
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Exit Portal</span>
+            </button>
+            <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-md text-gray-600"
+              className={`md:hidden p-2 rounded-md ${theme.text}`}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -103,14 +140,24 @@ export const Navigation: React.FC<NavigationProps> = ({ role }) => {
                   }}
                   className={`block w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
                     isActive
-                      ? 'text-ceenai-cyan bg-ceenai-cyan/10 font-semibold'
-                      : 'text-gray-700 hover:text-ceenai-cyan hover:bg-gray-50'
+                      ? `${theme.mobileActiveText} ${theme.mobileActiveBg} font-semibold`
+                      : `${theme.mobileText} ${theme.hoverBg}`
                   }`}
                 >
                   {link.label}
                 </button>
               );
             })}
+            <button
+              onClick={() => {
+                navigate('/');
+                setMobileMenuOpen(false);
+              }}
+              className={`block w-full text-left px-3 py-2 rounded-md text-sm font-medium ${theme.mobileText} ${theme.hoverBg} flex items-center space-x-2`}
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Exit Portal</span>
+            </button>
           </div>
         )}
       </div>
