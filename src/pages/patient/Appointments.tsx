@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, MapPin, Video, Plus, Search, X, ChevronLeft, ChevronRight, Stethoscope, Star, AlertTriangle, Navigation as NavigationIcon } from 'lucide-react';
+import { Calendar, Clock, MapPin, Video, Plus, Search, X, ChevronLeft, ChevronRight, User, Star, AlertTriangle, Navigation as NavigationIcon } from 'lucide-react';
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
 import { supabase } from '../../lib/supabase';
@@ -406,41 +406,65 @@ export const PatientAppointments: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation role="patient" />
-      <PageHeader
-        title="Appointments"
-        subtitle="Manage your medical appointments"
-        icon={<Calendar className="w-6 h-6 text-white" />}
-        backTo="/patient/dashboard"
-        actions={
-          <button onClick={handleBookAppointment} className="flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold">
-            <Plus className="w-5 h-5" />
-            <span>Book Appointment</span>
-          </button>
-        }
-      />
+
+      <div className="relative bg-gradient-to-r from-cyan-600 to-blue-600 overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <img
+            src="https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=1920"
+            alt="Medical Professional"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-600/80 to-blue-600/80"></div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2">My Appointments</h1>
+              <p className="text-cyan-100 text-lg">Manage your healthcare visits</p>
+            </div>
+            <button
+              onClick={handleBookAppointment}
+              className="flex items-center space-x-2 px-6 py-3 bg-white text-cyan-700 rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold"
+            >
+              <Plus className="w-5 h-5" />
+              <span>Book Appointment</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600 mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading appointments...</p>
             </div>
           </div>
         ) : (
           <div className="space-y-8">
-            <div className="grid lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 space-y-6">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-3xl font-bold text-gray-900">Scheduled Appointments</h2>
-                  <span className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
-                    {upcomingAppointments.length} Upcoming
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Upcoming Appointments</h2>
+                {upcomingAppointments.length > 0 && (
+                  <span className="bg-cyan-100 text-cyan-700 px-4 py-2 rounded-full text-sm font-bold">
+                    {upcomingAppointments.length} {upcomingAppointments.length === 1 ? 'Appointment' : 'Appointments'}
                   </span>
-                </div>
+                )}
+              </div>
 
-                {upcomingAppointments.length === 0 ? (
-                  <div className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 rounded-3xl shadow-lg border border-blue-100 p-12 text-center">
-                    <div className="bg-gradient-to-br from-blue-500 to-cyan-500 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+              {upcomingAppointments.length === 0 ? (
+                <div className="relative bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 opacity-5">
+                    <img
+                      src="https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=400"
+                      alt="Medical"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="relative p-12 text-center">
+                    <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                       <Calendar className="w-10 h-10 text-white" />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">No Upcoming Appointments</h3>
@@ -448,7 +472,7 @@ export const PatientAppointments: React.FC = () => {
                     <div className="flex items-center justify-center gap-4">
                       <button
                         onClick={handleBookAppointment}
-                        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold flex items-center space-x-2"
+                        className="px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold flex items-center space-x-2"
                       >
                         <Plus className="w-5 h-5" />
                         <span>Book Appointment</span>
@@ -462,224 +486,197 @@ export const PatientAppointments: React.FC = () => {
                       </button>
                     </div>
                   </div>
-                ) : (
-                  <div className="space-y-6">
-                    {upcomingAppointments.slice(0, 2).map((appointment) => (
-                      <div key={appointment.id} className="group bg-white rounded-3xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-2xl transition-all duration-300">
-                        <div className="relative h-24 bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 overflow-hidden">
-                          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 to-cyan-600/30"></div>
-                          <div className="absolute inset-0 opacity-30" style={{
-                            backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.2) 1px, transparent 0)',
-                            backgroundSize: '24px 24px'
-                          }}></div>
-
-                          <div className="relative h-full flex items-center justify-between px-6">
-                            <div className="flex items-center space-x-4">
-                              <div className="bg-white/20 backdrop-blur-sm border border-white/30 p-3 rounded-xl">
-                                <Stethoscope className="w-6 h-6 text-white" />
-                              </div>
-                              <div>
-                                <h3 className="text-xl font-bold text-white">{appointment.doctor_name}</h3>
-                                <p className="text-cyan-200 text-sm font-medium">{appointment.specialty}</p>
-                              </div>
-                            </div>
-
-                            <div className={`px-3 py-1.5 rounded-full backdrop-blur-sm border flex items-center space-x-2 ${
-                              appointment.type === 'video'
-                                ? 'bg-purple-500/30 border-purple-300/40'
-                                : 'bg-cyan-500/30 border-cyan-300/40'
-                            }`}>
-                              {appointment.type === 'video' ? (
-                                <Video className="w-4 h-4 text-white" />
-                              ) : (
-                                <MapPin className="w-4 h-4 text-white" />
-                              )}
-                              <span className="text-white text-xs font-bold uppercase">
-                                {appointment.type === 'video' ? 'Video' : 'In-Person'}
-                              </span>
-                            </div>
-                          </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {upcomingAppointments.map((appointment) => (
+                    <div key={appointment.id} className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200">
+                      <div className="relative bg-gradient-to-r from-cyan-600 to-blue-600 p-6">
+                        <div className="absolute inset-0 opacity-10">
+                          <img
+                            src="https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=600"
+                            alt="Doctor"
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-
-                        <div className="p-6">
-                          <div className="flex items-center space-x-4 mb-6">
-                            <div className="flex-1 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-4 border border-blue-200">
-                              <div className="flex items-center space-x-2 mb-2">
-                                <Calendar className="w-4 h-4 text-blue-700" />
-                                <span className="text-xs font-bold text-blue-900 uppercase tracking-wide">Date</span>
-                              </div>
-                              <p className="text-lg font-bold text-gray-900">
-                                {new Date(appointment.appointment_date).toLocaleDateString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric'
-                                })}
-                              </p>
-                              <p className="text-xs text-gray-600">
-                                {new Date(appointment.appointment_date).toLocaleDateString('en-US', { year: 'numeric' })}
-                              </p>
+                        <div className="relative flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center shadow-lg">
+                              <User className="w-8 h-8 text-cyan-600" />
                             </div>
-
-                            <div className="flex-1 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-4 border border-emerald-200">
-                              <div className="flex items-center space-x-2 mb-2">
-                                <Clock className="w-4 h-4 text-emerald-700" />
-                                <span className="text-xs font-bold text-emerald-900 uppercase tracking-wide">Time</span>
-                              </div>
-                              <p className="text-lg font-bold text-gray-900">
-                                {new Date(`2000-01-01T${appointment.appointment_time}`).toLocaleTimeString('en-US', {
-                                  hour: 'numeric',
-                                  minute: '2-digit',
-                                  hour12: true
-                                })}
-                              </p>
+                            <div>
+                              <h3 className="text-xl font-bold text-white">{appointment.doctor_name}</h3>
+                              <p className="text-cyan-100 text-sm">{appointment.specialty}</p>
                             </div>
                           </div>
-
-                          <div className="bg-gray-50 rounded-2xl p-4 mb-6 space-y-3">
-                            <div className="flex items-start space-x-3">
-                              <MapPin className="w-5 h-5 text-gray-500 mt-0.5" />
-                              <div className="flex-1">
-                                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Location</p>
-                                <p className="text-sm text-gray-900 font-semibold">{appointment.location}</p>
-                              </div>
-                            </div>
-                            <div className="flex items-start space-x-3">
-                              <Calendar className="w-5 h-5 text-gray-500 mt-0.5" />
-                              <div className="flex-1">
-                                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Reason</p>
-                                <p className="text-sm text-gray-900 font-semibold">{appointment.reason}</p>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center space-x-3">
-                            <button
-                              onClick={() => appointment.type === 'video' ? null : handleGetDirections(appointment)}
-                              className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 font-bold text-sm flex items-center justify-center space-x-2"
-                            >
-                              <NavigationIcon className="w-4 h-4" />
-                              <span>{appointment.type === 'video' ? 'Join Call' : 'Directions'}</span>
-                            </button>
-                            <button
-                              onClick={() => handleRescheduleAppointment(appointment)}
-                              className="px-4 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 font-semibold text-sm"
-                            >
-                              Reschedule
-                            </button>
-                            <button
-                              onClick={() => handleCancelAppointment(appointment)}
-                              className="px-4 py-3 bg-white border-2 border-red-300 text-red-600 rounded-xl hover:border-red-400 hover:bg-red-50 transition-all duration-200 font-semibold text-sm"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">Recent History</h2>
-
-                  {pastAppointments.length === 0 ? (
-                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow border border-gray-200 p-8 text-center">
-                      <div className="bg-gray-200 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
-                        <Clock className="w-6 h-6 text-gray-500" />
-                      </div>
-                      <p className="text-gray-600 font-medium text-sm">No past appointments</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {pastAppointments.slice(0, 1).map((appointment) => (
-                        <div key={appointment.id} className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200">
-                          <div className="bg-gradient-to-r from-gray-100 to-gray-50 p-4 border-b border-gray-200">
-                            <div className="flex items-center justify-between mb-3">
-                              <span className="bg-gray-300 text-gray-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
-                                Completed
-                              </span>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                              <div className="bg-gray-300 p-2 rounded-lg">
-                                <Stethoscope className="w-5 h-5 text-gray-700" />
-                              </div>
-                              <div>
-                                <h3 className="text-lg font-bold text-gray-900">{appointment.doctor_name}</h3>
-                                <p className="text-gray-600 text-sm font-medium">{appointment.specialty}</p>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="p-4">
-                            <div className="space-y-3 mb-4">
-                              <div>
-                                <p className="text-xs text-gray-500 font-bold uppercase tracking-wide mb-1">Date & Time</p>
-                                <p className="text-sm text-gray-900 font-semibold">
-                                  {new Date(appointment.appointment_date).toLocaleDateString('en-US', {
-                                    month: 'short',
-                                    day: 'numeric',
-                                    year: 'numeric'
-                                  })} at {new Date(`2000-01-01T${appointment.appointment_time}`).toLocaleTimeString('en-US', {
-                                    hour: 'numeric',
-                                    minute: '2-digit',
-                                    hour12: true
-                                  })}
-                                </p>
-                              </div>
-
-                              <div>
-                                <p className="text-xs text-gray-500 font-bold uppercase tracking-wide mb-1">Reason</p>
-                                <p className="text-sm text-gray-900 font-medium">{appointment.reason}</p>
-                              </div>
-                            </div>
-
-                            {appointment.rating ? (
-                              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
-                                <p className="text-xs text-gray-600 font-medium mb-2">Your Rating</p>
-                                <div className="flex items-center space-x-1">
-                                  {[1, 2, 3, 4, 5].map((star) => (
-                                    <Star
-                                      key={star}
-                                      className={`w-5 h-5 ${star <= appointment.rating! ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
-                                    />
-                                  ))}
-                                </div>
-                              </div>
+                          <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/30">
+                            {appointment.type === 'video' ? (
+                              <Video className="w-4 h-4 text-white" />
                             ) : (
-                              <button
-                                onClick={() => handleRateDoctor(appointment)}
-                                className="w-full px-4 py-2.5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl hover:shadow-lg transition-all font-semibold text-sm flex items-center justify-center space-x-2"
-                              >
-                                <Star className="w-4 h-4" />
-                                <span>Rate Doctor</span>
-                              </button>
+                              <MapPin className="w-4 h-4 text-white" />
                             )}
+                            <span className="text-white text-sm font-semibold">
+                              {appointment.type === 'video' ? 'Video Call' : 'In-Person'}
+                            </span>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                      </div>
 
-                <div className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-2xl p-6 border border-cyan-200">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
-                  <div className="space-y-3">
-                    <button
-                      onClick={handleBookAppointment}
-                      className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-lg transition-all font-semibold flex items-center justify-center space-x-2"
-                    >
-                      <Plus className="w-5 h-5" />
-                      <span>New Appointment</span>
-                    </button>
-                    <button className="w-full px-4 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all font-semibold flex items-center justify-center space-x-2">
-                      <Calendar className="w-5 h-5" />
-                      <span>View All History</span>
-                    </button>
-                  </div>
+                      <div className="p-6">
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                          <div className="bg-gray-50 rounded-xl p-4">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <Calendar className="w-4 h-4 text-cyan-600" />
+                              <span className="text-xs font-bold text-gray-600 uppercase">Date</span>
+                            </div>
+                            <p className="text-lg font-bold text-gray-900">
+                              {new Date(appointment.appointment_date).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric'
+                              })}
+                            </p>
+                          </div>
+
+                          <div className="bg-gray-50 rounded-xl p-4">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <Clock className="w-4 h-4 text-cyan-600" />
+                              <span className="text-xs font-bold text-gray-600 uppercase">Time</span>
+                            </div>
+                            <p className="text-lg font-bold text-gray-900">
+                              {new Date(`2000-01-01T${appointment.appointment_time}`).toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: '2-digit',
+                                hour12: true
+                              })}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                          <div className="flex items-start space-x-3 mb-3">
+                            <MapPin className="w-5 h-5 text-gray-500 mt-0.5" />
+                            <div className="flex-1">
+                              <p className="text-xs font-bold text-gray-500 uppercase mb-1">Location</p>
+                              <p className="text-sm text-gray-900 font-medium">{appointment.location}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start space-x-3">
+                            <Calendar className="w-5 h-5 text-gray-500 mt-0.5" />
+                            <div className="flex-1">
+                              <p className="text-xs font-bold text-gray-500 uppercase mb-1">Reason</p>
+                              <p className="text-sm text-gray-900 font-medium">{appointment.reason}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3">
+                          <button
+                            onClick={() => appointment.type === 'video' ? null : handleGetDirections(appointment)}
+                            className="flex-1 px-4 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 font-semibold text-sm flex items-center justify-center space-x-2"
+                          >
+                            {appointment.type === 'video' ? (
+                              <>
+                                <Video className="w-4 h-4" />
+                                <span>Join Call</span>
+                              </>
+                            ) : (
+                              <>
+                                <NavigationIcon className="w-4 h-4" />
+                                <span>Get Directions</span>
+                              </>
+                            )}
+                          </button>
+                          <button
+                            onClick={() => handleRescheduleAppointment(appointment)}
+                            className="px-4 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 font-semibold text-sm"
+                          >
+                            Reschedule
+                          </button>
+                          <button
+                            onClick={() => handleCancelAppointment(appointment)}
+                            className="px-4 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl hover:border-red-300 hover:bg-red-50 hover:text-red-600 transition-all duration-200 font-semibold text-sm"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {pastAppointments.length > 0 && (
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Past Appointments</h2>
+                <div className="space-y-4">
+                  {pastAppointments.slice(0, 3).map((appointment) => (
+                    <div key={appointment.id} className="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all duration-200">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+                            <User className="w-6 h-6 text-gray-600" />
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-gray-900">{appointment.doctor_name}</h3>
+                            <p className="text-sm text-gray-600">{appointment.specialty}</p>
+                          </div>
+                        </div>
+                        <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold">
+                          Completed
+                        </span>
+                      </div>
+
+                      <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
+                        <div className="flex items-center space-x-2">
+                          <Calendar className="w-4 h-4" />
+                          <span>
+                            {new Date(appointment.appointment_date).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
+                            })}
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Clock className="w-4 h-4" />
+                          <span>
+                            {new Date(`2000-01-01T${appointment.appointment_time}`).toLocaleTimeString('en-US', {
+                              hour: 'numeric',
+                              minute: '2-digit',
+                              hour12: true
+                            })}
+                          </span>
+                        </div>
+                      </div>
+
+                      {appointment.rating ? (
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm text-gray-600">Your Rating:</span>
+                          <div className="flex items-center space-x-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`w-4 h-4 ${star <= appointment.rating! ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => handleRateDoctor(appointment)}
+                          className="w-full px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl hover:shadow-lg transition-all font-semibold text-sm flex items-center justify-center space-x-2"
+                        >
+                          <Star className="w-4 h-4" />
+                          <span>Rate This Appointment</span>
+                        </button>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>
@@ -687,10 +684,10 @@ export const PatientAppointments: React.FC = () => {
       {showBookingModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl my-8">
-            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 p-6 rounded-t-2xl flex items-center justify-between">
+            <div className="bg-gradient-to-r from-cyan-600 to-blue-600 p-6 rounded-t-2xl flex items-center justify-between">
               <div>
                 <h3 className="text-2xl font-bold text-white">Book an Appointment</h3>
-                <p className="text-blue-100 text-sm mt-1">Find a doctor and schedule your visit</p>
+                <p className="text-cyan-100 text-sm mt-1">Find a doctor and schedule your visit</p>
               </div>
               <button onClick={() => setShowBookingModal(false)} className="p-2 hover:bg-white/20 rounded-lg transition-colors">
                 <X className="w-6 h-6 text-white" />
@@ -708,7 +705,7 @@ export const PatientAppointments: React.FC = () => {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search by doctor name or specialty..."
-                        className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                        className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all"
                       />
                     </div>
                   </div>
@@ -718,34 +715,21 @@ export const PatientAppointments: React.FC = () => {
                       <div
                         key={doctor.id}
                         onClick={() => handleDoctorSelect(doctor)}
-                        className="bg-gradient-to-br from-gray-50 to-white border-2 border-gray-200 rounded-xl p-4 hover:border-blue-500 hover:shadow-lg transition-all cursor-pointer"
+                        className="bg-white border-2 border-gray-200 rounded-xl p-4 hover:border-cyan-500 hover:shadow-lg transition-all cursor-pointer"
                       >
                         <div className="flex items-start space-x-4">
                           <img src={doctor.image_url} alt={doctor.name} className="w-16 h-16 rounded-xl object-cover" />
                           <div className="flex-1">
                             <h4 className="font-bold text-gray-900">{doctor.name}</h4>
-                            <p className="text-sm text-gray-600 flex items-center mt-1">
-                              <Stethoscope className="w-3 h-3 mr-1" />
-                              {doctor.specialty}
-                            </p>
-                            <div className="flex items-center space-x-2 mt-2">
-                              <div className="flex items-center space-x-1">
-                                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                <span className="text-sm font-semibold text-gray-900">{doctor.rating.toFixed(1)}</span>
-                                <span className="text-xs text-gray-500">({doctor.reviews})</span>
-                              </div>
-                              {doctor.accepts_video && (
-                                <span className="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full font-medium">
-                                  Video
-                                </span>
-                              )}
+                            <p className="text-sm text-gray-600">{doctor.specialty}</p>
+                            <div className="flex items-center space-x-1 mt-2">
+                              <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                              <span className="text-sm font-semibold text-gray-900">{doctor.rating.toFixed(1)}</span>
+                              <span className="text-xs text-gray-500">({doctor.reviews})</span>
                             </div>
                             <p className="text-xs text-gray-500 mt-2 flex items-center">
                               <MapPin className="w-3 h-3 mr-1" />
                               {doctor.location}
-                            </p>
-                            <p className="text-xs text-green-600 font-semibold mt-1">
-                              {doctor.available_slots} slots available
                             </p>
                           </div>
                         </div>
@@ -755,12 +739,12 @@ export const PatientAppointments: React.FC = () => {
                 </div>
               ) : !selectedDate ? (
                 <div>
-                  <button onClick={() => setSelectedDoctor(null)} className="flex items-center text-blue-600 hover:text-blue-700 mb-4 font-semibold">
+                  <button onClick={() => setSelectedDoctor(null)} className="flex items-center text-cyan-600 hover:text-cyan-700 mb-4 font-semibold">
                     <ChevronLeft className="w-4 h-4" />
                     Back to doctors
                   </button>
 
-                  <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 mb-6 border border-blue-100">
+                  <div className="bg-cyan-50 rounded-xl p-4 mb-6 border border-cyan-100">
                     <div className="flex items-center space-x-4">
                       <img src={selectedDoctor.image_url} alt={selectedDoctor.name} className="w-16 h-16 rounded-xl object-cover" />
                       <div>
@@ -778,12 +762,12 @@ export const PatientAppointments: React.FC = () => {
                           onClick={() => setAppointmentType('in-person')}
                           className={`p-4 rounded-xl border-2 transition-all ${
                             appointmentType === 'in-person'
-                              ? 'border-blue-500 bg-blue-50'
+                              ? 'border-cyan-500 bg-cyan-50'
                               : 'border-gray-200 bg-white hover:border-gray-300'
                           }`}
                         >
-                          <MapPin className={`w-6 h-6 mx-auto mb-2 ${appointmentType === 'in-person' ? 'text-blue-600' : 'text-gray-400'}`} />
-                          <p className={`font-semibold text-sm ${appointmentType === 'in-person' ? 'text-blue-900' : 'text-gray-700'}`}>
+                          <MapPin className={`w-6 h-6 mx-auto mb-2 ${appointmentType === 'in-person' ? 'text-cyan-600' : 'text-gray-400'}`} />
+                          <p className={`font-semibold text-sm ${appointmentType === 'in-person' ? 'text-cyan-900' : 'text-gray-700'}`}>
                             In-Person Visit
                           </p>
                         </button>
@@ -791,13 +775,13 @@ export const PatientAppointments: React.FC = () => {
                           onClick={() => setAppointmentType('video')}
                           className={`p-4 rounded-xl border-2 transition-all ${
                             appointmentType === 'video'
-                              ? 'border-purple-500 bg-purple-50'
+                              ? 'border-cyan-500 bg-cyan-50'
                               : 'border-gray-200 bg-white hover:border-gray-300'
                           }`}
                         >
-                          <Video className={`w-6 h-6 mx-auto mb-2 ${appointmentType === 'video' ? 'text-purple-600' : 'text-gray-400'}`} />
-                          <p className={`font-semibold text-sm ${appointmentType === 'video' ? 'text-purple-900' : 'text-gray-700'}`}>
-                            Video Consultation
+                          <Video className={`w-6 h-6 mx-auto mb-2 ${appointmentType === 'video' ? 'text-cyan-600' : 'text-gray-400'}`} />
+                          <p className={`font-semibold text-sm ${appointmentType === 'video' ? 'text-cyan-900' : 'text-gray-700'}`}>
+                            Video Call
                           </p>
                         </button>
                       </div>
@@ -833,7 +817,7 @@ export const PatientAppointments: React.FC = () => {
                               ? 'invisible'
                               : isDateDisabled(date)
                               ? 'text-gray-300 cursor-not-allowed'
-                              : 'hover:bg-blue-100 hover:text-blue-900 cursor-pointer text-gray-900'
+                              : 'hover:bg-cyan-100 hover:text-cyan-900 cursor-pointer text-gray-900'
                           }`}
                         >
                           {date?.getDate()}
@@ -844,12 +828,12 @@ export const PatientAppointments: React.FC = () => {
                 </div>
               ) : !selectedTime ? (
                 <div>
-                  <button onClick={() => setSelectedDate(null)} className="flex items-center text-blue-600 hover:text-blue-700 mb-4 font-semibold">
+                  <button onClick={() => setSelectedDate(null)} className="flex items-center text-cyan-600 hover:text-cyan-700 mb-4 font-semibold">
                     <ChevronLeft className="w-4 h-4" />
                     Back to calendar
                   </button>
 
-                  <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 mb-6 border border-blue-100">
+                  <div className="bg-cyan-50 rounded-xl p-4 mb-6 border border-cyan-100">
                     <p className="text-sm text-gray-600 mb-1">Selected Date</p>
                     <p className="text-lg font-bold text-gray-900">
                       {selectedDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
@@ -862,7 +846,7 @@ export const PatientAppointments: React.FC = () => {
                       <button
                         key={slot.value}
                         onClick={() => setSelectedTime(slot.display)}
-                        className="p-3 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all text-sm font-semibold text-gray-900"
+                        className="p-3 border-2 border-gray-200 rounded-xl hover:border-cyan-500 hover:bg-cyan-50 transition-all text-sm font-semibold text-gray-900"
                       >
                         {slot.display}
                       </button>
@@ -871,16 +855,16 @@ export const PatientAppointments: React.FC = () => {
                 </div>
               ) : (
                 <div>
-                  <button onClick={() => setSelectedTime(null)} className="flex items-center text-blue-600 hover:text-blue-700 mb-6 font-semibold">
+                  <button onClick={() => setSelectedTime(null)} className="flex items-center text-cyan-600 hover:text-cyan-700 mb-6 font-semibold">
                     <ChevronLeft className="w-4 h-4" />
                     Back to time slots
                   </button>
 
-                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200 mb-6">
+                  <div className="bg-cyan-50 rounded-xl p-6 border border-cyan-200 mb-6">
                     <h4 className="font-bold text-gray-900 mb-4 text-lg">Appointment Summary</h4>
                     <div className="space-y-3">
                       <div className="flex items-center space-x-3">
-                        <Stethoscope className="w-5 h-5 text-green-600" />
+                        <User className="w-5 h-5 text-cyan-600" />
                         <div>
                           <p className="text-xs text-gray-600">Doctor</p>
                           <p className="font-semibold text-gray-900">{selectedDoctor.name}</p>
@@ -888,7 +872,7 @@ export const PatientAppointments: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <Calendar className="w-5 h-5 text-green-600" />
+                        <Calendar className="w-5 h-5 text-cyan-600" />
                         <div>
                           <p className="text-xs text-gray-600">Date</p>
                           <p className="font-semibold text-gray-900">
@@ -897,14 +881,14 @@ export const PatientAppointments: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <Clock className="w-5 h-5 text-green-600" />
+                        <Clock className="w-5 h-5 text-cyan-600" />
                         <div>
                           <p className="text-xs text-gray-600">Time</p>
                           <p className="font-semibold text-gray-900">{selectedTime}</p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
-                        {appointmentType === 'video' ? <Video className="w-5 h-5 text-green-600" /> : <MapPin className="w-5 h-5 text-green-600" />}
+                        {appointmentType === 'video' ? <Video className="w-5 h-5 text-cyan-600" /> : <MapPin className="w-5 h-5 text-cyan-600" />}
                         <div>
                           <p className="text-xs text-gray-600">Type</p>
                           <p className="font-semibold text-gray-900">{appointmentType === 'video' ? 'Video Consultation' : 'In-Person Visit'}</p>
@@ -925,7 +909,7 @@ export const PatientAppointments: React.FC = () => {
                     </button>
                     <button
                       onClick={handleConfirmBooking}
-                      className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:shadow-lg transition-all font-semibold"
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl hover:shadow-lg transition-all font-semibold"
                     >
                       Confirm Booking
                     </button>
@@ -940,11 +924,11 @@ export const PatientAppointments: React.FC = () => {
       {showCancelModal && selectedAppointment && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="bg-gradient-to-r from-red-600 to-orange-600 p-6 rounded-t-2xl flex items-center space-x-3">
+            <div className="bg-gradient-to-r from-cyan-600 to-blue-600 p-6 rounded-t-2xl flex items-center space-x-3">
               <AlertTriangle className="w-8 h-8 text-white" />
               <div>
                 <h3 className="text-xl font-bold text-white">Cancel Appointment</h3>
-                <p className="text-red-100 text-sm">This action cannot be undone</p>
+                <p className="text-cyan-100 text-sm">This action cannot be undone</p>
               </div>
             </div>
             <div className="p-6">
@@ -959,8 +943,8 @@ export const PatientAppointments: React.FC = () => {
                   })}
                 </strong>?
               </p>
-              <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
-                <p className="text-sm text-orange-800">
+              <div className="bg-cyan-50 border border-cyan-200 rounded-xl p-4 mb-6">
+                <p className="text-sm text-cyan-800">
                   Please note: Cancelling within 24 hours of your appointment may result in a cancellation fee.
                 </p>
               </div>
@@ -973,7 +957,7 @@ export const PatientAppointments: React.FC = () => {
                 </button>
                 <button
                   onClick={confirmCancelAppointment}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-xl hover:shadow-lg transition-all font-semibold"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl hover:shadow-lg transition-all font-semibold"
                 >
                   Yes, Cancel
                 </button>
@@ -986,10 +970,10 @@ export const PatientAppointments: React.FC = () => {
       {showRescheduleModal && selectedAppointment && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl my-8">
-            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 p-6 rounded-t-2xl flex items-center justify-between">
+            <div className="bg-gradient-to-r from-cyan-600 to-blue-600 p-6 rounded-t-2xl flex items-center justify-between">
               <div>
                 <h3 className="text-2xl font-bold text-white">Reschedule Appointment</h3>
-                <p className="text-blue-100 text-sm mt-1">
+                <p className="text-cyan-100 text-sm mt-1">
                   {selectedAppointment.doctor_name} - {selectedAppointment.specialty}
                 </p>
               </div>
@@ -1008,8 +992,8 @@ export const PatientAppointments: React.FC = () => {
             <div className="p-6">
               {!selectedDate ? (
                 <div>
-                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-                    <p className="text-sm text-blue-800">
+                  <div className="bg-cyan-50 border border-cyan-200 rounded-xl p-4 mb-6">
+                    <p className="text-sm text-cyan-800">
                       <strong>Current Appointment:</strong> {new Date(selectedAppointment.appointment_date).toLocaleDateString()} at{' '}
                       {new Date(`2000-01-01T${selectedAppointment.appointment_time}`).toLocaleTimeString('en-US', {
                         hour: 'numeric',
@@ -1048,7 +1032,7 @@ export const PatientAppointments: React.FC = () => {
                             ? 'invisible'
                             : isDateDisabled(date)
                             ? 'text-gray-300 cursor-not-allowed'
-                            : 'hover:bg-blue-100 hover:text-blue-900 cursor-pointer text-gray-900'
+                            : 'hover:bg-cyan-100 hover:text-cyan-900 cursor-pointer text-gray-900'
                         }`}
                       >
                         {date?.getDate()}
@@ -1058,12 +1042,12 @@ export const PatientAppointments: React.FC = () => {
                 </div>
               ) : !selectedTime ? (
                 <div>
-                  <button onClick={() => setSelectedDate(null)} className="flex items-center text-blue-600 hover:text-blue-700 mb-4 font-semibold">
+                  <button onClick={() => setSelectedDate(null)} className="flex items-center text-cyan-600 hover:text-cyan-700 mb-4 font-semibold">
                     <ChevronLeft className="w-4 h-4" />
                     Back to calendar
                   </button>
 
-                  <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 mb-6 border border-blue-100">
+                  <div className="bg-cyan-50 rounded-xl p-4 mb-6 border border-cyan-100">
                     <p className="text-sm text-gray-600 mb-1">Selected Date</p>
                     <p className="text-lg font-bold text-gray-900">
                       {selectedDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
@@ -1076,7 +1060,7 @@ export const PatientAppointments: React.FC = () => {
                       <button
                         key={slot.value}
                         onClick={() => setSelectedTime(slot.display)}
-                        className="p-3 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all text-sm font-semibold text-gray-900"
+                        className="p-3 border-2 border-gray-200 rounded-xl hover:border-cyan-500 hover:bg-cyan-50 transition-all text-sm font-semibold text-gray-900"
                       >
                         {slot.display}
                       </button>
@@ -1085,12 +1069,12 @@ export const PatientAppointments: React.FC = () => {
                 </div>
               ) : (
                 <div>
-                  <button onClick={() => setSelectedTime(null)} className="flex items-center text-blue-600 hover:text-blue-700 mb-6 font-semibold">
+                  <button onClick={() => setSelectedTime(null)} className="flex items-center text-cyan-600 hover:text-cyan-700 mb-6 font-semibold">
                     <ChevronLeft className="w-4 h-4" />
                     Back to time slots
                   </button>
 
-                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200 mb-6">
+                  <div className="bg-cyan-50 rounded-xl p-6 border border-cyan-200 mb-6">
                     <h4 className="font-bold text-gray-900 mb-4 text-lg">New Appointment Details</h4>
                     <div className="space-y-3">
                       <div>
@@ -1123,7 +1107,7 @@ export const PatientAppointments: React.FC = () => {
                     </button>
                     <button
                       onClick={confirmReschedule}
-                      className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:shadow-lg transition-all font-semibold"
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl hover:shadow-lg transition-all font-semibold"
                     >
                       Confirm Reschedule
                     </button>
@@ -1138,15 +1122,15 @@ export const PatientAppointments: React.FC = () => {
       {showDirectionsModal && selectedAppointment && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 p-6 rounded-t-2xl flex items-center space-x-3">
+            <div className="bg-gradient-to-r from-cyan-600 to-blue-600 p-6 rounded-t-2xl flex items-center space-x-3">
               <NavigationIcon className="w-8 h-8 text-white" />
               <div>
                 <h3 className="text-xl font-bold text-white">Get Directions</h3>
-                <p className="text-blue-100 text-sm">Choose your navigation app</p>
+                <p className="text-cyan-100 text-sm">Choose your navigation app</p>
               </div>
             </div>
             <div className="p-6">
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+              <div className="bg-cyan-50 border border-cyan-200 rounded-xl p-4 mb-6">
                 <p className="text-sm text-gray-700">
                   <strong>{selectedAppointment.location}</strong>
                 </p>
@@ -1163,7 +1147,7 @@ export const PatientAppointments: React.FC = () => {
               <div className="space-y-3 mb-6">
                 <button
                   onClick={openGoogleMaps}
-                  className="w-full flex items-center space-x-4 p-4 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl hover:shadow-lg transition-all"
+                  className="w-full flex items-center space-x-4 p-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
                 >
                   <div className="bg-white/20 p-2 rounded-lg">
                     <MapPin className="w-6 h-6" />
@@ -1177,7 +1161,7 @@ export const PatientAppointments: React.FC = () => {
 
                 <button
                   onClick={openWaze}
-                  className="w-full flex items-center space-x-4 p-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl hover:shadow-lg transition-all"
+                  className="w-full flex items-center space-x-4 p-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl hover:shadow-lg transition-all"
                 >
                   <div className="bg-white/20 p-2 rounded-lg">
                     <NavigationIcon className="w-6 h-6" />
@@ -1204,11 +1188,11 @@ export const PatientAppointments: React.FC = () => {
       {showRatingModal && appointmentToRate && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="bg-gradient-to-r from-yellow-500 to-orange-500 p-6 rounded-t-2xl flex items-center space-x-3">
+            <div className="bg-gradient-to-r from-cyan-600 to-blue-600 p-6 rounded-t-2xl flex items-center space-x-3">
               <Star className="w-8 h-8 text-white fill-white" />
               <div>
                 <h3 className="text-xl font-bold text-white">Rate Doctor</h3>
-                <p className="text-yellow-100 text-sm">Share your experience</p>
+                <p className="text-cyan-100 text-sm">Share your experience</p>
               </div>
             </div>
             <div className="p-6">
@@ -1269,7 +1253,7 @@ export const PatientAppointments: React.FC = () => {
                   className={`flex-1 px-6 py-3 rounded-xl transition-all font-semibold ${
                     selectedRating === 0
                       ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:shadow-lg'
+                      : 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white hover:shadow-lg'
                   }`}
                 >
                   Submit Rating
