@@ -181,33 +181,19 @@ export const FindClinic: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 relative overflow-hidden">
+      <div className="absolute inset-0 z-0">
+        <img
+          src="https://images.pexels.com/photos/668300/pexels-photo-668300.jpeg?auto=compress&cs=tinysrgb&w=1920"
+          alt="Modern hospital"
+          className="w-full h-96 object-cover opacity-15"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/80 to-white"></div>
+      </div>
+
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
         <div className="absolute top-0 left-0 w-96 h-96 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
         <div className="absolute bottom-0 right-1/2 w-96 h-96 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-
-        <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
-              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-blue-400"/>
-            </pattern>
-            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3"/>
-              <stop offset="50%" stopColor="#06b6d4" stopOpacity="0.5"/>
-              <stop offset="100%" stopColor="#14b8a6" stopOpacity="0.3"/>
-            </linearGradient>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-          <path className="animate-draw-line" d="M0,100 Q400,50 800,100 T1600,100" fill="none" stroke="url(#lineGradient)" strokeWidth="2" strokeDasharray="1600" strokeDashoffset="1600"/>
-          <path className="animate-draw-line animation-delay-1000" d="M0,300 Q400,250 800,300 T1600,300" fill="none" stroke="url(#lineGradient)" strokeWidth="2" strokeDasharray="1600" strokeDashoffset="1600"/>
-          <path className="animate-draw-line animation-delay-2000" d="M0,500 Q400,450 800,500 T1600,500" fill="none" stroke="url(#lineGradient)" strokeWidth="2" strokeDasharray="1600" strokeDashoffset="1600"/>
-        </svg>
-
-        <div className="absolute top-1/4 left-10 w-2 h-2 bg-blue-400 rounded-full animate-float"></div>
-        <div className="absolute top-1/3 right-20 w-3 h-3 bg-cyan-400 rounded-full animate-float animation-delay-1000"></div>
-        <div className="absolute top-2/3 left-1/4 w-2 h-2 bg-teal-400 rounded-full animate-float animation-delay-2000"></div>
-        <div className="absolute top-1/2 right-1/3 w-2 h-2 bg-blue-500 rounded-full animate-float animation-delay-3000"></div>
-        <div className="absolute bottom-1/4 left-1/2 w-3 h-3 bg-cyan-500 rounded-full animate-float animation-delay-4000"></div>
       </div>
 
       <Header />

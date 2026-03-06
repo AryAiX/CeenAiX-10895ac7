@@ -157,11 +157,20 @@ export const Home: React.FC = () => {
         </div>
       </nav>
 
-      <section className="relative pt-20 pb-32 px-4 overflow-hidden">
-        <div className="max-w-7xl mx-auto">
+      <section className="relative min-h-screen flex items-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=1920"
+            alt="Modern healthcare"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-transparent"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8 animate-slide-up">
-              <div className="inline-flex items-center space-x-2 bg-ceenai-cyan/10 border border-ceenai-cyan/30 text-ceenai-blue px-5 py-2.5 rounded-full">
+              <div className="inline-flex items-center space-x-2 bg-ceenai-cyan/10 border border-ceenai-cyan/30 text-ceenai-blue px-5 py-2.5 rounded-full backdrop-blur-sm">
                 <Award className="w-5 h-5" />
                 <span className="text-sm font-semibold">Trusted by 15,000+ Patients</span>
               </div>
@@ -188,7 +197,7 @@ export const Home: React.FC = () => {
                 </button>
                 <button
                   onClick={() => navigate('/ai-chat')}
-                  className="px-8 py-4 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:border-ceenai-cyan hover:text-ceenai-blue transition-all duration-300"
+                  className="px-8 py-4 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:border-ceenai-cyan hover:text-ceenai-blue transition-all duration-300 hover:shadow-lg"
                 >
                   Try AI Assistant
                 </button>
@@ -206,17 +215,43 @@ export const Home: React.FC = () => {
               </div>
             </div>
 
-            <div className="relative animate-fade-in">
-              <div className="relative rounded-3xl overflow-hidden shadow-hard">
-                <img
-                  src="https://images.pexels.com/photos/5214997/pexels-photo-5214997.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Doctor consulting patient"
-                  className="w-full h-[600px] object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-tr from-ceenai-cyan/20 via-transparent to-ceenai-blue/20"></div>
+            <div className="relative animate-fade-in lg:block hidden">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4">
+                  <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300 h-64">
+                    <img
+                      src="https://images.pexels.com/photos/4173239/pexels-photo-4173239.jpeg?auto=compress&cs=tinysrgb&w=600"
+                      alt="Doctor with patient"
+                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300 h-80">
+                    <img
+                      src="https://images.pexels.com/photos/7579831/pexels-photo-7579831.jpeg?auto=compress&cs=tinysrgb&w=600"
+                      alt="Healthcare technology"
+                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-4 pt-12">
+                  <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300 h-80">
+                    <img
+                      src="https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=600"
+                      alt="Medical professional"
+                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300 h-64">
+                    <img
+                      src="https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=600"
+                      alt="Modern clinic"
+                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="absolute -bottom-8 -left-8 bg-white rounded-2xl shadow-hard p-6 animate-bounce-in border border-gray-100">
+              <div className="absolute -bottom-8 -left-8 bg-white rounded-2xl shadow-hard p-6 animate-bounce-in border border-gray-100 z-20">
                 <div className="flex items-center space-x-4">
                   <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
                     <Heart className="w-8 h-8 text-white" />
@@ -224,16 +259,6 @@ export const Home: React.FC = () => {
                   <div>
                     <p className="text-3xl font-bold text-gray-900">24/7</p>
                     <p className="text-sm text-gray-600 font-medium">Healthcare Support</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="absolute -top-8 -right-8 bg-white rounded-2xl shadow-hard p-6 animate-scale-in border border-gray-100">
-                <div className="flex items-center space-x-3">
-                  <TrendingUp className="w-10 h-10 text-ceenai-blue" />
-                  <div>
-                    <p className="text-2xl font-bold text-gray-900">850+</p>
-                    <p className="text-sm text-gray-600 font-medium">Expert Doctors</p>
                   </div>
                 </div>
               </div>

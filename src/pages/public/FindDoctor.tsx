@@ -106,25 +106,51 @@ export const FindDoctor: React.FC = () => {
       <GeometricBackground />
       <Header />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center space-x-2 text-gray-600 hover:text-ceenai-blue font-medium transition-colors group mb-8"
-        >
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span>Back to Home</span>
-        </button>
-        <div className="text-center mb-12 animate-slide-up">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Connect with
-            <span className="block bg-gradient-to-r from-ceenai-cyan to-ceenai-blue bg-clip-text text-transparent">
-              Expert Doctors
-            </span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Browse through our network of certified healthcare professionals and book appointments instantly
-          </p>
+      <div className="relative bg-gradient-to-r from-ceenai-cyan/10 via-ceenai-blue/10 to-ceenai-navy/10 overflow-hidden">
+        <div className="absolute inset-0 z-0 opacity-20">
+          <img
+            src="https://images.pexels.com/photos/6129410/pexels-photo-6129410.jpeg?auto=compress&cs=tinysrgb&w=1920"
+            alt="Healthcare professionals"
+            className="w-full h-full object-cover"
+          />
         </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center space-x-2 text-gray-600 hover:text-ceenai-blue font-medium transition-colors group mb-8 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-lg"
+          >
+            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            <span>Back to Home</span>
+          </button>
+          <div className="text-center mb-12 animate-slide-up">
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+              Connect with
+              <span className="block bg-gradient-to-r from-ceenai-cyan to-ceenai-blue bg-clip-text text-transparent">
+                Expert Doctors
+              </span>
+            </h1>
+            <p className="text-xl text-gray-700 max-w-2xl mx-auto font-medium">
+              Browse through our network of certified healthcare professionals and book appointments instantly
+            </p>
+            <div className="mt-8 flex justify-center gap-8">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl px-6 py-4 shadow-lg">
+                <p className="text-3xl font-bold text-ceenai-blue">850+</p>
+                <p className="text-sm text-gray-600">Verified Doctors</p>
+              </div>
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl px-6 py-4 shadow-lg">
+                <p className="text-3xl font-bold text-ceenai-blue">4.9★</p>
+                <p className="text-sm text-gray-600">Average Rating</p>
+              </div>
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl px-6 py-4 shadow-lg">
+                <p className="text-3xl font-bold text-ceenai-blue">24/7</p>
+                <p className="text-sm text-gray-600">Availability</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
 
         <div className="bg-white rounded-2xl shadow-soft p-6 mb-8 border border-gray-100 animate-scale-in">
           <div className="grid md:grid-cols-2 gap-4">

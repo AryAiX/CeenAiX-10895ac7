@@ -115,16 +115,23 @@ export const Pharmacy: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
       <Header />
 
-      <section className="relative bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 text-white py-20">
-        <div className="absolute inset-0 bg-black/10"></div>
+      <section className="relative bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 text-white py-20 overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src="https://images.pexels.com/photos/3683053/pexels-photo-3683053.jpeg?auto=compress&cs=tinysrgb&w=1920"
+            alt="Pharmacy"
+            className="w-full h-full object-cover opacity-20"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/90 via-cyan-600/90 to-teal-600/90"></div>
+        </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex justify-center mb-6">
-              <div className="bg-white/20 backdrop-blur-sm p-4 rounded-2xl">
+              <div className="bg-white/20 backdrop-blur-sm p-4 rounded-2xl shadow-2xl">
                 <Pill className="w-16 h-16" />
               </div>
             </div>
-            <h1 className="text-5xl font-bold mb-6">Find Your Nearest Pharmacy</h1>
+            <h1 className="text-5xl md:text-6xl font-bold mb-6">Find Your Nearest Pharmacy</h1>
             <p className="text-xl text-blue-50 max-w-3xl mx-auto mb-8">
               Discover trusted pharmacies in your area with convenient delivery options and 24/7 availability
             </p>

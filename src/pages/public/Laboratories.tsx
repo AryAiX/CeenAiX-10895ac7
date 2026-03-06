@@ -121,13 +121,26 @@ export const Laboratories: React.FC = () => {
   const locations = ['all', ...new Set(laboratories.map(lab => lab.location))];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 relative">
+      <div className="absolute inset-0 z-0">
+        <img
+          src="https://images.pexels.com/photos/3825517/pexels-photo-3825517.jpeg?auto=compress&cs=tinysrgb&w=1920"
+          alt="Medical laboratory"
+          className="w-full h-80 object-cover opacity-10"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-50/80 to-gray-50"></div>
+      </div>
+
       <Header />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Find a Laboratory</h1>
-          <p className="text-gray-600">Book diagnostic tests and health checkups at certified labs</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
+        <div className="mb-12 text-center">
+          <div className="inline-flex items-center space-x-2 bg-teal-100 border border-teal-300 text-teal-700 px-5 py-2.5 rounded-full mb-6">
+            <TestTube className="w-5 h-5" />
+            <span className="text-sm font-semibold">Certified Diagnostics</span>
+          </div>
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4">Find a Laboratory</h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">Book diagnostic tests and health checkups at certified labs with accurate results</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">

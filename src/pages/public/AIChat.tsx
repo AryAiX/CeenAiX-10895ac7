@@ -300,10 +300,17 @@ export const AIChat: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex flex-col relative">
+      <div className="absolute inset-0 z-0 opacity-5">
+        <img
+          src="https://images.pexels.com/photos/8438971/pexels-photo-8438971.jpeg?auto=compress&cs=tinysrgb&w=1920"
+          alt="AI Healthcare Background"
+          className="w-full h-full object-cover"
+        />
+      </div>
       <Header />
 
-      <div className="flex-1 max-w-5xl w-full mx-auto px-4 py-6 flex flex-col">
+      <div className="flex-1 max-w-5xl w-full mx-auto px-4 py-6 flex flex-col relative z-10">
         <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-4 mb-4 flex items-start space-x-3 shadow-sm">
           <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
             <Sparkles className="w-5 h-5 text-blue-600" />

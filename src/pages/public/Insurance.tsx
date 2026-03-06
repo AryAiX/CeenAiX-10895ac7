@@ -182,13 +182,26 @@ export const Insurance: React.FC = () => {
   const selectedPlanObjects = plans.filter((plan) => selectedPlans.includes(plan.id));
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 relative">
+      <div className="absolute inset-0 z-0">
+        <img
+          src="https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=1920"
+          alt="Healthcare insurance"
+          className="w-full h-80 object-cover opacity-10"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-50/80 to-gray-50"></div>
+      </div>
+
       <Header />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Health Insurance Plans</h1>
-          <p className="text-gray-600">Compare and choose from top insurance providers in UAE</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
+        <div className="mb-12 text-center">
+          <div className="inline-flex items-center space-x-2 bg-blue-100 border border-blue-300 text-blue-700 px-5 py-2.5 rounded-full mb-6">
+            <Shield className="w-5 h-5" />
+            <span className="text-sm font-semibold">DHA Approved Plans</span>
+          </div>
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4">Health Insurance Plans</h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">Compare and choose from top insurance providers in UAE with comprehensive coverage</p>
         </div>
 
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 text-center">
