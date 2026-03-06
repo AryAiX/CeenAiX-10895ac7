@@ -15,6 +15,7 @@ interface Message {
 export const AIChat: React.FC = () => {
   const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const conversationContextRef = useRef<string[]>([]);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -37,18 +38,79 @@ export const AIChat: React.FC = () => {
 
   const generateResponse = (userInput: string): { content: string; suggestions?: string[] } => {
     const input = userInput.toLowerCase();
+    const context = conversationContextRef.current.join(' ').toLowerCase();
 
-    if (input.includes('headache') || input.includes('head pain')) {
+    // Add current input to context
+    conversationContextRef.current.push(userInput);
+    // Keep only last 10 messages for context
+    if (conversationContextRef.current.length > 10) {
+      conversationContextRef.current.shift();
+    }
+
+    // Greetings
+    if (input.match(/^(hi|hello|hey|good morning|good afternoon|good evening|greetings)/)) {
       return {
-        content: "I understand you're experiencing a headache. Let me help you assess this:\n\n**Common causes:**\n• Tension or stress\n• Dehydration\n• Eye strain from screens\n• Lack of sleep\n• Caffeine withdrawal\n\n**When to see a doctor:**\n• Severe or sudden onset\n• Accompanied by fever, stiff neck, or vision changes\n• Lasting more than a few days\n• Getting progressively worse\n\n**Immediate relief:**\n• Rest in a quiet, dark room\n• Stay hydrated\n• Apply a cold compress\n\nWould you like me to help you find a neurologist or general practitioner?",
-        suggestions: ['Find a neurologist', 'Find a GP', 'Other symptoms', 'Book appointment'],
+        content: "Hello! I'm here to help with your health questions. I can assist you with:\n\n• Symptom assessment and guidance\n• Finding the right doctor or specialist\n• Understanding medical conditions\n• Wellness and prevention tips\n• Emergency guidance\n• Mental health support\n\nWhat brings you here today?",
+        suggestions: ['I have symptoms', 'Find a doctor', 'General health question', 'Wellness tips'],
       };
     }
 
-    if (input.includes('fever') || input.includes('temperature')) {
+    // Thank you
+    if (input.match(/thank/)) {
       return {
-        content: "Fever can be a sign your body is fighting an infection. Here's what you should know:\n\n**Normal response if:**\n• Temperature is below 102°F (39°C)\n• You have other cold/flu symptoms\n• It responds to medication\n\n**See a doctor if:**\n• Temperature above 103°F (39.4°C)\n• Lasts more than 3 days\n• Accompanied by severe headache, rash, or difficulty breathing\n• You have a weakened immune system\n\n**Self-care:**\n• Rest and stay hydrated\n• Take fever-reducing medication if appropriate\n• Monitor your temperature regularly\n\nShould I help you find a doctor for evaluation?",
-        suggestions: ['Find a doctor now', 'Emergency care', 'More about fever', 'Other symptoms'],
+        content: "You're welcome! I'm always here to help with your health concerns. Remember, while I provide helpful information, it's important to consult with healthcare professionals for medical decisions.\n\nIs there anything else I can help you with?",
+        suggestions: ['Find a doctor', 'Ask another question', 'Book appointment', 'I\'m done'],
+      };
+    }
+
+    // Follow-up questions with context
+    if ((input.includes('how long') || input.includes('when will') || input.includes('duration')) && context.length > 0) {
+      if (context.includes('symptom') || context.includes('pain') || context.includes('sick')) {
+        return {
+          content: "The duration depends on the underlying cause:\n\n**General Guidelines:**\n• Common cold: 7-10 days\n• Flu: 1-2 weeks\n• Minor injuries: Days to weeks depending on severity\n• Chronic conditions: Require ongoing management\n\n**Important:**\n• If symptoms worsen or don't improve as expected, see a doctor\n• Some conditions need immediate attention regardless of duration\n• Early treatment often leads to faster recovery\n\n**When to be concerned:**\n• Symptoms lasting longer than expected\n• Getting worse instead of better\n• New symptoms developing\n• Severe symptoms at any point\n\nWould you like specific information about your concern?",
+          suggestions: ['Find a doctor', 'Specific symptom', 'Emergency guidance', 'More questions'],
+        };
+      }
+    }
+
+    // "Should I see a doctor" type questions
+    if (input.includes('should i see') || input.includes('do i need') || input.includes('when to see') || input.includes('go to doctor')) {
+      return {
+        content: "Here's guidance on when to seek medical care:\n\n**See a doctor if:**\n• Symptoms are severe or worsening\n• Symptoms persist beyond expected duration\n• You have concerning symptoms (chest pain, difficulty breathing, severe pain)\n• Symptoms interfere with daily activities\n• You have underlying health conditions\n• You're unsure or worried\n\n**Urgent care for:**\n• Non-life-threatening but need same-day care\n• Minor injuries or illnesses\n• After-hours when doctor's office is closed\n\n**Emergency room (or call 911) for:**\n• Chest pain or pressure\n• Difficulty breathing\n• Severe bleeding\n• Loss of consciousness\n• Stroke symptoms\n• Severe allergic reaction\n\n**Remember:**\nIt's always better to err on the side of caution. If you're worried, get evaluated. Trust your instincts about your body.\n\nWould you like help finding a doctor or urgent care facility?",
+        suggestions: ['Find a doctor', 'Find urgent care', 'Emergency info', 'Describe symptoms'],
+      };
+    }
+
+    // Pain-related queries
+    if (input.includes('pain') && !input.includes('head')) {
+      const bodyPart = input.match(/(chest|stomach|back|knee|joint|muscle|abdomen|leg|arm|neck|shoulder)/)?.[0] || 'body';
+      return {
+        content: `I understand you're experiencing ${bodyPart} pain. Pain assessment is important for proper care.\n\n**Important Questions:**\n• When did the pain start?\n• Is it sharp, dull, or throbbing?\n• Does it come and go or is it constant?\n• What makes it better or worse?\n\n**Seek immediate care if:**\n• Pain is severe or sudden\n• Accompanied by fever, swelling, or redness\n• Difficulty moving or breathing\n• Pain after an injury\n\n**General relief:**\n• Rest the affected area\n• Apply ice (first 48 hours) or heat\n• Over-the-counter pain relief if appropriate\n• Avoid activities that worsen pain\n\nWould you like help finding a specialist to evaluate this?`,
+        suggestions: ['Find specialist', 'Emergency care', 'Tell me more', 'Other symptoms'],
+      };
+    }
+
+    // Headache
+    if (input.includes('headache') || input.includes('head pain') || input.includes('migraine')) {
+      return {
+        content: "I understand you're experiencing a headache. Let me help you assess this:\n\n**Common causes:**\n• Tension or stress\n• Dehydration\n• Eye strain from screens\n• Lack of sleep\n• Caffeine withdrawal\n• Migraines (recurring, often with nausea/light sensitivity)\n\n**When to see a doctor:**\n• Worst headache of your life (sudden, severe)\n• Accompanied by fever, stiff neck, or vision changes\n• After a head injury\n• Lasting more than a few days\n• Getting progressively worse\n• New headaches after age 50\n\n**Immediate relief:**\n• Rest in a quiet, dark room\n• Stay hydrated\n• Apply a cold compress\n• Gentle neck stretches\n• Over-the-counter pain relief if appropriate\n\nWould you like me to help you find a neurologist or general practitioner?",
+        suggestions: ['Find a neurologist', 'Find a GP', 'Other symptoms', 'Emergency care'],
+      };
+    }
+
+    // Cold, flu, COVID symptoms
+    if (input.includes('cold') || input.includes('flu') || input.includes('cough') || input.includes('covid') || input.includes('coronavirus')) {
+      return {
+        content: "Respiratory symptoms can have various causes. Let me help you understand:\n\n**Common Symptoms:**\n• Cold: Runny nose, sneezing, mild cough\n• Flu: Fever, body aches, fatigue, cough\n• COVID-19: Fever, cough, loss of taste/smell, fatigue\n\n**Self-care:**\n• Rest and stay hydrated\n• Over-the-counter symptom relief\n• Isolate to prevent spread\n• Monitor symptoms\n\n**See a doctor if:**\n• Difficulty breathing or shortness of breath\n• High fever (>103°F / 39.4°C)\n• Symptoms worsen after improving\n• Chest pain or pressure\n• Confusion or severe dizziness\n• Symptoms last more than 10 days\n\n**COVID-19 Testing:**\nConsider testing if you have symptoms or exposure. Many doctors offer telehealth visits for assessment.\n\nWould you like help finding a doctor or testing location?",
+        suggestions: ['Find a doctor', 'Telehealth visit', 'Testing locations', 'Monitor at home'],
+      };
+    }
+
+    // Fever
+    if (input.includes('fever') || input.includes('temperature') || input.includes('hot')) {
+      return {
+        content: "Fever can be a sign your body is fighting an infection. Here's what you should know:\n\n**Temperature Guide:**\n• Normal: 97-99°F (36-37°C)\n• Low-grade fever: 100-102°F (37.8-39°C)\n• High fever: Above 103°F (39.4°C)\n\n**Normal response if:**\n• Temperature is below 102°F (39°C)\n• You have other cold/flu symptoms\n• It responds to medication\n• You feel relatively okay otherwise\n\n**See a doctor if:**\n• Temperature above 103°F (39.4°C)\n• Lasts more than 3 days\n• Accompanied by severe headache, rash, or difficulty breathing\n• You have a weakened immune system\n• Infant under 3 months with any fever\n• Seizures or confusion\n\n**Self-care:**\n• Rest and stay hydrated\n• Take fever-reducing medication (acetaminophen or ibuprofen) if appropriate\n• Monitor your temperature every 4-6 hours\n• Light clothing and room temperature environment\n\nShould I help you find a doctor for evaluation?",
+        suggestions: ['Find a doctor now', 'Emergency care', 'More questions', 'Monitor at home'],
       };
     }
 
@@ -66,10 +128,43 @@ export const AIChat: React.FC = () => {
       };
     }
 
-    if (input.includes('wellness') || input.includes('health tips') || input.includes('prevention')) {
+    // Allergies
+    if (input.includes('allergy') || input.includes('allergic') || input.includes('sneez') || input.includes('itchy eyes')) {
       return {
-        content: "Here are some evidence-based wellness tips for optimal health:\n\n**Daily Habits:**\n• Get 7-9 hours of quality sleep\n• Stay hydrated (8 glasses of water daily)\n• Exercise for 30 minutes most days\n• Eat a balanced diet with fruits and vegetables\n\n**Preventive Care:**\n• Regular health checkups\n• Keep vaccinations up to date\n• Mental health is as important as physical health\n• Manage stress through meditation or hobbies\n\n**Warning Signs to Watch:**\n• Unexplained weight changes\n• Persistent fatigue\n• Changes in appetite or sleep patterns\n\nWould you like specific tips for any health area?",
-        suggestions: ['Nutrition advice', 'Exercise tips', 'Mental health', 'Schedule checkup'],
+        content: "Allergies affect millions of people. Here's what you should know:\n\n**Common Allergens:**\n• Pollen (seasonal allergies)\n• Dust mites\n• Pet dander\n• Mold\n• Food allergens\n• Insect stings\n\n**Mild Allergy Symptoms:**\n• Sneezing, runny nose\n• Itchy, watery eyes\n• Mild skin rash\n• Nasal congestion\n\n**Management:**\n• Identify and avoid triggers\n• Over-the-counter antihistamines\n• Nasal sprays\n• Keep windows closed during high pollen\n• Use air purifiers\n\n**See a doctor if:**\n• Symptoms interfere with daily life\n• Over-the-counter medications don't help\n• Want allergy testing\n• Considering immunotherapy\n\n**EMERGENCY - Seek immediate help if:**\n• Difficulty breathing or swallowing\n• Swelling of face, lips, or tongue\n• Rapid pulse with dizziness\n• These are signs of anaphylaxis - call 911\n\nWould you like to find an allergist or discuss treatment options?",
+        suggestions: ['Find allergist', 'Allergy testing', 'Emergency care', 'Management tips'],
+      };
+    }
+
+    // Pregnancy related
+    if (input.includes('pregnan') || input.includes('expecting') || input.includes('baby')) {
+      return {
+        content: "Pregnancy is an exciting time! Here's important health information:\n\n**Prenatal Care:**\n• Schedule first appointment at 8 weeks\n• Regular checkups throughout pregnancy\n• Prenatal vitamins with folic acid\n• Healthy diet and appropriate exercise\n• Avoid alcohol, smoking, certain medications\n\n**When to call your doctor:**\n• Vaginal bleeding\n• Severe abdominal pain\n• Decreased fetal movement (after 28 weeks)\n• Severe headache with vision changes\n• Signs of preterm labor\n• Persistent vomiting\n\n**Emergency signs:**\n• Severe bleeding\n• Water breaks before 37 weeks\n• Severe abdominal pain\n• High fever\n• Sudden swelling with headache\n\n**Finding Care:**\n• OB/GYN for pregnancy care\n• Midwife for lower-risk pregnancies\n• High-risk specialist if needed\n\nWould you like help finding an OB/GYN or midwife?",
+        suggestions: ['Find OB/GYN', 'Find midwife', 'Pregnancy tips', 'Emergency info'],
+      };
+    }
+
+    // Children/pediatric
+    if (input.includes('child') || input.includes('kid') || input.includes('baby') || input.includes('infant') || input.includes('toddler')) {
+      return {
+        content: "Children's health needs special attention. Here's guidance:\n\n**Well-Child Care:**\n• Regular checkups and vaccinations\n• Growth and development monitoring\n• Anticipatory guidance for parents\n\n**Common Concerns:**\n• Fever in infants: Any fever in baby under 3 months needs immediate evaluation\n• Ear infections: Pain, fever, tugging at ear\n• Rashes: Many are viral and harmless, but some need evaluation\n• Cough/cold: Common but watch for breathing difficulties\n\n**When to call pediatrician:**\n• Fever over 100.4°F (38°C) in infant under 3 months\n• Fever over 104°F (40°C) at any age\n• Difficulty breathing\n• Severe pain\n• Not drinking fluids\n• Unusual lethargy or irritability\n• Rash with fever\n\n**Emergency (Call 911):**\n• Difficulty breathing\n• Unresponsive or very difficult to wake\n• Seizure (first time or lasting >5 minutes)\n• Signs of severe allergic reaction\n\nWould you like help finding a pediatrician?",
+        suggestions: ['Find pediatrician', 'Emergency care', 'Well-child visits', 'Specific symptom'],
+      };
+    }
+
+    // Injury related
+    if (input.includes('injury') || input.includes('hurt') || input.includes('broke') || input.includes('sprain') || input.includes('cut') || input.includes('burn')) {
+      return {
+        content: "Injuries need prompt and appropriate care. Here's what to do:\n\n**Minor Injuries:**\n• Cuts: Clean, apply pressure, bandage\n• Minor burns: Cool water, don't use ice\n• Sprains: RICE (Rest, Ice, Compression, Elevation)\n• Bruises: Ice pack, elevation\n\n**See a doctor if:**\n• Deep cut that may need stitches\n• Can't move or bear weight on injured area\n• Severe pain or swelling\n• Numbness or tingling\n• Signs of infection (warmth, redness, pus)\n• Burn larger than 3 inches or on face/hands/joints\n\n**Go to ER or call 911:**\n• Suspected broken bone\n• Head injury with loss of consciousness\n• Severe bleeding that won't stop\n• Burn with blistering over large area\n• Injury from significant fall or accident\n• Chest or abdominal injury\n• Any injury with severe pain\n\n**Tetanus:**\nEnsure tetanus shot is up to date (every 10 years, or 5 years for dirty wounds).\n\nNeed help finding urgent care or orthopedic specialist?",
+        suggestions: ['Find urgent care', 'Find orthopedic', 'Emergency room', 'First aid info'],
+      };
+    }
+
+    // Wellness and prevention
+    if (input.includes('wellness') || input.includes('health tips') || input.includes('prevention') || input.includes('healthy') || input.includes('nutrition') || input.includes('exercise')) {
+      return {
+        content: "Here are evidence-based wellness tips for optimal health:\n\n**Daily Habits:**\n• **Sleep**: 7-9 hours for adults, consistent schedule\n• **Hydration**: 8-10 glasses of water daily\n• **Exercise**: 150 minutes moderate activity per week\n• **Diet**: Colorful fruits/vegetables, whole grains, lean protein\n• **Stress**: Regular breaks, mindfulness, hobbies\n\n**Preventive Care:**\n• Annual physical exam\n• Age-appropriate screenings (blood pressure, cholesterol, cancer screenings)\n• Keep vaccinations up to date\n• Dental checkups twice yearly\n• Vision exam every 1-2 years\n\n**Nutrition Tips:**\n• Eat the rainbow (variety of colored produce)\n• Limit processed foods and added sugars\n• Portion control\n• Don't skip breakfast\n\n**Exercise Ideas:**\n• Walking, swimming, cycling\n• Strength training 2x per week\n• Flexibility and balance exercises\n• Find activities you enjoy\n\n**Warning Signs to Watch:**\n• Unexplained weight changes\n• Persistent fatigue\n• Changes in appetite or sleep patterns\n• New or changing symptoms\n\nWould you like specific tips for any health area?",
+        suggestions: ['Nutrition advice', 'Exercise plan', 'Mental wellness', 'Schedule checkup'],
       };
     }
 
@@ -87,16 +182,82 @@ export const AIChat: React.FC = () => {
       };
     }
 
-    if (input.includes('mental health') || input.includes('anxiety') || input.includes('depression') || input.includes('stress')) {
+    // Digestive issues
+    if (input.includes('stomach') || input.includes('nausea') || input.includes('vomit') || input.includes('diarrhea') || input.includes('constipation') || input.includes('indigestion')) {
       return {
-        content: "Your mental health matters just as much as physical health. I'm here to help:\n\n**Common Feelings:**\n• Stress and anxiety are normal responses\n• Many people experience these challenges\n• Help is available and effective\n\n**When to Seek Help:**\n• Feelings interfere with daily life\n• Lasting more than 2 weeks\n• Thoughts of self-harm\n• Significant changes in sleep or appetite\n\n**Immediate Support:**\n• National Suicide Prevention Lifeline: 988\n• Crisis Text Line: Text HOME to 741741\n\n**Professional Help:**\nI can connect you with:\n• Licensed therapists\n• Psychiatrists\n• Support groups\n\nWould you like help finding a mental health professional?",
-        suggestions: ['Find therapist', 'Find psychiatrist', 'Coping strategies', 'Continue talking'],
+        content: "Digestive issues are common and usually resolve on their own. Here's guidance:\n\n**Common Causes:**\n• Food poisoning or stomach virus\n• Dietary triggers\n• Stress\n• Medications\n• Food intolerance\n\n**Self-care:**\n• Stay hydrated (small sips frequently)\n• Bland diet (BRAT: bananas, rice, applesauce, toast)\n• Rest your digestive system\n• Avoid dairy, caffeine, and fatty foods temporarily\n\n**See a doctor if:**\n• Severe abdominal pain\n• Blood in stool or vomit\n• Signs of dehydration (dark urine, dizziness, dry mouth)\n• High fever\n• Symptoms last more than 2-3 days\n• Unable to keep fluids down\n\n**When it's urgent:**\n• Severe pain that prevents standing upright\n• Rapid heart rate with dizziness\n• Vomiting blood\n\nWould you like help finding a gastroenterologist or general practitioner?",
+        suggestions: ['Find specialist', 'Emergency care', 'Dietary advice', 'More symptoms'],
       };
     }
 
+    // Skin issues
+    if (input.includes('rash') || input.includes('skin') || input.includes('itch') || input.includes('acne') || input.includes('eczema')) {
+      return {
+        content: "Skin conditions can have many causes. Let me help you understand:\n\n**Common Skin Issues:**\n• Rashes: Allergic reactions, infections, irritation\n• Acne: Hormones, bacteria, clogged pores\n• Eczema: Dry, itchy, inflamed skin\n• Contact dermatitis: Reaction to substances\n\n**General care:**\n• Keep area clean and dry\n• Avoid scratching\n• Use gentle, fragrance-free products\n• Moisturize regularly\n• Avoid known triggers\n\n**See a dermatologist if:**\n• Rash spreading rapidly\n• Signs of infection (warmth, pus, fever)\n• Severe itching affecting sleep\n• Not improving with over-the-counter treatments\n• Concerns about skin changes or moles\n\n**Seek immediate care if:**\n• Difficulty breathing with rash (possible allergic reaction)\n• Rash with fever and stiff neck\n• Painful blisters covering large areas\n\nWould you like to find a dermatologist?",
+        suggestions: ['Find dermatologist', 'Skin care tips', 'Emergency care', 'Other concerns'],
+      };
+    }
+
+    // Sleep issues
+    if (input.includes('sleep') || input.includes('insomnia') || input.includes('tired') || input.includes('fatigue')) {
+      return {
+        content: "Sleep is crucial for overall health. Let me help with your sleep concerns:\n\n**Common Sleep Issues:**\n• Difficulty falling asleep\n• Waking during the night\n• Not feeling rested\n• Excessive daytime sleepiness\n\n**Sleep Hygiene Tips:**\n• Consistent sleep schedule (same time daily)\n• Cool, dark, quiet bedroom\n• Avoid screens 1 hour before bed\n• Limit caffeine after 2 PM\n• Regular exercise (but not close to bedtime)\n• Relaxation techniques before bed\n\n**When to see a doctor:**\n• Chronic insomnia (3+ nights/week for 3+ months)\n• Snoring with pauses in breathing\n• Extreme daytime fatigue affecting function\n• Legs twitching or urge to move at night\n• Falling asleep during activities\n\n**Consider:**\n• Sleep study for sleep apnea concerns\n• Mental health evaluation if stress/anxiety related\n\nWould you like help finding a sleep specialist or discussing this with a doctor?",
+        suggestions: ['Find sleep specialist', 'Sleep tips', 'Mental health support', 'General consultation'],
+      };
+    }
+
+    // Mental health
+    if (input.includes('mental health') || input.includes('anxiety') || input.includes('depression') || input.includes('stress') || input.includes('sad') || input.includes('worried') || input.includes('panic')) {
+      return {
+        content: "Your mental health matters just as much as physical health. I'm here to help:\n\n**Common Feelings:**\n• Stress and anxiety are normal responses to life challenges\n• Many people experience these challenges\n• Help is available and treatment is effective\n• You're not alone\n\n**When to Seek Help:**\n• Feelings interfere with daily life, work, or relationships\n• Lasting more than 2 weeks\n• Panic attacks or overwhelming fear\n• Thoughts of self-harm or suicide\n• Significant changes in sleep, appetite, or energy\n• Loss of interest in activities you once enjoyed\n\n**CRISIS SUPPORT (24/7):**\n• **988 Suicide & Crisis Lifeline**: Call or text 988\n• **Crisis Text Line**: Text HOME to 741741\n• **Emergency**: Call 911 if immediate danger\n\n**Professional Help:**\nI can connect you with:\n• Licensed therapists (talk therapy)\n• Psychiatrists (medication management)\n• Support groups\n• Telehealth mental health services\n\n**Self-care while seeking help:**\n• Reach out to trusted friends/family\n• Maintain routine (sleep, meals, exercise)\n• Mindfulness and breathing exercises\n• Limit alcohol and substances\n\nWould you like help finding a mental health professional?",
+        suggestions: ['Find therapist', 'Find psychiatrist', 'Coping strategies', 'Crisis support'],
+      };
+    }
+
+    // Chronic conditions
+    if (input.includes('diabetes') || input.includes('blood sugar') || input.includes('hypertension') || input.includes('high blood pressure') || input.includes('asthma') || input.includes('arthritis')) {
+      return {
+        content: "Managing chronic conditions requires ongoing care. Here's helpful information:\n\n**Chronic Condition Management:**\n• Regular monitoring and checkups\n• Medication adherence\n• Lifestyle modifications\n• Track symptoms and triggers\n• Build a care team\n\n**Key Specialists:**\n• Endocrinologist (diabetes, thyroid)\n• Cardiologist (heart, blood pressure)\n• Pulmonologist (asthma, lung conditions)\n• Rheumatologist (arthritis, autoimmune)\n\n**Self-Management:**\n• Keep medication list updated\n• Monitor relevant metrics (blood sugar, blood pressure, etc.)\n• Healthy diet and regular exercise\n• Stress management\n• Join support groups\n\n**When to contact your doctor:**\n• Symptoms worsening\n• Medication side effects\n• New symptoms\n• Difficulty managing condition\n• Questions about treatment\n\nWould you like help finding a specialist for your condition?",
+        suggestions: ['Find specialist', 'Management tips', 'Support groups', 'General questions'],
+      };
+    }
+
+    // Lab tests and results
+    if (input.includes('test') || input.includes('lab') || input.includes('blood work') || input.includes('screening')) {
+      return {
+        content: "Medical tests and screenings are important for diagnosis and prevention:\n\n**Common Tests:**\n• Blood work (CBC, metabolic panel, lipids)\n• Urinalysis\n• Imaging (X-ray, CT, MRI, ultrasound)\n• Cancer screenings (mammogram, colonoscopy, etc.)\n\n**Understanding Results:**\n• Always review results with your doctor\n• Ask about what abnormal values mean\n• Discuss next steps if needed\n• Get copies for your records\n\n**Preparing for Tests:**\n• Follow fasting instructions if given\n• List all medications you take\n• Bring insurance card and ID\n• Ask about preparation requirements\n\n**Age-Appropriate Screenings:**\n• Blood pressure: Regular checks for all adults\n• Cholesterol: Starting at age 20\n• Diabetes: Age 35 or earlier if risk factors\n• Cancer screenings: Based on age and risk factors\n\nNeed help finding a lab or scheduling tests?",
+        suggestions: ['Find laboratory', 'Screening schedule', 'Test preparation', 'Understanding results'],
+      };
+    }
+
+    // Vaccination
+    if (input.includes('vaccin') || input.includes('immunization') || input.includes('shot')) {
+      return {
+        content: "Vaccinations are crucial for preventing serious diseases:\n\n**Adult Vaccinations:**\n• Annual flu vaccine\n• COVID-19 vaccine and boosters\n• Tetanus/Diphtheria (Td) every 10 years\n• Shingles vaccine (age 50+)\n• Pneumonia vaccine (age 65+ or if risk factors)\n\n**Child Vaccinations:**\n• Follow CDC recommended schedule\n• Protects against measles, polio, whooping cough, and more\n• Safe and effective\n\n**Travel Vaccinations:**\nDepending on destination, may need vaccines for:\n• Hepatitis A and B\n• Typhoid\n• Yellow fever\n• Others based on travel location\n\n**Common Concerns:**\n• Vaccines are thoroughly tested for safety\n• Mild side effects (soreness, low fever) are normal\n• Benefits far outweigh risks\n• Herd immunity protects vulnerable populations\n\n**Where to Get Vaccinated:**\n• Doctor's office\n• Pharmacies\n• Health departments\n• Urgent care clinics\n\nWould you like help finding vaccination services?",
+        suggestions: ['Find vaccination', 'Vaccine schedule', 'Travel vaccines', 'Vaccine safety'],
+      };
+    }
+
+    // Women's health
+    if (input.includes('period') || input.includes('menstrual') || input.includes('pap smear') || input.includes('mammogram') || input.includes('gynecolog')) {
+      return {
+        content: "Women's health requires specialized care. Here's important information:\n\n**Routine Care:**\n• Annual well-woman exam\n• Pap smear (ages 21-65, every 3-5 years depending on age)\n• Mammogram (starting age 40-50, annually or biennially)\n• Bone density screening (age 65+)\n\n**Menstrual Health:**\n• Normal cycle: 21-35 days\n• Period: 2-7 days\n• See doctor if: Very heavy bleeding, severe pain, irregular cycles, bleeding between periods\n\n**Birth Control:**\n• Many options available\n• Discuss with healthcare provider to find best fit\n• Consider health history and lifestyle\n\n**Menopause:**\n• Average age 51, but varies\n• Symptoms: Hot flashes, mood changes, sleep issues\n• Treatment options available\n\n**When to see gynecologist:**\n• Annual checkups\n• Abnormal bleeding\n• Pelvic pain\n• Concerns about fertility\n• Menopause symptoms\n\nWould you like help finding a gynecologist?",
+        suggestions: ['Find gynecologist', 'Women\'s health', 'Preventive care', 'Specific concern'],
+      };
+    }
+
+    // Men's health
+    if (input.includes('prostate') || input.includes('erectile') || input.includes('testosterone') || input.includes('men\'s health')) {
+      return {
+        content: "Men's health includes specific screenings and concerns:\n\n**Routine Care:**\n• Annual physical exam\n• Blood pressure and cholesterol screening\n• Prostate cancer screening (discuss at age 50, or 45 if high risk)\n• Testicular self-exam monthly\n• Colon cancer screening (age 45+)\n\n**Common Concerns:**\n• Prostate health (BPH, prostatitis, cancer)\n• Erectile dysfunction (often treatable)\n• Low testosterone\n• Heart health\n• Mental health\n\n**When to see a doctor:**\n• Difficulty urinating\n• Sexual health concerns\n• Unusual lumps or changes\n• Persistent fatigue or mood changes\n• Chest pain or shortness of breath\n\n**Preventive Health:**\n• Maintain healthy weight\n• Regular exercise\n• Balanced diet\n• Limit alcohol\n• Don't smoke\n• Manage stress\n\n**Important:**\nMany men avoid healthcare until problems become serious. Regular checkups can catch issues early.\n\nWould you like help finding a primary care doctor or urologist?",
+        suggestions: ['Find doctor', 'Men\'s screening', 'Specific concern', 'Preventive care'],
+      };
+    }
+
+    // Default response with helpful guidance
     return {
-      content: "I understand your concern. Based on what you've shared, here's my recommendation:\n\n**Next Steps:**\n• Consider scheduling a consultation with a healthcare professional for proper evaluation\n• Keep track of any symptoms and when they occur\n• Note any triggers or patterns you notice\n\n**I Can Help You:**\n• Find the right specialist for your needs\n• Book an appointment quickly\n• Answer more specific health questions\n• Provide general wellness guidance\n\nWhat would be most helpful for you right now?",
-      suggestions: ['Find a doctor', 'Describe symptoms', 'Book appointment', 'Ask another question'],
+      content: "I understand your concern. Based on what you've shared, here's my recommendation:\n\n**Next Steps:**\n• Consider scheduling a consultation with a healthcare professional for proper evaluation\n• Keep track of any symptoms and when they occur\n• Note any triggers or patterns you notice\n• Document questions to ask your doctor\n\n**I Can Help You:**\n• Find the right specialist for your needs\n• Book an appointment quickly\n• Answer more specific health questions\n• Provide general wellness guidance\n• Connect you with emergency care if needed\n\n**Tips for Better Care:**\n• Be specific about your symptoms (when, how often, severity)\n• List all medications and supplements you take\n• Share relevant family health history\n• Don't hesitate to ask questions\n\nWhat would be most helpful for you right now?",
+      suggestions: ['Find a doctor', 'Describe symptoms', 'Emergency guidance', 'Ask another question'],
     };
   };
 
