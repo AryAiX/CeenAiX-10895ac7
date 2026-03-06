@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
+import { Layout } from '../components/Layout';
 import { Home } from '../pages/public/Home';
 import { AIChat } from '../pages/public/AIChat';
 import { FindDoctor } from '../pages/public/FindDoctor';
@@ -24,86 +25,86 @@ import { AppointmentDesignShowcase } from '../pages/AppointmentDesignShowcase';
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Home />,
+    element: <Layout><Home /></Layout>,
   },
   {
     path: '/appointment-showcase',
-    element: <AppointmentDesignShowcase />,
+    element: <Layout><AppointmentDesignShowcase /></Layout>,
   },
   {
     path: '/patient/dashboard',
-    element: <PatientDashboard />,
+    element: <Layout><PatientDashboard /></Layout>,
   },
   {
     path: '/ai-chat',
-    element: <AIChat />,
+    element: <Layout><AIChat /></Layout>,
   },
   {
     path: '/find-doctor',
-    element: <FindDoctor />,
+    element: <Layout><FindDoctor /></Layout>,
   },
   {
     path: '/find-clinic',
-    element: <FindClinic />,
+    element: <Layout><FindClinic /></Layout>,
   },
   {
     path: '/insurance',
-    element: <Insurance />,
+    element: <Layout><Insurance /></Layout>,
   },
   {
     path: '/health-education',
-    element: <HealthEducation />,
+    element: <Layout><HealthEducation /></Layout>,
   },
   {
     path: '/laboratories',
-    element: <Laboratories />,
+    element: <Layout><Laboratories /></Layout>,
   },
   {
     path: '/patient/appointments',
-    element: <PatientAppointments />,
+    element: <Layout><PatientAppointments /></Layout>,
   },
   {
     path: '/patient/prescriptions',
-    element: <PatientPrescriptions />,
+    element: <Layout><PatientPrescriptions /></Layout>,
   },
   {
     path: '/pharmacy',
-    element: <Pharmacy />,
+    element: <Layout><Pharmacy /></Layout>,
   },
   {
     path: '/patient/records',
-    element: <PatientRecords />,
+    element: <Layout><PatientRecords /></Layout>,
   },
   {
     path: '/patient/messages',
-    element: <PatientMessages />,
+    element: <Layout><PatientMessages /></Layout>,
   },
   {
     path: '/patient/profile',
-    element: <PatientProfile />,
+    element: <Layout><PatientProfile /></Layout>,
   },
   {
     path: '/doctor/dashboard',
-    element: <DoctorDashboard />,
+    element: <Layout><DoctorDashboard /></Layout>,
   },
   {
     path: '/doctor/appointments',
-    element: <DoctorAppointments />,
+    element: <Layout><DoctorAppointments /></Layout>,
   },
   {
     path: '/doctor/patients',
-    element: <DoctorPatients />,
+    element: <Layout><DoctorPatients /></Layout>,
   },
   {
     path: '/doctor/prescriptions',
-    element: <DoctorPrescriptions />,
+    element: <Layout><DoctorPrescriptions /></Layout>,
   },
   {
     path: '/doctor/messages',
-    element: <DoctorMessages />,
+    element: <Layout><DoctorMessages /></Layout>,
   },
   {
     path: '/doctor/profile',
-    element: <DoctorProfile />,
+    element: <Layout><DoctorProfile /></Layout>,
   },
 ]);
