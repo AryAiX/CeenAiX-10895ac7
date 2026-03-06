@@ -105,15 +105,15 @@ export const FindDoctor: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-ceenai-cyan/5 relative">
       <GeometricBackground />
       <Header />
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center space-x-2 text-gray-600 hover:text-ceenai-blue font-medium transition-colors group"
-            >
-              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-              <span>Back to Home</span>
-            </button>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center space-x-2 text-gray-600 hover:text-ceenai-blue font-medium transition-colors group mb-8"
+        >
+          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+          <span>Back to Home</span>
+        </button>
         <div className="text-center mb-12 animate-slide-up">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Connect with
