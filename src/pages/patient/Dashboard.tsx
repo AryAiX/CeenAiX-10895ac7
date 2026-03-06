@@ -84,139 +84,182 @@ export const PatientDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
+    <div className="min-h-screen bg-gray-50">
       <Navigation role="patient" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Welcome Back!</h1>
-          <p className="text-gray-600 mt-2">Here's your health overview for today</p>
+      <div className="relative bg-gradient-to-r from-cyan-600 via-blue-600 to-cyan-700 overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <img
+            src="https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=1920"
+            alt="Healthcare"
+            className="w-full h-full object-cover"
+          />
         </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2">Welcome Back, Sarah!</h1>
+              <p className="text-cyan-100 text-lg">Here's your health overview for today</p>
+            </div>
+            <div className="hidden md:block">
+              <div className="flex items-center space-x-3 bg-white/10 backdrop-blur-sm rounded-xl px-6 py-3 border border-white/20">
+                <Heart className="w-6 h-6 text-white" />
+                <div>
+                  <p className="text-xs text-cyan-100">Health Score</p>
+                  <p className="text-2xl font-bold text-white">{healthScore}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        {/* AI Health Summary & Stats */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
-          <div className="lg:col-span-1 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-xl p-6 text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 -mt-20 mb-8 relative z-10">
+
+          <div
+            className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all cursor-pointer group"
+            onClick={() => navigate('/patient/appointments')}
+          >
             <div className="flex items-center justify-between mb-4">
-              <Heart className="w-10 h-10 text-white/80" />
-              <span className="text-xs font-semibold bg-white/20 px-3 py-1 rounded-full">AI Score</span>
+              <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Calendar className="w-7 h-7 text-white" />
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-600 group-hover:translate-x-1 transition-all" />
             </div>
-            <div className="text-5xl font-bold mb-2">{healthScore}</div>
-            <p className="text-green-100 text-sm">Health Wellness Score</p>
-            <div className="mt-4 bg-white/20 rounded-full h-2">
-              <div className="bg-white h-2 rounded-full" style={{ width: `${healthScore}%` }}></div>
-            </div>
+            <p className="text-gray-600 text-sm font-medium mb-1">Upcoming</p>
+            <p className="text-3xl font-bold text-gray-900 mb-1">{upcomingAppointments}</p>
+            <p className="text-sm text-cyan-600 font-medium">Appointments</p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all cursor-pointer" onClick={() => navigate('/patient/appointments')}>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-sm font-medium">Upcoming Appointments</p>
-                <p className="text-4xl font-bold text-gray-900 mt-2">{upcomingAppointments}</p>
-                <p className="text-sm text-blue-600 mt-2 flex items-center">
-                  View all <ChevronRight className="w-4 h-4 ml-1" />
-                </p>
+          <div
+            className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all cursor-pointer group"
+            onClick={() => navigate('/patient/prescriptions')}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Pill className="w-7 h-7 text-white" />
               </div>
-              <Calendar className="w-12 h-12 text-blue-500" />
+              <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-600 group-hover:translate-x-1 transition-all" />
             </div>
+            <p className="text-gray-600 text-sm font-medium mb-1">Active</p>
+            <p className="text-3xl font-bold text-gray-900 mb-1">{activePrescriptions}</p>
+            <p className="text-sm text-cyan-600 font-medium">Prescriptions</p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all cursor-pointer" onClick={() => navigate('/patient/prescriptions')}>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-sm font-medium">Active Prescriptions</p>
-                <p className="text-4xl font-bold text-gray-900 mt-2">{activePrescriptions}</p>
-                <p className="text-sm text-green-600 mt-2 flex items-center">
-                  Manage <ChevronRight className="w-4 h-4 ml-1" />
-                </p>
+          <div
+            className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all cursor-pointer group"
+            onClick={() => navigate('/patient/messages')}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <MessageSquare className="w-7 h-7 text-white" />
               </div>
-              <Pill className="w-12 h-12 text-green-500" />
+              <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-600 group-hover:translate-x-1 transition-all" />
             </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all cursor-pointer" onClick={() => navigate('/patient/messages')}>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-sm font-medium">Unread Messages</p>
-                <p className="text-4xl font-bold text-gray-900 mt-2">{unreadMessages}</p>
-                <p className="text-sm text-purple-600 mt-2 flex items-center">
-                  Read messages <ChevronRight className="w-4 h-4 ml-1" />
-                </p>
-              </div>
-              <MessageSquare className="w-12 h-12 text-purple-500" />
-            </div>
+            <p className="text-gray-600 text-sm font-medium mb-1">Unread</p>
+            <p className="text-3xl font-bold text-gray-900 mb-1">{unreadMessages}</p>
+            <p className="text-sm text-cyan-600 font-medium">Messages</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            {/* Quick Actions */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                <div className="w-1 h-6 bg-gradient-to-b from-cyan-500 to-blue-600 rounded-full mr-3"></div>
+                Quick Actions
+              </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {quickActions.map((action, index) => (
                   <button
                     key={index}
                     onClick={action.action}
-                    className={`bg-gradient-to-br ${action.color} text-white p-6 rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-200 flex flex-col items-center space-y-3`}
+                    className="group bg-gradient-to-br from-gray-50 to-gray-100 hover:from-cyan-50 hover:to-blue-50 border-2 border-gray-200 hover:border-cyan-500 p-6 rounded-xl transition-all duration-200 flex flex-col items-center space-y-3"
                   >
-                    <action.icon className="w-8 h-8" />
-                    <span className="text-sm font-semibold text-center">{action.label}</span>
+                    <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-md">
+                      <action.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-700 group-hover:text-cyan-700 text-center transition-colors">
+                      {action.label}
+                    </span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Next Appointment */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-gray-900">Next Appointment</h2>
-                <button onClick={() => navigate('/patient/appointments')} className="text-blue-600 text-sm font-semibold hover:text-blue-700">
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+                  <div className="w-1 h-6 bg-gradient-to-b from-cyan-500 to-blue-600 rounded-full mr-3"></div>
+                  Next Appointment
+                </h2>
+                <button
+                  onClick={() => navigate('/patient/appointments')}
+                  className="text-cyan-600 text-sm font-semibold hover:text-cyan-700 transition-colors"
+                >
                   View All
                 </button>
               </div>
-              <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl p-5">
-                <div className="flex items-start justify-between text-white">
+              <div className="relative bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl p-6 overflow-hidden">
+                <div className="absolute inset-0 opacity-10">
+                  <img
+                    src="https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=800"
+                    alt="Doctor"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="relative flex items-start justify-between text-white">
                   <div className="flex-1">
-                    <h3 className="text-lg font-bold">{nextAppointment.doctor}</h3>
-                    <p className="text-blue-100 text-sm">{nextAppointment.specialty}</p>
-                    <div className="mt-4 flex items-center space-x-4">
-                      <div className="flex items-center space-x-2">
+                    <h3 className="text-xl font-bold mb-1">{nextAppointment.doctor}</h3>
+                    <p className="text-cyan-100 text-sm mb-4">{nextAppointment.specialty}</p>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 w-fit">
                         <Calendar className="w-4 h-4" />
-                        <span className="text-sm">{new Date(nextAppointment.date).toLocaleDateString()}</span>
+                        <span className="text-sm font-medium">
+                          {new Date(nextAppointment.date).toLocaleDateString('en-US', {
+                            weekday: 'short',
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </span>
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 w-fit">
                         <Clock className="w-4 h-4" />
-                        <span className="text-sm">{nextAppointment.time}</span>
+                        <span className="text-sm font-medium">{nextAppointment.time}</span>
                       </div>
                     </div>
                   </div>
-                  <span className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold uppercase">
+                  <span className="bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-xs font-bold uppercase">
                     {nextAppointment.type}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Recent Activity */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Activity</h2>
-              <div className="space-y-4">
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                <div className="w-1 h-6 bg-gradient-to-b from-cyan-500 to-blue-600 rounded-full mr-3"></div>
+                Recent Activity
+              </h2>
+              <div className="space-y-3">
                 {recentActivity.map((activity) => (
-                  <div key={activity.id} className="flex items-start space-x-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
-                    <div className={`p-2 rounded-lg ${
-                      activity.status === 'new' ? 'bg-blue-100' :
-                      activity.status === 'action' ? 'bg-orange-100' :
-                      'bg-purple-100'
-                    }`}>
-                      {activity.type === 'lab' && <FlaskConical className="w-5 h-5 text-blue-600" />}
-                      {activity.type === 'prescription' && <Pill className="w-5 h-5 text-orange-600" />}
-                      {activity.type === 'screening' && <Stethoscope className="w-5 h-5 text-purple-600" />}
+                  <div
+                    key={activity.id}
+                    className="group flex items-center space-x-4 p-4 bg-gray-50 rounded-xl hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 hover:border-cyan-200 border-2 border-transparent transition-all cursor-pointer"
+                  >
+                    <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                      {activity.type === 'lab' && <FlaskConical className="w-6 h-6 text-white" />}
+                      {activity.type === 'prescription' && <Pill className="w-6 h-6 text-white" />}
+                      {activity.type === 'screening' && <Stethoscope className="w-6 h-6 text-white" />}
                     </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-900">{activity.title}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-900 group-hover:text-cyan-700 transition-colors">
+                        {activity.title}
+                      </p>
                       <p className="text-sm text-gray-500">{activity.time}</p>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-600 group-hover:translate-x-1 transition-all flex-shrink-0" />
                   </div>
                 ))}
               </div>
@@ -224,26 +267,42 @@ export const PatientDashboard: React.FC = () => {
           </div>
 
           <div className="space-y-6">
-            {/* Medication Reminders */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-gray-900">Today's Medications</h2>
-                <Bell className="w-5 h-5 text-gray-400" />
+            <div className="bg-white rounded-2xl shadow-xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-900 flex items-center">
+                  <div className="w-1 h-5 bg-gradient-to-b from-cyan-500 to-blue-600 rounded-full mr-2"></div>
+                  Today's Medications
+                </h2>
+                <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center">
+                  <Bell className="w-5 h-5 text-white" />
+                </div>
               </div>
               <div className="space-y-3">
                 {medicationReminders.map((reminder) => (
-                  <div key={reminder.id} className={`p-4 rounded-xl border-2 ${
-                    reminder.taken ? 'bg-green-50 border-green-200' : 'bg-orange-50 border-orange-200'
-                  }`}>
+                  <div
+                    key={reminder.id}
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      reminder.taken
+                        ? 'bg-gradient-to-r from-cyan-50 to-blue-50 border-cyan-200'
+                        : 'bg-orange-50 border-orange-200 hover:border-orange-300'
+                    }`}
+                  >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <p className="font-semibold text-gray-900 text-sm">{reminder.medication}</p>
-                        <p className="text-xs text-gray-600 mt-1">{reminder.time}</p>
+                        <p className="text-xs text-gray-600 mt-1 flex items-center">
+                          <Clock className="w-3 h-3 mr-1" />
+                          {reminder.time}
+                        </p>
                       </div>
                       {reminder.taken ? (
-                        <CheckCircle2 className="w-5 h-5 text-green-600" />
+                        <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center">
+                          <CheckCircle2 className="w-5 h-5 text-white" />
+                        </div>
                       ) : (
-                        <AlertCircle className="w-5 h-5 text-orange-600" />
+                        <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                          <AlertCircle className="w-5 h-5 text-white" />
+                        </div>
                       )}
                     </div>
                   </div>
@@ -251,13 +310,15 @@ export const PatientDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Health Features */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Health Features</h2>
+            <div className="bg-white rounded-2xl shadow-xl p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                <div className="w-1 h-5 bg-gradient-to-b from-cyan-500 to-blue-600 rounded-full mr-2"></div>
+                Health Features
+              </h2>
               <div className="space-y-3">
-                <button className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl hover:shadow-md transition-all border border-purple-100">
+                <button className="group w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 rounded-xl hover:shadow-md transition-all border-2 border-transparent hover:border-cyan-200">
                   <div className="flex items-center space-x-3">
-                    <div className="bg-purple-500 p-2 rounded-lg">
+                    <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                       <Target className="w-5 h-5 text-white" />
                     </div>
                     <div className="text-left">
@@ -265,12 +326,12 @@ export const PatientDashboard: React.FC = () => {
                       <p className="text-xs text-gray-600">Track your progress</p>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-600 group-hover:translate-x-1 transition-all" />
                 </button>
 
-                <button className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl hover:shadow-md transition-all border border-blue-100">
+                <button className="group w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 rounded-xl hover:shadow-md transition-all border-2 border-transparent hover:border-cyan-200">
                   <div className="flex items-center space-x-3">
-                    <div className="bg-blue-500 p-2 rounded-lg">
+                    <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                       <TrendingUp className="w-5 h-5 text-white" />
                     </div>
                     <div className="text-left">
@@ -278,12 +339,12 @@ export const PatientDashboard: React.FC = () => {
                       <p className="text-xs text-gray-600">AI health analysis</p>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-600 group-hover:translate-x-1 transition-all" />
                 </button>
 
-                <button className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl hover:shadow-md transition-all border border-green-100">
+                <button className="group w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 rounded-xl hover:shadow-md transition-all border-2 border-transparent hover:border-cyan-200">
                   <div className="flex items-center space-x-3">
-                    <div className="bg-green-500 p-2 rounded-lg">
+                    <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                       <Syringe className="w-5 h-5 text-white" />
                     </div>
                     <div className="text-left">
@@ -291,12 +352,12 @@ export const PatientDashboard: React.FC = () => {
                       <p className="text-xs text-gray-600">View & schedule</p>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-600 group-hover:translate-x-1 transition-all" />
                 </button>
 
-                <button className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl hover:shadow-md transition-all border border-orange-100">
+                <button className="group w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 rounded-xl hover:shadow-md transition-all border-2 border-transparent hover:border-cyan-200">
                   <div className="flex items-center space-x-3">
-                    <div className="bg-orange-500 p-2 rounded-lg">
+                    <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                       <Shield className="w-5 h-5 text-white" />
                     </div>
                     <div className="text-left">
@@ -304,12 +365,15 @@ export const PatientDashboard: React.FC = () => {
                       <p className="text-xs text-gray-600">Critical info access</p>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-600 group-hover:translate-x-1 transition-all" />
                 </button>
 
-                <button onClick={() => navigate('/patient/profile')} className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl hover:shadow-md transition-all border border-gray-100">
+                <button
+                  onClick={() => navigate('/patient/profile')}
+                  className="group w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 rounded-xl hover:shadow-md transition-all border-2 border-transparent hover:border-cyan-200"
+                >
                   <div className="flex items-center space-x-3">
-                    <div className="bg-gray-500 p-2 rounded-lg">
+                    <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                       <Users className="w-5 h-5 text-white" />
                     </div>
                     <div className="text-left">
@@ -317,7 +381,7 @@ export const PatientDashboard: React.FC = () => {
                       <p className="text-xs text-gray-600">Manage linked accounts</p>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-600 group-hover:translate-x-1 transition-all" />
                 </button>
               </div>
             </div>
@@ -325,40 +389,44 @@ export const PatientDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* AI Chat Modal */}
       {showAIChat && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 rounded-t-2xl flex items-center justify-between">
+            <div className="bg-gradient-to-r from-cyan-600 to-blue-600 p-6 rounded-t-2xl flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="bg-white/20 p-2 rounded-lg">
+                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
                   <Bot className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white">AI Health Assistant</h3>
-                  <p className="text-purple-100 text-sm">Powered by CeenAiX AI</p>
+                  <p className="text-cyan-100 text-sm">Powered by CeenAiX AI</p>
                 </div>
               </div>
-              <button onClick={() => setShowAIChat(false)} className="p-2 hover:bg-white/20 rounded-lg transition-colors">
+              <button
+                onClick={() => setShowAIChat(false)}
+                className="w-10 h-10 hover:bg-white/20 rounded-xl transition-colors flex items-center justify-center"
+              >
                 <X className="w-6 h-6 text-white" />
               </button>
             </div>
 
-            <div className="flex-1 p-6 overflow-y-auto space-y-4">
+            <div className="flex-1 p-6 overflow-y-auto space-y-4 bg-gray-50">
               {chatMessages.map((msg, idx) => (
                 <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-sm p-4 rounded-2xl ${
-                    msg.role === 'user'
-                      ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-tr-none'
-                      : 'bg-gray-100 text-gray-800 rounded-tl-none'
-                  }`}>
-                    <p className="text-sm">{msg.content}</p>
+                  <div
+                    className={`max-w-sm p-4 rounded-2xl shadow-md ${
+                      msg.role === 'user'
+                        ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-tr-none'
+                        : 'bg-white text-gray-800 rounded-tl-none border border-gray-200'
+                    }`}
+                  >
+                    <p className="text-sm leading-relaxed">{msg.content}</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="p-6 border-t border-gray-100">
+            <div className="p-6 border-t border-gray-200 bg-white rounded-b-2xl">
               <div className="flex space-x-3">
                 <input
                   type="text"
@@ -366,12 +434,15 @@ export const PatientDashboard: React.FC = () => {
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   placeholder="Ask about symptoms, medications, or upload a document..."
-                  className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                  className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all"
                 />
-                <button className="flex items-center space-x-2 px-4 py-3 bg-purple-100 text-purple-700 rounded-xl hover:bg-purple-200 transition-all">
+                <button className="w-12 h-12 bg-gray-100 hover:bg-gray-200 text-cyan-700 rounded-xl transition-all flex items-center justify-center">
                   <Camera className="w-5 h-5" />
                 </button>
-                <button onClick={handleSendMessage} className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:shadow-lg transition-all font-semibold flex items-center space-x-2">
+                <button
+                  onClick={handleSendMessage}
+                  className="px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl hover:shadow-lg transition-all font-semibold flex items-center space-x-2"
+                >
                   <Send className="w-4 h-4" />
                   <span>Send</span>
                 </button>
