@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, MapPin, Video, Star, Phone, MessageSquare, Navigation, CheckCircle, User, FileText, ChevronRight, Bell, AlertCircle } from 'lucide-react';
+import { Calendar, Clock, MapPin, Video, Star, Phone, MessageSquare, Navigation, CheckCircle, FileText, Bell, AlertCircle } from 'lucide-react';
 
 export const AppointmentDesignShowcase: React.FC = () => {
   const [selectedStyle, setSelectedStyle] = useState<'modern' | 'minimal' | 'bold'>('modern');
@@ -143,7 +143,7 @@ export const AppointmentDesignShowcase: React.FC = () => {
             </div>
 
             <div className="grid gap-6">
-              {upcomingAppointments.map((appointment, index) => {
+              {upcomingAppointments.map((appointment) => {
                 if (selectedStyle === 'modern') {
                   return (
                     <div key={appointment.id} className="group relative bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl overflow-hidden border border-gray-700 hover:border-blue-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-2">

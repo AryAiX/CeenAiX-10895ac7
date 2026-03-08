@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { MessageCircle, X, Minimize2 } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 export const ChatbotButton: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isMinimized, setIsMinimized] = useState(true);
   const [showTooltip, setShowTooltip] = useState(false);
 
   // Don't show the button if we're already on the AI chat page

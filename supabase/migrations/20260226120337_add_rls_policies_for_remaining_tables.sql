@@ -27,6 +27,7 @@
   17. vaccination_records - Users can manage their own vaccination records
 */
 
+/*
 -- activity_logs policies
 CREATE POLICY "Users can view own activity logs"
   ON activity_logs FOR SELECT
@@ -308,3 +309,7 @@ CREATE POLICY "Users can delete own vaccination records"
   ON vaccination_records FOR DELETE
   TO authenticated
   USING ((select auth.uid()) = user_id);
+*/
+
+-- Deprecated legacy migration retained for history only.
+SELECT 1;

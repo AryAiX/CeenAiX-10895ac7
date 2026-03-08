@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Search } from 'lucide-react';
+import { ArrowRight, BookOpen, Search } from 'lucide-react';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
 
@@ -176,7 +176,7 @@ export const HealthEducation: React.FC = () => {
                   </p>
                   <button className="mt-4 text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center space-x-1">
                     <span>Read more</span>
-                    <ArrowLeft className="w-4 h-4 rotate-180" />
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>

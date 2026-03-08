@@ -16,6 +16,7 @@
     - RLS policy optimization maintains same security level with better performance
 */
 
+/*
 -- Add indexes for all unindexed foreign keys
 CREATE INDEX IF NOT EXISTS idx_activity_logs_user_id ON activity_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_appointment_types_doctor_id ON appointment_types(doctor_id);
@@ -343,3 +344,7 @@ CREATE POLICY "Authenticated users can create audit logs"
   ON audit_logs FOR INSERT
   TO authenticated
   WITH CHECK (user_id = (SELECT auth.uid()));
+*/
+
+-- Deprecated legacy migration retained for history only.
+SELECT 1;

@@ -25,6 +25,7 @@
   - linked_family_members
 */
 
+/*
 -- user_profiles policies
 DROP POLICY IF EXISTS "Users can view own profile" ON user_profiles;
 DROP POLICY IF EXISTS "Users can update own profile" ON user_profiles;
@@ -226,3 +227,7 @@ CREATE POLICY "Users can create family links"
   ON linked_family_members FOR INSERT
   TO authenticated
   WITH CHECK ((select auth.uid()) = patient_id);
+*/
+
+-- Deprecated legacy migration retained for history only.
+SELECT 1;

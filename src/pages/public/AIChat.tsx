@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send, Upload, User, Bot, Calendar, Sparkles } from 'lucide-react';
+import { Send, User, Bot, Calendar, Sparkles } from 'lucide-react';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
 

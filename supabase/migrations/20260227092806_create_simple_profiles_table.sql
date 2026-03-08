@@ -21,6 +21,7 @@
     - Add policies for public access (since auth is removed)
 */
 
+/*
 CREATE TABLE IF NOT EXISTS profiles (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   full_name text NOT NULL,
@@ -62,3 +63,7 @@ CREATE POLICY "Anyone can delete profiles"
   FOR DELETE
   TO public
   USING (true);
+*/
+
+-- Deprecated legacy migration retained for history only.
+SELECT 1;

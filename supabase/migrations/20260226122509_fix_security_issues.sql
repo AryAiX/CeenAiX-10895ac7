@@ -13,6 +13,7 @@
     - Reduced index overhead improves write performance
 */
 
+/*
 -- Drop unused indexes
 DROP INDEX IF EXISTS idx_user_profiles_user_id;
 DROP INDEX IF EXISTS idx_user_profiles_role;
@@ -291,3 +292,7 @@ CREATE POLICY "Authenticated users can create own health scores"
   ON health_scores FOR INSERT
   TO authenticated
   WITH CHECK (user_id = auth.uid());
+*/
+
+-- Deprecated legacy migration retained for history only.
+SELECT 1;

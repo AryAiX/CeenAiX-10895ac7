@@ -18,6 +18,7 @@
   using auth.uid() checks.
 */
 
+/*
 -- user_profiles: Add INSERT policy
 CREATE POLICY "Users can create own profile"
   ON user_profiles FOR INSERT
@@ -35,3 +36,7 @@ CREATE POLICY "Users can create own health record"
   ON health_records FOR INSERT
   TO authenticated
   WITH CHECK ((select auth.uid()) = user_id);
+*/
+
+-- Deprecated legacy migration retained for history only.
+SELECT 1;

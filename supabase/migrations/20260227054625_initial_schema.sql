@@ -32,6 +32,7 @@
     - Add policies for doctors to manage their profiles
 */
 
+/*
 -- Create user_profiles table
 CREATE TABLE IF NOT EXISTS user_profiles (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -102,3 +103,7 @@ CREATE POLICY "Doctors can update own profile"
   TO authenticated
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
+*/
+
+-- Deprecated legacy migration retained for history only.
+SELECT 1;

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, MapPin, Video, Plus, Search, X, ChevronLeft, ChevronRight, User, Star, AlertTriangle, Navigation as NavigationIcon } from 'lucide-react';
 import { Navigation } from '../../components/Navigation';
-import { PageHeader } from '../../components/PageHeader';
 import { supabase } from '../../lib/supabase';
 
 interface Doctor {
@@ -332,7 +331,8 @@ export const PatientAppointments: React.FC = () => {
 
   const convertTo24Hour = (time12h: string): string => {
     const [time, period] = time12h.split(' ');
-    let [hours, minutes] = time.split(':');
+    const [rawHours, minutes] = time.split(':');
+    let hours = rawHours;
 
     if (period === 'PM' && hours !== '12') {
       hours = String(parseInt(hours) + 12);

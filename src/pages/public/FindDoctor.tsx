@@ -20,6 +20,8 @@ interface Doctor {
   rating?: number;
 }
 
+type DoctorRow = Omit<Doctor, 'rating'>;
+
 const doctorImages = [
   'https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=400',
   'https://images.pexels.com/photos/5452293/pexels-photo-5452293.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -66,7 +68,7 @@ export const FindDoctor: React.FC = () => {
 
       if (error) throw error;
 
-      const doctorsWithRatings = data?.map((doc: any, index: number) => ({
+      const doctorsWithRatings = (data as DoctorRow[] | null)?.map((doc, index) => ({
         ...doc,
         rating: 4.2 + Math.random() * 0.8,
         image_url: doc.image_url || doctorImages[index % doctorImages.length],

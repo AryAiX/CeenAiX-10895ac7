@@ -18,6 +18,7 @@
     - Create new policies without recursion
 */
 
+/*
 -- Drop the problematic policy
 DROP POLICY IF EXISTS "Users can view relevant profiles" ON user_profiles;
 
@@ -44,3 +45,7 @@ CREATE POLICY "Users can search for other users"
   ON user_profiles FOR SELECT
   TO authenticated
   USING (true);
+*/
+
+-- Deprecated legacy migration retained for history only.
+SELECT 1;

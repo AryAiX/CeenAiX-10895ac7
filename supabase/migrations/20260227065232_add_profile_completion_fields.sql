@@ -28,6 +28,7 @@
     - Add policies for family members to view each other's basic info
 */
 
+/*
 -- Add new columns to user_profiles
 DO $$
 BEGIN
@@ -160,3 +161,7 @@ CREATE POLICY "Users can delete own family links"
   ON family_links FOR DELETE
   TO authenticated
   USING (auth.uid() = (SELECT user_id FROM user_profiles WHERE user_profiles.user_id = family_links.user_id));
+*/
+
+-- Deprecated legacy migration retained for history only.
+SELECT 1;

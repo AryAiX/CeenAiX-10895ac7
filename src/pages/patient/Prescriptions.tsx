@@ -134,7 +134,7 @@ export const PatientPrescriptions: React.FC = () => {
     return diffDays;
   };
 
-  const handleRefillRequest = (prescriptionId: string, medicationName: string) => {
+  const handleRefillRequest = (medicationName: string) => {
     setSelectedMedication(medicationName);
     setActiveTab('pharmacy');
   };
@@ -370,7 +370,7 @@ export const PatientPrescriptions: React.FC = () => {
 
                           <div className="flex items-center space-x-3 pt-4 border-t border-gray-100">
                             <button
-                              onClick={() => handleRefillRequest(prescription.id, prescription.medication_name)}
+                              onClick={() => handleRefillRequest(prescription.medication_name)}
                               className="flex-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:shadow-lg text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center space-x-2"
                             >
                               <RefreshCw className="w-5 h-5" />
