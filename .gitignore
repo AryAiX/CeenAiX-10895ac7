@@ -22,3 +22,5 @@ dist-ssr
 *.sw?
 .env
 .cursor/mcp.json
+.vercel
+.env*.local
