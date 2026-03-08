@@ -21,9 +21,9 @@
 | FND-07 | Custom hooks pattern (`src/hooks/`) | done | 2026-02-28 | TH | `AGENTS.md` — Code Style; e.g. `useAppointments()`, `usePatientProfile()` | 2026-03-08 | `useQuery`, `useUserProfile`, `useAppointments`, `useNotifications` |
 | FND-08 | Error boundaries around major page sections | done | 2026-02-28 | TH | `AGENTS.md` — Code Style; graceful failure isolation | 2026-03-08 | `src/components/ErrorBoundary.tsx` |
 | FND-09 | Skeleton loaders for all data-fetching views | done | 2026-02-28 | TH | `AGENTS.md` — Code Style; replace spinners with skeleton loaders | 2026-03-08 | `src/components/Skeleton.tsx` — Skeleton, SkeletonText, SkeletonCard, SkeletonTable, SkeletonAvatar |
-| FND-10 | Vercel project setup + environment variables | in-progress | 2026-02-28 | TH | `docs/specs/08-technical-architecture.md` — Hosting: Vercel + Supabase Cloud | | `vercel.json` created; needs Vercel project creation + secrets |
+| FND-10 | Vercel project setup + environment variables | done | 2026-02-28 | TH | `docs/specs/08-technical-architecture.md` — Hosting: Vercel + Supabase Cloud | 2026-03-08 | Vercel project linked to `aryaix/ceenaix`; GitHub Actions secrets configured for Vercel + Supabase |
 | FND-11 | GitHub Actions CI/CD (lint + typecheck + build + deploy) | done | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Infrastructure; `docs/specs/08-technical-architecture.md` | 2026-03-08 | `.github/workflows/ci.yml` + `deploy.yml` |
-| FND-12 | Initial Vercel deployment (hello-world level) | pending | 2026-02-28 | TH | Validates full pipeline: push → CI → deploy; unblocks all future work | | Blocked by FND-10 (Vercel project setup) |
+| FND-12 | Initial Vercel deployment (hello-world level) | done | 2026-02-28 | TH | Validates full pipeline: push → CI → deploy; unblocks all future work | 2026-03-08 | Production deploy validated via GitHub Actions `deploy.yml` after correcting Vercel token and linked project/org IDs |
 
 ---
 
