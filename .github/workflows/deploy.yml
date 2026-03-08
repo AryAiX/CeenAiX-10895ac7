@@ -23,21 +23,19 @@ jobs:
       - run: npm ci
 
       - name: Normalize Vercel Token
-        run: echo "VERCEL_TOKEN_CLEAN=$(printf '%s' "$VERCEL_TOKEN" | tr -d '\r\n[:space:]')" >> "$GITHUB_ENV"
+        run: echo "VERCEL_TOKEN_CLEAN=$(printf '%s' "$VERCEL_TOKEN_B64" | base64 -d | tr -d '\r\n[:space:]')" >> "$GITHUB_ENV"
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TOKEN_B64: ${{ secrets.VERCEL_TOKEN_B64 }}
 
       - name: Pull Vercel Environment Information
         run: npx vercel@50.1.3 pull --yes --environment=production --token="$VERCEL_TOKEN_CLEAN"
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Build Project Artifacts
         run: npx vercel@50.1.3 build --prod --token="$VERCEL_TOKEN_CLEAN"
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
@@ -46,7 +44,6 @@ jobs:
       - name: Deploy to Vercel
         run: npx vercel@50.1.3 deploy --prebuilt --prod --token="$VERCEL_TOKEN_CLEAN"
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
@@ -66,21 +63,19 @@ jobs:
       - run: npm ci
 
       - name: Normalize Vercel Token
-        run: echo "VERCEL_TOKEN_CLEAN=$(printf '%s' "$VERCEL_TOKEN" | tr -d '\r\n[:space:]')" >> "$GITHUB_ENV"
+        run: echo "VERCEL_TOKEN_CLEAN=$(printf '%s' "$VERCEL_TOKEN_B64" | base64 -d | tr -d '\r\n[:space:]')" >> "$GITHUB_ENV"
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TOKEN_B64: ${{ secrets.VERCEL_TOKEN_B64 }}
 
       - name: Pull Vercel Environment Information
         run: npx vercel@50.1.3 pull --yes --environment=preview --token="$VERCEL_TOKEN_CLEAN"
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Build Project Artifacts
         run: npx vercel@50.1.3 build --token="$VERCEL_TOKEN_CLEAN"
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
@@ -89,6 +84,5 @@ jobs:
       - name: Deploy Preview to Vercel
         run: npx vercel@50.1.3 deploy --prebuilt --token="$VERCEL_TOKEN_CLEAN"
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
