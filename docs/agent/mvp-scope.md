@@ -73,6 +73,50 @@ See `docs/agent/schema-reference.md` — use only tables marked **Phase 1**.
 - RLS policies on all tables scoped by `auth.uid()` and role
 - CI/CD: GitHub Actions → lint + typecheck + build → deploy to Vercel
 
+## Current Code State (Bolt Prototype)
+
+> The UI was prototyped using Bolt. This section tracks what exists in code vs what still needs to be built. See `docs/agent/bolt-code-audit.md` for detailed conflict analysis.
+
+### What Bolt Has Built
+
+**Working with Supabase (but wrong schema)**:
+- FindDoctor — queries `doctors` (needs migration to `doctor_profiles` + `user_profiles`)
+- FindClinic — queries `hospitals` (Phase 3 table; hardcode for MVP)
+- PatientAppointments — queries `appointments` + `doctors` + `doctor_ratings` (schema mismatch)
+- PatientPrescriptions — queries `prescriptions` + `doctors` (flat vs normalized)
+- DoctorProfile — queries `profiles` (needs migration to `user_profiles`)
+- BookingModal — inserts into `appointments` (column mismatch)
+
+**UI-only (static/mock data)**:
+- Home, Insurance, HealthEducation, Pharmacy, Laboratories
+- PatientDashboard, PatientRecords, PatientMessages, PatientProfile
+- DoctorDashboard, DoctorAppointments, DoctorPatients, DoctorPrescriptions, DoctorMessages
+- AIChat (local rule-based, no Edge Functions)
+
+**Extra pages not in MVP spec**:
+- `/pharmacy` — defer to Phase 3
+- `/laboratories` — defer to Phase 3
+- `/appointment-showcase` — design demo, remove
+
+### What Still Needs to Be Built
+
+| Category | Items | Priority |
+|---|---|---|
+| Database | Supabase migrations for all Phase 1 tables, RLS policies | Highest |
+| Auth | `auth-context.tsx`, login, register, OTP, forgot-password, onboarding, route guards | Highest |
+| Shared types | `src/types/` matching spec schema | High |
+| Custom hooks | `src/hooks/` for Supabase queries | High |
+| Schema migration | Rewire existing Bolt queries to use spec tables | High |
+| AI backend | Edge Functions (ai-chat, ai-document-analyze, ai-embed) | High |
+| Missing pages | Admin (dashboard, users, insurance), patient (ai-chat, lab-results, notifications, emergency-profile, booking flow), doctor (patient detail, create prescription, lab orders, schedule, notifications) | High |
+| System pages | 404, 500, maintenance, access-denied | Medium |
+| Storage | Supabase Storage buckets (avatars, documents, medical-files) | Medium |
+| CI/CD | GitHub Actions pipeline | Medium |
+
+### Guiding Principle
+
+Bolt's UI components are the **visual reference** — preserve their look and feel. Replace data-fetching, types, and business logic to match the spec. See `AGENTS.md` for the full rule.
+
 ## NOT in MVP
 
 - Virtual consultation (video/audio) — Phase 2
