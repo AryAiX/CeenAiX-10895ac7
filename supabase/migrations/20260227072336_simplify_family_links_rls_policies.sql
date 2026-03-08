@@ -15,6 +15,7 @@
     - Create new simplified policies
 */
 
+/*
 -- Drop all existing family_links policies
 DROP POLICY IF EXISTS "Users can view own family links" ON family_links;
 DROP POLICY IF EXISTS "Users can view links to them" ON family_links;
@@ -44,3 +45,7 @@ CREATE POLICY "Users can delete own family links"
   ON family_links FOR DELETE
   TO authenticated
   USING (auth.uid() = user_id);
+*/
+
+-- Deprecated legacy migration retained for history only.
+SELECT 1;

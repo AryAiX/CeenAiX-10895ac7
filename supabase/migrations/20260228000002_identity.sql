@@ -87,16 +87,6 @@ ALTER TABLE doctor_profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "users_own_profile" ON user_profiles
   FOR ALL USING (auth.uid() = user_id);
 
--- Doctors can read profiles of patients they have appointments with
-CREATE POLICY "doctors_read_patient_profiles" ON user_profiles
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM appointments
-      WHERE appointments.doctor_id = auth.uid()
-        AND appointments.patient_id = user_profiles.user_id
-    )
-  );
-
 -- Super admins can read all profiles
 CREATE POLICY "admins_read_all_profiles" ON user_profiles
   FOR SELECT USING (
@@ -118,16 +108,6 @@ CREATE POLICY "admins_update_all_profiles" ON user_profiles
 -- Patients see their own patient profile
 CREATE POLICY "patients_own_patient_profile" ON patient_profiles
   FOR ALL USING (auth.uid() = user_id);
-
--- Doctors can read patient profiles via appointments
-CREATE POLICY "doctors_read_patient_profiles_ext" ON patient_profiles
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM appointments
-      WHERE appointments.doctor_id = auth.uid()
-        AND appointments.patient_id = patient_profiles.user_id
-    )
-  );
 
 -- Doctors see their own doctor profile
 CREATE POLICY "doctors_own_doctor_profile" ON doctor_profiles

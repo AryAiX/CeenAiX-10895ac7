@@ -59,6 +59,7 @@
     - idx_vaccination_records_user_id on user_id
 */
 
+/*
 -- activity_logs indexes
 CREATE INDEX IF NOT EXISTS idx_activity_logs_user_id ON activity_logs(user_id);
 
@@ -108,3 +109,7 @@ CREATE INDEX IF NOT EXISTS idx_symptom_logs_user_id ON symptom_logs(user_id);
 
 -- vaccination_records indexes
 CREATE INDEX IF NOT EXISTS idx_vaccination_records_user_id ON vaccination_records(user_id);
+*/
+
+-- Deprecated legacy migration retained for history only.
+SELECT 1;

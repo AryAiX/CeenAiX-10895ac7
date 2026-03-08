@@ -1,57 +1,6 @@
-/*
-  # Add Appointments and Doctor Ratings Schema
+-- Compatibility layer for the current Bolt-era public doctor experience.
+-- Keep this independent from the canonical appointments schema created earlier.
 
-  1. New Tables
-    - `doctors`
-      - `id` (uuid, primary key)
-      - `name` (text, doctor's full name)
-      - `specialty` (text, medical specialty)
-      - `location` (text, clinic/hospital location)
-      - `latitude` (numeric, location coordinate)
-      - `longitude` (numeric, location coordinate)
-      - `image_url` (text, profile photo URL)
-      - `available_slots` (integer, number of available appointment slots)
-      - `accepts_video` (boolean, whether doctor accepts video consultations)
-      - `created_at` (timestamptz, record creation time)
-      - `updated_at` (timestamptz, record update time)
-    
-    - `appointments`
-      - `id` (uuid, primary key)
-      - `user_id` (uuid, references auth.users)
-      - `doctor_id` (uuid, references doctors)
-      - `appointment_date` (date, appointment date)
-      - `appointment_time` (time, appointment time)
-      - `type` (text, 'in-person' or 'video')
-      - `location` (text, appointment location)
-      - `latitude` (numeric, optional location coordinate)
-      - `longitude` (numeric, optional location coordinate)
-      - `reason` (text, reason for appointment)
-      - `status` (text, 'scheduled', 'completed', 'cancelled')
-      - `created_at` (timestamptz, record creation time)
-      - `updated_at` (timestamptz, record update time)
-    
-    - `doctor_ratings`
-      - `id` (uuid, primary key)
-      - `user_id` (uuid, references auth.users)
-      - `doctor_id` (uuid, references doctors)
-      - `appointment_id` (uuid, references appointments)
-      - `rating` (integer, 1-5 stars)
-      - `created_at` (timestamptz, record creation time)
-      - `updated_at` (timestamptz, record update time)
-
-  2. Security
-    - Enable RLS on all tables
-    - Users can view their own appointments
-    - Users can create, update, and cancel their own appointments
-    - Users can view all doctors (public data)
-    - Users can create and view their own ratings
-    - Users can only rate completed appointments once
-
-  3. Indexes
-    - Add indexes for foreign keys and frequently queried columns
-*/
-
--- Create doctors table
 CREATE TABLE IF NOT EXISTS doctors (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text NOT NULL,
@@ -66,78 +15,29 @@ CREATE TABLE IF NOT EXISTS doctors (
   updated_at timestamptz DEFAULT now()
 );
 
--- Create appointments table
-CREATE TABLE IF NOT EXISTS appointments (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  doctor_id uuid NOT NULL REFERENCES doctors(id) ON DELETE CASCADE,
-  appointment_date date NOT NULL,
-  appointment_time time NOT NULL,
-  type text NOT NULL CHECK (type IN ('in-person', 'video')),
-  location text NOT NULL,
-  latitude numeric,
-  longitude numeric,
-  reason text,
-  status text NOT NULL DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'completed', 'cancelled')),
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
--- Create doctor_ratings table
 CREATE TABLE IF NOT EXISTS doctor_ratings (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   doctor_id uuid NOT NULL REFERENCES doctors(id) ON DELETE CASCADE,
-  appointment_id uuid NOT NULL REFERENCES appointments(id) ON DELETE CASCADE,
+  appointment_id uuid REFERENCES appointments(id) ON DELETE CASCADE,
   rating integer NOT NULL CHECK (rating >= 1 AND rating <= 5),
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now(),
   UNIQUE(user_id, appointment_id)
 );
 
--- Create indexes
-CREATE INDEX IF NOT EXISTS idx_appointments_user_id ON appointments(user_id);
-CREATE INDEX IF NOT EXISTS idx_appointments_doctor_id ON appointments(doctor_id);
-CREATE INDEX IF NOT EXISTS idx_appointments_status ON appointments(status);
-CREATE INDEX IF NOT EXISTS idx_appointments_date ON appointments(appointment_date);
 CREATE INDEX IF NOT EXISTS idx_doctor_ratings_user_id ON doctor_ratings(user_id);
 CREATE INDEX IF NOT EXISTS idx_doctor_ratings_doctor_id ON doctor_ratings(doctor_id);
 CREATE INDEX IF NOT EXISTS idx_doctor_ratings_appointment_id ON doctor_ratings(appointment_id);
 
--- Enable RLS
 ALTER TABLE doctors ENABLE ROW LEVEL SECURITY;
-ALTER TABLE appointments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE doctor_ratings ENABLE ROW LEVEL SECURITY;
 
--- Doctors policies (public read access)
 CREATE POLICY "Anyone can view doctors"
   ON doctors FOR SELECT
   TO authenticated
   USING (true);
 
--- Appointments policies
-CREATE POLICY "Users can view own appointments"
-  ON appointments FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can create own appointments"
-  ON appointments FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can update own appointments"
-  ON appointments FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete own appointments"
-  ON appointments FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- Doctor ratings policies
 CREATE POLICY "Users can view own ratings"
   ON doctor_ratings FOR SELECT
   TO authenticated
@@ -151,12 +51,12 @@ CREATE POLICY "Users can create ratings for own completed appointments"
     AND EXISTS (
       SELECT 1 FROM appointments
       WHERE appointments.id = appointment_id
-      AND appointments.user_id = auth.uid()
-      AND appointments.status = 'completed'
+        AND appointments.patient_id = auth.uid()
+        AND appointments.status = 'completed'
+        AND NOT appointments.is_deleted
     )
   );
 
--- Insert sample doctors
 INSERT INTO doctors (id, name, specialty, location, latitude, longitude, image_url, available_slots, accepts_video)
 VALUES
   ('d1111111-1111-1111-1111-111111111111', 'Dr. Sarah Ahmed', 'General Medicine', 'Dubai Healthcare City', 25.1172, 55.2082, 'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=200', 12, true),
@@ -165,11 +65,10 @@ VALUES
   ('d4444444-4444-4444-4444-444444444444', 'Dr. Ahmed Khalil', 'Orthopedics', 'NMC Royal Hospital', 25.2244, 55.2819, 'https://images.pexels.com/photos/5452201/pexels-photo-5452201.jpeg?auto=compress&cs=tinysrgb&w=200', 6, true)
 ON CONFLICT (id) DO NOTHING;
 
--- Create a view for doctor average ratings
 CREATE OR REPLACE VIEW doctor_ratings_summary AS
 SELECT
   doctor_id,
-  COUNT(*) as total_reviews,
-  ROUND(AVG(rating)::numeric, 1) as average_rating
+  COUNT(*) AS total_reviews,
+  ROUND(AVG(rating)::numeric, 1) AS average_rating
 FROM doctor_ratings
 GROUP BY doctor_id;
