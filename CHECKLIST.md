@@ -13,17 +13,17 @@
 | ID | Item | Status | Added | By | Justification | Completed | Notes |
 |---|---|---|---|---|---|---|---|
 | FND-01 | Supabase Auth providers (email + phone OTP) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Infrastructure | | |
-| FND-02 | Database migrations — Phase 1 tables | pending | 2026-02-28 | TH | `docs/agent/schema-reference.md` — all Phase 1 tables with correct columns | | |
-| FND-03 | RLS policies on all Phase 1 tables | pending | 2026-02-28 | TH | `docs/agent/schema-reference.md` — RLS Pattern; security requirement | | |
-| FND-04 | Supabase Storage buckets (avatars, documents, medical-files) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Infrastructure | | |
-| FND-05 | Shared TypeScript types in `src/types/` | pending | 2026-02-28 | TH | `AGENTS.md` — Code Style; replace Bolt inline types with spec-compliant shared types | | |
+| FND-02 | Database migrations — Phase 1 tables | done | 2026-02-28 | TH | `docs/agent/schema-reference.md` — all Phase 1 tables with correct columns | 2026-03-08 | 12 migration files in `supabase/migrations/` |
+| FND-03 | RLS policies on all Phase 1 tables | done | 2026-02-28 | TH | `docs/agent/schema-reference.md` — RLS Pattern; security requirement | 2026-03-08 | Included in migration files |
+| FND-04 | Supabase Storage buckets (avatars, documents, medical-files) | done | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Infrastructure | 2026-03-08 | Migration 000013; includes RLS policies per bucket |
+| FND-05 | Shared TypeScript types in `src/types/` | done | 2026-02-28 | TH | `AGENTS.md` — Code Style; replace Bolt inline types with spec-compliant shared types | 2026-03-08 | `enums.ts`, `database.ts`, `index.ts` |
 | FND-06 | Auth context (`src/lib/auth-context.tsx`) | pending | 2026-02-28 | TH | `AGENTS.md` — Auth; React Context for auth state, `onAuthStateChange` listener | | |
-| FND-07 | Custom hooks pattern (`src/hooks/`) | pending | 2026-02-28 | TH | `AGENTS.md` — Code Style; e.g. `useAppointments()`, `usePatientProfile()` | | |
-| FND-08 | Error boundaries around major page sections | pending | 2026-02-28 | TH | `AGENTS.md` — Code Style; graceful failure isolation | | |
-| FND-09 | Skeleton loaders for all data-fetching views | pending | 2026-02-28 | TH | `AGENTS.md` — Code Style; replace spinners with skeleton loaders | | |
-| FND-10 | Vercel project setup + environment variables | pending | 2026-02-28 | TH | `docs/specs/08-technical-architecture.md` — Hosting: Vercel + Supabase Cloud | | New project from scratch |
-| FND-11 | GitHub Actions CI/CD (lint + typecheck + build + deploy) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Infrastructure; `docs/specs/08-technical-architecture.md` | | |
-| FND-12 | Initial Vercel deployment (hello-world level) | pending | 2026-02-28 | TH | Validates full pipeline: push → CI → deploy; unblocks all future work | | |
+| FND-07 | Custom hooks pattern (`src/hooks/`) | done | 2026-02-28 | TH | `AGENTS.md` — Code Style; e.g. `useAppointments()`, `usePatientProfile()` | 2026-03-08 | `useQuery`, `useUserProfile`, `useAppointments`, `useNotifications` |
+| FND-08 | Error boundaries around major page sections | done | 2026-02-28 | TH | `AGENTS.md` — Code Style; graceful failure isolation | 2026-03-08 | `src/components/ErrorBoundary.tsx` |
+| FND-09 | Skeleton loaders for all data-fetching views | done | 2026-02-28 | TH | `AGENTS.md` — Code Style; replace spinners with skeleton loaders | 2026-03-08 | `src/components/Skeleton.tsx` — Skeleton, SkeletonText, SkeletonCard, SkeletonTable, SkeletonAvatar |
+| FND-10 | Vercel project setup + environment variables | in-progress | 2026-02-28 | TH | `docs/specs/08-technical-architecture.md` — Hosting: Vercel + Supabase Cloud | | `vercel.json` created; needs Vercel project creation + secrets |
+| FND-11 | GitHub Actions CI/CD (lint + typecheck + build + deploy) | done | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Infrastructure; `docs/specs/08-technical-architecture.md` | 2026-03-08 | `.github/workflows/ci.yml` + `deploy.yml` |
+| FND-12 | Initial Vercel deployment (hello-world level) | pending | 2026-02-28 | TH | Validates full pipeline: push → CI → deploy; unblocks all future work | | Blocked by FND-10 (Vercel project setup) |
 
 ---
 
