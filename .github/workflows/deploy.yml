@@ -22,7 +22,7 @@ jobs:
 
       - run: npm ci
 
-      - name: Normalize Vercel Token
+      - name: Pull Vercel Environment Information
         run: |
           VERCEL_TOKEN_CLEAN="$(python - <<'PY'
           import base64
@@ -30,27 +30,39 @@ jobs:
           print(base64.b64decode(os.environ["VERCEL_TOKEN_B64"]).decode().strip())
           PY
           )"
-          echo "VERCEL_TOKEN_CLEAN=$VERCEL_TOKEN_CLEAN" >> "$GITHUB_ENV"
+          npx vercel@50.1.3 pull --yes --environment=production --token="$VERCEL_TOKEN_CLEAN"
         env:
           VERCEL_TOKEN_B64: ${{ secrets.VERCEL_TOKEN_B64 }}
-
-      - name: Pull Vercel Environment Information
-        run: npx vercel@50.1.3 pull --yes --environment=production --token="$VERCEL_TOKEN_CLEAN"
-        env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Build Project Artifacts
-        run: npx vercel@50.1.3 build --prod --token="$VERCEL_TOKEN_CLEAN"
+        run: |
+          VERCEL_TOKEN_CLEAN="$(python - <<'PY'
+          import base64
+          import os
+          print(base64.b64decode(os.environ["VERCEL_TOKEN_B64"]).decode().strip())
+          PY
+          )"
+          npx vercel@50.1.3 build --prod --token="$VERCEL_TOKEN_CLEAN"
         env:
+          VERCEL_TOKEN_B64: ${{ secrets.VERCEL_TOKEN_B64 }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: Deploy to Vercel
-        run: npx vercel@50.1.3 deploy --prebuilt --prod --token="$VERCEL_TOKEN_CLEAN"
+        run: |
+          VERCEL_TOKEN_CLEAN="$(python - <<'PY'
+          import base64
+          import os
+          print(base64.b64decode(os.environ["VERCEL_TOKEN_B64"]).decode().strip())
+          PY
+          )"
+          npx vercel@50.1.3 deploy --prebuilt --prod --token="$VERCEL_TOKEN_CLEAN"
         env:
+          VERCEL_TOKEN_B64: ${{ secrets.VERCEL_TOKEN_B64 }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
@@ -69,7 +81,7 @@ jobs:
 
       - run: npm ci
 
-      - name: Normalize Vercel Token
+      - name: Pull Vercel Environment Information
         run: |
           VERCEL_TOKEN_CLEAN="$(python - <<'PY'
           import base64
@@ -77,26 +89,38 @@ jobs:
           print(base64.b64decode(os.environ["VERCEL_TOKEN_B64"]).decode().strip())
           PY
           )"
-          echo "VERCEL_TOKEN_CLEAN=$VERCEL_TOKEN_CLEAN" >> "$GITHUB_ENV"
+          npx vercel@50.1.3 pull --yes --environment=preview --token="$VERCEL_TOKEN_CLEAN"
         env:
           VERCEL_TOKEN_B64: ${{ secrets.VERCEL_TOKEN_B64 }}
-
-      - name: Pull Vercel Environment Information
-        run: npx vercel@50.1.3 pull --yes --environment=preview --token="$VERCEL_TOKEN_CLEAN"
-        env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Build Project Artifacts
-        run: npx vercel@50.1.3 build --token="$VERCEL_TOKEN_CLEAN"
+        run: |
+          VERCEL_TOKEN_CLEAN="$(python - <<'PY'
+          import base64
+          import os
+          print(base64.b64decode(os.environ["VERCEL_TOKEN_B64"]).decode().strip())
+          PY
+          )"
+          npx vercel@50.1.3 build --token="$VERCEL_TOKEN_CLEAN"
         env:
+          VERCEL_TOKEN_B64: ${{ secrets.VERCEL_TOKEN_B64 }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: Deploy Preview to Vercel
-        run: npx vercel@50.1.3 deploy --prebuilt --token="$VERCEL_TOKEN_CLEAN"
+        run: |
+          VERCEL_TOKEN_CLEAN="$(python - <<'PY'
+          import base64
+          import os
+          print(base64.b64decode(os.environ["VERCEL_TOKEN_B64"]).decode().strip())
+          PY
+          )"
+          npx vercel@50.1.3 deploy --prebuilt --token="$VERCEL_TOKEN_CLEAN"
         env:
+          VERCEL_TOKEN_B64: ${{ secrets.VERCEL_TOKEN_B64 }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
