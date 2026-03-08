@@ -12,6 +12,7 @@ Start here when developing. These are condensed, action-oriented summaries.
 | [routes-reference.md](agent/routes-reference.md) | All MVP routes with components and data sources |
 | [tech-stack.md](agent/tech-stack.md) | Technology choices, file structure, coding conventions |
 | [ai-reference.md](agent/ai-reference.md) | AI features, Edge Function patterns, model usage |
+| [bolt-code-audit.md](agent/bolt-code-audit.md) | Bolt prototype conflicts, table mapping, migration guide |
 
 ## Detailed Specifications (`docs/specs/`)
 

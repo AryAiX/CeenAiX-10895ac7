@@ -174,6 +174,27 @@ insurance_claims          — Phase 3
 
 ---
 
+## Bolt Code Compatibility
+
+> The Bolt-generated UI queries ad-hoc tables that do not match the spec schema. When building the real database, use the spec tables above. This section maps Bolt's table names so agents understand what the existing code expects.
+
+| Bolt Table Name | Spec Equivalent | Bolt Columns (key differences) |
+|---|---|---|
+| `doctors` | `user_profiles` JOIN `doctor_profiles` | Flat: `id`, `name`, `specialty`, `location`, `image_url`, `rating`, `accepts_video` |
+| `hospitals` | `facilities` (Phase 3) | `id`, `name`, `type`, `address`, `city`, `rating`, `specialties` |
+| `hospital_doctors` | `facility_staff` (Phase 3) | Junction table linking hospitals to doctors |
+| `laboratories` | `lab_profiles` (Phase 3) | `id`, `name`, `location`, `rating`, `tests_available` |
+| `profiles` | `user_profiles` | `id`, `full_name`, `email`, `phone`, `role`, `specialization`, `license_number` |
+| `doctor_ratings` | **Not in spec** | `id`, `doctor_id`, `user_id`, `rating`, `comment` |
+| `appointments` | `appointments` (same name, different columns) | Uses `doctor_name`, `appointment_date`/`appointment_time` (strings), `location`, `reason` instead of spec's `scheduled_at`, `facility_id`, `chief_complaint` |
+| `prescriptions` | `prescriptions` + `prescription_items` | Flat: medication fields directly on the row instead of normalized items |
+
+**When creating migrations**: use the spec column definitions above. Existing Bolt component queries will need updating to match. See `docs/agent/bolt-code-audit.md` for the full migration guide.
+
+**Suggested approach for `doctors` table**: create a Postgres VIEW `doctors_view` that joins `user_profiles` + `doctor_profiles` so existing queries need minimal refactoring.
+
+---
+
 ## RLS Pattern
 
 Every table with patient data uses this RLS pattern:
