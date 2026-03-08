@@ -1,0 +1,64 @@
+---
+description: CeenAiX project-specific coding rules for Cursor AI agent
+globs: **/*.{ts,tsx,sql}
+---
+
+# CeenAiX Coding Rules
+
+## Project Context
+This is CeenAiX — an AI-native healthcare platform for the UAE. Read `AGENTS.md` at the project root before making changes. Read `docs/agent/mvp-scope.md` for current build scope.
+
+## TypeScript
+- Strict mode enabled — never use `any`
+- Use interfaces for object shapes, types for unions/intersections
+- All Supabase query results must be typed
+- Define shared types in `src/types/`
+
+## React Components
+- Functional components only with TypeScript props interfaces
+- Use named exports (exception: page components can use default export for lazy loading)
+- Colocate component-specific hooks in the same file if small, or extract to `src/hooks/`
+- Use React.lazy() for route-level code splitting
+- Wrap page sections in ErrorBoundary components
+
+## Styling
+- Tailwind CSS utility classes only — no CSS modules, no styled-components, no inline style objects
+- Use the CeenAiX design tokens: `ceenai-cyan`, `ceenai-blue`, `ceenai-navy` (defined in tailwind.config)
+- Mobile-first responsive design: base styles for mobile, then `md:` and `lg:` breakpoints
+- Use Tailwind logical properties (`ms-`, `me-`, `ps-`, `pe-`) instead of `ml-`, `mr-` for future RTL support
+
+## Supabase
+- Single Supabase client instance in `src/lib/supabase.ts`
+- All queries in custom hooks (e.g., `useAppointments()`)
+- Always handle loading, error, and empty states
+- Every table MUST have RLS enabled — verify in migration files
+- Use `auth.uid()` in RLS policies
+- Soft delete for clinical data: `is_deleted` + `deleted_at`
+- Include RLS policies in every migration that creates a table
+
+## Routing
+- Route definitions in `src/lib/router.tsx`
+- Patient routes: `/patient/*` — require role=patient
+- Doctor routes: `/doctor/*` — require role=doctor
+- Admin routes: `/admin/*` — require role=super_admin
+- Public routes: `/`, `/ai-chat`, `/find-doctor`, `/find-clinic`, `/insurance`, `/health-education`
+- Auth routes: `/auth/*`
+
+## AI Integration
+- NEVER call OpenAI or any AI API directly from frontend code
+- All AI calls go through Supabase Edge Functions
+- Stream AI responses using Server-Sent Events (SSE)
+- Tag all AI-generated content in the UI with an "AI" label
+- Check patient consent before injecting health data into AI context
+
+## Database Migrations
+- Place in `supabase/migrations/` with timestamp prefix
+- Always include RLS policies for new tables
+- Always include indexes on foreign key columns
+- Use enums for status fields (defined as PostgreSQL types)
+- Never drop clinical data columns — add new ones alongside
+
+## Phase Awareness
+- Current phase: MVP (Phase 1)
+- DO NOT implement: video consultation, live transcription, family accounts, payments, Arabic/RTL, FCM push, nurse/pharmacy/lab/facility roles, DHA integration, UAE Pass, insurance claims, emergency access, analytics
+- If asked about Phase 2+ features, confirm scope before implementing
