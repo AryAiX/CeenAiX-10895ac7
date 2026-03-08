@@ -13,8 +13,7 @@ import {
   Star,
   CheckCircle2,
   ArrowRight,
-  Award,
-  TrendingUp
+  Award
 } from 'lucide-react';
 import { GeometricBackground } from '../../components/GeometricBackground';
 

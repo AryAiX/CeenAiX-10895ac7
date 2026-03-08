@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search, MapPin, Star, Clock, Phone,
-  Filter, X, Building2, Users, Calendar, Mail,
+  Filter, Building2, Users, Calendar, Mail,
   ChevronDown, ChevronUp,
-  CheckCircle2, Ambulance, ParkingCircle, Shield, Navigation,
-  Sparkles, Award, TrendingUp, Stethoscope, Heart
+  Ambulance, ParkingCircle, Shield, Navigation,
+  Award, TrendingUp, Stethoscope, Heart
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { Header } from '../../components/Header';
-import { Footer } from '../../components/Footer';
 import { BookingModal } from '../../components/BookingModal';
 
 interface Hospital {
