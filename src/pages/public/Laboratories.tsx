@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Clock, Star, Search, Filter, Beaker, TestTube } from 'lucide-react';
 import { Header } from '../../components/Header';
@@ -23,11 +23,7 @@ export const Laboratories: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('all');
 
-  useEffect(() => {
-    fetchLaboratories();
-  }, []);
-
-  const fetchLaboratories = async () => {
+  const fetchLaboratories = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('laboratories')
@@ -46,7 +42,11 @@ export const Laboratories: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchLaboratories();
+  }, [fetchLaboratories]);
 
   const getSampleLaboratories = (): Laboratory[] => [
     {
