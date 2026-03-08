@@ -23,7 +23,14 @@ jobs:
       - run: npm ci
 
       - name: Normalize Vercel Token
-        run: echo "VERCEL_TOKEN_CLEAN=$(printf '%s' "$VERCEL_TOKEN_B64" | base64 -d | tr -d '\r\n[:space:]')" >> "$GITHUB_ENV"
+        run: |
+          VERCEL_TOKEN_CLEAN="$(python - <<'PY'
+          import base64
+          import os
+          print(base64.b64decode(os.environ["VERCEL_TOKEN_B64"]).decode().strip())
+          PY
+          )"
+          echo "VERCEL_TOKEN_CLEAN=$VERCEL_TOKEN_CLEAN" >> "$GITHUB_ENV"
         env:
           VERCEL_TOKEN_B64: ${{ secrets.VERCEL_TOKEN_B64 }}
 
@@ -63,7 +70,14 @@ jobs:
       - run: npm ci
 
       - name: Normalize Vercel Token
-        run: echo "VERCEL_TOKEN_CLEAN=$(printf '%s' "$VERCEL_TOKEN_B64" | base64 -d | tr -d '\r\n[:space:]')" >> "$GITHUB_ENV"
+        run: |
+          VERCEL_TOKEN_CLEAN="$(python - <<'PY'
+          import base64
+          import os
+          print(base64.b64decode(os.environ["VERCEL_TOKEN_B64"]).decode().strip())
+          PY
+          )"
+          echo "VERCEL_TOKEN_CLEAN=$VERCEL_TOKEN_CLEAN" >> "$GITHUB_ENV"
         env:
           VERCEL_TOKEN_B64: ${{ secrets.VERCEL_TOKEN_B64 }}
 
