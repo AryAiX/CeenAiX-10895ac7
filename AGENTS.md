@@ -4,11 +4,12 @@ You are working on **CeenAiX**, an AI-native healthcare platform for the UAE mar
 
 ## Before You Start
 
-1. Read `docs/agent/overview.md` for platform context and tech stack.
-2. Read `docs/agent/mvp-scope.md` to understand what is in scope for the current build phase.
-3. Reference `docs/agent/schema-reference.md` for database tables.
-4. Reference `docs/agent/routes-reference.md` for routing structure.
-5. Reference `docs/agent/tech-stack.md` for coding conventions.
+1. Read `CHECKLIST.md` for the current development status and what to work on next.
+2. Read `docs/agent/overview.md` for platform context and tech stack.
+3. Read `docs/agent/mvp-scope.md` to understand what is in scope for the current build phase.
+4. Reference `docs/agent/schema-reference.md` for database tables.
+5. Reference `docs/agent/routes-reference.md` for routing structure.
+6. Reference `docs/agent/tech-stack.md` for coding conventions.
 
 ## Bolt UI Prototype
 

@@ -39,4 +39,5 @@ Full product design spec — consult when you need complete feature details.
 | File | Purpose |
 |---|---|
 | [AGENTS.md](../AGENTS.md) | AI agent instructions — read this first |
+| [CHECKLIST.md](../CHECKLIST.md) | Development tracker — current status, what to build next |
 | [.cursor/rules/ceenaix.mdc](../.cursor/rules/ceenaix.mdc) | Cursor-specific coding rules |
