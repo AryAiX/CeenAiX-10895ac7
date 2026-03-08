@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { X, Calendar, Clock, ChevronLeft, ChevronRight, MapPin, Video } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -31,11 +31,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ doctor, onClose, onB
   const [loading, setLoading] = useState(false);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
-  useEffect(() => {
-    generateTimeSlots();
-  }, [selectedDate]);
-
-  const generateTimeSlots = async () => {
+  const generateTimeSlots = useCallback(async () => {
     const slots: TimeSlot[] = [];
     const startHour = 9;
     const endHour = 17;
@@ -68,7 +64,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({ doctor, onClose, onB
     }
 
     setTimeSlots(slots);
-  };
+  }, [doctor.id, selectedDate]);
+
+  useEffect(() => {
+    generateTimeSlots();
+  }, [generateTimeSlots]);
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
