@@ -1,0 +1,80 @@
+# AGENTS.md — CeenAiX AI Agent Instructions
+
+You are working on **CeenAiX**, an AI-native healthcare platform for the UAE market built with React + TypeScript + Supabase.
+
+## Before You Start
+
+1. Read `docs/agent/overview.md` for platform context and tech stack.
+2. Read `docs/agent/mvp-scope.md` to understand what is in scope for the current build phase.
+3. Reference `docs/agent/schema-reference.md` for database tables.
+4. Reference `docs/agent/routes-reference.md` for routing structure.
+5. Reference `docs/agent/tech-stack.md` for coding conventions.
+
+## Rules
+
+### Scope Control
+- **Only implement features listed in `docs/agent/mvp-scope.md`** unless explicitly asked otherwise.
+- If a user asks for something that is Phase 2+, flag it and confirm before proceeding.
+- Check the phase of any feature in `docs/specs/13-phased-roadmap.md`.
+
+### Architecture
+- All data access goes through **Supabase client** (`src/lib/supabase.ts`).
+- All AI calls go through **Supabase Edge Functions** — never call OpenAI directly from the frontend.
+- All tables must have **Row-Level Security (RLS)** enabled. No table should be publicly accessible without RLS.
+- Use the **canonical schema** from `docs/agent/schema-reference.md`. Do not create ad-hoc tables.
+- Appointments are the **central clinical entity** — consultations, prescriptions, lab orders, and payments reference appointments.
+
+### Code Style
+- **TypeScript strict mode** — no `any` types.
+- **Functional components** only.
+- **Tailwind CSS** for all styling — no CSS modules, styled-components, or inline styles.
+- **Named exports** (except page components for lazy loading).
+- **Custom hooks** for Supabase queries (e.g., `useAppointments()`, `usePatientProfile()`).
+- Loading states use **skeleton loaders**, not spinners.
+- Error states use **error boundaries** around major sections.
+
+### File Organization
+- Pages go in `src/pages/{role}/` (e.g., `src/pages/patient/Dashboard.tsx`).
+- Shared components go in `src/components/`.
+- Supabase client and helpers in `src/lib/`.
+- Custom hooks in `src/hooks/`.
+- TypeScript types in `src/types/`.
+- Route definitions in `src/lib/router.tsx`.
+
+### Auth
+- Auth state managed via React Context (`src/lib/auth-context.tsx`).
+- Route guards: patient pages require `role === 'patient'`, doctor pages require `role === 'doctor'`, admin pages require `role === 'super_admin'`.
+- Unauthenticated → redirect to `/auth/login`.
+- Wrong role → redirect to `/access-denied`.
+
+### Database
+- Use **Supabase migrations** (`supabase/migrations/`) for schema changes.
+- Every migration must include RLS policies for new tables.
+- Use `auth.uid()` in RLS policies to scope data access.
+- Soft delete clinical data: set `is_deleted = true` and `deleted_at = now()`.
+- Never hard-delete clinical records.
+
+### AI
+- See `docs/agent/ai-reference.md` for AI feature specifications and Edge Function patterns.
+- AI responses must be tagged as "AI-generated" in the UI.
+- Patient context must have consent check before being sent to AI.
+- Guest AI sessions are ephemeral — not retained after 30 days.
+
+## Detailed Specifications
+
+When you need the full specification for any feature, consult:
+
+| Topic | File |
+|---|---|
+| User roles and features | `docs/specs/02-user-roles.md` |
+| Platform sitemap | `docs/specs/03-platform-sitemap.md` |
+| User flows (13 flows) | `docs/specs/04-user-flows.md` |
+| AI capabilities | `docs/specs/05-ai-capabilities.md` |
+| Privacy and compliance | `docs/specs/06-privacy-and-compliance.md` |
+| Technical architecture | `docs/specs/08-technical-architecture.md` |
+| Data model (full) | `docs/specs/09-data-model.md` |
+| Integrations | `docs/specs/10-integrations.md` |
+| Non-functional requirements | `docs/specs/11-non-functional-requirements.md` |
+| Phased roadmap | `docs/specs/13-phased-roadmap.md` |
+| Complete route map | `docs/specs/14-route-map.md` |
+| Glossary | `docs/specs/07-glossary.md` |
