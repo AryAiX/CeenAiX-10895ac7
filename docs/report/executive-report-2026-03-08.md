@@ -67,41 +67,17 @@ The most important outcome is that the system now has a functioning end-to-end d
 - Created a repeatable release path, which lowers manual deployment effort and shortens feedback loops for subsequent product increments.
 - Improved confidence that future implementation can proceed against a stable schema, shared types, and enforced CI quality gates.
 
-## Key Artifacts Delivered
+## Details
 
-- `docs/agent/bolt-code-audit.md`
-- `src/types/database.ts`
-- `src/types/enums.ts`
-- `src/hooks/use-query.ts`
-- `src/hooks/use-user-profile.ts`
-- `src/hooks/use-appointments.ts`
-- `src/hooks/use-notifications.ts`
-- `src/components/ErrorBoundary.tsx`
-- `src/components/Skeleton.tsx`
-- `supabase/migrations/`
-- `.github/workflows/ci.yml`
-- `.github/workflows/deploy.yml`
-- `vercel.json`
-- `CHECKLIST.md`
-
-## Status at Close
-
-Completed foundation items:
-
-- `FND-02` Database migrations - Phase 1 tables
-- `FND-03` RLS policies on all Phase 1 tables
-- `FND-04` Supabase Storage buckets
-- `FND-05` Shared TypeScript types
-- `FND-07` Custom hooks pattern
-- `FND-08` Error boundaries
-- `FND-09` Skeleton loaders
-- `FND-10` Vercel project setup and environment variables
-- `FND-11` GitHub Actions CI/CD
-- `FND-12` Initial Vercel deployment
-
-## Recommended Next Steps
-
-1. Remove temporary deployment diagnostics from `.github/workflows/deploy.yml` now that the pipeline is stable.
-2. Begin the next MVP-critical stream: `FND-06` auth context, followed by auth pages and route guards.
-3. Start rewiring patient and doctor workflows from Bolt prototype queries to the canonical Supabase schema using the shared types and hooks already in place.
-4. Add a short release runbook documenting required GitHub and Vercel secrets so the delivery pipeline is easier to maintain.
+| ID | Item | Status | Completed | Notes |
+|---|---|---|---|---|
+| FND-02 | Database migrations - Phase 1 tables | done | 2026-03-08 | 12 migration files in `supabase/migrations/` |
+| FND-03 | RLS policies on all Phase 1 tables | done | 2026-03-08 | Included in migration files |
+| FND-04 | Supabase Storage buckets (`avatars`, `documents`, `medical-files`) | done | 2026-03-08 | Migration 000013; includes RLS policies per bucket |
+| FND-05 | Shared TypeScript types in `src/types/` | done | 2026-03-08 | `enums.ts`, `database.ts`, `index.ts` |
+| FND-07 | Custom hooks pattern in `src/hooks/` | done | 2026-03-08 | `useQuery`, `useUserProfile`, `useAppointments`, `useNotifications` |
+| FND-08 | Error boundaries around major page sections | done | 2026-03-08 | `src/components/ErrorBoundary.tsx` |
+| FND-09 | Skeleton loaders for data-fetching views | done | 2026-03-08 | `src/components/Skeleton.tsx` — Skeleton, SkeletonText, SkeletonCard, SkeletonTable, SkeletonAvatar |
+| FND-10 | Vercel project setup + environment variables | done | 2026-03-08 | Vercel project linked to `aryaix/ceenaix`; GitHub Actions secrets configured for Vercel + Supabase |
+| FND-11 | GitHub Actions CI/CD | done | 2026-03-08 | `.github/workflows/ci.yml` + `deploy.yml` |
+| FND-12 | Initial Vercel deployment | done | 2026-03-08 | Production deploy validated via GitHub Actions `deploy.yml` after correcting Vercel token and linked project/org IDs |
