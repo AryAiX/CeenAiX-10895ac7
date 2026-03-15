@@ -492,7 +492,7 @@ export const FindClinic: React.FC = () => {
                         }
                       </button>
                       <button
-                        onClick={() => navigate('/patient/appointments')}
+                        onClick={() => navigate('/auth/register?role=patient&reset=1')}
                         className="flex items-center gap-2 px-5 py-2.5 bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold rounded-lg transition-all transform hover:scale-105 hover:shadow-md"
                       >
                         <Calendar className="w-4 h-4" />

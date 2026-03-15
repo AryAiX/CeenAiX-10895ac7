@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Download, Eye, Calendar, User, HardDrive, Filter, Search } from 'lucide-react';
+import { FileText, Filter, Search } from 'lucide-react';
 import { Navigation } from '../../components/Navigation';
 
 export const PatientRecords: React.FC = () => {
@@ -7,68 +7,12 @@ export const PatientRecords: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<string>('newest');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  const records = [
-    {
-      id: 1,
-      type: 'Lab Results',
-      title: 'Blood Test - Complete Panel',
-      date: '2026-02-15',
-      doctor: 'Dr. Sarah Ahmed',
-      fileSize: '2.4 MB',
-      category: 'lab'
-    },
-    {
-      id: 2,
-      type: 'Imaging',
-      title: 'Chest X-Ray',
-      date: '2026-02-10',
-      doctor: 'Dr. Mohammed Hassan',
-      fileSize: '5.1 MB',
-      category: 'imaging'
-    },
-    {
-      id: 3,
-      type: 'Report',
-      title: 'Annual Physical Examination',
-      date: '2026-01-20',
-      doctor: 'Dr. Sarah Ahmed',
-      fileSize: '1.8 MB',
-      category: 'report'
-    },
-    {
-      id: 4,
-      type: 'Lab Results',
-      title: 'Lipid Panel',
-      date: '2026-01-15',
-      doctor: 'Dr. Mohammed Hassan',
-      fileSize: '1.2 MB',
-      category: 'lab'
-    },
-    {
-      id: 5,
-      type: 'Imaging',
-      title: 'MRI Scan - Brain',
-      date: '2025-12-10',
-      doctor: 'Dr. Sarah Ahmed',
-      fileSize: '8.7 MB',
-      category: 'imaging'
-    },
-    {
-      id: 6,
-      type: 'Lab Results',
-      title: 'Thyroid Function Test',
-      date: '2025-11-28',
-      doctor: 'Dr. Mohammed Hassan',
-      fileSize: '1.5 MB',
-      category: 'lab'
-    }
-  ];
+  const records: Array<{ id: number; category: string; title: string; type: string }> = [];
 
   const filteredRecords = records.filter(record => {
     const matchesType = filterType === 'all' || record.category === filterType;
     const matchesSearch = record.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         record.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         record.doctor.toLowerCase().includes(searchQuery.toLowerCase());
+      record.type.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesType && matchesSearch;
   });
 
@@ -161,92 +105,14 @@ export const PatientRecords: React.FC = () => {
               <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <FileText className="w-10 h-10 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">No Records Found</h3>
-              <p className="text-gray-600">Try adjusting your search or filter criteria</p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">No records available yet</h3>
+              <p className="text-gray-600">
+                This screen no longer shows sample documents. Lab results, imaging, and reports will appear here once they are connected to live patient records.
+              </p>
             </div>
           </div>
         ) : (
-          <div className="space-y-6">
-            {sortedRecords.map((record) => (
-              <div key={record.id} className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200">
-                <div className="relative bg-gradient-to-r from-cyan-600 to-blue-600 p-6">
-                  <div className="absolute inset-0 opacity-10">
-                    <img
-                      src="https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg?auto=compress&cs=tinysrgb&w=600"
-                      alt="Medical Record"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="relative flex items-center justify-between flex-wrap gap-4">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center shadow-lg">
-                        <FileText className="w-8 h-8 text-cyan-600" />
-                      </div>
-                      <div>
-                        <div className="flex items-center space-x-2 mb-1">
-                          <span className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-bold border border-white/30 uppercase">
-                            {record.type}
-                          </span>
-                        </div>
-                        <h3 className="text-xl font-bold text-white">{record.title}</h3>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  <div className="grid md:grid-cols-3 gap-6 mb-6">
-                    <div className="flex items-start space-x-3">
-                      <div className="bg-gray-100 p-2 rounded-lg">
-                        <Calendar className="w-4 h-4 text-cyan-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 font-medium">Date</p>
-                        <p className="text-sm font-semibold text-gray-900 mt-0.5">
-                          {new Date(record.date).toLocaleDateString('en-AE', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric'
-                          })}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start space-x-3">
-                      <div className="bg-gray-100 p-2 rounded-lg">
-                        <User className="w-4 h-4 text-cyan-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 font-medium">Provider</p>
-                        <p className="text-sm font-semibold text-gray-900 mt-0.5">{record.doctor}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start space-x-3">
-                      <div className="bg-gray-100 p-2 rounded-lg">
-                        <HardDrive className="w-4 h-4 text-cyan-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 font-medium">File Size</p>
-                        <p className="text-sm font-semibold text-gray-900 mt-0.5">{record.fileSize}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 pt-4 border-t border-gray-100">
-                    <button className="flex-1 sm:flex-none bg-gradient-to-r from-cyan-600 to-blue-600 hover:shadow-lg text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center space-x-2">
-                      <Eye className="w-5 h-5" />
-                      <span>View Document</span>
-                    </button>
-                    <button className="flex-1 sm:flex-none bg-white border-2 border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center space-x-2">
-                      <Download className="w-5 h-5" />
-                      <span>Download</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <div className="space-y-6" />
         )}
       </div>
     </div>

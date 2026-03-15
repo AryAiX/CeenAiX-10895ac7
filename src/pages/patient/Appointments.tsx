@@ -482,7 +482,7 @@ export const PatientAppointments: React.FC = () => {
                         disabled={creatingDemo}
                         className="px-6 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl hover:border-gray-300 hover:shadow-lg transition-all duration-200 font-semibold disabled:opacity-50"
                       >
-                        {creatingDemo ? 'Loading...' : 'Load Demo Data'}
+                        {creatingDemo ? 'Loading...' : 'Try Sample Appointments'}
                       </button>
                     </div>
                   </div>

@@ -67,6 +67,19 @@ export interface DoctorProfile extends BaseRecord {
   dha_verified_at: string | null;
 }
 
+export interface Specialization extends BaseRecord {
+  slug: string;
+  name: string;
+  category: string;
+  sort_order: number;
+  is_active: boolean;
+}
+
+export interface DoctorSpecialization extends BaseRecord {
+  doctor_user_id: string;
+  specialization_id: string;
+}
+
 // ---------------------------------------------------------------------------
 // Clinical
 // ---------------------------------------------------------------------------

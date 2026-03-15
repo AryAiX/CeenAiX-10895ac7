@@ -22,9 +22,16 @@ patient_profiles
 
 doctor_profiles
   - id (PK), user_id (FK → auth.users, unique)
-  - license_number, specialization, sub_specialization, years_of_experience
+  - license_number, specialization (primary text summary), sub_specialization, years_of_experience
   - consultation_fee, bio, languages_spoken (JSONB)
   - dha_license_verified (bool), dha_verified_at
+
+specializations
+  - id (PK), slug (unique), name (unique), category, sort_order, is_active
+
+doctor_specializations
+  - id (PK), doctor_user_id (FK → auth.users), specialization_id (FK → specializations)
+  - unique (doctor_user_id, specialization_id)
 ```
 
 ### Clinical

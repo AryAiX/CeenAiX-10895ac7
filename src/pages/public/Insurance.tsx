@@ -402,7 +402,7 @@ export const Insurance: React.FC = () => {
                   </div>
 
                   <button
-                    onClick={() => navigate('/patient/profile')}
+                    onClick={() => navigate('/auth/register?role=patient&reset=1')}
                     className={`w-full py-3 font-semibold rounded-xl transition-all shadow-md hover:shadow-lg ${
                       plan.popular
                         ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white'

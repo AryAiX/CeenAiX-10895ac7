@@ -243,7 +243,7 @@ export const Laboratories: React.FC = () => {
                   </div>
 
                   <button
-                    onClick={() => navigate('/patient/profile')}
+                    onClick={() => navigate('/auth/register?role=patient&reset=1')}
                     className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold py-3 rounded-xl transition-all shadow-md hover:shadow-lg"
                   >
                     Book Test
