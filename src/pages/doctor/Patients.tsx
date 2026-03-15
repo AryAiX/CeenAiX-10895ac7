@@ -1,44 +1,72 @@
-import React from 'react';
-import { Users, Search, Phone, Mail, Calendar, FileText } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Users, Search, Calendar } from 'lucide-react';
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
+import { Skeleton } from '../../components/Skeleton';
+import { useAppointments, useQuery } from '../../hooks';
+import { useAuth } from '../../lib/auth-context';
+import { supabase } from '../../lib/supabase';
 
 export const DoctorPatients: React.FC = () => {
-  const patients = [
-    {
-      id: 1,
-      name: 'Ahmed Al Maktoum',
-      age: 45,
-      gender: 'Male',
-      lastVisit: '2026-02-20',
-      nextAppointment: '2026-03-05',
-      phone: '+971 50 123 4567',
-      email: 'ahmed.maktoum@email.com',
-      conditions: ['Hypertension', 'Type 2 Diabetes']
+  const { user } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
+  const {
+    data: appointments = [],
+    loading,
+    error,
+  } = useAppointments({ role: 'doctor', userId: user?.id ?? '' });
+
+  const patientIds = useMemo(
+    () => Array.from(new Set(appointments.map((appointment) => appointment.patient_id))),
+    [appointments]
+  );
+
+  const { data: patientProfiles = [] } = useQuery(
+    async () => {
+      if (patientIds.length === 0) {
+        return [];
+      }
+
+      const { data, error: patientProfilesError } = await supabase
+        .from('user_profiles')
+        .select('user_id, full_name, email, phone')
+        .in('user_id', patientIds);
+
+      if (patientProfilesError) throw patientProfilesError;
+      return data ?? [];
     },
-    {
-      id: 2,
-      name: 'Fatima Hassan',
-      age: 32,
-      gender: 'Female',
-      lastVisit: '2026-02-15',
-      nextAppointment: '2026-02-28',
-      phone: '+971 50 234 5678',
-      email: 'fatima.hassan@email.com',
-      conditions: ['Asthma']
-    },
-    {
-      id: 3,
-      name: 'Mohammed Ali',
-      age: 58,
-      gender: 'Male',
-      lastVisit: '2026-01-30',
-      nextAppointment: null,
-      phone: '+971 50 345 6789',
-      email: 'mohammed.ali@email.com',
-      conditions: ['High Cholesterol']
-    }
-  ];
+    [patientIds.join(',')]
+  );
+
+  const patients = useMemo(() => {
+    return patientProfiles
+      .map((profile) => {
+        const patientAppointments = appointments.filter(
+          (appointment) => appointment.patient_id === profile.user_id
+        );
+        const sortedAppointments = [...patientAppointments].sort((a, b) =>
+          a.scheduled_at.localeCompare(b.scheduled_at)
+        );
+        const nextAppointment =
+          sortedAppointments.find((appointment) => new Date(appointment.scheduled_at).getTime() >= Date.now()) ??
+          null;
+        const lastAppointment =
+          [...sortedAppointments]
+            .reverse()
+            .find((appointment) => new Date(appointment.scheduled_at).getTime() < Date.now()) ?? null;
+
+        return {
+          id: profile.user_id,
+          name: profile.full_name ?? 'Patient',
+          email: profile.email ?? 'Not provided',
+          phone: profile.phone ?? 'Not provided',
+          nextAppointment: nextAppointment?.scheduled_at ?? null,
+          lastAppointment: lastAppointment?.scheduled_at ?? null,
+          totalAppointments: patientAppointments.length,
+        };
+      })
+      .filter((patient) => patient.name.toLowerCase().includes(searchQuery.trim().toLowerCase()));
+  }, [appointments, patientProfiles, searchQuery]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -57,103 +85,92 @@ export const DoctorPatients: React.FC = () => {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search patients by name, ID, or condition..."
+                placeholder="Search patients by name..."
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
                 className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 font-medium"
               />
-            </div>
-            <div className="flex space-x-3 ml-4">
-              <select className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 font-medium">
-                <option>All Patients</option>
-                <option>Active</option>
-                <option>Inactive</option>
-              </select>
             </div>
           </div>
         </div>
 
-        <div className="grid gap-6">
-          {patients.map((patient) => (
-            <div key={patient.id} className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-200">
-              <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-4">
-                <div className="flex items-center justify-between">
+        {loading ? (
+          <div className="grid gap-6">
+            <Skeleton className="h-52 w-full rounded-2xl" />
+            <Skeleton className="h-52 w-full rounded-2xl" />
+          </div>
+        ) : error ? (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            Doctor patients could not be loaded yet.
+          </div>
+        ) : patients.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center shadow-sm">
+            <Users className="mx-auto mb-4 h-10 w-10 text-gray-400" />
+            <h3 className="text-xl font-bold text-gray-900">No patients connected yet</h3>
+            <p className="mt-2 text-sm text-gray-600">
+              This page no longer shows sample patients. Real patient relationships will appear here after appointments are created.
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-6">
+            {patients.map((patient) => (
+              <div
+                key={patient.id}
+                className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg transition-all duration-200 hover:shadow-xl"
+              >
+                <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-4">
                   <div className="flex items-center space-x-3">
-                    <div className="bg-white/20 backdrop-blur-sm w-12 h-12 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold text-lg">
-                        {patient.name.split(' ').map(n => n[0]).join('')}
-                      </span>
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 text-lg font-bold text-white backdrop-blur-sm">
+                      {patient.name
+                        .split(' ')
+                        .filter(Boolean)
+                        .map((name) => name[0])
+                        .join('')
+                        .slice(0, 2)}
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-white">{patient.name}</h3>
-                      <p className="text-white/90 text-sm">{patient.age} years • {patient.gender}</p>
+                      <p className="text-sm text-white/90">{patient.totalAppointments} linked appointments</p>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="p-6">
-                <div className="grid md:grid-cols-2 gap-6 mb-6">
+                <div className="grid gap-6 p-6 md:grid-cols-3">
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3">Contact Information</h4>
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <Phone className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-600">{patient.phone}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Mail className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-600">{patient.email}</span>
-                      </div>
-                    </div>
+                    <h4 className="mb-2 text-sm font-semibold text-gray-700">Contact</h4>
+                    <p className="text-sm text-gray-600">{patient.phone}</p>
+                    <p className="mt-1 text-sm text-gray-600">{patient.email}</p>
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3">Medical History</h4>
-                    <div className="space-y-2">
-                      <div className="flex items-start space-x-2">
-                        <Calendar className="w-4 h-4 text-gray-400 mt-0.5" />
-                        <div className="text-sm">
-                          <p className="text-gray-600">Last Visit: {new Date(patient.lastVisit).toLocaleDateString()}</p>
-                          {patient.nextAppointment && (
-                            <p className="text-gray-600">Next: {new Date(patient.nextAppointment).toLocaleDateString()}</p>
-                          )}
-                        </div>
-                      </div>
+                    <h4 className="mb-2 text-sm font-semibold text-gray-700">Last Appointment</h4>
+                    <p className="text-sm text-gray-600">
+                      {patient.lastAppointment
+                        ? new Date(patient.lastAppointment).toLocaleString()
+                        : 'No completed visits yet'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="mb-2 text-sm font-semibold text-gray-700">Next Appointment</h4>
+                    <div className="flex items-start space-x-2 text-sm text-gray-600">
+                      <Calendar className="mt-0.5 h-4 w-4 text-gray-400" />
+                      <span>
+                        {patient.nextAppointment
+                          ? new Date(patient.nextAppointment).toLocaleString()
+                          : 'No future appointment scheduled'}
+                      </span>
                     </div>
                   </div>
                 </div>
 
-                {patient.conditions.length > 0 && (
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-2">Conditions</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {patient.conditions.map((condition, index) => (
-                        <span
-                          key={index}
-                          className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium"
-                        >
-                          {condition}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex space-x-3 pt-4 border-t border-gray-100">
-                  <button className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 font-semibold">
-                    <FileText className="w-4 h-4" />
-                    <span>View Records</span>
-                  </button>
-                  <button className="px-4 py-2.5 border-2 border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 font-semibold">
-                    Schedule Appointment
-                  </button>
-                  <button className="px-4 py-2.5 border-2 border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 font-semibold">
-                    Message
-                  </button>
+                <div className="border-t border-gray-100 px-6 py-4 text-sm text-gray-500">
+                  Patient detail and record views will use this live list once the doctor patient detail route is connected.
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

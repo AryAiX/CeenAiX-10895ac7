@@ -12,12 +12,12 @@
 
 | ID | Item | Status | Added | By | Justification | Completed | Notes |
 |---|---|---|---|---|---|---|---|
-| FND-01 | Supabase Auth providers (email + phone OTP) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Infrastructure | | |
+| FND-01 | Supabase Auth providers (email + phone OTP) | done | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Infrastructure | 2026-03-15 | Email auth confirmed enabled; phone OTP is now backed by Twilio Verify on the current project, with the old temporary test OTP mapping removed |
 | FND-02 | Database migrations — Phase 1 tables | done | 2026-02-28 | TH | `docs/agent/schema-reference.md` — all Phase 1 tables with correct columns | 2026-03-08 | 12 migration files in `supabase/migrations/` |
 | FND-03 | RLS policies on all Phase 1 tables | done | 2026-02-28 | TH | `docs/agent/schema-reference.md` — RLS Pattern; security requirement | 2026-03-08 | Included in migration files |
 | FND-04 | Supabase Storage buckets (avatars, documents, medical-files) | done | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Infrastructure | 2026-03-08 | Migration 000013; includes RLS policies per bucket |
 | FND-05 | Shared TypeScript types in `src/types/` | done | 2026-02-28 | TH | `AGENTS.md` — Code Style; replace Bolt inline types with spec-compliant shared types | 2026-03-08 | `enums.ts`, `database.ts`, `index.ts` |
-| FND-06 | Auth context (`src/lib/auth-context.tsx`) | pending | 2026-02-28 | TH | `AGENTS.md` — Auth; React Context for auth state, `onAuthStateChange` listener | | |
+| FND-06 | Auth context (`src/lib/auth-context.tsx`) | done | 2026-02-28 | TH | `AGENTS.md` — Auth; React Context for auth state, `onAuthStateChange` listener | 2026-03-08 | Auth provider added with session sync, profile bootstrap, role resolution, and protected route support |
 | FND-07 | Custom hooks pattern (`src/hooks/`) | done | 2026-02-28 | TH | `AGENTS.md` — Code Style; e.g. `useAppointments()`, `usePatientProfile()` | 2026-03-08 | `useQuery`, `useUserProfile`, `useAppointments`, `useNotifications` |
 | FND-08 | Error boundaries around major page sections | done | 2026-02-28 | TH | `AGENTS.md` — Code Style; graceful failure isolation | 2026-03-08 | `src/components/ErrorBoundary.tsx` |
 | FND-09 | Skeleton loaders for all data-fetching views | done | 2026-02-28 | TH | `AGENTS.md` — Code Style; replace spinners with skeleton loaders | 2026-03-08 | `src/components/Skeleton.tsx` — Skeleton, SkeletonText, SkeletonCard, SkeletonTable, SkeletonAvatar |
@@ -31,13 +31,14 @@
 
 | ID | Item | Status | Added | By | Justification | Completed | Notes |
 |---|---|---|---|---|---|---|---|
-| AUTH-01 | Login page (`/auth/login`) — email/password + OTP | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Auth Pages | | Depends on FND-01, FND-06 |
-| AUTH-02 | Registration wizard (`/auth/register`) — multi-step | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Auth Pages; `docs/specs/04-user-flows.md` Flow 6 | | |
-| AUTH-03 | OTP verification page (`/auth/verify-otp`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Auth Pages | | |
-| AUTH-04 | Forgot password flow (`/auth/forgot-password`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Auth Pages | | |
-| AUTH-05 | Onboarding wizard (`/auth/onboarding`) — post-registration | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Auth Pages; role-adaptive, skippable | | |
-| AUTH-06 | Route guards (patient / doctor / admin) | pending | 2026-02-28 | TH | `AGENTS.md` — Auth; redirect unauthenticated → `/auth/login`, wrong role → `/access-denied` | | Depends on FND-06 |
-| AUTH-07 | Access denied page (`/access-denied`) | pending | 2026-02-28 | TH | `docs/agent/routes-reference.md` — System routes | | |
+| AUTH-01 | Login page (`/auth/login`) — email/password + OTP | done | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Auth Pages | 2026-03-08 | Supports email/password sign-in, phone OTP request, redirect handling, and password recovery mode |
+| AUTH-02 | Registration wizard (`/auth/register`) — multi-step | done | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Auth Pages; `docs/specs/04-user-flows.md` Flow 6 | 2026-03-08 | Multi-step patient/doctor registration with email/password or phone OTP onboarding entry |
+| AUTH-03 | OTP verification page (`/auth/verify-otp`) | done | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Auth Pages | 2026-03-08 | OTP verification page added with resend support and post-auth redirects |
+| AUTH-04 | Forgot password flow (`/auth/forgot-password`) | done | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Auth Pages | 2026-03-08 | Reset email request plus in-app recovery password update flow |
+| AUTH-05 | Onboarding wizard (`/auth/onboarding`) — post-registration | done | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Auth Pages; role-adaptive, skippable | 2026-03-08 | Authenticated onboarding added with patient and doctor profile completion fields |
+| AUTH-06 | Route guards (patient / doctor / admin) | done | 2026-02-28 | TH | `AGENTS.md` — Auth; redirect unauthenticated → `/auth/login`, wrong role → `/access-denied` | 2026-03-08 | Patient and doctor routes now require auth context and role checks; admin guard helper path is in place for future routes |
+| AUTH-07 | Access denied page (`/access-denied`) | done | 2026-02-28 | TH | `docs/agent/routes-reference.md` — System routes | 2026-03-08 | Dedicated access-denied page added and wired into role guard redirects |
+| AUTH-08 | Connect auth flows to custom domain | pending | 2026-03-08 | AI | `docs/specs/08-technical-architecture.md` — production hosting; auth redirects and email links should use the final domain | | After auth pages are live, configure DNS, Vercel custom domain, and Supabase auth redirect/site URLs |
 
 ---
 
@@ -45,11 +46,11 @@
 
 | ID | Item | Status | Added | By | Justification | Completed | Notes |
 |---|---|---|---|---|---|---|---|
-| PAT-01 | Rewire PatientDashboard to live Supabase data | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently ui-only with mock data | | Depends on FND-02, FND-07 |
+| PAT-01 | Rewire PatientDashboard to live Supabase data | done | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently ui-only with mock data | 2026-03-15 | Dashboard now uses `usePatientDashboard()` to load upcoming appointments, active prescriptions, unread messages, next appointment, medication reminders, and recent activity from spec tables |
 | PAT-02 | Patient AI chat (`/patient/ai-chat`) with context + Edge Function | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages; `docs/agent/ai-reference.md` | | Depends on AI-01, AI-04 |
-| PAT-03 | Appointment booking flow (`/patient/appointments/book`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages; `docs/specs/04-user-flows.md` Flow 1 | | |
+| PAT-03 | Appointment booking flow (`/patient/appointments/book`) | done | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages; `docs/specs/04-user-flows.md` Flow 1 | 2026-03-15 | Patients can now choose a doctor with active schedule windows, select a real available slot, and create spec-compliant appointments against `doctor_availability`, `blocked_slots`, and `appointments` |
 | PAT-04 | Appointment detail page (`/patient/appointments/:id`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages | | |
-| PAT-05 | Rewire PatientAppointments to spec schema | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — queries wrong columns, wrong joins | | Depends on FND-02, FND-05 |
+| PAT-05 | Rewire PatientAppointments to spec schema | done | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — queries wrong columns, wrong joins | 2026-03-16 | Patient appointments list now reads canonical `appointments` rows, joins doctor names/specialties from `user_profiles` + `doctor_profiles`, and supports patient-side cancel and reschedule actions |
 | PAT-06 | Rewire PatientRecords to medical_conditions / allergies / vaccinations | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently fully static | | Depends on FND-02 |
 | PAT-07 | Lab results viewer (`/patient/lab-results`) + AI interpretation | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages; AI plain-language explanation | | Depends on FND-02, AI-01 |
 | PAT-08 | Rewire PatientPrescriptions to normalized schema | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — flat vs prescriptions + prescription_items | | Depends on FND-02, FND-05 |
@@ -57,6 +58,7 @@
 | PAT-10 | Patient notifications (`/patient/notifications`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages | | Depends on FND-02 |
 | PAT-11 | Rewire PatientProfile to user_profiles + patient_profiles + patient_insurance | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently local state only | | Depends on FND-02, FND-05 |
 | PAT-12 | Emergency profile page (`/patient/emergency-profile`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages; `docs/specs/04-user-flows.md` Flow 13 | | |
+| PAT-13 | Patient appointment actions (`/patient/appointments`) — cancel + reschedule | done | 2026-03-16 | AI | `docs/agent/mvp-scope.md` — Patient appointments list must support cancel/reschedule | 2026-03-16 | Upcoming patient appointments can now be cancelled directly and rescheduled through the canonical booking flow with the same doctor, updated slot, and preserved booking context |
 
 ---
 
@@ -67,12 +69,12 @@
 | DOC-01 | Rewire DoctorDashboard to live Supabase data | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently all-zeros static | | Depends on FND-02, FND-07 |
 | DOC-02 | Rewire DoctorPatients to live data (via appointments join) | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently static list | | Depends on FND-02 |
 | DOC-03 | Patient detail page (`/doctor/patients/:id`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Doctor Pages; full health record view | | |
-| DOC-04 | Rewire DoctorAppointments to spec schema | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently static list | | Depends on FND-02, FND-05 |
+| DOC-04 | Rewire DoctorAppointments to spec schema | done | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently static list | 2026-03-16 | Doctor appointments now read canonical `appointments`, show patient-submitted booking reason/notes, support list and calendar views with day filtering, and allow doctors to cancel upcoming scheduled visits |
 | DOC-05 | Appointment detail / consultation notes (`/doctor/appointments/:id`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Doctor Pages; SOAP notes | | |
 | DOC-06 | Create prescription page (`/doctor/prescriptions/new`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Doctor Pages; prescriptions + prescription_items | | |
 | DOC-07 | Rewire DoctorPrescriptions to live data | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently empty state | | Depends on FND-02 |
 | DOC-08 | Lab order creation (`/doctor/lab-orders`, `/doctor/lab-orders/new`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Doctor Pages; lab_orders + lab_order_items | | |
-| DOC-09 | Schedule / availability management (`/doctor/schedule`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Doctor Pages; doctor_availability, blocked_slots | | |
+| DOC-09 | Schedule / availability management (`/doctor/schedule`) | done | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Doctor Pages; doctor_availability, blocked_slots | 2026-03-15 | Doctors can now add recurring weekly availability, choose slot lengths, pause or delete schedule windows, and manage one-off blocked slots from the portal |
 | DOC-10 | Rewire DoctorMessages to conversations / messages tables | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently empty state | | Depends on FND-02 |
 | DOC-11 | Doctor notifications (`/doctor/notifications`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Doctor Pages | | Depends on FND-02 |
 | DOC-12 | Rewire DoctorProfile to user_profiles + doctor_profiles | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — queries wrong `profiles` table | | Depends on FND-02, FND-05 |
@@ -121,7 +123,7 @@
 | SYS-01 | 404 Not Found page | pending | 2026-02-28 | TH | `docs/specs/14-route-map.md` — System routes | | |
 | SYS-02 | 500 Server Error page | pending | 2026-02-28 | TH | `docs/specs/14-route-map.md` — System routes | | |
 | SYS-03 | Maintenance page | pending | 2026-02-28 | TH | `docs/specs/14-route-map.md` — System routes | | |
-| SYS-04 | Access Denied page | pending | 2026-02-28 | TH | `docs/specs/14-route-map.md` — System routes; used by AUTH-06 route guards | | Same page as AUTH-07 |
+| SYS-04 | Access Denied page | done | 2026-02-28 | TH | `docs/specs/14-route-map.md` — System routes; used by AUTH-06 route guards | 2026-03-08 | Same page as AUTH-07 |
 
 ---
 

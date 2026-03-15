@@ -19,6 +19,9 @@ import { GeometricBackground } from '../../components/GeometricBackground';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
+  const openRegistration = (role: 'patient' | 'doctor') => {
+    navigate(`/auth/register?role=${role}&reset=1`);
+  };
 
   const features = [
     {
@@ -65,7 +68,7 @@ export const Home: React.FC = () => {
       icon: User,
       title: 'Patient Profile',
       description: 'Manage your health information and medical history',
-      action: () => navigate('/patient/profile'),
+      action: () => openRegistration('patient'),
       gradient: 'from-ceenai-blue to-ceenai-cyan',
       image: 'https://images.pexels.com/photos/4386464/pexels-photo-4386464.jpeg?auto=compress&cs=tinysrgb&w=400'
     },
@@ -140,13 +143,13 @@ export const Home: React.FC = () => {
 
             <div className="flex gap-3">
               <button
-                onClick={() => navigate('/patient/profile')}
+                onClick={() => openRegistration('patient')}
                 className="px-6 py-2.5 bg-gradient-to-r from-ceenai-cyan to-ceenai-blue hover:from-ceenai-cyan-dark hover:to-ceenai-blue-dark text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg hover:scale-105"
               >
                 Patient
               </button>
               <button
-                onClick={() => navigate('/doctor/profile')}
+                onClick={() => openRegistration('doctor')}
                 className="px-6 py-2.5 border-2 border-ceenai-navy text-ceenai-navy hover:bg-ceenai-navy hover:text-white font-semibold rounded-xl transition-all"
               >
                 Doctor
@@ -393,13 +396,13 @@ export const Home: React.FC = () => {
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <button
-                  onClick={() => navigate('/patient/profile')}
+                  onClick={() => openRegistration('patient')}
                   className="px-10 py-4 bg-white text-ceenai-blue hover:bg-gray-50 font-bold rounded-xl transition-all text-lg shadow-xl hover:shadow-2xl hover:scale-105"
                 >
                   Patient Portal
                 </button>
                 <button
-                  onClick={() => navigate('/doctor/profile')}
+                  onClick={() => openRegistration('doctor')}
                   className="px-10 py-4 bg-white/10 backdrop-blur-sm border-2 border-white text-white hover:bg-white/20 font-bold rounded-xl transition-all text-lg"
                 >
                   Doctor Portal

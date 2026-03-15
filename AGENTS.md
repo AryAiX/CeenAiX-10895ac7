@@ -34,6 +34,7 @@ The UI was prototyped by the product lead using **Bolt**. Treat Bolt-generated c
 - All AI calls go through **Supabase Edge Functions** — never call OpenAI directly from the frontend.
 - All tables must have **Row-Level Security (RLS)** enabled. No table should be publicly accessible without RLS.
 - Use the **canonical schema** from `docs/agent/schema-reference.md`. Do not create ad-hoc tables.
+- During MVP development, do **not** add legacy compatibility paths, fallback reads, or dual-schema support for Bolt-era fields/tables. Move features directly onto the canonical schema.
 - Appointments are the **central clinical entity** — consultations, prescriptions, lab orders, and payments reference appointments.
 
 ### Code Style

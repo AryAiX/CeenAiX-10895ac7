@@ -13,6 +13,10 @@ interface UseAppointmentsOptions {
  */
 export function useAppointments({ role, userId, status }: UseAppointmentsOptions) {
   return useQuery<Appointment[]>(async () => {
+    if (!userId) {
+      return [];
+    }
+
     const column = role === 'patient' ? 'patient_id' : 'doctor_id';
 
     let query = supabase
