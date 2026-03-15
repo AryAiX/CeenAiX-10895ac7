@@ -28,7 +28,7 @@ export const PatientAppointments: React.FC = () => {
     error,
     refetch,
   } = useAppointments({ role: 'patient', userId: user?.id ?? '' });
-  const appointments = appointmentsData ?? [];
+  const appointments = useMemo(() => appointmentsData ?? [], [appointmentsData]);
   const [busyAppointmentId, setBusyAppointmentId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -75,7 +75,7 @@ export const PatientAppointments: React.FC = () => {
     },
     [doctorIds.join(',')]
   );
-  const doctorProfiles = doctorProfilesData ?? [];
+  const doctorProfiles = useMemo(() => doctorProfilesData ?? [], [doctorProfilesData]);
 
   const doctorProfileById = useMemo(
     () => new Map(doctorProfiles.map((doctorProfile) => [doctorProfile.userId, doctorProfile])),

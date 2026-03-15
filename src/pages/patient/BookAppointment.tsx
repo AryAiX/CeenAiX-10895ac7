@@ -66,13 +66,16 @@ export const BookAppointment: React.FC = () => {
     loading: doctorsLoading,
     error: doctorsError,
   } = useBookableDoctors();
-  const doctors = doctorsData ?? [];
+  const doctors = useMemo(() => doctorsData ?? [], [doctorsData]);
   const {
     data: specializationOptionsData,
     loading: specializationsLoading,
     error: specializationsError,
   } = useSpecializations();
-  const specializationOptions = specializationOptionsData ?? [];
+  const specializationOptions = useMemo(
+    () => specializationOptionsData ?? [],
+    [specializationOptionsData]
+  );
 
   const [selectedDoctorId, setSelectedDoctorId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);

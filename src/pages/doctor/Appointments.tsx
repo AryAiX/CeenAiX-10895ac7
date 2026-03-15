@@ -46,7 +46,7 @@ export const DoctorAppointments: React.FC = () => {
     error,
     refetch,
   } = useAppointments({ role: 'doctor', userId: user?.id ?? '' });
-  const appointments = appointmentsData ?? [];
+  const appointments = useMemo(() => appointmentsData ?? [], [appointmentsData]);
   const [viewMode, setViewMode] = useState<AppointmentViewMode>('list');
   const [selectedCalendarDate, setSelectedCalendarDate] = useState(() => new Date());
   const [currentMonth, setCurrentMonth] = useState(
@@ -76,7 +76,7 @@ export const DoctorAppointments: React.FC = () => {
     },
     [patientIds.join(',')]
   );
-  const patientProfiles = patientProfilesData ?? [];
+  const patientProfiles = useMemo(() => patientProfilesData ?? [], [patientProfilesData]);
 
   const patientNameById = useMemo(
     () =>

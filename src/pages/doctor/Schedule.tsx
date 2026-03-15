@@ -84,8 +84,8 @@ export const DoctorSchedule: React.FC = () => {
   const [busyAvailabilityId, setBusyAvailabilityId] = useState<string | null>(null);
   const [busyBlockedSlotId, setBusyBlockedSlotId] = useState<string | null>(null);
 
-  const availabilities = data?.availabilities ?? [];
-  const blockedSlots = data?.blockedSlots ?? [];
+  const availabilities = useMemo(() => data?.availabilities ?? [], [data?.availabilities]);
+  const blockedSlots = useMemo(() => data?.blockedSlots ?? [], [data?.blockedSlots]);
 
   const groupedAvailability = useMemo(
     () =>
