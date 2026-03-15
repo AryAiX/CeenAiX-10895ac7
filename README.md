@@ -11,7 +11,7 @@ AI-native healthcare platform for the UAE market, built with React, TypeScript, 
 
 ## Overview
 
-CeenAiX is an MVP-focused healthcare product that supports:
+CeenAiX is a healthcare platform that supports:
 
 - patient authentication with email/password and phone OTP
 - role-based patient and doctor portals
@@ -19,24 +19,19 @@ CeenAiX is an MVP-focused healthcare product that supports:
 - doctor schedule and availability management
 - canonical Supabase-backed clinical and identity data models
 
-The current implementation follows a simple rule:
+Implementation follows a simple rule:
 
 - Bolt remains the visual reference
 - product specs define routing, schema, auth, and business logic
 - all new MVP work must use the canonical schema only
 
-## Current Status
+## Architecture
 
-Completed or live foundations include:
-
-- Supabase Phase 1 schema and RLS baseline
-- shared TypeScript types and query hooks
-- auth context, route guards, and onboarding flow
-- patient appointment booking against real doctor schedules
-- doctor schedule management and canonical appointment views
-- Vercel hosting plus GitHub Actions CI/CD
-
-The active delivery tracker lives in `CHECKLIST.md`.
+- Identity uses a shared `user_profiles` table with role-specific extension tables such as `patient_profiles` and `doctor_profiles`
+- Appointments are the central clinical entity and connect consultations, prescriptions, lab orders, and related workflows
+- Data access is built around Supabase with Row-Level Security enabled across protected tables
+- AI functionality is intended to run through Supabase Edge Functions rather than direct frontend-to-model calls
+- Frontend code is organized around shared hooks, shared types, and route-based pages per role
 
 ## Tech Stack
 
@@ -125,6 +120,7 @@ npm run preview
 
 Start here:
 
+- `README.md` — repo-level overview and setup
 - `CHECKLIST.md` — current delivery tracker
 - `docs/INDEX.md` — documentation index
 - `docs/agent/overview.md` — platform summary and architecture
