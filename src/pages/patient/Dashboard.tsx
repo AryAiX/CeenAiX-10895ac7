@@ -73,7 +73,7 @@ export const PatientDashboard: React.FC = () => {
       { icon: MessageSquare, label: 'Messages', action: () => navigate('/patient/messages') },
       { icon: FileText, label: 'Records', action: () => navigate('/patient/records') },
       { icon: Users, label: 'Profile', action: () => navigate('/patient/profile') },
-      { icon: Bot, label: 'AI Health Chat', action: () => navigate('/patient/ai-chat') },
+      { icon: Bot, label: 'AI Health Chat', action: () => navigate('/ai-chat') },
     ],
     [navigate]
   );
@@ -418,7 +418,7 @@ export const PatientDashboard: React.FC = () => {
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-gray-900 flex items-center">
                     <div className="w-1 h-5 bg-gradient-to-b from-cyan-500 to-blue-600 rounded-full mr-2"></div>
-                    Active Medications
+                    Medication Reminders
                   </h2>
                   <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center">
                     <Bell className="w-5 h-5 text-white" />
@@ -463,9 +463,9 @@ export const PatientDashboard: React.FC = () => {
                   ) : (
                     <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
                       <Pill className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                      <p className="font-semibold text-gray-900">No active medications</p>
+                      <p className="font-semibold text-gray-900">No medication reminders right now</p>
                       <p className="mt-1 text-sm text-gray-600">
-                        Prescribed medication items will appear here once they are added to your chart.
+                        Active prescription items will appear here once they are added to your chart.
                       </p>
                     </div>
                   )}

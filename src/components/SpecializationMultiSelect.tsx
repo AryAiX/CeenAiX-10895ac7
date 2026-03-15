@@ -12,6 +12,7 @@ interface SpecializationMultiSelectProps {
   loading?: boolean;
   disabled?: boolean;
   helperText?: string | null;
+  selectionMode?: 'single' | 'multiple';
 }
 
 export const SpecializationMultiSelect = ({
@@ -23,6 +24,7 @@ export const SpecializationMultiSelect = ({
   loading = false,
   disabled = false,
   helperText = null,
+  selectionMode = 'multiple',
 }: SpecializationMultiSelectProps) => {
   const [query, setQuery] = useState('');
   const safeOptions = useMemo(() => options ?? [], [options]);
@@ -55,6 +57,11 @@ export const SpecializationMultiSelect = ({
 
     if (safeSelectedIds.includes(specializationId)) {
       onChange(safeSelectedIds.filter((id) => id !== specializationId));
+      return;
+    }
+
+    if (selectionMode === 'single') {
+      onChange([specializationId]);
       return;
     }
 

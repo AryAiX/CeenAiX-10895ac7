@@ -4,4 +4,7 @@ export { useAppointments } from './use-appointments';
 export { useNotifications } from './use-notifications';
 export { usePatientDashboard } from './use-patient-dashboard';
 export { useDoctorDashboard } from './use-doctor-dashboard';
+export { useDoctorSchedule } from './use-doctor-schedule';
+export { useBookableDoctors } from './use-bookable-doctors';
+export { useDoctorBookingAvailability } from './use-doctor-booking-availability';
 export { useSpecializations, useDoctorSpecializationIds } from './use-specializations';

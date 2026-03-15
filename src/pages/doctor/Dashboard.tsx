@@ -20,6 +20,7 @@ export const DoctorDashboard: React.FC = () => {
   const quickActions = useMemo(
     () => [
       { label: 'Appointments', href: '/doctor/appointments' },
+      { label: 'Schedule', href: '/doctor/schedule' },
       { label: 'Patients', href: '/doctor/patients' },
       { label: 'Prescriptions', href: '/doctor/prescriptions' },
       { label: 'Messages', href: '/doctor/messages' },
@@ -43,10 +44,10 @@ export const DoctorDashboard: React.FC = () => {
               </p>
             </div>
             <button
-              onClick={() => navigate('/doctor/profile')}
+              onClick={() => navigate('/doctor/schedule')}
               className="rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:shadow-lg"
             >
-              Open profile
+              Manage schedule
             </button>
           </div>
 

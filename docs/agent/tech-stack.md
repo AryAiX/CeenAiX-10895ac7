@@ -25,6 +25,7 @@
 - **Supabase Edge Functions (Deno)** — AI proxy, webhooks, scheduled jobs
 - **PostgREST** — auto-generated REST API from Postgres schema
 - **Row-Level Security (RLS)** — ALL tables must have RLS enabled; access scoped by `auth.uid()` and role
+- **Canonical schema only during MVP development** — do not add legacy fallback queries, Bolt-era compatibility shims, or dual-path reads/writes when wiring real features
 
 ## AI Integration
 

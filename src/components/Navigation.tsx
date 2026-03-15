@@ -31,6 +31,7 @@ export const Navigation: React.FC<NavigationProps> = ({ role }) => {
           { label: 'Dashboard', href: '/doctor/dashboard' },
           { label: 'Patients', href: '/doctor/patients' },
           { label: 'Appointments', href: '/doctor/appointments' },
+          { label: 'Schedule', href: '/doctor/schedule' },
           { label: 'Prescriptions', href: '/doctor/prescriptions' },
           { label: 'Messages', href: '/doctor/messages' },
         ];

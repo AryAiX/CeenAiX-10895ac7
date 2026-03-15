@@ -5,7 +5,6 @@ import { AuthShell } from '../../components/AuthShell';
 import { SpecializationMultiSelect } from '../../components/SpecializationMultiSelect';
 import { useDoctorSpecializationIds, useSpecializations } from '../../hooks';
 import {
-  deriveLegacySpecializationIds,
   getPrimaryAndSecondarySpecializations,
   syncDoctorSpecializations,
 } from '../../lib/doctor-specializations';
@@ -128,30 +127,21 @@ export const Onboarding = () => {
       activeRole !== 'doctor' ||
       hasInitializedDoctorSpecializations ||
       !user ||
-      specializationsLoading ||
       doctorSpecializationIdsLoading
     ) {
       return;
     }
 
-    const initialSpecializationIds =
-      doctorSpecializationIds.length > 0
-        ? doctorSpecializationIds
-        : deriveLegacySpecializationIds(doctorProfile, specializationOptions);
-
     setForm((current) => ({
       ...current,
-      selectedSpecializationIds: initialSpecializationIds,
+      selectedSpecializationIds: doctorSpecializationIds,
     }));
     setHasInitializedDoctorSpecializations(true);
   }, [
     activeRole,
-    doctorProfile,
     doctorSpecializationIds,
     doctorSpecializationIdsLoading,
     hasInitializedDoctorSpecializations,
-    specializationsLoading,
-    specializationOptions,
     user,
   ]);
 
@@ -187,6 +177,11 @@ export const Onboarding = () => {
 
     if (!form.termsAccepted) {
       setErrorMessage('Please accept the terms to complete onboarding.');
+      return;
+    }
+
+    if (activeRole === 'doctor' && form.selectedSpecializationIds.length === 0) {
+      setErrorMessage('Select at least one specialization to complete doctor onboarding.');
       return;
     }
 

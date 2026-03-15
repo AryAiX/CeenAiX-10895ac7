@@ -5,7 +5,6 @@ import { supabase } from '../../lib/supabase';
 import { GeometricBackground } from '../../components/GeometricBackground';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
-import { BookingModal } from '../../components/BookingModal';
 
 interface Doctor {
   id: string;
@@ -37,8 +36,6 @@ export const FindDoctor: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('all');
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
-  const [showBookingModal, setShowBookingModal] = useState(false);
 
   const specialties = [
     'All Specialties',
@@ -94,13 +91,8 @@ export const FindDoctor: React.FC = () => {
     return matchesSearch && matchesSpecialty;
   });
 
-  const handleBookAppointment = (doctor: Doctor) => {
-    setSelectedDoctor(doctor);
-    setShowBookingModal(true);
-  };
-
-  const handleBookingComplete = () => {
-    fetchDoctors();
+  const handleBookAppointment = () => {
+    navigate('/patient/appointments/book');
   };
 
   return (
@@ -261,7 +253,7 @@ export const FindDoctor: React.FC = () => {
                   </div>
 
                   <button
-                    onClick={() => handleBookAppointment(doctor)}
+                    onClick={() => handleBookAppointment()}
                     className="w-full py-3 bg-gradient-to-r from-ceenai-cyan to-ceenai-blue text-white rounded-xl font-semibold shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300"
                   >
                     Book Appointment
@@ -292,14 +284,6 @@ export const FindDoctor: React.FC = () => {
         )}
       </div>
       <Footer />
-
-      {showBookingModal && selectedDoctor && (
-        <BookingModal
-          doctor={selectedDoctor}
-          onClose={() => setShowBookingModal(false)}
-          onBookingComplete={handleBookingComplete}
-        />
-      )}
     </div>
   );
 };
