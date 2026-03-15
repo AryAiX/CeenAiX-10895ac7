@@ -19,7 +19,6 @@ import { SpecializationMultiSelect } from '../../components/SpecializationMultiS
 import { useDoctorSpecializationIds, useSpecializations } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
 import {
-  deriveLegacySpecializationIds,
   getPrimaryAndSecondarySpecializations,
   getSelectedSpecializations,
   syncDoctorSpecializations,
@@ -105,10 +104,7 @@ export const DoctorProfile: React.FC = () => {
       dateOfBirth: profile?.date_of_birth ?? '',
       gender: profile?.gender ?? '',
       address: profile?.address ?? '',
-      selectedSpecializationIds:
-        doctorSpecializationIds.length > 0
-          ? doctorSpecializationIds
-          : deriveLegacySpecializationIds(doctorProfile, specializationOptions),
+      selectedSpecializationIds: doctorSpecializationIds,
       licenseNumber: doctorProfile?.license_number ?? '',
       bio: doctorProfile?.bio ?? '',
     });
@@ -123,6 +119,12 @@ export const DoctorProfile: React.FC = () => {
     setSaving(true);
     setErrorMessage(null);
     setSuccessMessage(null);
+
+    if (formData.selectedSpecializationIds.length === 0) {
+      setErrorMessage('Select at least one specialization before saving your doctor profile.');
+      setSaving(false);
+      return;
+    }
 
     const parsedName = splitFullName(formData.fullName);
     const { primarySpecialization, secondarySpecialization } = getPrimaryAndSecondarySpecializations(
@@ -437,7 +439,7 @@ export const DoctorProfile: React.FC = () => {
                         </div>
                       ) : (
                         <p className="mt-1 text-base text-gray-900">
-                          {doctorProfile?.specialization || 'Not provided'}
+                          Not provided
                         </p>
                       )}
                     </div>

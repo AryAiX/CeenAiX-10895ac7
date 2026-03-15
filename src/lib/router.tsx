@@ -18,6 +18,7 @@ import { VerifyOTP } from '../pages/auth/VerifyOTP';
 import { Onboarding } from '../pages/auth/Onboarding';
 import { PatientDashboard } from '../pages/patient/Dashboard';
 import { PatientAppointments } from '../pages/patient/Appointments';
+import { BookAppointment } from '../pages/patient/BookAppointment';
 import { PatientPrescriptions } from '../pages/patient/Prescriptions';
 import { PatientRecords } from '../pages/patient/Records';
 import { PatientMessages } from '../pages/patient/Messages';
@@ -27,6 +28,7 @@ import { DoctorAppointments } from '../pages/doctor/Appointments';
 import { DoctorPrescriptions } from '../pages/doctor/Prescriptions';
 import { DoctorPatients } from '../pages/doctor/Patients';
 import { DoctorMessages } from '../pages/doctor/Messages';
+import { DoctorSchedule } from '../pages/doctor/Schedule';
 import { DoctorProfile } from '../pages/doctor/Profile';
 import { AppointmentDesignShowcase } from '../pages/AppointmentDesignShowcase';
 import { AccessDenied } from '../pages/system/AccessDenied';
@@ -107,6 +109,10 @@ export const router = createBrowserRouter([
     element: withProtection(<PatientAppointments />, ['patient']),
   },
   {
+    path: '/patient/appointments/book',
+    element: withProtection(<BookAppointment />, ['patient']),
+  },
+  {
     path: '/patient/prescriptions',
     element: withProtection(<PatientPrescriptions />, ['patient']),
   },
@@ -137,6 +143,10 @@ export const router = createBrowserRouter([
   {
     path: '/doctor/patients',
     element: withProtection(<DoctorPatients />, ['doctor']),
+  },
+  {
+    path: '/doctor/schedule',
+    element: withProtection(<DoctorSchedule />, ['doctor']),
   },
   {
     path: '/doctor/prescriptions',

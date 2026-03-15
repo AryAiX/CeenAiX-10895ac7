@@ -46,11 +46,11 @@
 
 | ID | Item | Status | Added | By | Justification | Completed | Notes |
 |---|---|---|---|---|---|---|---|
-| PAT-01 | Rewire PatientDashboard to live Supabase data | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently ui-only with mock data | | Depends on FND-02, FND-07 |
+| PAT-01 | Rewire PatientDashboard to live Supabase data | done | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently ui-only with mock data | 2026-03-15 | Dashboard now uses `usePatientDashboard()` to load upcoming appointments, active prescriptions, unread messages, next appointment, medication reminders, and recent activity from spec tables |
 | PAT-02 | Patient AI chat (`/patient/ai-chat`) with context + Edge Function | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages; `docs/agent/ai-reference.md` | | Depends on AI-01, AI-04 |
-| PAT-03 | Appointment booking flow (`/patient/appointments/book`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages; `docs/specs/04-user-flows.md` Flow 1 | | |
+| PAT-03 | Appointment booking flow (`/patient/appointments/book`) | done | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages; `docs/specs/04-user-flows.md` Flow 1 | 2026-03-15 | Patients can now choose a doctor with active schedule windows, select a real available slot, and create spec-compliant appointments against `doctor_availability`, `blocked_slots`, and `appointments` |
 | PAT-04 | Appointment detail page (`/patient/appointments/:id`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages | | |
-| PAT-05 | Rewire PatientAppointments to spec schema | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — queries wrong columns, wrong joins | | Depends on FND-02, FND-05 |
+| PAT-05 | Rewire PatientAppointments to spec schema | done | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — queries wrong columns, wrong joins | 2026-03-16 | Patient appointments list now reads canonical `appointments` rows, joins doctor names/specialties from `user_profiles` + `doctor_profiles`, and supports patient-side cancel and reschedule actions |
 | PAT-06 | Rewire PatientRecords to medical_conditions / allergies / vaccinations | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently fully static | | Depends on FND-02 |
 | PAT-07 | Lab results viewer (`/patient/lab-results`) + AI interpretation | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages; AI plain-language explanation | | Depends on FND-02, AI-01 |
 | PAT-08 | Rewire PatientPrescriptions to normalized schema | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — flat vs prescriptions + prescription_items | | Depends on FND-02, FND-05 |
@@ -58,6 +58,7 @@
 | PAT-10 | Patient notifications (`/patient/notifications`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages | | Depends on FND-02 |
 | PAT-11 | Rewire PatientProfile to user_profiles + patient_profiles + patient_insurance | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently local state only | | Depends on FND-02, FND-05 |
 | PAT-12 | Emergency profile page (`/patient/emergency-profile`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages; `docs/specs/04-user-flows.md` Flow 13 | | |
+| PAT-13 | Patient appointment actions (`/patient/appointments`) — cancel + reschedule | done | 2026-03-16 | AI | `docs/agent/mvp-scope.md` — Patient appointments list must support cancel/reschedule | 2026-03-16 | Upcoming patient appointments can now be cancelled directly and rescheduled through the canonical booking flow with the same doctor, updated slot, and preserved booking context |
 
 ---
 
@@ -68,12 +69,12 @@
 | DOC-01 | Rewire DoctorDashboard to live Supabase data | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently all-zeros static | | Depends on FND-02, FND-07 |
 | DOC-02 | Rewire DoctorPatients to live data (via appointments join) | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently static list | | Depends on FND-02 |
 | DOC-03 | Patient detail page (`/doctor/patients/:id`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Doctor Pages; full health record view | | |
-| DOC-04 | Rewire DoctorAppointments to spec schema | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently static list | | Depends on FND-02, FND-05 |
+| DOC-04 | Rewire DoctorAppointments to spec schema | done | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently static list | 2026-03-16 | Doctor appointments now read canonical `appointments`, show patient-submitted booking reason/notes, support list and calendar views with day filtering, and allow doctors to cancel upcoming scheduled visits |
 | DOC-05 | Appointment detail / consultation notes (`/doctor/appointments/:id`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Doctor Pages; SOAP notes | | |
 | DOC-06 | Create prescription page (`/doctor/prescriptions/new`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Doctor Pages; prescriptions + prescription_items | | |
 | DOC-07 | Rewire DoctorPrescriptions to live data | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently empty state | | Depends on FND-02 |
 | DOC-08 | Lab order creation (`/doctor/lab-orders`, `/doctor/lab-orders/new`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Doctor Pages; lab_orders + lab_order_items | | |
-| DOC-09 | Schedule / availability management (`/doctor/schedule`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Doctor Pages; doctor_availability, blocked_slots | | |
+| DOC-09 | Schedule / availability management (`/doctor/schedule`) | done | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Doctor Pages; doctor_availability, blocked_slots | 2026-03-15 | Doctors can now add recurring weekly availability, choose slot lengths, pause or delete schedule windows, and manage one-off blocked slots from the portal |
 | DOC-10 | Rewire DoctorMessages to conversations / messages tables | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently empty state | | Depends on FND-02 |
 | DOC-11 | Doctor notifications (`/doctor/notifications`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Doctor Pages | | Depends on FND-02 |
 | DOC-12 | Rewire DoctorProfile to user_profiles + doctor_profiles | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — queries wrong `profiles` table | | Depends on FND-02, FND-05 |
@@ -122,7 +123,7 @@
 | SYS-01 | 404 Not Found page | pending | 2026-02-28 | TH | `docs/specs/14-route-map.md` — System routes | | |
 | SYS-02 | 500 Server Error page | pending | 2026-02-28 | TH | `docs/specs/14-route-map.md` — System routes | | |
 | SYS-03 | Maintenance page | pending | 2026-02-28 | TH | `docs/specs/14-route-map.md` — System routes | | |
-| SYS-04 | Access Denied page | pending | 2026-02-28 | TH | `docs/specs/14-route-map.md` — System routes; used by AUTH-06 route guards | | Same page as AUTH-07 |
+| SYS-04 | Access Denied page | done | 2026-02-28 | TH | `docs/specs/14-route-map.md` — System routes; used by AUTH-06 route guards | 2026-03-08 | Same page as AUTH-07 |
 
 ---
 

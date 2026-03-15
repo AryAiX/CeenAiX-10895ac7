@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { DoctorProfile, Specialization } from '../types';
+import type { Specialization } from '../types';
 
 export const getSelectedSpecializations = (
   selectedIds: string[] | null | undefined,
@@ -12,30 +12,6 @@ export const getSelectedSpecializations = (
   return safeOptions
     .filter((option) => orderMap.has(option.id))
     .sort((left, right) => (orderMap.get(left.id) ?? 0) - (orderMap.get(right.id) ?? 0));
-};
-
-export const deriveLegacySpecializationIds = (
-  doctorProfile: DoctorProfile | null,
-  options: Specialization[] | null | undefined
-) => {
-  if (!doctorProfile) {
-    return [];
-  }
-
-  const safeOptions = options ?? [];
-  const optionByName = new Map(safeOptions.map((option) => [option.name.toLowerCase(), option.id]));
-  const legacyValues = [doctorProfile.specialization, doctorProfile.sub_specialization]
-    .flatMap((value) => (value ?? '').split(','))
-    .map((value) => value.trim().toLowerCase())
-    .filter(Boolean);
-
-  return Array.from(
-    new Set(
-      legacyValues
-        .map((value) => optionByName.get(value))
-        .filter((value): value is string => Boolean(value))
-    )
-  );
 };
 
 export const getPrimaryAndSecondarySpecializations = (
