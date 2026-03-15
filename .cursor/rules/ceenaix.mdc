@@ -35,6 +35,7 @@ This is CeenAiX — an AI-native healthcare platform for the UAE. Read `AGENTS.m
 - Use `auth.uid()` in RLS policies
 - Soft delete for clinical data: `is_deleted` + `deleted_at`
 - Include RLS policies in every migration that creates a table
+- During MVP development, use canonical schema paths only. Do not add legacy compatibility code, fallback reads, or dual-schema support for Bolt-era fields/tables.
 
 ## Routing
 - Route definitions in `src/lib/router.tsx`

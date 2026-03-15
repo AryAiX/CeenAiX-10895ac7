@@ -39,10 +39,10 @@
 
 | Route | Component | Code Status | Key Data |
 |---|---|---|---|
-| `/patient/dashboard` | PatientDashboard | ui-only | Static mock data; needs custom hooks |
+| `/patient/dashboard` | PatientDashboard | live | appointments, prescriptions, prescription_items, conversations, messages, notifications |
 | `/patient/ai-chat` | PatientAIChat | not-started | ai_chat_sessions, ai_chat_messages |
-| `/patient/appointments` | PatientAppointments | live | Queries Bolt `appointments` + `doctors` (needs schema migration) |
-| `/patient/appointments/book` | BookAppointment | not-started | doctor_availability, blocked_slots |
+| `/patient/appointments` | PatientAppointments | live | Reads canonical `appointments` and doctor profile data from `user_profiles` + `doctor_profiles` |
+| `/patient/appointments/book` | BookAppointment | live | Books against `doctor_availability`, `blocked_slots`, and existing `appointments` |
 | `/patient/appointments/:id` | AppointmentDetail | not-started | Single appointment + consultation_notes |
 | `/patient/records` | PatientRecords | ui-only | Static data; needs wiring to medical_conditions, allergies, vaccinations |
 | `/patient/lab-results` | PatientLabResults | not-started | lab_orders + lab_order_items (patient_id = me) |
@@ -67,7 +67,7 @@
 | `/doctor/prescriptions/new` | CreatePrescription | not-started | Creates prescription + items |
 | `/doctor/lab-orders` | DoctorLabOrders | not-started | lab_orders (doctor_id = me) |
 | `/doctor/lab-orders/new` | CreateLabOrder | not-started | Creates lab_order + items |
-| `/doctor/schedule` | DoctorSchedule | not-started | doctor_availability, blocked_slots |
+| `/doctor/schedule` | DoctorSchedule | live | doctor_availability, blocked_slots |
 | `/doctor/messages` | DoctorMessages | ui-only | Empty state; needs wiring |
 | `/doctor/messages/:id` | ConversationDetail | not-started | Single conversation |
 | `/doctor/notifications` | NotificationCenter | not-started | notifications (user_id = me) |

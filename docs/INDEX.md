@@ -34,6 +34,14 @@ Full product design spec — consult when you need complete feature details.
 | [13-phased-roadmap.md](specs/13-phased-roadmap.md) | 4-phase delivery plan with feature checklists |
 | [14-route-map.md](specs/14-route-map.md) | Complete route map (90+ routes across all roles and phases) |
 
+## Runbooks (`docs/runbooks/`)
+
+Operational notes for configuration and platform setup that are not stored in source code.
+
+| File | Purpose |
+|---|---|
+| [manual-environment-configuration.md](runbooks/manual-environment-configuration.md) | Tracks manual Supabase, Vercel, GitHub, DNS, and auth-related configuration required per environment |
+
 ## Root Files
 
 | File | Purpose |

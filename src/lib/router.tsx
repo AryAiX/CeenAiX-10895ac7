@@ -1,5 +1,8 @@
+import type { ReactNode } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import { Layout } from '../components/Layout';
+import { ProtectedRoute } from './auth-context';
+import type { UserRole } from '../types';
 import { Home } from '../pages/public/Home';
 import { AIChat } from '../pages/public/AIChat';
 import { FindDoctor } from '../pages/public/FindDoctor';
@@ -8,8 +11,14 @@ import { Insurance } from '../pages/public/Insurance';
 import { HealthEducation } from '../pages/public/HealthEducation';
 import { Laboratories } from '../pages/public/Laboratories';
 import { Pharmacy } from '../pages/public/Pharmacy';
+import { Login } from '../pages/auth/Login';
+import { Register } from '../pages/auth/Register';
+import { ForgotPassword } from '../pages/auth/ForgotPassword';
+import { VerifyOTP } from '../pages/auth/VerifyOTP';
+import { Onboarding } from '../pages/auth/Onboarding';
 import { PatientDashboard } from '../pages/patient/Dashboard';
 import { PatientAppointments } from '../pages/patient/Appointments';
+import { BookAppointment } from '../pages/patient/BookAppointment';
 import { PatientPrescriptions } from '../pages/patient/Prescriptions';
 import { PatientRecords } from '../pages/patient/Records';
 import { PatientMessages } from '../pages/patient/Messages';
@@ -19,92 +28,136 @@ import { DoctorAppointments } from '../pages/doctor/Appointments';
 import { DoctorPrescriptions } from '../pages/doctor/Prescriptions';
 import { DoctorPatients } from '../pages/doctor/Patients';
 import { DoctorMessages } from '../pages/doctor/Messages';
+import { DoctorSchedule } from '../pages/doctor/Schedule';
 import { DoctorProfile } from '../pages/doctor/Profile';
 import { AppointmentDesignShowcase } from '../pages/AppointmentDesignShowcase';
+import { AccessDenied } from '../pages/system/AccessDenied';
+
+const withLayout = (page: ReactNode) => <Layout>{page}</Layout>;
+
+const withProtection = (page: ReactNode, allowedRoles?: UserRole[]) => (
+  <ProtectedRoute allowedRoles={allowedRoles}>{withLayout(page)}</ProtectedRoute>
+);
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Layout><Home /></Layout>,
+    element: withLayout(<Home />),
   },
   {
     path: '/appointment-showcase',
-    element: <Layout><AppointmentDesignShowcase /></Layout>,
+    element: withLayout(<AppointmentDesignShowcase />),
+  },
+  {
+    path: '/auth/login',
+    element: <Login />,
+  },
+  {
+    path: '/auth/register',
+    element: <Register />,
+  },
+  {
+    path: '/auth/forgot-password',
+    element: <ForgotPassword />,
+  },
+  {
+    path: '/auth/verify-otp',
+    element: <VerifyOTP />,
+  },
+  {
+    path: '/auth/onboarding',
+    element: (
+      <ProtectedRoute>
+        <Onboarding />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/access-denied',
+    element: <AccessDenied />,
   },
   {
     path: '/patient/dashboard',
-    element: <Layout><PatientDashboard /></Layout>,
+    element: withProtection(<PatientDashboard />, ['patient']),
   },
   {
     path: '/ai-chat',
-    element: <Layout><AIChat /></Layout>,
+    element: withLayout(<AIChat />),
   },
   {
     path: '/find-doctor',
-    element: <Layout><FindDoctor /></Layout>,
+    element: withLayout(<FindDoctor />),
   },
   {
     path: '/find-clinic',
-    element: <Layout><FindClinic /></Layout>,
+    element: withLayout(<FindClinic />),
   },
   {
     path: '/insurance',
-    element: <Layout><Insurance /></Layout>,
+    element: withLayout(<Insurance />),
   },
   {
     path: '/health-education',
-    element: <Layout><HealthEducation /></Layout>,
+    element: withLayout(<HealthEducation />),
   },
   {
     path: '/laboratories',
-    element: <Layout><Laboratories /></Layout>,
+    element: withLayout(<Laboratories />),
   },
   {
     path: '/patient/appointments',
-    element: <Layout><PatientAppointments /></Layout>,
+    element: withProtection(<PatientAppointments />, ['patient']),
+  },
+  {
+    path: '/patient/appointments/book',
+    element: withProtection(<BookAppointment />, ['patient']),
   },
   {
     path: '/patient/prescriptions',
-    element: <Layout><PatientPrescriptions /></Layout>,
+    element: withProtection(<PatientPrescriptions />, ['patient']),
   },
   {
     path: '/pharmacy',
-    element: <Layout><Pharmacy /></Layout>,
+    element: withLayout(<Pharmacy />),
   },
   {
     path: '/patient/records',
-    element: <Layout><PatientRecords /></Layout>,
+    element: withProtection(<PatientRecords />, ['patient']),
   },
   {
     path: '/patient/messages',
-    element: <Layout><PatientMessages /></Layout>,
+    element: withProtection(<PatientMessages />, ['patient']),
   },
   {
     path: '/patient/profile',
-    element: <Layout><PatientProfile /></Layout>,
+    element: withProtection(<PatientProfile />, ['patient']),
   },
   {
     path: '/doctor/dashboard',
-    element: <Layout><DoctorDashboard /></Layout>,
+    element: withProtection(<DoctorDashboard />, ['doctor']),
   },
   {
     path: '/doctor/appointments',
-    element: <Layout><DoctorAppointments /></Layout>,
+    element: withProtection(<DoctorAppointments />, ['doctor']),
   },
   {
     path: '/doctor/patients',
-    element: <Layout><DoctorPatients /></Layout>,
+    element: withProtection(<DoctorPatients />, ['doctor']),
+  },
+  {
+    path: '/doctor/schedule',
+    element: withProtection(<DoctorSchedule />, ['doctor']),
   },
   {
     path: '/doctor/prescriptions',
-    element: <Layout><DoctorPrescriptions /></Layout>,
+    element: withProtection(<DoctorPrescriptions />, ['doctor']),
   },
   {
     path: '/doctor/messages',
-    element: <Layout><DoctorMessages /></Layout>,
+    element: withProtection(<DoctorMessages />, ['doctor']),
   },
   {
     path: '/doctor/profile',
-    element: <Layout><DoctorProfile /></Layout>,
+    element: withProtection(<DoctorProfile />, ['doctor']),
   },
 ]);

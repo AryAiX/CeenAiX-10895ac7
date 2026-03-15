@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
 import { FamilyTree } from '../../components/FamilyTree';
+import { AccountSecurityPanel } from '../../components/AccountSecurityPanel';
 import { Upload, Camera, User, Shield, Users, Plus, Trash2, CreditCard as Edit2, Save } from 'lucide-react';
 
 interface FamilyMember {
@@ -667,6 +668,8 @@ export const Profile: React.FC = () => {
                 )}
               </div>
             </div>
+
+            <AccountSecurityPanel tone="patient" />
           </div>
         </div>
       </div>

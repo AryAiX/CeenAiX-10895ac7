@@ -9,7 +9,6 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { Header } from '../../components/Header';
-import { BookingModal } from '../../components/BookingModal';
 
 interface Hospital {
   id: string;
@@ -63,8 +62,6 @@ export const FindClinic: React.FC = () => {
   const [hospitalDoctors, setHospitalDoctors] = useState<Record<string, Doctor[]>>({});
   const [sortBy, setSortBy] = useState<'rating' | 'name'>('rating');
   const [showNavMenu, setShowNavMenu] = useState<string | null>(null);
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
-  const [showBookingModal, setShowBookingModal] = useState(false);
 
   useEffect(() => {
     fetchHospitals();
@@ -492,7 +489,7 @@ export const FindClinic: React.FC = () => {
                         }
                       </button>
                       <button
-                        onClick={() => navigate('/patient/appointments')}
+                        onClick={() => navigate('/auth/register?role=patient&reset=1')}
                         className="flex items-center gap-2 px-5 py-2.5 bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold rounded-lg transition-all transform hover:scale-105 hover:shadow-md"
                       >
                         <Calendar className="w-4 h-4" />
@@ -595,10 +592,7 @@ export const FindClinic: React.FC = () => {
                             </div>
 
                             <button
-                              onClick={() => {
-                                setSelectedDoctor(doctor);
-                                setShowBookingModal(true);
-                              }}
+                              onClick={() => navigate('/patient/appointments/book')}
                               className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-medium rounded-lg transition-all text-sm shadow-md hover:shadow-lg transform hover:scale-105"
                             >
                               Book with Dr. {doctor.name.split(' ')[doctor.name.split(' ').length - 1]}
@@ -678,19 +672,6 @@ export const FindClinic: React.FC = () => {
           </div>
         </div>
       </footer>
-
-      {showBookingModal && selectedDoctor && (
-        <BookingModal
-          doctor={selectedDoctor}
-          onClose={() => {
-            setShowBookingModal(false);
-            setSelectedDoctor(null);
-          }}
-          onBookingComplete={() => {
-            fetchHospitals();
-          }}
-        />
-      )}
 
       <style>{`
         @keyframes blob {

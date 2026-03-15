@@ -4,6 +4,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 export const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const openRegistration = (role: 'patient' | 'doctor') => {
+    navigate(`/auth/register?role=${role}&reset=1`);
+  };
 
   const menuItems = [
     { label: 'Doctors', path: '/find-doctor' },
@@ -48,13 +51,13 @@ export const Header: React.FC = () => {
 
           <div className="flex gap-3">
             <button
-              onClick={() => navigate('/patient/profile')}
+              onClick={() => openRegistration('patient')}
               className="px-6 py-2.5 bg-gradient-to-r from-ceenai-cyan to-ceenai-blue hover:from-ceenai-cyan-dark hover:to-ceenai-blue-dark text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg hover:scale-105"
             >
               Patient
             </button>
             <button
-              onClick={() => navigate('/doctor/profile')}
+              onClick={() => openRegistration('doctor')}
               className="px-6 py-2.5 border-2 border-ceenai-navy text-ceenai-navy hover:bg-ceenai-navy hover:text-white font-semibold rounded-xl transition-all"
             >
               Doctor
