@@ -44,10 +44,10 @@
 | `/patient/appointments` | PatientAppointments | live | Reads canonical `appointments` and doctor profile data from `user_profiles` + `doctor_profiles` |
 | `/patient/appointments/book` | BookAppointment | live | Books against `doctor_availability`, `blocked_slots`, and existing `appointments` |
 | `/patient/appointments/:id` | AppointmentDetail | not-started | Single appointment + consultation_notes |
-| `/patient/records` | PatientRecords | ui-only | Static data; needs wiring to medical_conditions, allergies, vaccinations |
+| `/patient/records` | PatientRecords | live | Reads canonical `medical_conditions`, `allergies`, and `vaccinations`; supports patient-side record entry/removal |
 | `/patient/lab-results` | PatientLabResults | not-started | lab_orders + lab_order_items (patient_id = me) |
 | `/patient/lab-results/:id` | LabResultDetail | not-started | Single lab order |
-| `/patient/prescriptions` | PatientPrescriptions | live | Queries Bolt `prescriptions` + `doctors` (needs normalization) |
+| `/patient/prescriptions` | PatientPrescriptions | live | Reads canonical `prescriptions` + `prescription_items` and joins prescribing doctor details from `user_profiles` + `doctor_profiles` |
 | `/patient/messages` | PatientMessages | ui-only | Static conversation list; needs wiring to conversations, messages |
 | `/patient/messages/:id` | ConversationDetail | not-started | Single conversation |
 | `/patient/notifications` | NotificationCenter | not-started | notifications (user_id = me) |

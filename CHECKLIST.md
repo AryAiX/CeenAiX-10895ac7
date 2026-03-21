@@ -47,18 +47,19 @@
 | ID | Item | Status | Added | By | Justification | Completed | Notes |
 |---|---|---|---|---|---|---|---|
 | PAT-01 | Rewire PatientDashboard to live Supabase data | done | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently ui-only with mock data | 2026-03-15 | Dashboard now uses `usePatientDashboard()` to load upcoming appointments, active prescriptions, unread messages, next appointment, medication reminders, and recent activity from spec tables |
-| PAT-02 | Patient AI chat (`/patient/ai-chat`) with context + Edge Function | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages; `docs/agent/ai-reference.md` | | Depends on AI-01, AI-04 |
+| PAT-02 | Patient AI chat (`/patient/ai-chat`) with context + Edge Function | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages; `docs/agent/ai-reference.md` | | AI chat should automatically consider authenticated patient history without explicit user prompts, using canonical context retrieval first and AI-01/AI-04. PAT-06 and PAT-08 are now available as live context sources; remaining prerequisites are the AI backend and any secondary profile context needed later |
 | PAT-03 | Appointment booking flow (`/patient/appointments/book`) | done | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages; `docs/specs/04-user-flows.md` Flow 1 | 2026-03-15 | Patients can now choose a doctor with active schedule windows, select a real available slot, and create spec-compliant appointments against `doctor_availability`, `blocked_slots`, and `appointments` |
 | PAT-04 | Appointment detail page (`/patient/appointments/:id`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages | | |
 | PAT-05 | Rewire PatientAppointments to spec schema | done | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — queries wrong columns, wrong joins | 2026-03-16 | Patient appointments list now reads canonical `appointments` rows, joins doctor names/specialties from `user_profiles` + `doctor_profiles`, and supports patient-side cancel and reschedule actions |
-| PAT-06 | Rewire PatientRecords to medical_conditions / allergies / vaccinations | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently fully static | | Depends on FND-02 |
+| PAT-06 | Rewire PatientRecords to medical_conditions / allergies / vaccinations | done | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently fully static | 2026-03-21 | `/patient/records` now loads canonical `medical_conditions`, `allergies`, and `vaccinations`, supports patient-side add/remove flows, and exposes live record history for downstream PAT-02 retrieval |
 | PAT-07 | Lab results viewer (`/patient/lab-results`) + AI interpretation | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages; AI plain-language explanation | | Depends on FND-02, AI-01 |
-| PAT-08 | Rewire PatientPrescriptions to normalized schema | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — flat vs prescriptions + prescription_items | | Depends on FND-02, FND-05 |
+| PAT-08 | Rewire PatientPrescriptions to normalized schema | done | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — flat vs prescriptions + prescription_items | 2026-03-21 | `/patient/prescriptions` now reads canonical `prescriptions` + `prescription_items`, joins prescribing doctor details from spec tables, and surfaces active vs historical medication context for PAT-02 |
 | PAT-09 | Rewire PatientMessages to conversations / messages tables | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently fully static | | Depends on FND-02 |
 | PAT-10 | Patient notifications (`/patient/notifications`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages | | Depends on FND-02 |
-| PAT-11 | Rewire PatientProfile to user_profiles + patient_profiles + patient_insurance | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently local state only | | Depends on FND-02, FND-05 |
+| PAT-11 | Rewire PatientProfile to user_profiles + patient_profiles + patient_insurance | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently local state only | | Depends on FND-02, FND-05; profile and insurance data may become secondary patient-context inputs for PAT-02 |
 | PAT-12 | Emergency profile page (`/patient/emergency-profile`) | pending | 2026-02-28 | TH | `docs/agent/mvp-scope.md` — Patient Pages; `docs/specs/04-user-flows.md` Flow 13 | | |
 | PAT-13 | Patient appointment actions (`/patient/appointments`) — cancel + reschedule | done | 2026-03-16 | AI | `docs/agent/mvp-scope.md` — Patient appointments list must support cancel/reschedule | 2026-03-16 | Upcoming patient appointments can now be cancelled directly and rescheduled through the canonical booking flow with the same doctor, updated slot, and preserved booking context |
+| PAT-14 | Seed canonical patient history data for `patient1` | done | 2026-03-16 | AI | Needed to test PAT-02 patient AI chat against realistic medical history and prior encounters | 2026-03-21 | Added rerunnable seed migration plus applied canonical dev data for `patient1`: conditions, allergies, vaccinations, completed appointments, consultation notes, prescriptions/prescription_items, and lab results linked to `doctor1` |
 
 ---
 
@@ -95,10 +96,10 @@
 
 | ID | Item | Status | Added | By | Justification | Completed | Notes |
 |---|---|---|---|---|---|---|---|
-| AI-01 | `ai-chat` Edge Function (GPT-4o + SSE streaming) | pending | 2026-02-28 | TH | `docs/agent/ai-reference.md` — Conversational Health Chat | | |
+| AI-01 | `ai-chat` Edge Function (GPT-4o + SSE streaming) | pending | 2026-02-28 | TH | `docs/agent/ai-reference.md` — Conversational Health Chat | | Should perform per-message topic/intent extraction, automatic patient-history retrieval for authenticated users, compact evidence assembly, and SSE streaming of grounded responses |
 | AI-02 | `ai-document-analyze` Edge Function (GPT-4o Vision) | pending | 2026-02-28 | TH | `docs/agent/ai-reference.md` — Document & Photo Analysis | | |
-| AI-03 | `ai-embed` Edge Function (text-embedding-3-small) | pending | 2026-02-28 | TH | `docs/agent/ai-reference.md` — semantic search embeddings | | |
-| AI-04 | Rewire AIChat page to use Edge Functions (replace local rules) | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently hardcoded keyword matching | | Depends on AI-01 |
+| AI-03 | `ai-embed` Edge Function (text-embedding-3-small) | pending | 2026-02-28 | TH | `docs/agent/ai-reference.md` — semantic search embeddings | | Use for semantic retrieval over patient-history chunks after PAT-02 deterministic retrieval is in place; store embeddings in Supabase/Postgres rather than Storage |
+| AI-04 | Rewire AIChat page to use Edge Functions (replace local rules) | pending | 2026-02-28 | TH | `docs/agent/bolt-code-audit.md` — currently hardcoded keyword matching | | Depends on AI-01; the authenticated patient path should always consult retrieved history automatically rather than waiting for the user to reference prior history explicitly |
 | AI-05 | AI-powered lab result interpretation (patient-facing) | pending | 2026-02-28 | TH | `docs/agent/ai-reference.md` — Lab Result Interpretation; plain-language explanation | | Depends on AI-01, PAT-07 |
 
 ---

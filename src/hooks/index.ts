@@ -3,6 +3,8 @@ export { useUserProfile } from './use-user-profile';
 export { useAppointments } from './use-appointments';
 export { useNotifications } from './use-notifications';
 export { usePatientDashboard } from './use-patient-dashboard';
+export { usePatientPrescriptions } from './use-patient-prescriptions';
+export { usePatientRecords } from './use-patient-records';
 export { useDoctorDashboard } from './use-doctor-dashboard';
 export { useDoctorSchedule } from './use-doctor-schedule';
 export { useBookableDoctors } from './use-bookable-doctors';
