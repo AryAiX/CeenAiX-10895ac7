@@ -124,7 +124,10 @@ export const DoctorAppointments: React.FC = () => {
     },
     [appointmentIds.join(',')]
   );
-  const preVisitAssessments = preVisitAssessmentData ?? [];
+  const preVisitAssessments = useMemo(
+    () => preVisitAssessmentData ?? [],
+    [preVisitAssessmentData]
+  );
   const preVisitAssessmentByAppointmentId = useMemo(
     () => new Map(preVisitAssessments.map((assessment) => [assessment.appointmentId, assessment])),
     [preVisitAssessments]

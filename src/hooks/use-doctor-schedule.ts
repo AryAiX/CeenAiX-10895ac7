@@ -64,8 +64,8 @@ export function useDoctorSchedule(userId: string | null | undefined) {
       }
 
       return {
-        availabilities: (availabilities ?? []).toSorted(compareAvailability),
-        blockedSlots: (blockedSlots ?? []).toSorted(compareBlockedSlots),
+        availabilities: [...(availabilities ?? [])].sort(compareAvailability),
+        blockedSlots: [...(blockedSlots ?? [])].sort(compareBlockedSlots),
       };
     },
     [userId]

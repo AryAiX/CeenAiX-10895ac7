@@ -15,10 +15,11 @@ export const DoctorPatients: React.FC = () => {
     loading,
     error,
   } = useAppointments({ role: 'doctor', userId: user?.id ?? '' });
+  const safeAppointments = useMemo(() => appointments ?? [], [appointments]);
 
   const patientIds = useMemo(
-    () => Array.from(new Set(appointments.map((appointment) => appointment.patient_id))),
-    [appointments]
+    () => Array.from(new Set(safeAppointments.map((appointment) => appointment.patient_id))),
+    [safeAppointments]
   );
 
   const { data: patientProfiles = [] } = useQuery(
@@ -37,11 +38,12 @@ export const DoctorPatients: React.FC = () => {
     },
     [patientIds.join(',')]
   );
+  const safePatientProfiles = useMemo(() => patientProfiles ?? [], [patientProfiles]);
 
   const patients = useMemo(() => {
-    return patientProfiles
+    return safePatientProfiles
       .map((profile) => {
-        const patientAppointments = appointments.filter(
+        const patientAppointments = safeAppointments.filter(
           (appointment) => appointment.patient_id === profile.user_id
         );
         const sortedAppointments = [...patientAppointments].sort((a, b) =>
@@ -66,7 +68,7 @@ export const DoctorPatients: React.FC = () => {
         };
       })
       .filter((patient) => patient.name.toLowerCase().includes(searchQuery.trim().toLowerCase()));
-  }, [appointments, patientProfiles, searchQuery]);
+  }, [safeAppointments, safePatientProfiles, searchQuery]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -124,7 +126,7 @@ export const DoctorPatients: React.FC = () => {
                       {patient.name
                         .split(' ')
                         .filter(Boolean)
-                        .map((name) => name[0])
+                        .map((name: string) => name[0])
                         .join('')
                         .slice(0, 2)}
                     </div>

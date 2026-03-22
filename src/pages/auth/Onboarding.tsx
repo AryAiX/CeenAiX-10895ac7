@@ -134,7 +134,7 @@ export const Onboarding = () => {
 
     setForm((current) => ({
       ...current,
-      selectedSpecializationIds: doctorSpecializationIds,
+      selectedSpecializationIds: Array.isArray(doctorSpecializationIds) ? doctorSpecializationIds : [],
     }));
     setHasInitializedDoctorSpecializations(true);
   }, [
