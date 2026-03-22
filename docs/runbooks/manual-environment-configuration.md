@@ -35,10 +35,10 @@ Do not use this document for:
 | Supabase Auth | Site URL for auth emails and redirects | Staging, production | Supabase Auth URL configuration | pending | Current project still uses `http://localhost:5173`; each non-local environment must set `site_url` to its actual deployed app domain so confirmation and recovery links open the correct host |
 | Supabase Auth | Redirect URL allow-list for final domains | Preview, staging, production | Supabase Auth URL configuration | pending | Add exact custom-domain URLs and any approved preview URLs |
 | Supabase Edge Functions | Deploy AI Edge Functions used by the current app surface | Each Supabase env | Supabase CLI / Supabase dashboard | done | Current project has both `ai-chat` and `ai-document-analyze` deployed with platform JWT verification disabled so browser CORS preflights succeed; both functions handle auth requirements in-function as needed. Any environment running patient AI chat or doctor PDF-to-questionnaire extraction must deploy the same function set after code changes. |
-| Supabase Edge Functions | Set Edge Function AI secrets | All envs that use AI features | Supabase project secrets | done | Current project has `OPENAI_API_KEY` configured. Replicate required secrets in every environment before deploying `ai-chat` or `ai-document-analyze`. |
+| Supabase Edge Functions | Set Edge Function AI secrets | All envs that use AI features | Supabase project secrets | done | Current project has `OPENAI_API_KEY` configured. This key is consumed by Supabase Edge Functions, not by the Vercel frontend project. Replicate required secrets in every environment before deploying `ai-chat` or `ai-document-analyze`. |
 | Vercel | Project creation and linking | Each deployed env | Vercel dashboard / Vercel CLI | done | Current project is linked to `aryaix/ceenaix` |
-| Vercel | Frontend environment variables | Each deployed env | Vercel project environment settings | done | Must include `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` |
-| Vercel | Custom domain connection | Production | Vercel Domains settings + DNS provider | pending | Required for final auth redirects and branded production access |
+| Vercel | Frontend environment variables | Each deployed env | Vercel project environment settings | done | Current app requires `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`; compatibility duplicates `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY` are also present in the current Vercel project. Do not paste values with literal `\n` characters; that caused a production blank-page incident until the env vars were re-saved and redeployed. |
+| Vercel | Custom domain connection | Production | Vercel Domains settings + DNS provider | done | `ceenaix.com` and `www.ceenaix.com` are connected to the current Vercel project. This does not replace the separate Supabase auth `site_url` and redirect allow-list work. |
 | GitHub Actions | Deploy secrets for Vercel | Repo / env specific | GitHub repository secrets | done | Includes `VERCEL_PROJECT_ID`, `VERCEL_ORG_ID`, and Vercel auth token secret(s) |
 | GitHub Actions | Build secrets for Supabase client env vars | Repo / env specific | GitHub repository secrets | done | Includes `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` |
 
@@ -75,6 +75,8 @@ For each Vercel environment:
 
 1. Create or link the Vercel project
 2. Set all required frontend environment variables
+   Current app runtime requires `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. The current Vercel project also keeps `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY` aligned for compatibility. Twilio, SMTP sender, and `OPENAI_API_KEY` are not frontend Vercel vars for this app.
+   When entering Vercel values, ensure they do not contain literal escaped newlines such as `\n`; malformed Supabase env values caused the production site to render a blank page until they were corrected and production was redeployed.
 3. Verify the production and preview build commands
 4. Connect the custom domain when the environment is ready
 
@@ -94,7 +96,6 @@ These items are still not complete for a production-grade auth rollout:
 - Configure reliable auth email delivery for signup confirmation and password reset emails
 - Keep `ai-chat` and `ai-document-analyze` deployed in every environment that uses patient AI chat or doctor pre-visit PDF extraction, with the same JWT verification settings used by the current project
 - Store Twilio admin recovery codes in a secure vault outside the repository
-- Connect the final custom domain in Vercel
 - Update Supabase `site_url` from `http://localhost:5173` to the final custom domain
 - Add final custom-domain redirect URLs to the Supabase allow-list
 - Remove the temporary development OTP mapping
