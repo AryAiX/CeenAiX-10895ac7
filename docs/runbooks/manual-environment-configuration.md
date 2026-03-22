@@ -40,7 +40,7 @@ Do not use this document for:
 | Vercel | Frontend environment variables | Each deployed env | Vercel project environment settings | done | Current app requires `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`; compatibility duplicates `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY` are also present in the current Vercel project. Do not paste values with literal `\n` characters; that caused a production blank-page incident until the env vars were re-saved and redeployed. |
 | Vercel | Custom domain connection | Production | Vercel Domains settings + DNS provider | done | `ceenaix.com` and `www.ceenaix.com` are connected to the current Vercel project. This does not replace the separate Supabase auth `site_url` and redirect allow-list work. |
 | GitHub Actions | Deploy secrets for Vercel | Repo / env specific | GitHub repository secrets | done | Includes `VERCEL_PROJECT_ID`, `VERCEL_ORG_ID`, and Vercel auth token secret(s) |
-| GitHub Actions | Build secrets for Supabase client env vars | Repo / env specific | GitHub repository secrets | done | Includes `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` |
+| GitHub Actions | Build secrets for Supabase client env vars | Repo / env specific | GitHub repository secrets | done | Current repo still has `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` secrets for CI-side build validation, but production deploys must not override Vercel's pulled environment values with them. Keep them aligned if retained. |
 
 ## Environment Setup Checklist
 
@@ -86,6 +86,7 @@ For each repository or deployment target:
 
 1. Add all required Vercel secrets
 2. Add all required Supabase frontend env-var secrets
+   Current production deploys should use Vercel project environment variables as the source of truth after `vercel pull`. Do not inject stale GitHub copies of `VITE_SUPABASE_URL` or `VITE_SUPABASE_ANON_KEY` into the production release build step, or a valid Vercel configuration can be overwritten during deploy.
 3. Verify `main` production deploy and pull request preview deploy both succeed
 
 ## Production Readiness Items Still Manual
