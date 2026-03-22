@@ -1,142 +1,106 @@
-import React, { useState, useEffect } from 'react';
-import { Pill, Calendar, Clock, AlertCircle, Package, MapPin, RefreshCw, CheckCircle, XCircle, Bell, Search, Store, Phone } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import {
+  AlertCircle,
+  Bell,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Package,
+  Pill,
+  Search,
+} from 'lucide-react';
 import { Navigation } from '../../components/Navigation';
-import { supabase } from '../../lib/supabase';
-import { useLocation } from 'react-router-dom';
+import { Skeleton } from '../../components/Skeleton';
+import { usePatientPrescriptions } from '../../hooks';
+import { useAuth } from '../../lib/auth-context';
 
-interface Prescription {
-  id: string;
-  medication_name: string;
-  dosage: string;
-  frequency: string;
-  duration: string;
-  instructions: string;
-  start_date: string;
-  end_date: string | null;
-  refills_remaining: number;
-  status: string;
-  doctor_id: string;
-  created_at: string;
-}
+const formatDate = (value: string) =>
+  new Date(value).toLocaleDateString('en-AE', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
 
-interface Doctor {
-  id: string;
-  name: string;
-  specialization: string;
-}
-
-interface Pharmacy {
-  id: number;
-  name: string;
-  address: string;
-  phone: string;
-  distance: string;
-  hours: string;
-  hasStock: boolean;
-}
+const formatPrescriptionStatus = (value: string) => value.replace('_', ' ');
 
 export const PatientPrescriptions: React.FC = () => {
-  const location = useLocation();
-  const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
-  const [doctors, setDoctors] = useState<Record<string, Doctor>>({});
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'prescriptions' | 'pharmacy'>(
-    location.pathname === '/pharmacy' ? 'pharmacy' : 'prescriptions'
-  );
+  const { user } = useAuth();
+  const {
+    data,
+    loading,
+    error,
+  } = usePatientPrescriptions(user?.id);
   const [selectedMedication, setSelectedMedication] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'history'>('all');
 
-  const nearbyPharmacies: Pharmacy[] = [
-    {
-      id: 1,
-      name: 'Life Pharmacy - Dubai Mall',
-      address: 'Ground Floor, Dubai Mall, Downtown Dubai',
-      phone: '+971 4 339 8448',
-      distance: '2.3 km',
-      hours: 'Open 24/7',
-      hasStock: true
-    },
-    {
-      id: 2,
-      name: 'Boots Pharmacy - Marina Walk',
-      address: 'Shop 12, Marina Walk, Dubai Marina',
-      phone: '+971 4 423 1567',
-      distance: '3.8 km',
-      hours: '8 AM - 12 AM',
-      hasStock: true
-    },
-    {
-      id: 3,
-      name: 'Aster Pharmacy - JBR',
-      address: 'The Beach, JBR, Dubai',
-      phone: '+971 4 427 9988',
-      distance: '5.1 km',
-      hours: '9 AM - 11 PM',
-      hasStock: false
-    },
-    {
-      id: 4,
-      name: 'Medcare Pharmacy - Business Bay',
-      address: 'Bay Square, Business Bay, Dubai',
-      phone: '+971 4 375 7500',
-      distance: '1.7 km',
-      hours: 'Open 24/7',
-      hasStock: true
-    }
-  ];
+  const prescriptions = useMemo(() => data ?? [], [data]);
 
-  useEffect(() => {
-    fetchPrescriptions();
-  }, []);
+  const filteredPrescriptions = useMemo(
+    () =>
+      prescriptions.filter((prescription) => {
+        const matchesStatus =
+          statusFilter === 'all' ||
+          (statusFilter === 'active' ? prescription.status === 'active' : prescription.status !== 'active');
+        const searchValue = searchQuery.trim().toLowerCase();
 
-  const fetchPrescriptions = async () => {
-    try {
-      const { data: prescriptionsData, error: prescError } = await supabase
-        .from('prescriptions')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (prescError) throw prescError;
-
-      if (prescriptionsData && prescriptionsData.length > 0) {
-        setPrescriptions(prescriptionsData);
-
-        const doctorIds = [...new Set(prescriptionsData.map(p => p.doctor_id))];
-        const { data: doctorsData } = await supabase
-          .from('doctors')
-          .select('id, name, specialization')
-          .in('id', doctorIds);
-
-        if (doctorsData) {
-          const doctorsMap = doctorsData.reduce((acc, doc) => {
-            acc[doc.id] = doc;
-            return acc;
-          }, {} as Record<string, Doctor>);
-          setDoctors(doctorsMap);
+        if (!matchesStatus) {
+          return false;
         }
-      }
-    } catch (error) {
-      console.error('Error fetching prescriptions:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const activePrescriptions = prescriptions.filter(p => p.status === 'active');
-  const pastPrescriptions = prescriptions.filter(p => p.status === 'completed' || p.status === 'expired');
+        if (searchValue.length === 0) {
+          return true;
+        }
 
-  const getDaysRemaining = (endDate: string | null) => {
-    if (!endDate) return null;
-    const end = new Date(endDate);
-    const today = new Date();
-    const diffTime = end.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
+        const haystack = [
+          prescription.doctorName,
+          prescription.doctorSpecialty,
+          prescription.status,
+          ...prescription.items.flatMap((item) => [
+            item.medication_name,
+            item.dosage,
+            item.frequency,
+            item.duration,
+            item.instructions,
+          ]),
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+
+        return haystack.includes(searchValue);
+      }),
+    [prescriptions, searchQuery, statusFilter]
+  );
+
+  const activePrescriptions = useMemo(
+    () => filteredPrescriptions.filter((prescription) => prescription.status === 'active'),
+    [filteredPrescriptions]
+  );
+  const pastPrescriptions = useMemo(
+    () => filteredPrescriptions.filter((prescription) => prescription.status !== 'active'),
+    [filteredPrescriptions]
+  );
+
+  const activeMedicationCount = useMemo(
+    () =>
+      prescriptions
+        .filter((prescription) => prescription.status === 'active')
+        .reduce((count, prescription) => count + prescription.items.length, 0),
+    [prescriptions]
+  );
+
+  const pendingDispenseCount = useMemo(
+    () =>
+      prescriptions
+        .filter((prescription) => prescription.status === 'active')
+        .flatMap((prescription) => prescription.items)
+        .filter((item) => !item.is_dispensed).length,
+    [prescriptions]
+  );
 
   const handleRefillRequest = (medicationName: string) => {
     setSelectedMedication(medicationName);
-    setActiveTab('pharmacy');
   };
 
   if (loading) {
@@ -154,11 +118,13 @@ export const PatientPrescriptions: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-cyan-600/80 to-blue-600/80"></div>
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <h1 className="text-4xl font-bold text-white mb-2">My Prescriptions</h1>
-            <p className="text-cyan-100 text-lg">Manage your medications and find pharmacies</p>
+          <p className="text-cyan-100 text-lg">Track active medications and review historical prescriptions</p>
           </div>
         </div>
-        <div className="flex items-center justify-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-4">
+          <Skeleton className="h-28 w-full rounded-2xl" />
+          <Skeleton className="h-40 w-full rounded-2xl" />
+          <Skeleton className="h-40 w-full rounded-2xl" />
         </div>
       </div>
     );
@@ -180,353 +146,303 @@ export const PatientPrescriptions: React.FC = () => {
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <h1 className="text-4xl font-bold text-white mb-2">My Prescriptions</h1>
-          <p className="text-cyan-100 text-lg">Manage your medications and find pharmacies</p>
+          <p className="text-cyan-100 text-lg">Live medication data from canonical prescriptions and prescription items</p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex space-x-2 mb-8 bg-white rounded-xl p-2 shadow-md border border-gray-200">
-          <button
-            onClick={() => setActiveTab('prescriptions')}
-            className={`flex-1 flex items-center justify-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
-              activeTab === 'prescriptions'
-                ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            <Pill className="w-5 h-5" />
-            <span>My Prescriptions</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('pharmacy')}
-            className={`flex-1 flex items-center justify-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
-              activeTab === 'pharmacy'
-                ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            <Store className="w-5 h-5" />
-            <span>Find Pharmacy</span>
-          </button>
+        {error ? (
+          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+            We could not load your prescription history right now. Please try again shortly.
+          </div>
+        ) : null}
+
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-md">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Active Plans</p>
+                <p className="text-4xl font-bold text-gray-900 mt-2">
+                  {prescriptions.filter((prescription) => prescription.status === 'active').length}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-cyan-600" />
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-md">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Active Medications</p>
+                <p className="text-4xl font-bold text-gray-900 mt-2">{activeMedicationCount}</p>
+              </div>
+              <div className="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
+                <Pill className="w-6 h-6 text-cyan-600" />
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-md">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Pending Pickup</p>
+                <p className="text-4xl font-bold text-gray-900 mt-2">{pendingDispenseCount}</p>
+              </div>
+              <div className="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
+                <Bell className="w-6 h-6 text-cyan-600" />
+              </div>
+            </div>
+          </div>
         </div>
 
-        {activeTab === 'prescriptions' ? (
-          <div className="space-y-8">
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-md">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 text-sm font-medium">Active Medications</p>
-                    <p className="text-4xl font-bold text-gray-900 mt-2">{activePrescriptions.length}</p>
-                  </div>
-                  <div className="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
-                    <CheckCircle className="w-6 h-6 text-cyan-600" />
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-md">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 text-sm font-medium">Refills Needed</p>
-                    <p className="text-4xl font-bold text-gray-900 mt-2">
-                      {activePrescriptions.filter(p => p.refills_remaining <= 1).length}
-                    </p>
-                  </div>
-                  <div className="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
-                    <Bell className="w-6 h-6 text-cyan-600" />
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-md">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 text-sm font-medium">Total Prescriptions</p>
-                    <p className="text-4xl font-bold text-gray-900 mt-2">{prescriptions.length}</p>
-                  </div>
-                  <div className="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
-                    <Package className="w-6 h-6 text-cyan-600" />
-                  </div>
-                </div>
-              </div>
+        <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-8">
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className="flex-1 w-full relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search medications, dosage, or prescribing doctor..."
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+              />
+            </div>
+            <select
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value as 'all' | 'active' | 'history')}
+              className="w-full md:w-auto rounded-xl border-2 border-gray-200 px-4 py-3 font-medium focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+            >
+              <option value="all">All statuses</option>
+              <option value="active">Active only</option>
+              <option value="history">Completed or cancelled</option>
+            </select>
+          </div>
+          {selectedMedication ? (
+            <div className="mt-4 rounded-xl border border-cyan-200 bg-cyan-50 p-4 text-sm text-cyan-900">
+              <span className="font-semibold">Selected medication:</span> {selectedMedication}
+            </div>
+          ) : null}
+        </div>
+
+        <div className="space-y-8">
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Active Prescriptions</h2>
+              <span className="bg-cyan-100 text-cyan-700 px-4 py-2 rounded-full text-sm font-bold">
+                {activePrescriptions.length} Active
+              </span>
             </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Active Prescriptions</h2>
-                {activePrescriptions.length > 0 && (
-                  <span className="bg-cyan-100 text-cyan-700 px-4 py-2 rounded-full text-sm font-bold">
-                    {activePrescriptions.length} Active
-                  </span>
-                )}
-              </div>
-
-              {activePrescriptions.length === 0 ? (
-                <div className="relative bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
-                  <div className="absolute top-0 right-0 w-64 h-64 opacity-5">
-                    <img
-                      src="https://images.pexels.com/photos/3873146/pexels-photo-3873146.jpeg?auto=compress&cs=tinysrgb&w=400"
-                      alt="Pharmacy"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="relative p-12 text-center">
-                    <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                      <Pill className="w-10 h-10 text-white" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">No Active Prescriptions</h3>
-                    <p className="text-gray-600">Your prescribed medications will appear here</p>
-                  </div>
+            {activePrescriptions.length === 0 ? (
+              <div className="relative bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 opacity-5">
+                  <img
+                    src="https://images.pexels.com/photos/3873146/pexels-photo-3873146.jpeg?auto=compress&cs=tinysrgb&w=400"
+                    alt="Pharmacy"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-              ) : (
-                <div className="space-y-6">
-                  {activePrescriptions.map((prescription) => {
-                    const daysLeft = getDaysRemaining(prescription.end_date);
-                    const doctor = doctors[prescription.doctor_id];
+                <div className="relative p-12 text-center">
+                  <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                    <Pill className="w-10 h-10 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">No active prescriptions</h3>
+                  <p className="text-gray-600">Once a doctor issues medication, it will appear here with all prescription items.</p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {activePrescriptions.map((prescription) => {
+                  const pendingItems = prescription.items.filter((item) => !item.is_dispensed).length;
 
-                    return (
-                      <div key={prescription.id} className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200">
-                        <div className="relative bg-gradient-to-r from-cyan-600 to-blue-600 p-6">
-                          <div className="absolute inset-0 opacity-10">
-                            <img
-                              src="https://images.pexels.com/photos/3873146/pexels-photo-3873146.jpeg?auto=compress&cs=tinysrgb&w=600"
-                              alt="Medication"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="relative flex items-center justify-between flex-wrap gap-4">
-                            <div className="flex items-center space-x-4">
-                              <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center shadow-lg">
-                                <Pill className="w-8 h-8 text-cyan-600" />
-                              </div>
-                              <div>
-                                <h3 className="text-xl font-bold text-white">{prescription.medication_name}</h3>
-                                <p className="text-cyan-100 text-sm mt-1">
-                                  Prescribed by {doctor?.name || 'Doctor'}
-                                  {doctor?.specialization && ` - ${doctor.specialization}`}
-                                </p>
-                              </div>
+                  return (
+                    <div
+                      key={prescription.id}
+                      className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200"
+                    >
+                      <div className="relative bg-gradient-to-r from-cyan-600 to-blue-600 p-6">
+                        <div className="absolute inset-0 opacity-10">
+                          <img
+                            src="https://images.pexels.com/photos/3873146/pexels-photo-3873146.jpeg?auto=compress&cs=tinysrgb&w=600"
+                            alt="Medication"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="relative flex items-start justify-between gap-4 flex-wrap">
+                          <div className="flex items-center gap-4">
+                            <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center shadow-lg">
+                              <Pill className="w-8 h-8 text-cyan-600" />
                             </div>
-                            <div className="flex items-center space-x-3">
-                              {daysLeft !== null && daysLeft <= 7 && daysLeft > 0 && (
-                                <span className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
-                                  <Bell className="w-3 h-3" />
-                                  <span>{daysLeft} days left</span>
-                                </span>
-                              )}
-                              <span className="bg-white/20 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-xs font-bold border border-white/30">
-                                ACTIVE
+                            <div>
+                              <h3 className="text-xl font-bold text-white">
+                                {prescription.items[0]?.medication_name ?? 'Medication plan'}
+                                {prescription.items.length > 1 ? ` + ${prescription.items.length - 1} more` : ''}
+                              </h3>
+                              <p className="text-cyan-100 text-sm mt-1">
+                                Prescribed by {prescription.doctorName}
+                                {prescription.doctorSpecialty ? ` - ${prescription.doctorSpecialty}` : ''}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-3">
+                            {pendingItems > 0 ? (
+                              <span className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-bold">
+                                {pendingItems} pending pickup
                               </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="p-6">
-                          <div className="grid md:grid-cols-2 gap-6 mb-6">
-                            <div>
-                              <h4 className="text-sm font-bold text-gray-700 mb-4 uppercase tracking-wide">Dosage Information</h4>
-                              <div className="space-y-3">
-                                <div className="flex items-start space-x-3">
-                                  <div className="bg-gray-100 p-2 rounded-lg">
-                                    <Pill className="w-4 h-4 text-cyan-600" />
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-semibold text-gray-900">{prescription.dosage}</p>
-                                    <p className="text-xs text-gray-500 mt-0.5">Frequency: {prescription.frequency}</p>
-                                  </div>
-                                </div>
-                                <div className="flex items-start space-x-3">
-                                  <div className="bg-gray-100 p-2 rounded-lg">
-                                    <Clock className="w-4 h-4 text-cyan-600" />
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-semibold text-gray-900">Duration: {prescription.duration}</p>
-                                    <p className="text-xs text-gray-500 mt-0.5">Refills remaining: {prescription.refills_remaining}</p>
-                                  </div>
-                                </div>
-                                <div className="flex items-start space-x-3">
-                                  <div className="bg-gray-100 p-2 rounded-lg">
-                                    <Calendar className="w-4 h-4 text-cyan-600" />
-                                  </div>
-                                  <div>
-                                    <p className="text-sm text-gray-700">Start: {new Date(prescription.start_date).toLocaleDateString('en-AE', { year: 'numeric', month: 'short', day: 'numeric' })}</p>
-                                    {prescription.end_date && (
-                                      <p className="text-sm text-gray-700 mt-0.5">End: {new Date(prescription.end_date).toLocaleDateString('en-AE', { year: 'numeric', month: 'short', day: 'numeric' })}</p>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div>
-                              <h4 className="text-sm font-bold text-gray-700 mb-4 uppercase tracking-wide">Special Instructions</h4>
-                              <div className="bg-cyan-50 border border-cyan-200 rounded-xl p-4">
-                                <div className="flex items-start space-x-3">
-                                  <AlertCircle className="w-5 h-5 text-cyan-600 mt-0.5 flex-shrink-0" />
-                                  <p className="text-sm text-gray-800 leading-relaxed">{prescription.instructions || 'Follow doctor\'s instructions'}</p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center space-x-3 pt-4 border-t border-gray-100">
-                            <button
-                              onClick={() => handleRefillRequest(prescription.medication_name)}
-                              className="flex-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:shadow-lg text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center space-x-2"
-                            >
-                              <RefreshCw className="w-5 h-5" />
-                              <span>Request Refill</span>
-                            </button>
-                            <button
-                              onClick={() => setActiveTab('pharmacy')}
-                              className="bg-white border-2 border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center space-x-2"
-                            >
-                              <MapPin className="w-5 h-5" />
-                              <span>Find Pharmacy</span>
-                            </button>
+                            ) : null}
+                            <span className="bg-white/20 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-xs font-bold border border-white/30 uppercase">
+                              {formatPrescriptionStatus(prescription.status)}
+                            </span>
                           </div>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
 
-            {pastPrescriptions.length > 0 && (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">Past Prescriptions</h2>
-                  <span className="bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-bold">
-                    {pastPrescriptions.length} Completed
-                  </span>
-                </div>
-
-                <div className="space-y-4">
-                  {pastPrescriptions.map((prescription) => {
-                    const doctor = doctors[prescription.doctor_id];
-
-                    return (
-                      <div key={prescription.id} className="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all duration-200">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center space-x-4">
-                            <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
-                              <Pill className="w-6 h-6 text-gray-600" />
+                      <div className="p-6">
+                        <div className="grid gap-4 md:grid-cols-3 mb-6">
+                          <div className="rounded-xl bg-gray-50 p-4">
+                            <div className="flex items-center gap-2 text-xs font-semibold uppercase text-gray-500">
+                              <Calendar className="h-4 w-4" />
+                              <span>Prescribed</span>
                             </div>
-                            <div>
-                              <h3 className="text-lg font-bold text-gray-900">{prescription.medication_name}</h3>
-                              <p className="text-gray-600 text-sm">Prescribed by {doctor?.name || 'Doctor'}</p>
-                            </div>
+                            <p className="mt-2 font-semibold text-gray-900">{formatDate(prescription.prescribed_at)}</p>
                           </div>
-                          <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold">
-                            {prescription.status.toUpperCase()}
-                          </span>
+                          <div className="rounded-xl bg-gray-50 p-4">
+                            <div className="flex items-center gap-2 text-xs font-semibold uppercase text-gray-500">
+                              <Package className="h-4 w-4" />
+                              <span>Medication items</span>
+                            </div>
+                            <p className="mt-2 font-semibold text-gray-900">{prescription.items.length}</p>
+                          </div>
+                          <div className="rounded-xl bg-gray-50 p-4">
+                            <div className="flex items-center gap-2 text-xs font-semibold uppercase text-gray-500">
+                              <Clock className="h-4 w-4" />
+                              <span>Dispensing status</span>
+                            </div>
+                            <p className="mt-2 font-semibold text-gray-900">
+                              {prescription.items.filter((item) => item.is_dispensed).length}/{prescription.items.length} dispensed
+                            </p>
+                          </div>
                         </div>
 
-                        <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
-                          <div>
-                            <span className="font-semibold text-gray-900">Dosage:</span> {prescription.dosage}
-                          </div>
-                          <div>
-                            <span className="font-semibold text-gray-900">Duration:</span> {prescription.duration}
-                          </div>
-                          <div className="md:col-span-2">
-                            <span className="font-semibold text-gray-900">Period:</span> {new Date(prescription.start_date).toLocaleDateString('en-AE')} - {prescription.end_date ? new Date(prescription.end_date).toLocaleDateString('en-AE') : 'Ongoing'}
-                          </div>
+                        <div className="grid gap-4 md:grid-cols-2">
+                          {prescription.items.map((item) => (
+                            <div key={item.id} className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+                              <div className="flex items-start justify-between gap-3">
+                                <div>
+                                  <h4 className="text-lg font-bold text-gray-900">{item.medication_name}</h4>
+                                  <p className="mt-1 text-sm text-gray-600">
+                                    {[item.dosage, item.frequency, item.duration].filter(Boolean).join(' • ') || 'Dosage details pending'}
+                                  </p>
+                                </div>
+                                <span
+                                  className={`rounded-full px-3 py-1 text-xs font-bold ${
+                                    item.is_dispensed ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                                  }`}
+                                >
+                                  {item.is_dispensed ? 'Dispensed' : 'Pending pickup'}
+                                </span>
+                              </div>
+
+                              {item.instructions ? (
+                                <div className="mt-4 rounded-xl border border-cyan-200 bg-cyan-50 p-4">
+                                  <div className="flex items-start gap-3">
+                                    <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-cyan-600" />
+                                    <p className="text-sm text-gray-800 leading-relaxed">{item.instructions}</p>
+                                  </div>
+                                </div>
+                              ) : null}
+
+                              {item.quantity !== null ? (
+                                <p className="mt-4 text-sm text-gray-600">
+                                  <span className="font-semibold text-gray-900">Quantity:</span> {item.quantity}
+                                </p>
+                              ) : null}
+
+                              <button
+                                type="button"
+                                onClick={() => handleRefillRequest(item.medication_name)}
+                                className="mt-4 inline-flex items-center gap-2 rounded-xl border border-cyan-200 px-4 py-2 text-sm font-semibold text-cyan-700 transition hover:bg-cyan-50"
+                              >
+                                <Bell className="h-4 w-4" />
+                                Mark for refill follow-up
+                              </button>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
-        ) : (
-          <div className="space-y-8">
-            <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
-              <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
-                <div className="flex-1 w-full relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search for medication or pharmacy..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                  />
-                </div>
-                <button className="w-full md:w-auto bg-gradient-to-r from-cyan-600 to-blue-600 hover:shadow-lg text-white px-8 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center space-x-2">
-                  <MapPin className="w-5 h-5" />
-                  <span>Use My Location</span>
-                </button>
-              </div>
-              {selectedMedication && (
-                <div className="mt-4 bg-cyan-50 border border-cyan-200 rounded-xl p-4">
-                  <p className="text-sm text-cyan-900">
-                    <span className="font-semibold">Searching for:</span> {selectedMedication}
-                  </p>
-                </div>
-              )}
+
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Prescription History</h2>
+              <span className="bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-bold">
+                {pastPrescriptions.length} Historical
+              </span>
             </div>
 
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Nearby Pharmacies</h2>
-              <div className="space-y-6">
-                {nearbyPharmacies.map((pharmacy) => (
-                  <div key={pharmacy.id} className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200">
-                    <div className="p-6">
-                      <div className="flex items-start justify-between mb-4 flex-wrap gap-4">
-                        <div className="flex items-start space-x-4">
-                          <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                            <Store className="w-7 h-7 text-white" />
-                          </div>
-                          <div>
-                            <h3 className="text-xl font-bold text-gray-900">{pharmacy.name}</h3>
-                            <p className="text-sm text-gray-600 mt-1">{pharmacy.address}</p>
-                            <div className="flex items-center space-x-4 mt-3">
-                              <div className="flex items-center space-x-1 text-sm text-gray-600">
-                                <MapPin className="w-4 h-4 text-cyan-600" />
-                                <span className="font-medium">{pharmacy.distance}</span>
-                              </div>
-                              <div className="flex items-center space-x-1 text-sm text-gray-600">
-                                <Clock className="w-4 h-4 text-cyan-600" />
-                                <span className="font-medium">{pharmacy.hours}</span>
-                              </div>
-                            </div>
-                          </div>
+            {pastPrescriptions.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
+                Past prescriptions will appear here once a medication plan is completed or cancelled.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {pastPrescriptions.map((prescription) => (
+                  <div key={prescription.id} className="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all duration-200">
+                    <div className="flex items-start justify-between gap-4 flex-wrap">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+                          <Pill className="w-6 h-6 text-gray-600" />
                         </div>
-                        {pharmacy.hasStock ? (
-                          <span className="bg-cyan-100 text-cyan-700 px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
-                            <CheckCircle className="w-3 h-3" />
-                            <span>In Stock</span>
-                          </span>
-                        ) : (
-                          <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
-                            <XCircle className="w-3 h-3" />
-                            <span>Out of Stock</span>
-                          </span>
-                        )}
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900">
+                            {prescription.items[0]?.medication_name ?? 'Medication plan'}
+                            {prescription.items.length > 1 ? ` + ${prescription.items.length - 1} more` : ''}
+                          </h3>
+                          <p className="text-gray-600 text-sm">
+                            Prescribed by {prescription.doctorName}
+                            {prescription.doctorSpecialty ? ` - ${prescription.doctorSpecialty}` : ''}
+                          </p>
+                        </div>
                       </div>
+                      <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold uppercase">
+                        {formatPrescriptionStatus(prescription.status)}
+                      </span>
+                    </div>
 
-                      <div className="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-3 pt-4 border-t border-gray-100">
-                        <a
-                          href={`tel:${pharmacy.phone}`}
-                          className="w-full md:flex-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:shadow-lg text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center space-x-2"
-                        >
-                          <Phone className="w-5 h-5" />
-                          <span>Call Pharmacy</span>
-                        </a>
-                        <button className="w-full md:flex-1 bg-white border-2 border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center space-x-2">
-                          <MapPin className="w-5 h-5" />
-                          <span>Get Directions</span>
-                        </button>
+                    <div className="mt-4 grid gap-4 md:grid-cols-2 text-sm text-gray-600">
+                      <div>
+                        <span className="font-semibold text-gray-900">Prescribed:</span> {formatDate(prescription.prescribed_at)}
                       </div>
+                      <div>
+                        <span className="font-semibold text-gray-900">Medication items:</span> {prescription.items.length}
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {prescription.items.map((item) => (
+                        <span
+                          key={item.id}
+                          className="rounded-full border border-gray-200 px-3 py-1 text-xs font-medium text-gray-600"
+                        >
+                          {item.medication_name}
+                        </span>
+                      ))}
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
+            )}
           </div>
-        )}
+        </div>
+
+        <div className="mt-8 rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-4 text-sm text-cyan-900">
+          This page now reads normalized prescription headers and medication items. Pharmacy directory workflows stay out of scope for MVP.
+        </div>
       </div>
     </div>
   );

@@ -62,6 +62,7 @@ interface AuthContextValue {
   isLoading: boolean;
   signInWithPassword: (input: PasswordSignInInput) => Promise<AuthActionResult>;
   signUpWithPassword: (input: PasswordSignUpInput) => Promise<AuthActionResult>;
+  resendSignupConfirmation: (email: string) => Promise<AuthActionResult>;
   requestOtp: (input: OtpRequestInput) => Promise<AuthActionResult>;
   verifyOtp: (input: VerifyOtpInput) => Promise<AuthActionResult>;
   requestPasswordReset: (email: string) => Promise<AuthActionResult>;
@@ -452,6 +453,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     []
   );
 
+  const resendSignupConfirmation = useCallback(async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: buildAuthRedirectUrl('/auth/onboarding'),
+        },
+      });
+
+      return { error };
+    } catch (error) {
+      return { error: toError(error) };
+    }
+  }, []);
+
   const requestOtp = useCallback(async ({ phone, shouldCreateUser, data }: OtpRequestInput) => {
     try {
       const { error } = await supabase.auth.signInWithOtp({
@@ -546,6 +563,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isLoading,
       signInWithPassword,
       signUpWithPassword,
+      resendSignupConfirmation,
       requestOtp,
       verifyOtp,
       requestPasswordReset,
@@ -561,6 +579,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       refreshProfile,
       requestOtp,
       requestPasswordReset,
+      resendSignupConfirmation,
       role,
       session,
       signInWithPassword,

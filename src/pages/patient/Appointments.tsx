@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { AlertCircle, Calendar, Clock, MapPin, Plus, User } from 'lucide-react';
+import { AlertCircle, Calendar, ClipboardList, Clock, MapPin, Plus, User } from 'lucide-react';
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
 import { Skeleton } from '../../components/Skeleton';
-import { useAppointments, useQuery } from '../../hooks';
+import { useAppointments, usePatientPreVisitAssessments, useQuery } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
+import { formatPreVisitStatus } from '../../lib/pre-visit';
 import { supabase } from '../../lib/supabase';
 
 interface DoctorAppointmentProfile {
@@ -31,6 +32,11 @@ export const PatientAppointments: React.FC = () => {
   const appointments = useMemo(() => appointmentsData ?? [], [appointmentsData]);
   const [busyAppointmentId, setBusyAppointmentId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const { data: preVisitAssessmentsData } = usePatientPreVisitAssessments(user?.id);
+  const preVisitAssessments = useMemo(
+    () => preVisitAssessmentsData ?? [],
+    [preVisitAssessmentsData]
+  );
 
   const doctorIds = useMemo(
     () => Array.from(new Set(appointments.map((appointment) => appointment.doctor_id))),
@@ -80,6 +86,10 @@ export const PatientAppointments: React.FC = () => {
   const doctorProfileById = useMemo(
     () => new Map(doctorProfiles.map((doctorProfile) => [doctorProfile.userId, doctorProfile])),
     [doctorProfiles]
+  );
+  const preVisitAssessmentByAppointmentId = useMemo(
+    () => new Map(preVisitAssessments.map((assessment) => [assessment.appointmentId, assessment])),
+    [preVisitAssessments]
   );
 
   const upcomingAppointments = useMemo(
@@ -137,6 +147,7 @@ export const PatientAppointments: React.FC = () => {
       [doctorProfile?.city, doctorProfile?.address].filter(Boolean).join(' • ') ||
       'Clinic details will be confirmed after booking';
     const isUpcoming = upcomingAppointments.some((currentAppointment) => currentAppointment.id === appointment.id);
+    const preVisitAssessment = preVisitAssessmentByAppointmentId.get(appointment.id);
 
     return (
       <div
@@ -213,6 +224,28 @@ export const PatientAppointments: React.FC = () => {
             {appointment.chief_complaint ?? 'Scheduled consultation'}
           </p>
 
+          {preVisitAssessment ? (
+            <div className="mt-4 rounded-2xl border border-cyan-100 bg-cyan-50/70 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <ClipboardList className="h-4 w-4 text-cyan-700" />
+                  <p className="text-sm font-semibold text-cyan-900">
+                    Pre-visit intake: {formatPreVisitStatus(preVisitAssessment.status)}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate(`/patient/pre-visit/${preVisitAssessment.id}`)}
+                  className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-cyan-800 shadow-sm transition hover:shadow"
+                >
+                  {preVisitAssessment.status === 'completed' || preVisitAssessment.status === 'reviewed'
+                    ? 'Review intake'
+                    : 'Continue intake'}
+                </button>
+              </div>
+            </div>
+          ) : null}
+
           {isUpcoming ? (
             <div className="mt-4 flex flex-wrap gap-3">
               <button
@@ -247,6 +280,7 @@ export const PatientAppointments: React.FC = () => {
 
   const showSuccessBanner = searchParams.get('booked') === '1';
   const showRescheduledBanner = searchParams.get('rescheduled') === '1';
+  const showPreVisitCompletedBanner = searchParams.get('previsit') === 'completed';
   const isLoadingPage = loading || doctorProfilesLoading;
 
   return (
@@ -279,6 +313,12 @@ export const PatientAppointments: React.FC = () => {
         {showRescheduledBanner ? (
           <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
             Your appointment has been rescheduled successfully.
+          </div>
+        ) : null}
+
+        {showPreVisitCompletedBanner ? (
+          <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+            Your pre-visit intake has been completed and shared with your doctor.
           </div>
         ) : null}
 

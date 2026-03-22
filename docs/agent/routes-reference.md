@@ -40,14 +40,15 @@
 | Route | Component | Code Status | Key Data |
 |---|---|---|---|
 | `/patient/dashboard` | PatientDashboard | live | appointments, prescriptions, prescription_items, conversations, messages, notifications |
-| `/patient/ai-chat` | PatientAIChat | not-started | ai_chat_sessions, ai_chat_messages |
-| `/patient/appointments` | PatientAppointments | live | Reads canonical `appointments` and doctor profile data from `user_profiles` + `doctor_profiles` |
-| `/patient/appointments/book` | BookAppointment | live | Books against `doctor_availability`, `blocked_slots`, and existing `appointments` |
+| `/patient/ai-chat` | PatientAIChat | live | Reads/stores `ai_chat_sessions` + `ai_chat_messages`, calls the deployed `ai-chat` Edge Function, surfaces ranked history evidence + action metadata, persists chat attachments, supports chat starter actions including resume into incomplete pre-visit intake, and hands symptom-driven recommendations into `/patient/appointments/book`; GPT-backed responses are validated in the current environment and other environments must provide the same secret/config |
+| `/patient/appointments` | PatientAppointments | live | Reads canonical `appointments` and doctor profile data from `user_profiles` + `doctor_profiles`; upcoming cards now surface pre-visit intake status and resume/review actions when an assessment exists |
+| `/patient/appointments/book` | BookAppointment | live | Books against `doctor_availability`, `blocked_slots`, and existing `appointments`; when the doctor has an active pre-visit template, booking now redirects into the linked intake flow |
+| `/patient/pre-visit/:assessmentId` | PatientPreVisitAssessment | live | Appointment-linked structured intake with autofill review, patient completion, and AI-generated doctor summary |
 | `/patient/appointments/:id` | AppointmentDetail | not-started | Single appointment + consultation_notes |
-| `/patient/records` | PatientRecords | ui-only | Static data; needs wiring to medical_conditions, allergies, vaccinations |
+| `/patient/records` | PatientRecords | live | Reads canonical `medical_conditions`, `allergies`, and `vaccinations`; supports patient-side record entry/removal |
 | `/patient/lab-results` | PatientLabResults | not-started | lab_orders + lab_order_items (patient_id = me) |
 | `/patient/lab-results/:id` | LabResultDetail | not-started | Single lab order |
-| `/patient/prescriptions` | PatientPrescriptions | live | Queries Bolt `prescriptions` + `doctors` (needs normalization) |
+| `/patient/prescriptions` | PatientPrescriptions | live | Reads canonical `prescriptions` + `prescription_items` and joins prescribing doctor details from `user_profiles` + `doctor_profiles` |
 | `/patient/messages` | PatientMessages | ui-only | Static conversation list; needs wiring to conversations, messages |
 | `/patient/messages/:id` | ConversationDetail | not-started | Single conversation |
 | `/patient/notifications` | NotificationCenter | not-started | notifications (user_id = me) |
@@ -61,7 +62,7 @@
 | `/doctor/dashboard` | DoctorDashboard | ui-only | All zeros; needs aggregated queries |
 | `/doctor/patients` | DoctorPatients | ui-only | Static list; needs query via appointments join |
 | `/doctor/patients/:id` | PatientDetail | not-started | Patient's full health record |
-| `/doctor/appointments` | DoctorAppointments | ui-only | Static list; needs Supabase query |
+| `/doctor/appointments` | DoctorAppointments | live | Reads canonical `appointments`; surfaces patient-provided reason/notes plus appointment-linked pre-visit intake status and AI summary when available |
 | `/doctor/appointments/:id` | DoctorAppointmentDetail | not-started | Appointment + notes |
 | `/doctor/prescriptions` | DoctorPrescriptions | ui-only | Empty state; needs Supabase query |
 | `/doctor/prescriptions/new` | CreatePrescription | not-started | Creates prescription + items |
@@ -71,7 +72,7 @@
 | `/doctor/messages` | DoctorMessages | ui-only | Empty state; needs wiring |
 | `/doctor/messages/:id` | ConversationDetail | not-started | Single conversation |
 | `/doctor/notifications` | NotificationCenter | not-started | notifications (user_id = me) |
-| `/doctor/profile` | DoctorProfile | live | Queries Bolt `profiles` table (needs migration to `user_profiles` + `doctor_profiles`) |
+| `/doctor/profile` | DoctorProfile | live | Queries `user_profiles` + `doctor_profiles`; also manages doctor pre-visit template authoring with PDF upload, AI draft extraction, question review, and publish |
 
 ## Admin (auth required, role=super_admin)
 

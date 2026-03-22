@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
 import { MessageCircle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../lib/auth-context';
 
 export const ChatbotButton: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { role } = useAuth();
   const [showTooltip, setShowTooltip] = useState(false);
+  const targetRoute = role === 'patient' ? '/patient/ai-chat' : '/ai-chat';
 
-  // Don't show the button if we're already on the AI chat page
-  if (location.pathname === '/ai-chat') {
+  // Don't show the button if we're already on either AI chat page.
+  if (location.pathname === '/ai-chat' || location.pathname === '/patient/ai-chat') {
     return null;
   }
 
   const handleClick = () => {
-    navigate('/ai-chat');
+    navigate(targetRoute);
   };
 
   return (

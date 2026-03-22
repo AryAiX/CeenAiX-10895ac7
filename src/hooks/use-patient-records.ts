@@ -1,0 +1,66 @@
+import { supabase } from '../lib/supabase';
+import type { Allergy, MedicalCondition, Vaccination } from '../types';
+import { useQuery } from './use-query';
+
+export interface PatientRecordsData {
+  conditions: MedicalCondition[];
+  allergies: Allergy[];
+  vaccinations: Vaccination[];
+}
+
+export function usePatientRecords(userId: string | null | undefined) {
+  return useQuery<PatientRecordsData>(async () => {
+    if (!userId) {
+      return {
+        conditions: [],
+        allergies: [],
+        vaccinations: [],
+      };
+    }
+
+    const [
+      { data: conditions, error: conditionsError },
+      { data: allergies, error: allergiesError },
+      { data: vaccinations, error: vaccinationsError },
+    ] = await Promise.all([
+      supabase
+        .from('medical_conditions')
+        .select('*')
+        .eq('patient_id', userId)
+        .eq('is_deleted', false)
+        .order('diagnosed_date', { ascending: false })
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('allergies')
+        .select('*')
+        .eq('patient_id', userId)
+        .eq('is_deleted', false)
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('vaccinations')
+        .select('*')
+        .eq('patient_id', userId)
+        .eq('is_deleted', false)
+        .order('administered_date', { ascending: false })
+        .order('created_at', { ascending: false }),
+    ]);
+
+    if (conditionsError) {
+      throw conditionsError;
+    }
+
+    if (allergiesError) {
+      throw allergiesError;
+    }
+
+    if (vaccinationsError) {
+      throw vaccinationsError;
+    }
+
+    return {
+      conditions: conditions ?? [],
+      allergies: allergies ?? [],
+      vaccinations: vaccinations ?? [],
+    };
+  }, [userId]);
+}

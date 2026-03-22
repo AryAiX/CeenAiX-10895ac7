@@ -10,7 +10,15 @@ type RegistrationRole = 'patient' | 'doctor';
 export const Register = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { isAuthenticated, isLoading, requestOtp, role, signOut, signUpWithPassword } = useAuth();
+  const {
+    isAuthenticated,
+    isLoading,
+    requestOtp,
+    resendSignupConfirmation,
+    role,
+    signOut,
+    signUpWithPassword,
+  } = useAuth();
   const requestedRole = searchParams.get('role');
   const resetRequested = searchParams.get('reset') === '1';
   const safeRequestedRole = requestedRole === 'doctor' || requestedRole === 'patient' ? requestedRole : null;
@@ -27,6 +35,7 @@ export const Register = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResendingConfirmation, setIsResendingConfirmation] = useState(false);
   const [isResettingSession, setIsResettingSession] = useState(false);
 
   const registerPathWithoutReset = useMemo(() => {
@@ -70,6 +79,34 @@ export const Register = () => {
   const resetFeedback = () => {
     setErrorMessage(null);
     setSuccessMessage(null);
+  };
+
+  const normalizedEmail = email.trim();
+  const hasExistingUserError =
+    errorMessage?.trim().toLowerCase().includes('already registered') ?? false;
+
+  const handleResendConfirmation = async () => {
+    if (!normalizedEmail) {
+      setErrorMessage('Enter your email address first so we know where to resend the confirmation link.');
+      return;
+    }
+
+    setIsResendingConfirmation(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    const { error } = await resendSignupConfirmation(normalizedEmail);
+
+    if (error) {
+      setErrorMessage(error.message);
+      setIsResendingConfirmation(false);
+      return;
+    }
+
+    setSuccessMessage(
+      'We sent a fresh confirmation email. Check your inbox and spam folder, then open the link to continue.'
+    );
+    setIsResendingConfirmation(false);
   };
 
   const nextStep = () => {
@@ -128,7 +165,7 @@ export const Register = () => {
 
     if (mode === 'email-password') {
       const { error } = await signUpWithPassword({
-        email: email.trim(),
+        email: normalizedEmail,
         password,
         phone: phone.trim() || undefined,
         role: selectedRole,
@@ -137,13 +174,19 @@ export const Register = () => {
       });
 
       if (error) {
-        setErrorMessage(error.message);
+        if (error.message.trim().toLowerCase().includes('already registered')) {
+          setErrorMessage(
+            'This email is already registered. If you did not receive the confirmation email yet, resend it below. Otherwise sign in or reset your password.'
+          );
+        } else {
+          setErrorMessage(error.message);
+        }
         setIsSubmitting(false);
         return;
       }
 
       setSuccessMessage(
-        'Account created. Check your email to confirm your account, then continue to onboarding.'
+        'Account created. Check your email to confirm your account, then continue to onboarding. If you do not see it soon, use the resend button below.'
       );
       setIsSubmitting(false);
       return;
@@ -231,6 +274,26 @@ export const Register = () => {
       {successMessage ? (
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
           {successMessage}
+        </div>
+      ) : null}
+
+      {(successMessage || hasExistingUserError) && mode === 'email-password' ? (
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-ceenai-cyan/20 bg-ceenai-cyan/10 px-4 py-3 text-sm text-ceenai-blue">
+          <span>Need another confirmation email?</span>
+          <button
+            type="button"
+            onClick={() => void handleResendConfirmation()}
+            disabled={isSubmitting || isResendingConfirmation || !normalizedEmail}
+            className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-ceenai-blue shadow-sm transition hover:shadow disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isResendingConfirmation ? 'Sending...' : 'Resend confirmation email'}
+          </button>
+          <Link
+            to="/auth/login"
+            className="font-semibold underline underline-offset-2"
+          >
+            Sign in instead
+          </Link>
         </div>
       ) : null}
 

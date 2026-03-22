@@ -73,7 +73,7 @@ export const PatientDashboard: React.FC = () => {
       { icon: MessageSquare, label: 'Messages', action: () => navigate('/patient/messages') },
       { icon: FileText, label: 'Records', action: () => navigate('/patient/records') },
       { icon: Users, label: 'Profile', action: () => navigate('/patient/profile') },
-      { icon: Bot, label: 'AI Health Chat', action: () => navigate('/ai-chat') },
+      { icon: Bot, label: 'AI Health Chat', action: () => navigate('/patient/ai-chat') },
     ],
     [navigate]
   );

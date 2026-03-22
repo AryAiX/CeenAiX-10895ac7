@@ -12,7 +12,8 @@
 - **Output**: Streaming response via SSE
 - **Storage**: `ai_chat_sessions` + `ai_chat_messages`
 - **Guest behavior**: Session-scoped, no persistent history, prompts registration on booking
-- **Patient behavior**: Full conversation history, patient records injected as context (conditions, allergies, medications)
+- **Patient behavior**: Full conversation history, patient records injected as context (conditions, allergies, medications), plus reusable patient-memory facts derived from confirmed forms and lower-trust prior chat disclosures
+- **Canonical record review**: Authenticated chat now stages patient-provided canonical updates (for example address, phone, conditions, allergies, or medications) into a pending review queue before anything updates the reusable record layer
 
 ### 2. Document & Photo Analysis
 
@@ -44,6 +45,8 @@
 - **Who**: Patient (before appointment)
 - **Behavior**: AI conducts structured questionnaire based on appointment specialty and chief complaint
 - **Output**: Structured summary stored in `ai_chat_messages`; shared with doctor via appointment record
+- **Memory reuse**: Repeated non-canonical questions can map to stable `memory_key` values so future forms and authenticated chat can reuse patient-confirmed answers without writing them directly into canonical medical tables
+- **Canonical confirmation**: If a confirmed form answer differs from editable canonical record fields, the patient sees a review-before-submit step; demographics/profile values update directly after confirmation, clinical lists preserve history, and medication changes go into doctor-reviewable patient-reported medication history
 
 ## Edge Function Patterns
 

@@ -9,6 +9,16 @@ import type {
   NotificationType,
   AiMessageRole,
   AuditAction,
+  PreVisitTemplateStatus,
+  PreVisitQuestionType,
+  PreVisitAssessmentStatus,
+  PatientMemorySourceKind,
+  PatientMemoryValueType,
+  PatientMemoryStatus,
+  PatientCanonicalUpdateSourceKind,
+  PatientCanonicalUpdateStatus,
+  PatientCanonicalUpdateStrategy,
+  PatientReportedMedicationReviewStatus,
 } from './enums';
 
 /** Base fields present on most tables */
@@ -232,6 +242,125 @@ export interface AiChatMessage {
   content: string;
   attachments: unknown[];
   created_at: string;
+}
+
+export interface PreVisitTemplate extends BaseRecord, SoftDeletable {
+  doctor_user_id: string;
+  specialization_id: string | null;
+  title: string;
+  description: string | null;
+  status: PreVisitTemplateStatus;
+  is_active: boolean;
+  source_bucket: string | null;
+  source_path: string | null;
+  source_file_name: string | null;
+  extraction_metadata: Record<string, unknown>;
+  published_at: string | null;
+}
+
+export interface PreVisitTemplateQuestion extends BaseRecord {
+  template_id: string;
+  question_key: string;
+  label: string;
+  help_text: string | null;
+  question_type: PreVisitQuestionType;
+  display_order: number;
+  is_required: boolean;
+  options: unknown[];
+  autofill_source: string | null;
+  memory_key: string | null;
+  ai_instructions: string | null;
+}
+
+export interface AppointmentPreVisitAssessment extends BaseRecord {
+  appointment_id: string;
+  patient_id: string;
+  doctor_id: string;
+  template_id: string | null;
+  template_title: string;
+  template_snapshot: Record<string, unknown>;
+  status: PreVisitAssessmentStatus;
+  due_at: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+  reviewed_at: string | null;
+  last_answered_at: string | null;
+}
+
+export interface AppointmentPreVisitAnswer extends BaseRecord {
+  assessment_id: string;
+  question_key: string;
+  question_label: string;
+  question_type: PreVisitQuestionType;
+  answer_text: string | null;
+  answer_json: unknown;
+  autofill_value: unknown;
+  autofill_source: string | null;
+  autofilled: boolean;
+  confirmed_by_patient: boolean;
+  answered_at: string | null;
+}
+
+export interface AppointmentPreVisitSummary {
+  id: string;
+  assessment_id: string;
+  appointment_id: string;
+  patient_id: string;
+  doctor_id: string;
+  summary_text: string;
+  key_points: unknown[];
+  risk_flags: unknown[];
+  pending_questions: unknown[];
+  generated_by: string;
+  generated_at: string;
+  updated_at: string;
+}
+
+export interface PatientMemoryFact extends BaseRecord {
+  patient_id: string;
+  source_kind: PatientMemorySourceKind;
+  source_record_id: string;
+  memory_key: string;
+  label: string;
+  value_type: PatientMemoryValueType;
+  value_text: string | null;
+  value_json: unknown;
+  status: PatientMemoryStatus;
+  confidence: number;
+  usable_in_chat: boolean;
+  usable_in_forms: boolean;
+  confirmed_at: string | null;
+  last_used_at: string | null;
+  metadata: Record<string, unknown>;
+}
+
+export interface PatientCanonicalUpdateRequest extends BaseRecord {
+  patient_id: string;
+  source_kind: PatientCanonicalUpdateSourceKind;
+  source_record_id: string;
+  target_field: string;
+  display_label: string;
+  apply_strategy: PatientCanonicalUpdateStrategy;
+  current_value: unknown;
+  proposed_value: unknown;
+  status: PatientCanonicalUpdateStatus;
+  requires_doctor_review: boolean;
+  metadata: Record<string, unknown>;
+  confirmed_at: string | null;
+  applied_at: string | null;
+  dismissed_at: string | null;
+}
+
+export interface PatientReportedMedication extends BaseRecord, SoftDeletable {
+  patient_id: string;
+  source_update_request_id: string | null;
+  medication_name: string;
+  dosage: string | null;
+  frequency: string | null;
+  duration: string | null;
+  instructions: string | null;
+  review_status: PatientReportedMedicationReviewStatus;
+  is_current: boolean;
 }
 
 // ---------------------------------------------------------------------------
