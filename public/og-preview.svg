@@ -1,0 +1,47 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="120" y1="70" x2="1070" y2="580" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#08111F"/>
+      <stop offset="0.55" stop-color="#0F2342"/>
+      <stop offset="1" stop-color="#0E7490"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="278" y1="184" x2="903" y2="437" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+    <filter id="blur" x="-100" y="-100" width="1400" height="830" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="60"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <g filter="url(#blur)" opacity="0.55">
+    <circle cx="190" cy="112" r="130" fill="#22D3EE"/>
+    <circle cx="1010" cy="560" r="190" fill="#2563EB"/>
+    <circle cx="930" cy="136" r="112" fill="#38BDF8"/>
+  </g>
+
+  <rect x="54" y="54" width="1092" height="522" rx="36" fill="white" fill-opacity="0.06" stroke="white" stroke-opacity="0.16" stroke-width="2"/>
+
+  <g>
+    <rect x="98" y="104" width="70" height="70" rx="20" fill="url(#accent)"/>
+    <path d="M133 122C121.402 122 112 131.402 112 143V147.5C112 153.299 116.701 158 122.5 158H126V178H140V158H143.5C149.299 158 154 153.299 154 147.5V143C154 131.402 144.598 122 133 122ZM126 145.5C123.791 145.5 122 143.709 122 141.5C122 139.291 123.791 137.5 126 137.5C128.209 137.5 130 139.291 130 141.5C130 143.709 128.209 145.5 126 145.5ZM140 145.5C137.791 145.5 136 143.709 136 141.5C136 139.291 137.791 137.5 140 137.5C142.209 137.5 144 139.291 144 141.5C144 143.709 142.209 145.5 140 145.5Z" fill="white"/>
+  </g>
+
+  <text x="188" y="152" fill="white" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700">CeenAiX</text>
+  <text x="100" y="286" fill="white" font-family="Arial, Helvetica, sans-serif" font-size="88" font-weight="700">Healthcare Platform</text>
+  <text x="100" y="354" fill="#C7D2FE" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="500">
+    AI-native care journeys for patients and doctors in one connected experience.
+  </text>
+
+  <g>
+    <rect x="100" y="426" width="250" height="62" rx="31" fill="white" fill-opacity="0.1" stroke="white" stroke-opacity="0.18"/>
+    <text x="142" y="467" fill="white" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="600">AI Health Chat</text>
+    <rect x="370" y="426" width="272" height="62" rx="31" fill="white" fill-opacity="0.1" stroke="white" stroke-opacity="0.18"/>
+    <text x="412" y="467" fill="white" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="600">Doctor Booking</text>
+    <rect x="662" y="426" width="314" height="62" rx="31" fill="white" fill-opacity="0.1" stroke="white" stroke-opacity="0.18"/>
+    <text x="704" y="467" fill="white" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="600">Pre-Visit Intake</text>
+  </g>
+
+  <text x="100" y="540" fill="#A5F3FC" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="600">www.ceenaix.com</text>
+</svg>
