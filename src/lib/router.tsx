@@ -21,6 +21,8 @@ import { PatientAppointments } from '../pages/patient/Appointments';
 import { BookAppointment } from '../pages/patient/BookAppointment';
 import { PatientPrescriptions } from '../pages/patient/Prescriptions';
 import { PatientRecords } from '../pages/patient/Records';
+import { PatientAIChat } from '../pages/patient/AIChat';
+import { PatientPreVisitAssessment } from '../pages/patient/PreVisitAssessment';
 import { PatientMessages } from '../pages/patient/Messages';
 import { Profile as PatientProfile } from '../pages/patient/Profile';
 import { DoctorDashboard } from '../pages/doctor/Dashboard';
@@ -123,6 +125,14 @@ export const router = createBrowserRouter([
   {
     path: '/patient/records',
     element: withProtection(<PatientRecords />, ['patient']),
+  },
+  {
+    path: '/patient/ai-chat',
+    element: withProtection(<PatientAIChat />, ['patient']),
+  },
+  {
+    path: '/patient/pre-visit/:assessmentId',
+    element: withProtection(<PatientPreVisitAssessment />, ['patient']),
   },
   {
     path: '/patient/messages',

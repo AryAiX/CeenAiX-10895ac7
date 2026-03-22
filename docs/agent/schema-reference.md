@@ -113,7 +113,67 @@ ai_chat_sessions
 ai_chat_messages
   - id (PK), session_id (FK → ai_chat_sessions)
   - role (enum: user/assistant/system), content (text), attachments (JSONB), created_at
+
+patient_memory_facts
+  - id (PK), patient_id (FK → auth.users)
+  - source_kind (enum: pre_visit_answer/ai_chat_message), source_record_id
+  - memory_key, label, value_type (enum: text/text_list/boolean/number/date/json)
+  - value_text, value_json (JSONB), status (enum: suggested/confirmed), confidence
+  - usable_in_chat, usable_in_forms, confirmed_at, last_used_at, metadata (JSONB)
+
+patient_canonical_update_requests
+  - id (PK), patient_id (FK → auth.users)
+  - source_kind (enum: pre_visit_assessment/ai_chat_message), source_record_id
+  - target_field, display_label, apply_strategy
+  - current_value (JSONB), proposed_value (JSONB)
+  - status (enum: pending/applied/dismissed), requires_doctor_review, metadata (JSONB)
+  - confirmed_at, applied_at, dismissed_at
+
+patient_reported_medications
+  - id (PK), patient_id (FK → auth.users), source_update_request_id (FK → patient_canonical_update_requests, nullable)
+  - medication_name, dosage, frequency, duration, instructions
+  - review_status (enum: pending_review/reviewed), is_current, is_deleted, deleted_at
 ```
+
+### Pre-Visit Intake
+
+```
+pre_visit_templates
+  - id (PK), doctor_user_id (FK → auth.users), specialization_id (FK → specializations, nullable)
+  - title, description, status (enum: draft/published/archived), is_active
+  - source_bucket, source_path, source_file_name, extraction_metadata (JSONB)
+  - published_at
+
+pre_visit_template_questions
+  - id (PK), template_id (FK → pre_visit_templates)
+  - question_key, label, help_text, question_type (enum: short_text/long_text/single_select/multi_select/boolean/number/date)
+  - display_order, is_required, options (JSONB), autofill_source, memory_key, ai_instructions
+
+appointment_pre_visit_assessments
+  - id (PK), appointment_id (FK → appointments, unique), patient_id (FK → auth.users), doctor_id (FK → auth.users)
+  - template_id (FK → pre_visit_templates, nullable), template_title, template_snapshot (JSONB)
+  - status (enum: not_started/in_progress/completed/reviewed)
+  - due_at, started_at, completed_at, reviewed_at, last_answered_at
+
+appointment_pre_visit_answers
+  - id (PK), assessment_id (FK → appointment_pre_visit_assessments)
+  - question_key, question_label, question_type
+  - answer_text, answer_json (JSONB), autofill_value (JSONB), autofill_source
+  - autofilled, confirmed_by_patient, answered_at
+
+appointment_pre_visit_summaries
+  - id (PK), assessment_id (FK → appointment_pre_visit_assessments, unique)
+  - appointment_id (FK → appointments), patient_id (FK → auth.users), doctor_id (FK → auth.users)
+  - summary_text, key_points (JSONB), risk_flags (JSONB), pending_questions (JSONB)
+  - generated_by, generated_at
+```
+
+## Canonical Record Update Notes
+
+- Canonical demographic/profile updates are staged in `patient_canonical_update_requests` first, then applied only after patient confirmation.
+- `medical_conditions` and `allergies` keep historical visibility by soft-deleting superseded current rows rather than hard deleting them.
+- Medication changes from patient forms/chat do **not** overwrite doctor-issued `prescriptions`; they create/update `patient_reported_medications` for doctor review and future patient autofill/chat context.
+- Doctors can read `patient_canonical_update_requests` and `patient_reported_medications` through the same appointment-linked RLS pattern used by other patient data.
 
 ### Content
 

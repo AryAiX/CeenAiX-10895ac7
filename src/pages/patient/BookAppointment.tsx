@@ -16,7 +16,7 @@ import { Skeleton } from '../../components/Skeleton';
 import { SpecializationMultiSelect } from '../../components/SpecializationMultiSelect';
 import { useBookableDoctors, useDoctorBookingAvailability, useQuery, useSpecializations } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
-import { generateAvailableTimeSlots } from '../../lib/appointment-booking';
+import { generateAvailableTimeSlots, type AvailableTimeSlot } from '../../lib/appointment-booking';
 import { supabase } from '../../lib/supabase';
 
 const getMonthDays = (date: Date) => {
@@ -88,6 +88,7 @@ export const BookAppointment: React.FC = () => {
   const [feedback, setFeedback] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [didInitializeReschedule, setDidInitializeReschedule] = useState(false);
+  const [didInitializeAiPrefill, setDidInitializeAiPrefill] = useState(false);
 
   const {
     data: rescheduleAppointment,
@@ -131,8 +132,51 @@ export const BookAppointment: React.FC = () => {
       return;
     }
 
+    if (searchTerm.trim().length > 0 || selectedSpecializationIds.length > 0) {
+      return;
+    }
+
     setSelectedDoctorId(doctors[0]?.userId ?? null);
-  }, [doctors, isRescheduling, searchParams, selectedDoctorId]);
+  }, [doctors, isRescheduling, searchParams, searchTerm, selectedDoctorId, selectedSpecializationIds]);
+
+  useEffect(() => {
+    if (isRescheduling || didInitializeAiPrefill) {
+      return;
+    }
+
+    const requestedSpecializationId = searchParams.get('specialization');
+    const requestedReason = searchParams.get('reason');
+    const requestedNotes = searchParams.get('notes');
+
+    if (requestedSpecializationId && specializationsLoading) {
+      return;
+    }
+
+    if (
+      requestedSpecializationId &&
+      specializationOptions.some((specialization) => specialization.id === requestedSpecializationId)
+    ) {
+      setSelectedSpecializationIds([requestedSpecializationId]);
+    }
+
+    if (requestedReason && !chiefComplaint.trim()) {
+      setChiefComplaint(requestedReason);
+    }
+
+    if (requestedNotes && !notes.trim()) {
+      setNotes(requestedNotes);
+    }
+
+    setDidInitializeAiPrefill(true);
+  }, [
+    chiefComplaint,
+    didInitializeAiPrefill,
+    isRescheduling,
+    notes,
+    searchParams,
+    specializationsLoading,
+    specializationOptions,
+  ]);
 
   useEffect(() => {
     if (!isRescheduling || !rescheduleAppointment || didInitializeReschedule) {
@@ -202,7 +246,7 @@ export const BookAppointment: React.FC = () => {
     setSelectedSlotIso(null);
   }, [filteredDoctors, selectedDoctorId]);
 
-  const availableSlotsForSelectedDate = useMemo(() => {
+  const availableSlotsForSelectedDate = useMemo<AvailableTimeSlot[]>(() => {
     if (!selectedDate || !availabilityData) {
       return [];
     }
@@ -276,18 +320,17 @@ export const BookAppointment: React.FC = () => {
     setFeedback(null);
     setIsSubmitting(true);
 
-    const appointmentError = isRescheduling
-      ? (
-          await supabase.rpc('reschedule_patient_appointment', {
-            p_appointment_id: rescheduleAppointment?.id,
-            p_scheduled_at: selectedSlot.iso,
-            p_duration_minutes: selectedSlot.durationMinutes,
-            p_chief_complaint: chiefComplaint.trim(),
-            p_notes: notes.trim(),
-          })
-        ).error
-      : (
-          await supabase.from('appointments').insert({
+    const bookingResult = isRescheduling
+      ? await supabase.rpc('reschedule_patient_appointment', {
+          p_appointment_id: rescheduleAppointment?.id,
+          p_scheduled_at: selectedSlot.iso,
+          p_duration_minutes: selectedSlot.durationMinutes,
+          p_chief_complaint: chiefComplaint.trim(),
+          p_notes: notes.trim(),
+        })
+      : await supabase
+          .from('appointments')
+          .insert({
             patient_id: user.id,
             doctor_id: selectedDoctor.userId,
             facility_id: null,
@@ -298,13 +341,36 @@ export const BookAppointment: React.FC = () => {
             chief_complaint: chiefComplaint.trim(),
             notes: notes.trim() || null,
           })
-        ).error;
+          .select('id')
+          .single();
 
     setIsSubmitting(false);
 
-    if (appointmentError) {
-      setFeedback({ type: 'error', message: appointmentError.message });
+    if (bookingResult.error) {
+      setFeedback({ type: 'error', message: bookingResult.error.message });
       return;
+    }
+
+    const appointmentId = isRescheduling ? rescheduleAppointment?.id ?? null : bookingResult.data?.id ?? null;
+
+    if (appointmentId) {
+      const { data: preVisitAssessment, error: preVisitAssessmentError } = await supabase
+        .from('appointment_pre_visit_assessments')
+        .select('id')
+        .eq('appointment_id', appointmentId)
+        .maybeSingle();
+
+      if (preVisitAssessmentError) {
+        setFeedback({ type: 'error', message: preVisitAssessmentError.message });
+        return;
+      }
+
+      if (preVisitAssessment?.id) {
+        navigate(`/patient/pre-visit/${preVisitAssessment.id}`, {
+          replace: true,
+        });
+        return;
+      }
     }
 
     navigate(`/patient/appointments?${isRescheduling ? 'rescheduled=1' : 'booked=1'}`, {
@@ -388,82 +454,140 @@ export const BookAppointment: React.FC = () => {
                 })}
               </div>
             ) : (
-              <div className="mt-5 grid gap-4 md:grid-cols-2">
-                <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-gray-700">Search</span>
-                  <div className="relative">
-                    <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="text"
-                      value={searchTerm}
-                      onChange={(event) => setSearchTerm(event.target.value)}
-                      placeholder="Name, specialty, or city"
-                      className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-11 pr-4 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
-                    />
-                  </div>
-                </label>
+              <div className="mt-5 grid gap-6 md:grid-cols-[320px_minmax(0,1fr)] md:items-start">
+                <div className="space-y-4">
+                  <label className="block space-y-2">
+                    <span className="text-sm font-semibold text-gray-700">Search</span>
+                    <div className="relative">
+                      <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                      <input
+                        type="text"
+                        value={searchTerm}
+                        onChange={(event) => setSearchTerm(event.target.value)}
+                        placeholder="Name, specialty, or city"
+                        className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-11 pr-4 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
+                      />
+                    </div>
+                  </label>
 
-                <SpecializationMultiSelect
-                  label="Specialty"
-                  options={specializationOptions}
-                  selectedIds={selectedSpecializationIds}
-                  onChange={setSelectedSpecializationIds}
-                  selectionMode="single"
-                  loading={specializationsLoading}
-                  placeholder="Search specialties"
-                  helperText="Leave empty to show all specialties."
-                />
+                  <SpecializationMultiSelect
+                    label="Specialty"
+                    options={specializationOptions}
+                    selectedIds={selectedSpecializationIds}
+                    onChange={setSelectedSpecializationIds}
+                    selectionMode="single"
+                    loading={specializationsLoading}
+                    placeholder="Search specialties"
+                    helperText="Leave empty to show all specialties."
+                  />
+                </div>
+
+                <div className="min-w-0 space-y-3">
+                  <div className="rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+                    Matching doctors
+                  </div>
+                  <div className="space-y-3">
+                    {doctorsLoading || (isRescheduling && rescheduleLoading) ? (
+                      <>
+                        <Skeleton className="h-28 w-full rounded-2xl" />
+                        <Skeleton className="h-28 w-full rounded-2xl" />
+                        <Skeleton className="h-28 w-full rounded-2xl" />
+                      </>
+                    ) : filteredDoctors.length === 0 ? (
+                      <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
+                        <Stethoscope className="mx-auto mb-3 h-8 w-8 text-gray-400" />
+                        <p className="font-semibold text-gray-900">No doctors match your filters</p>
+                        <p className="mt-1 text-sm text-gray-600">
+                          Adjust the search or specialty filter to see available doctors.
+                        </p>
+                      </div>
+                    ) : (
+                      filteredDoctors.map((doctor) => {
+                        const isSelected = doctor.userId === selectedDoctorId;
+                        return (
+                          <button
+                            key={doctor.userId}
+                            type="button"
+                            onClick={() => handleDoctorSelection(doctor.userId)}
+                            className={`w-full rounded-2xl border p-4 text-left transition ${
+                              isSelected
+                                ? 'border-cyan-400 bg-cyan-50 shadow-sm'
+                                : 'border-gray-200 bg-white hover:border-cyan-200 hover:bg-cyan-50/50'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-4">
+                              <div>
+                                <p className="text-lg font-semibold text-gray-900">{doctor.fullName}</p>
+                                <p className="mt-1 text-sm text-cyan-700">
+                                  {doctor.specialty ?? 'General practice'}
+                                </p>
+                                <p className="mt-2 text-sm text-gray-600">
+                                  {[doctor.city, doctor.address].filter(Boolean).join(' • ') || 'Clinic location to be confirmed'}
+                                </p>
+                              </div>
+                              <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm">
+                                {doctor.activeAvailabilityCount} window{doctor.activeAvailabilityCount === 1 ? '' : 's'}
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 
-            <div className="mt-6 space-y-3">
-              {doctorsLoading || (isRescheduling && rescheduleLoading) ? (
-                <>
-                  <Skeleton className="h-28 w-full rounded-2xl" />
-                  <Skeleton className="h-28 w-full rounded-2xl" />
-                  <Skeleton className="h-28 w-full rounded-2xl" />
-                </>
-              ) : filteredDoctors.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-                  <Stethoscope className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                  <p className="font-semibold text-gray-900">No doctors match your filters</p>
-                  <p className="mt-1 text-sm text-gray-600">
-                    Adjust the search or specialty filter to see available doctors.
-                  </p>
-                </div>
-              ) : (
-                filteredDoctors.map((doctor) => {
-                  const isSelected = doctor.userId === selectedDoctorId;
-                  return (
-                    <button
-                      key={doctor.userId}
-                      type="button"
-                      onClick={() => handleDoctorSelection(doctor.userId)}
-                      className={`w-full rounded-2xl border p-4 text-left transition ${
-                        isSelected
-                          ? 'border-cyan-400 bg-cyan-50 shadow-sm'
-                          : 'border-gray-200 bg-white hover:border-cyan-200 hover:bg-cyan-50/50'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <p className="text-lg font-semibold text-gray-900">{doctor.fullName}</p>
-                          <p className="mt-1 text-sm text-cyan-700">
-                            {doctor.specialty ?? 'General practice'}
-                          </p>
-                          <p className="mt-2 text-sm text-gray-600">
-                            {[doctor.city, doctor.address].filter(Boolean).join(' • ') || 'Clinic location to be confirmed'}
-                          </p>
+            {isRescheduling ? (
+              <div className="mt-6 space-y-3">
+                {doctorsLoading || rescheduleLoading ? (
+                  <>
+                    <Skeleton className="h-28 w-full rounded-2xl" />
+                    <Skeleton className="h-28 w-full rounded-2xl" />
+                    <Skeleton className="h-28 w-full rounded-2xl" />
+                  </>
+                ) : filteredDoctors.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
+                    <Stethoscope className="mx-auto mb-3 h-8 w-8 text-gray-400" />
+                    <p className="font-semibold text-gray-900">No doctors match your filters</p>
+                    <p className="mt-1 text-sm text-gray-600">
+                      Adjust the search or specialty filter to see available doctors.
+                    </p>
+                  </div>
+                ) : (
+                  filteredDoctors.map((doctor) => {
+                    const isSelected = doctor.userId === selectedDoctorId;
+                    return (
+                      <button
+                        key={doctor.userId}
+                        type="button"
+                        onClick={() => handleDoctorSelection(doctor.userId)}
+                        className={`w-full rounded-2xl border p-4 text-left transition ${
+                          isSelected
+                            ? 'border-cyan-400 bg-cyan-50 shadow-sm'
+                            : 'border-gray-200 bg-white hover:border-cyan-200 hover:bg-cyan-50/50'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <p className="text-lg font-semibold text-gray-900">{doctor.fullName}</p>
+                            <p className="mt-1 text-sm text-cyan-700">
+                              {doctor.specialty ?? 'General practice'}
+                            </p>
+                            <p className="mt-2 text-sm text-gray-600">
+                              {[doctor.city, doctor.address].filter(Boolean).join(' • ') || 'Clinic location to be confirmed'}
+                            </p>
+                          </div>
+                          <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm">
+                            {doctor.activeAvailabilityCount} window{doctor.activeAvailabilityCount === 1 ? '' : 's'}
+                          </span>
                         </div>
-                        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm">
-                          {doctor.activeAvailabilityCount} window{doctor.activeAvailabilityCount === 1 ? '' : 's'}
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })
-              )}
-            </div>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            ) : null}
           </section>
 
           <section className="rounded-2xl bg-white p-6 shadow-sm">

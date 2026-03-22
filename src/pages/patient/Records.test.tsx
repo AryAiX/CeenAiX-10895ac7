@@ -131,13 +131,15 @@ describe('PatientRecords', () => {
       error: null,
       refetch,
     });
-    fromMock.mockImplementation((table: string) => {
-      if (table === 'medical_conditions') {
-        return insertBuilder;
-      }
+    fromMock.mockImplementation(
+      ((table: string) => {
+        if (table === 'medical_conditions') {
+          return insertBuilder;
+        }
 
-      throw new Error(`Unexpected table ${table}`);
-    });
+        throw new Error(`Unexpected table ${table}`);
+      }) as never
+    );
 
     render(<PatientRecords />);
 

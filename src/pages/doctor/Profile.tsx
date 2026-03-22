@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   User,
   Mail,
@@ -11,18 +11,30 @@ import {
   X,
   Stethoscope,
   FileText,
+  ClipboardList,
+  Loader2,
+  Plus,
+  Sparkles,
+  Trash2,
+  Upload,
 } from 'lucide-react';
 import { Navigation } from '../../components/Navigation';
 import { AccountSecurityPanel } from '../../components/AccountSecurityPanel';
 import { PageHeader } from '../../components/PageHeader';
 import { SpecializationMultiSelect } from '../../components/SpecializationMultiSelect';
-import { useDoctorSpecializationIds, useSpecializations } from '../../hooks';
+import { useDoctorPreVisitTemplates, useDoctorSpecializationIds, useSpecializations } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
+import { extractPreVisitQuestionnaire, uploadPreVisitTemplateSource } from '../../lib/ai';
 import {
   getPrimaryAndSecondarySpecializations,
   getSelectedSpecializations,
   syncDoctorSpecializations,
 } from '../../lib/doctor-specializations';
+import {
+  PRE_VISIT_AUTOFILL_SOURCE_OPTIONS,
+  normalizeTemplateQuestion,
+  type PreVisitTemplateQuestionDraft,
+} from '../../lib/pre-visit';
 import { supabase } from '../../lib/supabase';
 
 interface DoctorProfileFormState {
@@ -35,6 +47,18 @@ interface DoctorProfileFormState {
   selectedSpecializationIds: string[];
   licenseNumber: string;
   bio: string;
+}
+
+interface PreVisitTemplateEditorState {
+  id: string | null;
+  title: string;
+  description: string;
+  specializationId: string | null;
+  sourceBucket: 'documents' | null;
+  sourcePath: string | null;
+  sourceFileName: string | null;
+  extractionNotes: string[];
+  questions: PreVisitTemplateQuestionDraft[];
 }
 
 const splitFullName = (fullName: string) => {
@@ -54,24 +78,72 @@ const splitFullName = (fullName: string) => {
   };
 };
 
+const createEmptyQuestion = (index: number): PreVisitTemplateQuestionDraft =>
+  normalizeTemplateQuestion(
+    {
+      key: `question_${index + 1}`,
+      label: '',
+      helpText: null,
+      type: 'short_text',
+      required: false,
+      options: [],
+      displayOrder: index,
+      autofillSource: null,
+      memoryKey: null,
+      aiInstructions: null,
+    },
+    index
+  );
+
+const createEmptyTemplateDraft = (): PreVisitTemplateEditorState => ({
+  id: null,
+  title: '',
+  description: '',
+  specializationId: null,
+  sourceBucket: null,
+  sourcePath: null,
+  sourceFileName: null,
+  extractionNotes: [],
+  questions: [createEmptyQuestion(0)],
+});
+
 export const DoctorProfile: React.FC = () => {
   const { doctorProfile, isLoading, profile, refreshProfile, user } = useAuth();
   const isPhoneManagedByOtp = Boolean(user?.phone && !user?.email);
+  const templateFileInputRef = useRef<HTMLInputElement | null>(null);
   const {
-    data: specializationOptions = [],
+    data: specializationOptionsData,
     loading: specializationsLoading,
     error: specializationsError,
   } = useSpecializations();
+  const specializationOptions = useMemo(() => specializationOptionsData ?? [], [specializationOptionsData]);
   const {
-    data: doctorSpecializationIds = [],
+    data: doctorSpecializationIdsData,
     loading: doctorSpecializationIdsLoading,
     refetch: refetchDoctorSpecializationIds,
   } = useDoctorSpecializationIds(user?.id);
+  const doctorSpecializationIds = useMemo(
+    () => doctorSpecializationIdsData ?? [],
+    [doctorSpecializationIdsData]
+  );
+  const {
+    data: preVisitTemplatesData,
+    loading: preVisitTemplatesLoading,
+    error: preVisitTemplatesError,
+    refetch: refetchPreVisitTemplates,
+  } = useDoctorPreVisitTemplates(user?.id);
+  const preVisitTemplates = useMemo(() => preVisitTemplatesData ?? [], [preVisitTemplatesData]);
 
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [templateDraft, setTemplateDraft] = useState<PreVisitTemplateEditorState>(createEmptyTemplateDraft);
+  const [templateDirty, setTemplateDirty] = useState(false);
+  const [templateSaving, setTemplateSaving] = useState(false);
+  const [templateExtracting, setTemplateExtracting] = useState(false);
+  const [templateErrorMessage, setTemplateErrorMessage] = useState<string | null>(null);
+  const [templateSuccessMessage, setTemplateSuccessMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState<DoctorProfileFormState>({
     fullName: '',
     email: '',
@@ -91,6 +163,12 @@ export const DoctorProfile: React.FC = () => {
     selectedSpecializations.length > 0
       ? selectedSpecializations.map((specialization) => specialization.name).join(', ')
       : 'Add your specialization to complete your clinician profile';
+  const specializationNameById = useMemo(
+    () => new Map(specializationOptions.map((specialization) => [specialization.id, specialization.name])),
+    [specializationOptions]
+  );
+  const activePreVisitTemplate =
+    preVisitTemplates.find((template) => template.isActive) ?? preVisitTemplates[0] ?? null;
 
   useEffect(() => {
     if (isEditing) {
@@ -109,6 +187,180 @@ export const DoctorProfile: React.FC = () => {
       bio: doctorProfile?.bio ?? '',
     });
   }, [doctorProfile, doctorSpecializationIds, isEditing, profile, specializationOptions, user]);
+
+  useEffect(() => {
+    if (templateDirty) {
+      return;
+    }
+
+    if (activePreVisitTemplate) {
+      setTemplateDraft({
+        id: activePreVisitTemplate.id,
+        title: activePreVisitTemplate.title,
+        description: activePreVisitTemplate.description ?? '',
+        specializationId:
+          activePreVisitTemplate.specializationId ?? formData.selectedSpecializationIds[0] ?? null,
+        sourceBucket: activePreVisitTemplate.sourceBucket,
+        sourcePath: activePreVisitTemplate.sourcePath,
+        sourceFileName: activePreVisitTemplate.sourceFileName,
+        extractionNotes:
+          Array.isArray(activePreVisitTemplate.extractionMetadata.extractionNotes)
+            ? (activePreVisitTemplate.extractionMetadata.extractionNotes as string[])
+            : [],
+        questions:
+          activePreVisitTemplate.questions.length > 0
+            ? activePreVisitTemplate.questions
+            : [createEmptyQuestion(0)],
+      });
+      return;
+    }
+
+    setTemplateDraft((currentDraft) =>
+      currentDraft.id || currentDraft.title || currentDraft.questions.some((question) => question.label.trim())
+        ? currentDraft
+        : {
+            ...createEmptyTemplateDraft(),
+            specializationId: formData.selectedSpecializationIds[0] ?? null,
+          }
+    );
+  }, [activePreVisitTemplate, formData.selectedSpecializationIds, templateDirty]);
+
+  const updateTemplateDraft = (nextState: Partial<PreVisitTemplateEditorState>) => {
+    setTemplateDraft((currentDraft) => ({ ...currentDraft, ...nextState }));
+    setTemplateDirty(true);
+    setTemplateErrorMessage(null);
+    setTemplateSuccessMessage(null);
+  };
+
+  const handleTemplateQuestionChange = (
+    index: number,
+    nextState: Partial<PreVisitTemplateQuestionDraft>
+  ) => {
+    setTemplateDraft((currentDraft) => {
+      const nextQuestions = [...currentDraft.questions];
+      nextQuestions[index] = normalizeTemplateQuestion(
+        {
+          ...nextQuestions[index],
+          ...nextState,
+        },
+        index
+      );
+
+      return {
+        ...currentDraft,
+        questions: nextQuestions,
+      };
+    });
+    setTemplateDirty(true);
+    setTemplateErrorMessage(null);
+    setTemplateSuccessMessage(null);
+  };
+
+  const handleAddTemplateQuestion = () => {
+    setTemplateDraft((currentDraft) => ({
+      ...currentDraft,
+      questions: [...currentDraft.questions, createEmptyQuestion(currentDraft.questions.length)],
+    }));
+    setTemplateDirty(true);
+    setTemplateErrorMessage(null);
+    setTemplateSuccessMessage(null);
+  };
+
+  const handleRemoveTemplateQuestion = (index: number) => {
+    setTemplateDraft((currentDraft) => {
+      const nextQuestions = currentDraft.questions.filter((_, currentIndex) => currentIndex !== index);
+
+      return {
+        ...currentDraft,
+        questions: nextQuestions.length > 0
+          ? nextQuestions.map((question, currentIndex) =>
+              normalizeTemplateQuestion({ ...question, displayOrder: currentIndex }, currentIndex)
+            )
+          : [createEmptyQuestion(0)],
+      };
+    });
+    setTemplateDirty(true);
+    setTemplateErrorMessage(null);
+    setTemplateSuccessMessage(null);
+  };
+
+  const resetTemplateDraft = () => {
+    setTemplateDirty(false);
+    setTemplateErrorMessage(null);
+    setTemplateSuccessMessage(null);
+
+    if (activePreVisitTemplate) {
+      setTemplateDraft({
+        id: activePreVisitTemplate.id,
+        title: activePreVisitTemplate.title,
+        description: activePreVisitTemplate.description ?? '',
+        specializationId:
+          activePreVisitTemplate.specializationId ?? formData.selectedSpecializationIds[0] ?? null,
+        sourceBucket: activePreVisitTemplate.sourceBucket,
+        sourcePath: activePreVisitTemplate.sourcePath,
+        sourceFileName: activePreVisitTemplate.sourceFileName,
+        extractionNotes:
+          Array.isArray(activePreVisitTemplate.extractionMetadata.extractionNotes)
+            ? (activePreVisitTemplate.extractionMetadata.extractionNotes as string[])
+            : [],
+        questions:
+          activePreVisitTemplate.questions.length > 0
+            ? activePreVisitTemplate.questions
+            : [createEmptyQuestion(0)],
+      });
+      return;
+    }
+
+    setTemplateDraft({
+      ...createEmptyTemplateDraft(),
+      specializationId: formData.selectedSpecializationIds[0] ?? null,
+    });
+  };
+
+  const handleTemplateSourceSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const sourceFile = event.target.files?.[0];
+    event.target.value = '';
+
+    if (!user || !sourceFile) {
+      return;
+    }
+
+    try {
+      setTemplateErrorMessage(null);
+      setTemplateSuccessMessage(null);
+      setTemplateExtracting(true);
+
+      const uploadedFile = await uploadPreVisitTemplateSource(user.id, sourceFile);
+      const extractedDraft = await extractPreVisitQuestionnaire({
+        bucket: 'documents',
+        path: uploadedFile.path,
+        fileName: uploadedFile.fileName,
+      });
+
+      setTemplateDraft({
+        id: null,
+        title: extractedDraft.title,
+        description: extractedDraft.description ?? '',
+        specializationId: templateDraft.specializationId ?? formData.selectedSpecializationIds[0] ?? null,
+        sourceBucket: 'documents',
+        sourcePath: uploadedFile.path,
+        sourceFileName: uploadedFile.fileName,
+        extractionNotes: extractedDraft.extractionNotes,
+        questions:
+          extractedDraft.questions.length > 0
+            ? extractedDraft.questions.map((question, index) => normalizeTemplateQuestion(question, index))
+            : [createEmptyQuestion(0)],
+      });
+      setTemplateDirty(true);
+      setTemplateSuccessMessage('AI converted the PDF into an editable draft. Review it before publishing.');
+    } catch (error) {
+      setTemplateErrorMessage(
+        error instanceof Error ? error.message : 'Unable to extract a questionnaire from this PDF.'
+      );
+    } finally {
+      setTemplateExtracting(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!user) {
@@ -195,6 +447,128 @@ export const DoctorProfile: React.FC = () => {
     setSaving(false);
     setIsEditing(false);
     setSuccessMessage('Doctor profile updated.');
+  };
+
+  const handleSavePreVisitTemplate = async (publish: boolean) => {
+    if (!user) {
+      setTemplateErrorMessage('You must be signed in to manage pre-visit templates.');
+      return;
+    }
+
+    const normalizedQuestions = templateDraft.questions.map((question, index) =>
+      normalizeTemplateQuestion(question, index)
+    );
+
+    if (!templateDraft.title.trim()) {
+      setTemplateErrorMessage('Add a template title before saving.');
+      return;
+    }
+
+    if (normalizedQuestions.length === 0 || normalizedQuestions.every((question) => !question.label.trim())) {
+      setTemplateErrorMessage('Add at least one questionnaire item before saving.');
+      return;
+    }
+
+    setTemplateSaving(true);
+    setTemplateErrorMessage(null);
+    setTemplateSuccessMessage(null);
+
+    try {
+      if (publish) {
+        const { error: deactivateError } = await supabase
+          .from('pre_visit_templates')
+          .update({ is_active: false })
+          .eq('doctor_user_id', user.id)
+          .eq('is_active', true);
+
+        if (deactivateError) {
+          throw deactivateError;
+        }
+      }
+
+      const templatePayload = {
+        doctor_user_id: user.id,
+        specialization_id: templateDraft.specializationId ?? formData.selectedSpecializationIds[0] ?? null,
+        title: templateDraft.title.trim(),
+        description: templateDraft.description.trim() || null,
+        status: publish ? 'published' : 'draft',
+        is_active: publish,
+        source_bucket: templateDraft.sourceBucket,
+        source_path: templateDraft.sourcePath,
+        source_file_name: templateDraft.sourceFileName,
+        extraction_metadata: {
+          extractionNotes: templateDraft.extractionNotes,
+          lastSavedAt: new Date().toISOString(),
+        },
+        published_at: publish ? new Date().toISOString() : null,
+        is_deleted: false,
+        deleted_at: null,
+      };
+
+      const templateMutation = templateDraft.id
+        ? await supabase
+            .from('pre_visit_templates')
+            .update(templatePayload)
+            .eq('id', templateDraft.id)
+            .eq('doctor_user_id', user.id)
+            .select('id')
+            .single()
+        : await supabase.from('pre_visit_templates').insert(templatePayload).select('id').single();
+
+      if (templateMutation.error) {
+        throw templateMutation.error;
+      }
+
+      const nextTemplateId = templateMutation.data.id;
+
+      const { error: deleteQuestionsError } = await supabase
+        .from('pre_visit_template_questions')
+        .delete()
+        .eq('template_id', nextTemplateId);
+
+      if (deleteQuestionsError) {
+        throw deleteQuestionsError;
+      }
+
+      const { error: insertQuestionsError } = await supabase.from('pre_visit_template_questions').insert(
+        normalizedQuestions.map((question, index) => ({
+          template_id: nextTemplateId,
+          question_key: question.key,
+          label: question.label,
+          help_text: question.helpText,
+          question_type: question.type,
+          display_order: index,
+          is_required: question.required,
+          options: question.options,
+          autofill_source: question.autofillSource,
+          memory_key: question.memoryKey,
+          ai_instructions: question.aiInstructions,
+        }))
+      );
+
+      if (insertQuestionsError) {
+        throw insertQuestionsError;
+      }
+
+      setTemplateDraft((currentDraft) => ({
+        ...currentDraft,
+        id: nextTemplateId,
+        questions: normalizedQuestions,
+      }));
+      setTemplateDirty(false);
+      setTemplateSuccessMessage(
+        publish
+          ? 'Pre-visit template published. New bookings will receive this intake.'
+          : 'Pre-visit draft saved.'
+      );
+      await refetchPreVisitTemplates();
+    } catch (error) {
+      setTemplateErrorMessage(
+        error instanceof Error ? error.message : 'Unable to save the pre-visit template.'
+      );
+    } finally {
+      setTemplateSaving(false);
+    }
   };
 
   const handleCancel = () => {
@@ -504,6 +878,372 @@ export const DoctorProfile: React.FC = () => {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-3xl bg-white shadow-md">
+            <div className="border-b border-gray-100 px-8 py-6">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">Pre-Visit Intake Template</h3>
+                  <p className="mt-1 text-sm text-gray-600">
+                    Upload a doctor questionnaire PDF, let AI convert it into structured questions, then review and publish the intake patients complete after booking.
+                  </p>
+                </div>
+                {activePreVisitTemplate ? (
+                  <div className="rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm text-cyan-900">
+                    Active template:
+                    {' '}
+                    <span className="font-semibold">{activePreVisitTemplate.title}</span>
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-gray-300 px-4 py-3 text-sm text-gray-600">
+                    No published template yet
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-6 px-8 py-6">
+              {templateErrorMessage ? (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {templateErrorMessage}
+                </div>
+              ) : null}
+
+              {templateSuccessMessage ? (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                  {templateSuccessMessage}
+                </div>
+              ) : null}
+
+              {preVisitTemplatesError ? (
+                <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                  {preVisitTemplatesError}
+                </div>
+              ) : null}
+
+              <input
+                ref={templateFileInputRef}
+                type="file"
+                accept="application/pdf"
+                className="hidden"
+                onChange={handleTemplateSourceSelected}
+              />
+
+              <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+                <div className="rounded-2xl border border-gray-200 p-5">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => templateFileInputRef.current?.click()}
+                      disabled={templateExtracting || templateSaving}
+                      className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {templateExtracting ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Upload className="h-4 w-4" />
+                      )}
+                      Upload PDF and draft
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleAddTemplateQuestion}
+                      disabled={templateExtracting || templateSaving}
+                      className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add question
+                    </button>
+                    <button
+                      type="button"
+                      onClick={resetTemplateDraft}
+                      disabled={templateExtracting || templateSaving}
+                      className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <X className="h-4 w-4" />
+                      Reset
+                    </button>
+                  </div>
+
+                  <div className="mt-5 grid gap-4 md:grid-cols-2">
+                    <label className="block">
+                      <span className="mb-1 block text-sm font-medium text-gray-700">Template title</span>
+                      <input
+                        type="text"
+                        value={templateDraft.title}
+                        onChange={(event) => updateTemplateDraft({ title: event.target.value })}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                        placeholder="Cardiology pre-visit intake"
+                      />
+                    </label>
+
+                    <label className="block">
+                      <span className="mb-1 block text-sm font-medium text-gray-700">Specialization</span>
+                      <select
+                        value={templateDraft.specializationId ?? ''}
+                        onChange={(event) =>
+                          updateTemplateDraft({ specializationId: event.target.value || null })
+                        }
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                      >
+                        <option value="">Use doctor primary specialty</option>
+                        {specializationOptions.map((specialization) => (
+                          <option key={specialization.id} value={specialization.id}>
+                            {specialization.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+
+                  <label className="mt-4 block">
+                    <span className="mb-1 block text-sm font-medium text-gray-700">Description</span>
+                    <textarea
+                      value={templateDraft.description}
+                      onChange={(event) => updateTemplateDraft({ description: event.target.value })}
+                      rows={3}
+                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                      placeholder="Short note shown in the patient pre-visit flow."
+                    />
+                  </label>
+
+                  <div className="mt-6 space-y-4">
+                    {templateDraft.questions.map((question, index) => (
+                      <div key={`${question.key}-${index}`} className="rounded-2xl border border-gray-200 p-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-sm font-semibold text-gray-900">Question {index + 1}</p>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveTemplateQuestion(index)}
+                            className="inline-flex items-center gap-2 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 transition hover:bg-red-50"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Remove
+                          </button>
+                        </div>
+
+                        <div className="mt-4 grid gap-4 md:grid-cols-2">
+                          <label className="block md:col-span-2">
+                            <span className="mb-1 block text-sm font-medium text-gray-700">Prompt</span>
+                            <input
+                              type="text"
+                              value={question.label}
+                              onChange={(event) =>
+                                handleTemplateQuestionChange(index, { label: event.target.value })
+                              }
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                              placeholder="Describe your current symptoms"
+                            />
+                          </label>
+
+                          <label className="block">
+                            <span className="mb-1 block text-sm font-medium text-gray-700">Question type</span>
+                            <select
+                              value={question.type}
+                              onChange={(event) =>
+                                handleTemplateQuestionChange(index, {
+                                  type: event.target.value as PreVisitTemplateQuestionDraft['type'],
+                                })
+                              }
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                            >
+                              <option value="short_text">Short text</option>
+                              <option value="long_text">Long text</option>
+                              <option value="single_select">Single select</option>
+                              <option value="multi_select">Multi select</option>
+                              <option value="boolean">Yes / No</option>
+                              <option value="number">Number</option>
+                              <option value="date">Date</option>
+                            </select>
+                          </label>
+
+                          <label className="block">
+                            <span className="mb-1 block text-sm font-medium text-gray-700">Autofill source</span>
+                            <select
+                              value={question.autofillSource ?? ''}
+                              onChange={(event) =>
+                                handleTemplateQuestionChange(index, {
+                                  autofillSource: event.target.value || null,
+                                })
+                              }
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                            >
+                              <option value="">No autofill</option>
+                              {PRE_VISIT_AUTOFILL_SOURCE_OPTIONS.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+
+                          <label className="block">
+                            <span className="mb-1 block text-sm font-medium text-gray-700">Memory key</span>
+                            <input
+                              type="text"
+                              value={question.memoryKey ?? ''}
+                              onChange={(event) =>
+                                handleTemplateQuestionChange(index, {
+                                  memoryKey: event.target.value || null,
+                                })
+                              }
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                              placeholder="symptom_duration"
+                            />
+                            <p className="mt-1 text-xs text-gray-500">
+                              Use the same key for semantically equivalent questions across templates.
+                            </p>
+                          </label>
+
+                          <label className="block md:col-span-2">
+                            <span className="mb-1 block text-sm font-medium text-gray-700">Help text</span>
+                            <textarea
+                              value={question.helpText ?? ''}
+                              onChange={(event) =>
+                                handleTemplateQuestionChange(index, { helpText: event.target.value })
+                              }
+                              rows={2}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                              placeholder="Explain what the patient should include."
+                            />
+                          </label>
+
+                          {question.type === 'single_select' || question.type === 'multi_select' ? (
+                            <label className="block md:col-span-2">
+                              <span className="mb-1 block text-sm font-medium text-gray-700">
+                                Options
+                              </span>
+                              <textarea
+                                value={question.options.map((option) => option.label).join('\n')}
+                                onChange={(event) =>
+                                  handleTemplateQuestionChange(index, {
+                                    options: event.target.value
+                                      .split('\n')
+                                      .map((option) => option.trim())
+                                      .filter(Boolean)
+                                      .map((option) => ({ label: option, value: option })),
+                                  })
+                                }
+                                rows={3}
+                                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                                placeholder={'Chest pain\nShortness of breath\nPalpitations'}
+                              />
+                            </label>
+                          ) : null}
+
+                          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                            <input
+                              type="checkbox"
+                              checked={question.required}
+                              onChange={(event) =>
+                                handleTemplateQuestionChange(index, { required: event.target.checked })
+                              }
+                              className="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                            />
+                            Required question
+                          </label>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="rounded-2xl border border-gray-200 p-5">
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-2xl bg-cyan-50 p-3 text-cyan-700">
+                        <ClipboardList className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900">Template summary</p>
+                        <p className="text-sm text-gray-600">
+                          Patients will be asked to complete this right after booking.
+                        </p>
+                      </div>
+                    </div>
+
+                    <dl className="mt-5 space-y-3 text-sm">
+                      <div className="flex items-start justify-between gap-3">
+                        <dt className="text-gray-500">Questions</dt>
+                        <dd className="font-medium text-gray-900">{templateDraft.questions.length}</dd>
+                      </div>
+                      <div className="flex items-start justify-between gap-3">
+                        <dt className="text-gray-500">Required</dt>
+                        <dd className="font-medium text-gray-900">
+                          {templateDraft.questions.filter((question) => question.required).length}
+                        </dd>
+                      </div>
+                      <div className="flex items-start justify-between gap-3">
+                        <dt className="text-gray-500">Specialization</dt>
+                        <dd className="text-right font-medium text-gray-900">
+                          {templateDraft.specializationId
+                            ? specializationNameById.get(templateDraft.specializationId) ?? 'Selected'
+                            : 'Doctor primary specialty'}
+                        </dd>
+                      </div>
+                      <div className="flex items-start justify-between gap-3">
+                        <dt className="text-gray-500">Source PDF</dt>
+                        <dd className="text-right font-medium text-gray-900">
+                          {templateDraft.sourceFileName ?? 'Structured draft only'}
+                        </dd>
+                      </div>
+                    </dl>
+
+                    <div className="mt-5 space-y-3">
+                      <button
+                        type="button"
+                        onClick={() => void handleSavePreVisitTemplate(false)}
+                        disabled={templateSaving || templateExtracting}
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {templateSaving ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Save className="h-4 w-4" />
+                        )}
+                        Save draft
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void handleSavePreVisitTemplate(true)}
+                        disabled={templateSaving || templateExtracting}
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {templateSaving ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-4 w-4" />
+                        )}
+                        Publish active template
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-gray-200 p-5">
+                    <h4 className="font-semibold text-gray-900">Extraction notes</h4>
+                    {templateExtracting || preVisitTemplatesLoading ? (
+                      <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Preparing pre-visit template data...
+                      </div>
+                    ) : templateDraft.extractionNotes.length > 0 ? (
+                      <ul className="mt-3 space-y-2 text-sm text-gray-700">
+                        {templateDraft.extractionNotes.map((note) => (
+                          <li key={note} className="rounded-xl bg-gray-50 px-3 py-2">
+                            {note}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="mt-3 text-sm text-gray-600">
+                        Upload a PDF to receive AI extraction notes and a structured draft questionnaire.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

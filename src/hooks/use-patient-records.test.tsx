@@ -87,21 +87,23 @@ describe('usePatientRecords', () => {
       error: null,
     });
 
-    fromMock.mockImplementation((table: string) => {
-      if (table === 'medical_conditions') {
-        return conditionsBuilder;
-      }
+    fromMock.mockImplementation(
+      ((table: string) => {
+        if (table === 'medical_conditions') {
+          return conditionsBuilder;
+        }
 
-      if (table === 'allergies') {
-        return allergiesBuilder;
-      }
+        if (table === 'allergies') {
+          return allergiesBuilder;
+        }
 
-      if (table === 'vaccinations') {
-        return vaccinationsBuilder;
-      }
+        if (table === 'vaccinations') {
+          return vaccinationsBuilder;
+        }
 
-      throw new Error(`Unexpected table ${table}`);
-    });
+        throw new Error(`Unexpected table ${table}`);
+      }) as never
+    );
 
     const { result } = renderHook(() => usePatientRecords('patient-1'));
 

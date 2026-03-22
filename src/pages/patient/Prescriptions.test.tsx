@@ -105,6 +105,7 @@ describe('PatientPrescriptions', () => {
       ],
       loading: false,
       error: null,
+      refetch: vi.fn(),
     });
 
     render(<PatientPrescriptions />);
@@ -167,6 +168,7 @@ describe('PatientPrescriptions', () => {
       ],
       loading: false,
       error: null,
+      refetch: vi.fn(),
     });
 
     render(<PatientPrescriptions />);

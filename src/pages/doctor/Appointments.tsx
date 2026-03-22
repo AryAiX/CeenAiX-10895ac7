@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Calendar, CalendarDays, ChevronLeft, ChevronRight, Clock, List, MapPin, User, Video } from 'lucide-react';
+import { Calendar, CalendarDays, ChevronLeft, ChevronRight, ClipboardList, Clock, List, MapPin, User, Video } from 'lucide-react';
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
 import { Skeleton } from '../../components/Skeleton';
@@ -59,6 +59,7 @@ export const DoctorAppointments: React.FC = () => {
     () => Array.from(new Set((appointments ?? []).map((appointment) => appointment.patient_id))),
     [appointments]
   );
+  const appointmentIds = useMemo(() => appointments.map((appointment) => appointment.id), [appointments]);
 
   const { data: patientProfilesData } = useQuery(
     async () => {
@@ -84,6 +85,49 @@ export const DoctorAppointments: React.FC = () => {
         patientProfiles.map((profile) => [profile.user_id, profile.full_name ?? 'Patient'])
       ),
     [patientProfiles]
+  );
+  const { data: preVisitAssessmentData } = useQuery(
+    async () => {
+      if (appointmentIds.length === 0) {
+        return [];
+      }
+
+      const { data, error: assessmentsError } = await supabase
+        .from('appointment_pre_visit_assessments')
+        .select('id, appointment_id, status')
+        .in('appointment_id', appointmentIds);
+
+      if (assessmentsError) {
+        throw assessmentsError;
+      }
+
+      const assessmentIds = (data ?? []).map((assessment) => assessment.id);
+      const { data: summaries, error: summariesError } = assessmentIds.length
+        ? await supabase
+            .from('appointment_pre_visit_summaries')
+            .select('assessment_id, summary_text, key_points, risk_flags, pending_questions, generated_at')
+            .in('assessment_id', assessmentIds)
+        : { data: [], error: null };
+
+      if (summariesError) {
+        throw summariesError;
+      }
+
+      const summaryByAssessmentId = new Map((summaries ?? []).map((summary) => [summary.assessment_id, summary]));
+
+      return (data ?? []).map((assessment) => ({
+        id: assessment.id,
+        appointmentId: assessment.appointment_id,
+        status: assessment.status,
+        summary: summaryByAssessmentId.get(assessment.id) ?? null,
+      }));
+    },
+    [appointmentIds.join(',')]
+  );
+  const preVisitAssessments = preVisitAssessmentData ?? [];
+  const preVisitAssessmentByAppointmentId = useMemo(
+    () => new Map(preVisitAssessments.map((assessment) => [assessment.appointmentId, assessment])),
+    [preVisitAssessments]
   );
   const appointmentCountByDate = useMemo(
     () =>
@@ -389,6 +433,7 @@ export const DoctorAppointments: React.FC = () => {
                     const canCancel =
                       ['scheduled', 'confirmed'].includes(appointment.status) &&
                       new Date(appointment.scheduled_at).getTime() > Date.now();
+                    const preVisitAssessment = preVisitAssessmentByAppointmentId.get(appointment.id);
 
                     return (
                       <div
@@ -475,6 +520,31 @@ export const DoctorAppointments: React.FC = () => {
                               </p>
                             </div>
                           </div>
+
+                          {preVisitAssessment ? (
+                            <div className="mt-4 rounded-2xl border border-cyan-100 bg-cyan-50/70 p-4">
+                              <div className="flex items-center gap-2">
+                                <ClipboardList className="h-4 w-4 text-cyan-700" />
+                                <p className="text-sm font-semibold text-cyan-900">
+                                  Pre-visit intake {preVisitAssessment.status.replace('_', ' ')}
+                                </p>
+                              </div>
+                              {preVisitAssessment.summary ? (
+                                <>
+                                  <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-cyan-800">
+                                    AI summary
+                                  </p>
+                                  <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-700">
+                                    {preVisitAssessment.summary.summary_text}
+                                  </p>
+                                </>
+                              ) : (
+                                <p className="mt-2 text-sm text-gray-700">
+                                  The patient has not finished the pre-visit intake yet, or the summary is still being prepared.
+                                </p>
+                              )}
+                            </div>
+                          ) : null}
 
                           {canCancel ? (
                             <div className="mt-4 flex flex-wrap gap-3 border-t border-gray-100 pt-4">

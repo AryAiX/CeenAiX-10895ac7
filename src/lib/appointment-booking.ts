@@ -126,5 +126,5 @@ export const generateAvailableTimeSlots = ({
     }
   });
 
-  return Array.from(slotMap.values()).toSorted((left, right) => left.iso.localeCompare(right.iso));
+  return Array.from(slotMap.values()).sort((left, right) => left.iso.localeCompare(right.iso));
 };

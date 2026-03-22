@@ -83,25 +83,27 @@ describe('usePatientPrescriptions', () => {
       error: null,
     });
 
-    fromMock.mockImplementation((table: string) => {
-      if (table === 'prescriptions') {
-        return prescriptionsBuilder;
-      }
+    fromMock.mockImplementation(
+      ((table: string) => {
+        if (table === 'prescriptions') {
+          return prescriptionsBuilder;
+        }
 
-      if (table === 'prescription_items') {
-        return itemsBuilder;
-      }
+        if (table === 'prescription_items') {
+          return itemsBuilder;
+        }
 
-      if (table === 'user_profiles') {
-        return userProfilesBuilder;
-      }
+        if (table === 'user_profiles') {
+          return userProfilesBuilder;
+        }
 
-      if (table === 'doctor_profiles') {
-        return doctorProfilesBuilder;
-      }
+        if (table === 'doctor_profiles') {
+          return doctorProfilesBuilder;
+        }
 
-      throw new Error(`Unexpected table ${table}`);
-    });
+        throw new Error(`Unexpected table ${table}`);
+      }) as never
+    );
 
     const { result } = renderHook(() => usePatientPrescriptions('patient-1'));
 
