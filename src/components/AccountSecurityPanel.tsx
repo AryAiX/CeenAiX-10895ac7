@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import { AlertTriangle, KeyRound, ShieldAlert, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth-context';
 import { supabase } from '../lib/supabase';
+
+const DELETE_TOKEN = 'DELETE';
 
 interface AccountSecurityPanelProps {
   tone?: 'patient' | 'doctor';
 }
 
 export const AccountSecurityPanel = ({ tone = 'patient' }: AccountSecurityPanelProps) => {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const { updatePassword, signOut } = useAuth();
 
@@ -39,12 +43,12 @@ export const AccountSecurityPanel = ({ tone = 'patient' }: AccountSecurityPanelP
     setPasswordMessage(null);
 
     if (password.length < 8) {
-      setPasswordError('Use at least 8 characters for your new password.');
+      setPasswordError(t('accountSecurity.errorPasswordShort'));
       return;
     }
 
     if (password !== confirmPassword) {
-      setPasswordError('The password confirmation does not match.');
+      setPasswordError(t('accountSecurity.errorPasswordMismatch'));
       return;
     }
 
@@ -59,20 +63,18 @@ export const AccountSecurityPanel = ({ tone = 'patient' }: AccountSecurityPanelP
 
     setPassword('');
     setConfirmPassword('');
-    setPasswordMessage('Your password has been updated.');
+    setPasswordMessage(t('accountSecurity.successPasswordUpdated'));
   };
 
   const handleDeleteAccount = async () => {
     setDeleteError(null);
 
-    if (deleteConfirmation !== 'DELETE') {
-      setDeleteError('Type DELETE to confirm account deletion.');
+    if (deleteConfirmation !== DELETE_TOKEN) {
+      setDeleteError(t('accountSecurity.errorTypeDelete'));
       return;
     }
 
-    const shouldDelete = window.confirm(
-      'Delete this account now? This cannot be undone. Accounts with clinical or shared care data cannot self-delete.'
-    );
+    const shouldDelete = window.confirm(t('accountSecurity.confirmDeleteDialog'));
 
     if (!shouldDelete) {
       return;
@@ -94,50 +96,52 @@ export const AccountSecurityPanel = ({ tone = 'patient' }: AccountSecurityPanelP
   return (
     <div className="overflow-hidden rounded-3xl border border-gray-100/50 bg-white shadow-xl">
       <div className={`p-6 ${headerClass}`}>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-4">
           <div className="rounded-xl bg-white/20 p-3 backdrop-blur-sm">
             <ShieldAlert className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h3 className="text-2xl font-bold tracking-tight text-white">Account Security</h3>
-            <p className="mt-1 text-sm text-white/85">
-              Update your password or remove a test account that has no retained care data.
-            </p>
+            <h3 className="text-2xl font-bold tracking-tight text-white">{t('accountSecurity.title')}</h3>
+            <p className="mt-1 text-sm text-white/85">{t('accountSecurity.subtitle')}</p>
           </div>
         </div>
       </div>
 
       <div className="space-y-8 p-8">
         <div className="rounded-2xl border border-gray-200 bg-gray-50 p-6">
-          <div className="mb-5 flex items-center space-x-3">
+          <div className="mb-5 flex items-center gap-3">
             <div className="rounded-xl bg-white p-3 shadow-sm">
               <KeyRound className="h-5 w-5 text-gray-700" />
             </div>
             <div>
-              <h4 className="text-lg font-bold text-gray-900">Change password</h4>
-              <p className="text-sm text-gray-600">Use a new password for future sign-ins.</p>
+              <h4 className="text-lg font-bold text-gray-900">{t('accountSecurity.changePasswordTitle')}</h4>
+              <p className="text-sm text-gray-600">{t('accountSecurity.changePasswordLead')}</p>
             </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700">New password</label>
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
+                {t('accountSecurity.newPassword')}
+              </label>
               <input
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 className={`w-full rounded-xl border-2 border-gray-200 px-4 py-3 transition-all ${focusClass}`}
-                placeholder="Enter a new password"
+                placeholder={t('accountSecurity.newPasswordPlaceholder')}
               />
             </div>
             <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700">Confirm password</label>
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
+                {t('accountSecurity.confirmPassword')}
+              </label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
                 className={`w-full rounded-xl border-2 border-gray-200 px-4 py-3 transition-all ${focusClass}`}
-                placeholder="Confirm the new password"
+                placeholder={t('accountSecurity.confirmPasswordPlaceholder')}
               />
             </div>
           </div>
@@ -159,41 +163,42 @@ export const AccountSecurityPanel = ({ tone = 'patient' }: AccountSecurityPanelP
             disabled={isUpdatingPassword}
             className={`mt-5 inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${primaryButtonClass}`}
           >
-            {isUpdatingPassword ? 'Updating password...' : 'Update password'}
+            {isUpdatingPassword ? t('accountSecurity.updatingPassword') : t('accountSecurity.updatePassword')}
           </button>
         </div>
 
         <div className="rounded-2xl border border-red-200 bg-red-50 p-6">
-          <div className="mb-5 flex items-center space-x-3">
+          <div className="mb-5 flex items-center gap-3">
             <div className="rounded-xl bg-white p-3 shadow-sm">
               <Trash2 className="h-5 w-5 text-red-600" />
             </div>
             <div>
-              <h4 className="text-lg font-bold text-gray-900">Delete account</h4>
-              <p className="text-sm text-gray-600">
-                For safety, self-delete only works for accounts without clinical or shared care data.
-              </p>
+              <h4 className="text-lg font-bold text-gray-900">{t('accountSecurity.deleteTitle')}</h4>
+              <p className="text-sm text-gray-600">{t('accountSecurity.deleteLead')}</p>
             </div>
           </div>
 
           <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            <div className="flex items-start space-x-3">
+            <div className="flex items-start gap-3">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
               <p>
-                Type <span className="font-bold">DELETE</span> to confirm. If you already have appointments,
-                prescriptions, records, or shared care threads, contact support instead of self-deleting.
+                {t('accountSecurity.deleteWarningPrefix')}
+                <span className="font-bold">{DELETE_TOKEN}</span>
+                {t('accountSecurity.deleteWarningSuffix')}
               </p>
             </div>
           </div>
 
           <div className="mt-4">
-            <label className="mb-2 block text-sm font-semibold text-gray-700">Confirmation</label>
+            <label className="mb-2 block text-sm font-semibold text-gray-700">
+              {t('accountSecurity.confirmationLabel')}
+            </label>
             <input
               type="text"
               value={deleteConfirmation}
               onChange={(event) => setDeleteConfirmation(event.target.value)}
               className={`w-full rounded-xl border-2 border-red-200 bg-white px-4 py-3 transition-all ${focusClass}`}
-              placeholder='Type "DELETE" to continue'
+              placeholder={t('accountSecurity.deleteInputPlaceholder')}
             />
           </div>
 
@@ -208,7 +213,7 @@ export const AccountSecurityPanel = ({ tone = 'patient' }: AccountSecurityPanelP
             disabled={isDeletingAccount}
             className="mt-5 inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isDeletingAccount ? 'Deleting account...' : 'Delete account'}
+            {isDeletingAccount ? t('accountSecurity.deletingAccount') : t('accountSecurity.deleteButton')}
           </button>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { ArrowLeft, ArrowRight, CheckCircle2, ShieldCheck, Stethoscope, UserRound } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AuthShell } from '../../components/AuthShell';
 import { useAuth } from '../../lib/auth-context';
 
@@ -8,6 +9,7 @@ type RegistrationMode = 'email-password' | 'phone-otp';
 type RegistrationRole = 'patient' | 'doctor';
 
 export const Register = () => {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const {
@@ -34,6 +36,7 @@ export const Register = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [duplicateEmailConflict, setDuplicateEmailConflict] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResendingConfirmation, setIsResendingConfirmation] = useState(false);
   const [isResettingSession, setIsResettingSession] = useState(false);
@@ -79,15 +82,14 @@ export const Register = () => {
   const resetFeedback = () => {
     setErrorMessage(null);
     setSuccessMessage(null);
+    setDuplicateEmailConflict(false);
   };
 
   const normalizedEmail = email.trim();
-  const hasExistingUserError =
-    errorMessage?.trim().toLowerCase().includes('already registered') ?? false;
 
   const handleResendConfirmation = async () => {
     if (!normalizedEmail) {
-      setErrorMessage('Enter your email address first so we know where to resend the confirmation link.');
+      setErrorMessage(t('auth.register.errors.resendNeedEmail'));
       return;
     }
 
@@ -103,9 +105,7 @@ export const Register = () => {
       return;
     }
 
-    setSuccessMessage(
-      'We sent a fresh confirmation email. Check your inbox and spam folder, then open the link to continue.'
-    );
+    setSuccessMessage(t('auth.register.resendSuccess'));
     setIsResendingConfirmation(false);
   };
 
@@ -113,33 +113,33 @@ export const Register = () => {
     resetFeedback();
 
     if (step === 1 && fullName.trim().length < 3) {
-      setErrorMessage('Please enter the full name that should appear on the account.');
+      setErrorMessage(t('auth.register.errors.fullNameShort'));
       return;
     }
 
     if (step === 2) {
       if (mode === 'email-password') {
         if (!email.trim()) {
-          setErrorMessage('Email is required for email and password registration.');
+          setErrorMessage(t('auth.register.errors.emailRequired'));
           return;
         }
 
         if (password.length < 8) {
-          setErrorMessage('Choose a password with at least 8 characters.');
+          setErrorMessage(t('auth.register.errors.passwordShort'));
           return;
         }
 
         if (password !== confirmPassword) {
-          setErrorMessage('Password confirmation does not match.');
+          setErrorMessage(t('auth.register.errors.passwordMismatch'));
           return;
         }
       } else if (!phone.trim()) {
-        setErrorMessage('Phone number is required for phone OTP registration.');
+        setErrorMessage(t('auth.register.errors.phoneRequired'));
         return;
       }
 
       if (!termsAccepted) {
-        setErrorMessage('You must accept the terms to continue.');
+        setErrorMessage(t('auth.register.errors.termsRequired'));
         return;
       }
     }
@@ -175,9 +175,8 @@ export const Register = () => {
 
       if (error) {
         if (error.message.trim().toLowerCase().includes('already registered')) {
-          setErrorMessage(
-            'This email is already registered. If you did not receive the confirmation email yet, resend it below. Otherwise sign in or reset your password.'
-          );
+          setDuplicateEmailConflict(true);
+          setErrorMessage(t('auth.register.errors.emailAlreadyRegistered'));
         } else {
           setErrorMessage(error.message);
         }
@@ -185,9 +184,7 @@ export const Register = () => {
         return;
       }
 
-      setSuccessMessage(
-        'Account created. Check your email to confirm your account, then continue to onboarding. If you do not see it soon, use the resend button below.'
-      );
+      setSuccessMessage(t('auth.register.successAccountCreated'));
       setIsSubmitting(false);
       return;
     }
@@ -215,21 +212,24 @@ export const Register = () => {
     );
   };
 
-  const stepTitles = ['Choose access method', 'Choose account role', 'Create your credentials'];
+  const stepTitles = useMemo(
+    () => [t('auth.register.step1'), t('auth.register.step2'), t('auth.register.step3')],
+    [t]
+  );
 
   return (
     <AuthShell
-      badge="Secure Registration"
-      title="Create your CeenAiX account"
-      description="Follow the staged sign-up flow for patients and doctors. Choose how you want to authenticate, define your role, and complete the first account setup step."
+      badge={t('auth.register.badge')}
+      title={t('auth.register.title')}
+      description={t('auth.register.description')}
       footer={
-        <div className="flex flex-col gap-3 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between">
-          <span>Already have an account?</span>
+        <div className="flex flex-col gap-3 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between">
+          <span>{t('auth.register.haveAccount')}</span>
           <Link
             to="/auth/login"
             className="font-semibold text-ceenai-blue transition-colors hover:text-ceenai-navy"
           >
-            Sign in instead
+            {t('auth.register.signInInstead')}
           </Link>
         </div>
       }
@@ -245,7 +245,7 @@ export const Register = () => {
               className={`rounded-2xl border px-4 py-3 transition ${
                 completed || active
                   ? 'border-ceenai-cyan bg-ceenai-cyan/10'
-                  : 'border-gray-200 bg-white'
+                  : 'border-slate-200 bg-white'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -253,12 +253,12 @@ export const Register = () => {
                   className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
                     completed || active
                       ? 'bg-gradient-to-r from-ceenai-cyan to-ceenai-blue text-white'
-                      : 'bg-gray-100 text-gray-500'
+                      : 'bg-slate-100 text-slate-500'
                   }`}
                 >
                   {completed ? <CheckCircle2 className="h-4 w-4" /> : index + 1}
                 </div>
-                <span className="text-sm font-semibold text-gray-700">{stepTitle}</span>
+                <span className="text-sm font-semibold text-slate-700">{stepTitle}</span>
               </div>
             </div>
           );
@@ -277,29 +277,29 @@ export const Register = () => {
         </div>
       ) : null}
 
-      {(successMessage || hasExistingUserError) && mode === 'email-password' ? (
+      {(successMessage || duplicateEmailConflict) && mode === 'email-password' ? (
         <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-ceenai-cyan/20 bg-ceenai-cyan/10 px-4 py-3 text-sm text-ceenai-blue">
-          <span>Need another confirmation email?</span>
+          <span>{t('auth.register.resendPrompt')}</span>
           <button
             type="button"
             onClick={() => void handleResendConfirmation()}
             disabled={isSubmitting || isResendingConfirmation || !normalizedEmail}
             className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-ceenai-blue shadow-sm transition hover:shadow disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isResendingConfirmation ? 'Sending...' : 'Resend confirmation email'}
+            {isResendingConfirmation ? t('auth.register.resending') : t('auth.register.resendButton')}
           </button>
           <Link
             to="/auth/login"
             className="font-semibold underline underline-offset-2"
           >
-            Sign in instead
+            {t('auth.register.signInInstead')}
           </Link>
         </div>
       ) : null}
 
       {isResettingSession ? (
         <div className="rounded-2xl border border-ceenai-cyan/20 bg-ceenai-cyan/10 px-4 py-3 text-sm text-ceenai-blue">
-          Resetting the current session so you can start a new registration flow.
+          {t('auth.register.resettingSession')}
         </div>
       ) : null}
 
@@ -319,9 +319,9 @@ export const Register = () => {
               }`}
             >
               <ShieldCheck className="h-6 w-6 text-ceenai-blue" />
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">Email and password</h3>
+              <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.modeEmailTitle')}</h3>
               <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                Create your account with your email address and password.
+                {t('auth.register.modeEmailDesc')}
               </p>
             </button>
 
@@ -338,9 +338,9 @@ export const Register = () => {
               }`}
             >
               <UserRound className="h-6 w-6 text-ceenai-blue" />
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">Phone OTP</h3>
+              <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.modePhoneTitle')}</h3>
               <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                Ideal for mobile-first registration with a one-time verification code.
+                {t('auth.register.modePhoneDesc')}
               </p>
             </button>
           </div>
@@ -359,9 +359,9 @@ export const Register = () => {
                 }`}
               >
                 <UserRound className="h-6 w-6 text-ceenai-blue" />
-                <h3 className="mt-4 text-lg font-semibold text-gray-900">Patient account</h3>
+                <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.rolePatientTitle')}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                  Access appointments, records, prescriptions, and AI-assisted support.
+                  {t('auth.register.rolePatientDesc')}
                 </p>
               </button>
 
@@ -375,21 +375,21 @@ export const Register = () => {
                 }`}
               >
                 <Stethoscope className="h-6 w-6 text-ceenai-blue" />
-                <h3 className="mt-4 text-lg font-semibold text-gray-900">Doctor account</h3>
+                <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.roleDoctorTitle')}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                  Manage patient interactions, appointments, prescriptions, and future schedule flows.
+                  {t('auth.register.roleDoctorDesc')}
                 </p>
               </button>
             </div>
 
             <label className="block space-y-2">
-              <span className="text-sm font-semibold text-gray-700">Full name</span>
+              <span className="text-sm font-semibold text-gray-700">{t('auth.register.fullName')}</span>
               <input
                 type="text"
                 value={fullName}
                 onChange={(event) => setFullName(event.target.value)}
                 className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                placeholder="Enter your full name"
+                placeholder={t('auth.register.fullNamePlaceholder')}
                 autoComplete="name"
                 required
               />
@@ -402,51 +402,51 @@ export const Register = () => {
             {mode === 'email-password' ? (
               <>
                 <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-gray-700">Email address</span>
+                  <span className="text-sm font-semibold text-gray-700">{t('auth.register.email')}</span>
                   <input
                     type="email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                    placeholder="you@example.com"
+                    placeholder={t('auth.register.emailPlaceholder')}
                     autoComplete="email"
                     required
                   />
                 </label>
 
                 <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-gray-700">Mobile number</span>
+                  <span className="text-sm font-semibold text-gray-700">{t('auth.register.mobile')}</span>
                   <input
                     type="tel"
                     value={phone}
                     onChange={(event) => setPhone(event.target.value)}
                     className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                    placeholder="+971 50 123 4567"
+                    placeholder={t('auth.register.mobilePlaceholder')}
                     autoComplete="tel"
                   />
                 </label>
 
                 <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-gray-700">Password</span>
+                  <span className="text-sm font-semibold text-gray-700">{t('auth.register.password')}</span>
                   <input
                     type="password"
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                    placeholder="Minimum 8 characters"
+                    placeholder={t('auth.register.passwordPlaceholder')}
                     autoComplete="new-password"
                     required
                   />
                 </label>
 
                 <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-gray-700">Confirm password</span>
+                  <span className="text-sm font-semibold text-gray-700">{t('auth.register.confirmPassword')}</span>
                   <input
                     type="password"
                     value={confirmPassword}
                     onChange={(event) => setConfirmPassword(event.target.value)}
                     className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                    placeholder="Repeat the password"
+                    placeholder={t('auth.register.confirmPasswordPlaceholder')}
                     autoComplete="new-password"
                     required
                   />
@@ -455,20 +455,20 @@ export const Register = () => {
             ) : (
               <>
                 <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-gray-700">Mobile number</span>
+                  <span className="text-sm font-semibold text-gray-700">{t('auth.register.mobile')}</span>
                   <input
                     type="tel"
                     value={phone}
                     onChange={(event) => setPhone(event.target.value)}
                     className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                    placeholder="+971 50 123 4567"
+                    placeholder={t('auth.register.mobilePlaceholder')}
                     autoComplete="tel"
                     required
                   />
                 </label>
 
                 <div className="rounded-2xl bg-gray-50 px-4 py-3 text-sm text-gray-600">
-                  We&apos;ll create the account and send a verification code to this number in the next step.
+                  {t('auth.register.otpNextHint')}
                 </div>
               </>
             )}
@@ -481,8 +481,7 @@ export const Register = () => {
                 className="mt-1 h-4 w-4 rounded border-gray-300 text-ceenai-blue focus:ring-ceenai-cyan"
               />
               <span className="text-sm leading-relaxed text-gray-600">
-                I agree to the platform terms and understand that healthcare data is handled according
-                to CeenAiX privacy and consent requirements.
+                {t('auth.register.termsLabel')}
               </span>
             </label>
           </div>
@@ -496,7 +495,7 @@ export const Register = () => {
             className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 px-5 py-3 font-semibold text-gray-700 transition hover:border-ceenai-cyan hover:text-ceenai-blue disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Back</span>
+            <span>{t('auth.register.btnBack')}</span>
           </button>
 
           <button
@@ -506,12 +505,12 @@ export const Register = () => {
           >
             <span>
               {step < 2
-                ? 'Continue'
+                ? t('auth.register.btnContinue')
                 : isSubmitting
-                  ? 'Processing...'
+                  ? t('auth.register.btnProcessing')
                   : mode === 'email-password'
-                    ? 'Create account'
-                    : 'Send verification code'}
+                    ? t('auth.register.btnCreateAccount')
+                    : t('auth.register.btnSendCode')}
             </span>
             <ArrowRight className="h-4 w-4" />
           </button>

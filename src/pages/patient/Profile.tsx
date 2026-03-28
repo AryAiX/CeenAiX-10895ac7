@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
 import { FamilyTree } from '../../components/FamilyTree';
@@ -15,6 +16,7 @@ interface FamilyMember {
 }
 
 export const Profile: React.FC = () => {
+  const { t } = useTranslation();
   const [profileImage, setProfileImage] = useState<string>('');
   const [emiratesIdFront, setEmiratesIdFront] = useState<string>('');
   const [emiratesIdBack, setEmiratesIdBack] = useState<string>('');
@@ -69,7 +71,7 @@ export const Profile: React.FC = () => {
   };
 
   const handleScanEmiratesId = () => {
-    alert('Emirates ID scanning will be integrated with the device camera. This feature extracts information automatically from the ID card.');
+    alert(t('patient.profile.scanAlert'));
   };
 
   const addFamilyMember = () => {
@@ -98,8 +100,8 @@ export const Profile: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
       <Navigation role="patient" />
       <PageHeader
-        title="My Profile"
-        subtitle="Manage your personal information and health records"
+        title={t('patient.profile.title')}
+        subtitle={t('patient.profile.subtitle')}
         icon={<User className="w-6 h-6 text-white" />}
         backTo="/patient/dashboard"
       />
@@ -113,7 +115,7 @@ export const Profile: React.FC = () => {
                 <div className="relative inline-block group">
                   <div className="w-36 h-36 rounded-full bg-gradient-to-br from-blue-500 via-blue-400 to-cyan-400 flex items-center justify-center overflow-hidden border-4 border-white shadow-2xl ring-4 ring-blue-50">
                     {profileImage ? (
-                      <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                      <img src={profileImage} alt={t('patient.profile.altProfile')} className="w-full h-full object-cover" />
                     ) : (
                       <User className="w-20 h-20 text-white" />
                     )}
@@ -126,8 +128,14 @@ export const Profile: React.FC = () => {
                   </button>
                   <div className="absolute inset-0 rounded-full bg-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
-                <h2 className="mt-6 text-2xl font-bold text-gray-900 tracking-tight">{personalInfo.fullName || 'Add Your Name'}</h2>
-                <p className="text-gray-500 text-sm mt-2 font-medium">ID: {personalInfo.emiratesId || 'Not Set'}</p>
+                <h2 className="mt-6 text-2xl font-bold text-gray-900 tracking-tight">
+                  {personalInfo.fullName || t('patient.profile.addYourName')}
+                </h2>
+                <p className="text-gray-500 text-sm mt-2 font-medium">
+                  {t('patient.profile.idLine', {
+                    id: personalInfo.emiratesId?.trim() ? personalInfo.emiratesId : t('patient.profile.notSet'),
+                  })}
+                </p>
               </div>
 
               <div className="mt-8 space-y-4">
@@ -137,8 +145,12 @@ export const Profile: React.FC = () => {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <p className="text-xs font-semibold text-red-600 uppercase tracking-wide mb-1">Blood Type</p>
-                      <p className="text-lg font-bold text-gray-900">{personalInfo.bloodType || 'Not Set'}</p>
+                      <p className="text-xs font-semibold text-red-600 uppercase tracking-wide mb-1">
+                        {t('patient.profile.cardBloodType')}
+                      </p>
+                      <p className="text-lg font-bold text-gray-900">
+                        {personalInfo.bloodType || t('patient.profile.notSet')}
+                      </p>
                     </div>
                     {!isEditingPersonal && (
                       <div className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -154,8 +166,12 @@ export const Profile: React.FC = () => {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Date of Birth</p>
-                      <p className="text-lg font-bold text-gray-900">{personalInfo.dateOfBirth || 'Not Set'}</p>
+                      <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">
+                        {t('patient.profile.cardDob')}
+                      </p>
+                      <p className="text-lg font-bold text-gray-900">
+                        {personalInfo.dateOfBirth || t('patient.profile.notSet')}
+                      </p>
                     </div>
                     {!isEditingPersonal && (
                       <div className="text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -171,8 +187,12 @@ export const Profile: React.FC = () => {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <p className="text-xs font-semibold text-orange-600 uppercase tracking-wide mb-1">Emergency Contact</p>
-                      <p className="text-lg font-bold text-gray-900">{personalInfo.emergencyContactName || 'Not Set'}</p>
+                      <p className="text-xs font-semibold text-orange-600 uppercase tracking-wide mb-1">
+                        {t('patient.profile.cardEmergency')}
+                      </p>
+                      <p className="text-lg font-bold text-gray-900">
+                        {personalInfo.emergencyContactName || t('patient.profile.notSet')}
+                      </p>
                       {personalInfo.emergencyContactPhone && (
                         <p className="text-sm text-gray-600 mt-1">{personalInfo.emergencyContactPhone}</p>
                       )}
@@ -196,8 +216,8 @@ export const Profile: React.FC = () => {
                     <User className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white tracking-tight">Personal Information</h3>
-                    <p className="text-blue-100 text-sm mt-1">Your basic details and health information</p>
+                    <h3 className="text-2xl font-bold text-white tracking-tight">{t('patient.profile.personalTitle')}</h3>
+                    <p className="text-blue-100 text-sm mt-1">{t('patient.profile.personalSub')}</p>
                   </div>
                 </div>
                 <button
@@ -205,13 +225,13 @@ export const Profile: React.FC = () => {
                   className="flex items-center space-x-2 px-5 py-2.5 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
                 >
                   {isEditingPersonal ? <Save className="w-5 h-5" /> : <Edit2 className="w-5 h-5" />}
-                  <span>{isEditingPersonal ? 'Save Changes' : 'Edit Profile'}</span>
+                  <span>{isEditingPersonal ? t('patient.profile.saveChanges') : t('patient.profile.editProfile')}</span>
                 </button>
               </div>
               <div className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Full Name</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">{t('patient.profile.fullName')}</label>
                     <div className="relative">
                       <input
                         type="text"
@@ -219,12 +239,12 @@ export const Profile: React.FC = () => {
                         value={personalInfo.fullName}
                         onChange={(e) => setPersonalInfo({ ...personalInfo, fullName: e.target.value })}
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
-                        placeholder="Enter your full name"
+                        placeholder={t('patient.profile.phFullName')}
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Emirates ID</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">{t('patient.profile.emiratesId')}</label>
                     <div className="relative">
                       <input
                         type="text"
@@ -232,12 +252,12 @@ export const Profile: React.FC = () => {
                         value={personalInfo.emiratesId}
                         onChange={(e) => setPersonalInfo({ ...personalInfo, emiratesId: e.target.value })}
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
-                        placeholder="784-XXXX-XXXXXXX-X"
+                        placeholder={t('patient.profile.phEmiratesId')}
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Date of Birth</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">{t('patient.profile.dob')}</label>
                     <div className="relative group">
                       <input
                         type="date"
@@ -257,7 +277,7 @@ export const Profile: React.FC = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Blood Type</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">{t('patient.profile.bloodType')}</label>
                     <div className="relative group">
                       <select
                         disabled={!isEditingPersonal}
@@ -265,7 +285,7 @@ export const Profile: React.FC = () => {
                         onChange={(e) => setPersonalInfo({ ...personalInfo, bloodType: e.target.value })}
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium appearance-none bg-white"
                       >
-                        <option value="">Select Blood Type</option>
+                        <option value="">{t('patient.profile.selectBloodType')}</option>
                         <option value="A+">A+</option>
                         <option value="A-">A-</option>
                         <option value="B+">B+</option>
@@ -286,29 +306,29 @@ export const Profile: React.FC = () => {
                     </div>
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Allergies</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">{t('patient.profile.allergies')}</label>
                     <textarea
                       disabled={!isEditingPersonal}
                       value={personalInfo.allergies}
                       onChange={(e) => setPersonalInfo({ ...personalInfo, allergies: e.target.value })}
                       rows={3}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 resize-none font-medium"
-                      placeholder="List any allergies (e.g., Penicillin, Peanuts, Latex)"
+                      placeholder={t('patient.profile.phAllergies')}
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Chronic Conditions</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">{t('patient.profile.chronicConditions')}</label>
                     <textarea
                       disabled={!isEditingPersonal}
                       value={personalInfo.chronicConditions}
                       onChange={(e) => setPersonalInfo({ ...personalInfo, chronicConditions: e.target.value })}
                       rows={3}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 resize-none font-medium"
-                      placeholder="List any chronic conditions (e.g., Diabetes, Hypertension, Asthma)"
+                      placeholder={t('patient.profile.phChronic')}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Emergency Contact Name</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">{t('patient.profile.emergencyName')}</label>
                     <div className="relative group">
                       <input
                         type="text"
@@ -316,7 +336,7 @@ export const Profile: React.FC = () => {
                         value={personalInfo.emergencyContactName}
                         onChange={(e) => setPersonalInfo({ ...personalInfo, emergencyContactName: e.target.value })}
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
-                        placeholder="Contact person name"
+                        placeholder={t('patient.profile.phEmergencyName')}
                       />
                       {!isEditingPersonal && (
                         <button
@@ -329,7 +349,7 @@ export const Profile: React.FC = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Emergency Contact Phone</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">{t('patient.profile.emergencyPhone')}</label>
                     <div className="relative group">
                       <input
                         type="tel"
@@ -337,7 +357,7 @@ export const Profile: React.FC = () => {
                         value={personalInfo.emergencyContactPhone}
                         onChange={(e) => setPersonalInfo({ ...personalInfo, emergencyContactPhone: e.target.value })}
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
-                        placeholder="+971 XX XXX XXXX"
+                        placeholder={t('patient.profile.phEmergencyPhone')}
                       />
                       {!isEditingPersonal && (
                         <button
@@ -360,8 +380,8 @@ export const Profile: React.FC = () => {
                     <Camera className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white tracking-tight">Emirates ID Documents</h3>
-                    <p className="text-emerald-100 text-sm mt-1">Upload or scan your Emirates ID card</p>
+                    <h3 className="text-2xl font-bold text-white tracking-tight">{t('patient.profile.emiratesTitle')}</h3>
+                    <p className="text-emerald-100 text-sm mt-1">{t('patient.profile.emiratesSub')}</p>
                   </div>
                 </div>
                 <button
@@ -369,48 +389,48 @@ export const Profile: React.FC = () => {
                   className="flex items-center space-x-2 px-5 py-2.5 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
                 >
                   <Camera className="w-5 h-5" />
-                  <span>Scan ID</span>
+                  <span>{t('patient.profile.scanId')}</span>
                 </button>
               </div>
               <div className="p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">Front Side</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">{t('patient.profile.frontSide')}</label>
                     <div
                       onClick={() => handleImageUpload('emiratesFront')}
                       className="group relative border-2 border-dashed border-gray-300 rounded-2xl p-10 text-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/50 transition-all duration-300"
                     >
                       {emiratesIdFront ? (
-                        <img src={emiratesIdFront} alt="Emirates ID Front" className="max-h-48 mx-auto rounded-xl shadow-lg" />
+                        <img src={emiratesIdFront} alt={t('patient.profile.altEmiratesFront')} className="max-h-48 mx-auto rounded-xl shadow-lg" />
                       ) : (
                         <div className="space-y-3">
                           <div className="w-16 h-16 mx-auto bg-gray-100 rounded-2xl flex items-center justify-center group-hover:bg-emerald-100 transition-colors duration-300">
                             <Upload className="w-8 h-8 text-gray-400 group-hover:text-emerald-600 transition-colors duration-300" />
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-gray-700">Click to upload</p>
-                            <p className="text-xs text-gray-500 mt-1">Front side of Emirates ID</p>
+                            <p className="text-sm font-semibold text-gray-700">{t('patient.profile.clickUpload')}</p>
+                            <p className="text-xs text-gray-500 mt-1">{t('patient.profile.emiratesFrontHint')}</p>
                           </div>
                         </div>
                       )}
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">Back Side</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">{t('patient.profile.backSide')}</label>
                     <div
                       onClick={() => handleImageUpload('emiratesBack')}
                       className="group relative border-2 border-dashed border-gray-300 rounded-2xl p-10 text-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/50 transition-all duration-300"
                     >
                       {emiratesIdBack ? (
-                        <img src={emiratesIdBack} alt="Emirates ID Back" className="max-h-48 mx-auto rounded-xl shadow-lg" />
+                        <img src={emiratesIdBack} alt={t('patient.profile.altEmiratesBack')} className="max-h-48 mx-auto rounded-xl shadow-lg" />
                       ) : (
                         <div className="space-y-3">
                           <div className="w-16 h-16 mx-auto bg-gray-100 rounded-2xl flex items-center justify-center group-hover:bg-emerald-100 transition-colors duration-300">
                             <Upload className="w-8 h-8 text-gray-400 group-hover:text-emerald-600 transition-colors duration-300" />
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-gray-700">Click to upload</p>
-                            <p className="text-xs text-gray-500 mt-1">Back side of Emirates ID</p>
+                            <p className="text-sm font-semibold text-gray-700">{t('patient.profile.clickUpload')}</p>
+                            <p className="text-xs text-gray-500 mt-1">{t('patient.profile.emiratesBackHint')}</p>
                           </div>
                         </div>
                       )}
@@ -427,8 +447,8 @@ export const Profile: React.FC = () => {
                     <Shield className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white tracking-tight">Insurance Information</h3>
-                    <p className="text-violet-100 text-sm mt-1">Optional - Add your insurance details</p>
+                    <h3 className="text-2xl font-bold text-white tracking-tight">{t('patient.profile.insuranceTitle')}</h3>
+                    <p className="text-violet-100 text-sm mt-1">{t('patient.profile.insuranceSub')}</p>
                   </div>
                 </div>
                 <button
@@ -436,68 +456,68 @@ export const Profile: React.FC = () => {
                   className="flex items-center space-x-2 px-5 py-2.5 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
                 >
                   {isEditingInsurance ? <Save className="w-5 h-5" /> : <Edit2 className="w-5 h-5" />}
-                  <span>{isEditingInsurance ? 'Save Changes' : 'Edit Insurance'}</span>
+                  <span>{isEditingInsurance ? t('patient.profile.saveChanges') : t('patient.profile.editInsurance')}</span>
                 </button>
               </div>
               <div className="p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Insurance Provider</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">{t('patient.profile.insuranceProvider')}</label>
                     <input
                       type="text"
                       disabled={!isEditingInsurance}
                       value={insuranceInfo.provider}
                       onChange={(e) => setInsuranceInfo({ ...insuranceInfo, provider: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
-                      placeholder="e.g., AXA, Daman, MetLife"
+                      placeholder={t('patient.profile.phProvider')}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Policy Number</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">{t('patient.profile.policyNumber')}</label>
                     <input
                       type="text"
                       disabled={!isEditingInsurance}
                       value={insuranceInfo.policyNumber}
                       onChange={(e) => setInsuranceInfo({ ...insuranceInfo, policyNumber: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
-                      placeholder="Policy number"
+                      placeholder={t('patient.profile.phPolicy')}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Member ID</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">{t('patient.profile.memberId')}</label>
                     <input
                       type="text"
                       disabled={!isEditingInsurance}
                       value={insuranceInfo.memberId}
                       onChange={(e) => setInsuranceInfo({ ...insuranceInfo, memberId: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
-                      placeholder="Member ID"
+                      placeholder={t('patient.profile.phMember')}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Group Number</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">{t('patient.profile.groupNumber')}</label>
                     <input
                       type="text"
                       disabled={!isEditingInsurance}
                       value={insuranceInfo.groupNumber}
                       onChange={(e) => setInsuranceInfo({ ...insuranceInfo, groupNumber: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
-                      placeholder="Group number"
+                      placeholder={t('patient.profile.phGroup')}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Coverage Type</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">{t('patient.profile.coverageType')}</label>
                     <input
                       type="text"
                       disabled={!isEditingInsurance}
                       value={insuranceInfo.coverageType}
                       onChange={(e) => setInsuranceInfo({ ...insuranceInfo, coverageType: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
-                      placeholder="e.g., Premium, Basic, Gold"
+                      placeholder={t('patient.profile.phCoverage')}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">Valid Until</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">{t('patient.profile.validUntil')}</label>
                     <input
                       type="date"
                       disabled={!isEditingInsurance}
@@ -507,21 +527,21 @@ export const Profile: React.FC = () => {
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">Insurance Card Image</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">{t('patient.profile.insuranceCardLabel')}</label>
                     <div
                       onClick={() => isEditingInsurance && handleImageUpload('insurance')}
                       className={`group border-2 border-dashed border-gray-300 rounded-2xl p-10 text-center transition-all duration-300 ${isEditingInsurance ? 'cursor-pointer hover:border-violet-500 hover:bg-violet-50/50' : 'cursor-not-allowed opacity-75'}`}
                     >
                       {insuranceInfo.cardImage ? (
-                        <img src={insuranceInfo.cardImage} alt="Insurance Card" className="max-h-48 mx-auto rounded-xl shadow-lg" />
+                        <img src={insuranceInfo.cardImage} alt={t('patient.profile.altInsuranceCard')} className="max-h-48 mx-auto rounded-xl shadow-lg" />
                       ) : (
                         <div className="space-y-3">
                           <div className={`w-16 h-16 mx-auto bg-gray-100 rounded-2xl flex items-center justify-center transition-colors duration-300 ${isEditingInsurance ? 'group-hover:bg-violet-100' : ''}`}>
                             <Upload className={`w-8 h-8 text-gray-400 transition-colors duration-300 ${isEditingInsurance ? 'group-hover:text-violet-600' : ''}`} />
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-gray-700">Click to upload</p>
-                            <p className="text-xs text-gray-500 mt-1">Insurance card image (front or back)</p>
+                            <p className="text-sm font-semibold text-gray-700">{t('patient.profile.clickUpload')}</p>
+                            <p className="text-xs text-gray-500 mt-1">{t('patient.profile.insuranceUploadHint')}</p>
                           </div>
                         </div>
                       )}
@@ -538,8 +558,8 @@ export const Profile: React.FC = () => {
                     <Users className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white tracking-tight">Family Chart</h3>
-                    <p className="text-orange-100 text-sm mt-1">Manage your family members' profiles</p>
+                    <h3 className="text-2xl font-bold text-white tracking-tight">{t('patient.profile.familyTitle')}</h3>
+                    <p className="text-orange-100 text-sm mt-1">{t('patient.profile.familySub')}</p>
                   </div>
                 </div>
                 <button
@@ -547,14 +567,14 @@ export const Profile: React.FC = () => {
                   className="flex items-center space-x-2 px-5 py-2.5 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
                 >
                   <Plus className="w-5 h-5" />
-                  <span>Add Member</span>
+                  <span>{t('patient.profile.addMember')}</span>
                 </button>
               </div>
               <div className="p-8">
                 <FamilyTree
                   members={familyMembers}
                   primaryUser={{
-                    name: personalInfo.fullName || 'You',
+                    name: personalInfo.fullName || t('patient.profile.you'),
                     profileImage: profileImage,
                   }}
                 />
@@ -563,7 +583,7 @@ export const Profile: React.FC = () => {
                   <div className="mt-12 pt-8 border-t-2 border-gray-100">
                     <h4 className="font-bold text-gray-900 mb-6 text-lg flex items-center gap-2">
                       <Users className="w-5 h-5 text-orange-600" />
-                      Family Members List
+                      {t('patient.profile.familyListTitle')}
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       {familyMembers.map((member) => (
@@ -600,35 +620,35 @@ export const Profile: React.FC = () => {
 
                 {showAddFamily && (
                   <div className="mt-6 p-6 bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl border-2 border-orange-200">
-                    <h4 className="font-bold text-gray-900 mb-5 text-lg">Add Family Member</h4>
+                    <h4 className="font-bold text-gray-900 mb-5 text-lg">{t('patient.profile.addFamilyTitle')}</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Name</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">{t('patient.profile.name')}</label>
                         <input
                           type="text"
                           value={newFamilyMember.name || ''}
                           onChange={(e) => setNewFamilyMember({ ...newFamilyMember, name: e.target.value })}
                           className="w-full px-4 py-3 border-2 border-orange-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white font-medium"
-                          placeholder="Enter name"
+                          placeholder={t('patient.profile.phMemberName')}
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Relationship</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">{t('patient.profile.relationship')}</label>
                         <select
                           value={newFamilyMember.relationship || ''}
                           onChange={(e) => setNewFamilyMember({ ...newFamilyMember, relationship: e.target.value })}
                           className="w-full px-4 py-3 border-2 border-orange-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-white font-medium"
                         >
-                          <option value="">Select Relationship</option>
-                          <option value="Spouse">Spouse</option>
-                          <option value="Child">Child</option>
-                          <option value="Parent">Parent</option>
-                          <option value="Sibling">Sibling</option>
-                          <option value="Other">Other</option>
+                          <option value="">{t('patient.profile.selectRelationship')}</option>
+                          <option value="Spouse">{t('patient.profile.relSpouse')}</option>
+                          <option value="Child">{t('patient.profile.relChild')}</option>
+                          <option value="Parent">{t('patient.profile.relParent')}</option>
+                          <option value="Sibling">{t('patient.profile.relSibling')}</option>
+                          <option value="Other">{t('patient.profile.relOther')}</option>
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Date of Birth</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">{t('patient.profile.dob')}</label>
                         <input
                           type="date"
                           value={newFamilyMember.dateOfBirth || ''}
@@ -637,7 +657,7 @@ export const Profile: React.FC = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Emirates ID</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">{t('patient.profile.familyEmiratesId')}</label>
                         <input
                           type="text"
                           value={newFamilyMember.emiratesId || ''}
@@ -652,7 +672,7 @@ export const Profile: React.FC = () => {
                         onClick={addFamilyMember}
                         className="px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold"
                       >
-                        Add Member
+                        {t('patient.profile.addMember')}
                       </button>
                       <button
                         onClick={() => {
@@ -661,7 +681,7 @@ export const Profile: React.FC = () => {
                         }}
                         className="px-6 py-3 bg-white text-gray-700 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 font-semibold"
                       >
-                        Cancel
+                        {t('patient.profile.cancel')}
                       </button>
                     </div>
                   </div>

@@ -1,0 +1,327 @@
+{
+  "brand": {
+    "tagline": "Healthcare Platform"
+  },
+  "header": {
+    "doctors": "Doctors",
+    "clinics": "Clinics",
+    "pharmacy": "Pharmacy",
+    "laboratories": "Laboratories",
+    "insurance": "Insurance",
+    "patient": "Patient",
+    "doctor": "Doctor"
+  },
+  "footer": {
+    "services": "Services",
+    "resources": "Resources",
+    "contact": "Contact",
+    "findDoctors": "Find Doctors",
+    "findClinics": "Find Clinics",
+    "aiHealthChat": "AI Health Chat",
+    "healthEducation": "Health Education",
+    "signIn": "Patient and doctor sign in",
+    "supportLine": "Always-on digital support",
+    "blurb": "Connected care journeys for patients and clinicians across chat, booking, intake, and follow-up.",
+    "legal": "© 2026 CeenAiX. DHA-compliant healthcare technology. All rights reserved.",
+    "legalSub": "Built for trusted patient access, clinician workflows, and secure AI-assisted care."
+  },
+  "nav": {
+    "patientPortal": "Patient Portal",
+    "doctorPortal": "Doctor Portal",
+    "dashboard": "Dashboard",
+    "appointments": "Appointments",
+    "prescriptions": "Prescriptions",
+    "records": "Records",
+    "messages": "Messages",
+    "patients": "Patients",
+    "schedule": "Schedule",
+    "profile": "Profile",
+    "logOut": "Log out",
+    "patientAccount": "Patient account",
+    "doctorAccount": "Doctor account",
+    "account": "Account"
+  },
+  "language": {
+    "enShort": "EN",
+    "arShort": "عربي"
+  },
+  "home": {
+    "features": "Features",
+    "howItWorks": "How It Works",
+    "findCare": "Find Care",
+    "hero": {
+      "badge": "AI-powered healthcare journeys for patients and doctors",
+      "line1": "Your health,",
+      "line2": "simplified",
+      "lead": "Book care, prepare for visits, manage records, and use AI guidance in one connected healthcare platform built for the UAE market.",
+      "ctaFindDoctor": "Find a doctor",
+      "ctaAi": "Try AI assistant",
+      "checkBooking": "Real appointment booking",
+      "checkIntake": "AI-guided pre-visit intake",
+      "checkRecords": "Secure patient records",
+      "altConsultation": "Modern healthcare consultation",
+      "supportValue": "24/7",
+      "supportCaption": "AI health support and intake guidance",
+      "sideBadge": "Connected care",
+      "sideTitle": "One place for booking, records, messaging, and AI support.",
+      "sideBody": "Patients move from symptom questions to the right care path, while doctors manage schedules and intake from the same platform.",
+      "altDoctorTools": "Doctor using digital healthcare tools"
+    },
+    "stats": {
+      "patients": "Patients",
+      "doctors": "Doctors",
+      "appointments": "Appointments",
+      "aiSupport": "AI Support"
+    },
+    "featureSection": {
+      "title": "Everything you need for modern care",
+      "lead": "Approved UX ideas from the external branch, mapped onto the product surfaces that already exist in this repo."
+    },
+    "featureCards": {
+      "scheduling": {
+        "title": "Smart Scheduling",
+        "description": "Book appointments against real doctor availability with a smoother patient journey."
+      },
+      "records": {
+        "title": "Digital Records",
+        "description": "Keep appointments, prescriptions, and medical history connected in one secure place."
+      },
+      "prescription": {
+        "title": "Prescription Tracking",
+        "description": "Review active medication history and stay aligned with follow-up care."
+      },
+      "intake": {
+        "title": "Pre-Visit Intake",
+        "description": "Prepare ahead of appointments with structured forms, autofill, and AI summaries."
+      },
+      "aiChat": {
+        "title": "AI Health Chat",
+        "description": "Get guided health support and move directly into the right next step when care is needed."
+      },
+      "secure": {
+        "title": "Secure Experience",
+        "description": "Built around privacy, role-aware access, and a healthcare-first data model."
+      }
+    },
+    "howItWorksSection": {
+      "title": "How it works",
+      "lead": "Get started quickly, then keep your care journey connected."
+    },
+    "steps": {
+      "one": {
+        "num": "01",
+        "title": "Create your account",
+        "description": "Get started as a patient or doctor with the right onboarding path from day one."
+      },
+      "two": {
+        "num": "02",
+        "title": "Find care quickly",
+        "description": "Search doctors, book appointments, and prepare with AI-guided intake before visits."
+      },
+      "three": {
+        "num": "03",
+        "title": "Stay connected",
+        "description": "Access records, prescriptions, messages, and next-step guidance in one place."
+      }
+    },
+    "cta": {
+      "title": "Ready to get started?",
+      "lead": "Join patients and doctors using CeenAiX for smarter booking, better preparation, and more connected healthcare journeys.",
+      "patientPortal": "Patient portal",
+      "doctorPortal": "Doctor portal"
+    }
+  },
+  "auth": {
+    "shell": {
+      "headline": "Secure healthcare access built for patients and clinicians.",
+      "subhead": "Access your care journey, communicate securely, and move through the CeenAiX platform with role-based experiences designed for patients and clinicians.",
+      "cardPatient": "Patient-first journeys",
+      "cardPatientDesc": "Appointments, records, prescriptions.",
+      "cardDoctor": "Doctor-ready workflows",
+      "cardDoctorDesc": "Role-aware routing and profile setup.",
+      "cardSecure": "Secure by default",
+      "cardSecureDesc": "Supabase auth with guarded routes."
+    },
+    "login": {
+      "badge": "Secure Sign In",
+      "title": "Welcome back",
+      "titleRecovery": "Reset your password",
+      "description": "Sign in with email and password or request a phone OTP to access your role-specific dashboard.",
+      "descriptionRecovery": "Create a new password to continue securely into CeenAiX.",
+      "needAccount": "Need an account?",
+      "createAccount": "Create one now",
+      "newPassword": "New password",
+      "confirmNewPassword": "Confirm new password",
+      "newPasswordPlaceholder": "Create a strong password",
+      "repeatPasswordPlaceholder": "Repeat the new password",
+      "savePassword": "Save new password",
+      "updatingPassword": "Updating password...",
+      "modePassword": "Email password",
+      "modePasswordHint": "Fast sign-in for existing users",
+      "modeOtp": "Phone OTP",
+      "modeOtpHint": "Receive a one-time verification code",
+      "email": "Email address",
+      "password": "Password",
+      "passwordHint": "Use your registered email credentials.",
+      "forgotPassword": "Forgot password?",
+      "signIn": "Sign in",
+      "signingIn": "Signing in...",
+      "mobile": "Mobile number",
+      "otpHint": "We'll send a one-time code to the phone number associated with your account.",
+      "sendCode": "Send verification code",
+      "sendingCode": "Sending code..."
+    },
+    "register": {
+      "badge": "Secure Registration",
+      "title": "Create your CeenAiX account",
+      "description": "Follow the staged sign-up flow for patients and doctors. Choose how you want to authenticate, define your role, and complete the first account setup step.",
+      "haveAccount": "Already have an account?",
+      "signInInstead": "Sign in instead",
+      "step1": "Choose access method",
+      "step2": "Choose account role",
+      "step3": "Create your credentials",
+      "resendPrompt": "Need another confirmation email?",
+      "resendButton": "Resend confirmation email",
+      "resending": "Sending...",
+      "resettingSession": "Resetting the current session so you can start a new registration flow.",
+      "modeEmailTitle": "Email and password",
+      "modeEmailDesc": "Create your account with your email address and password.",
+      "modePhoneTitle": "Phone OTP",
+      "modePhoneDesc": "Ideal for mobile-first registration with a one-time verification code.",
+      "rolePatientTitle": "Patient account",
+      "rolePatientDesc": "Access appointments, records, prescriptions, and AI-assisted support.",
+      "roleDoctorTitle": "Doctor account",
+      "roleDoctorDesc": "Manage patient interactions, appointments, prescriptions, and future schedule flows.",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "Enter your full name",
+      "email": "Email address",
+      "emailPlaceholder": "you@example.com",
+      "mobile": "Mobile number",
+      "mobilePlaceholder": "+971 50 123 4567",
+      "password": "Password",
+      "passwordPlaceholder": "Minimum 8 characters",
+      "confirmPassword": "Confirm password",
+      "confirmPasswordPlaceholder": "Repeat the password",
+      "termsLabel": "I agree to the platform terms and understand that healthcare data is handled according to CeenAiX privacy and consent requirements.",
+      "otpNextHint": "We'll create the account and send a verification code to this number in the next step.",
+      "btnBack": "Back",
+      "btnContinue": "Continue",
+      "btnProcessing": "Processing...",
+      "btnCreateAccount": "Create account",
+      "btnSendCode": "Send verification code",
+      "errors": {
+        "resendNeedEmail": "Enter your email address first so we know where to resend the confirmation link.",
+        "fullNameShort": "Please enter the full name that should appear on the account.",
+        "emailRequired": "Email is required for email and password registration.",
+        "passwordShort": "Choose a password with at least 8 characters.",
+        "passwordMismatch": "Password confirmation does not match.",
+        "phoneRequired": "Phone number is required for phone OTP registration.",
+        "termsRequired": "You must accept the terms to continue.",
+        "emailAlreadyRegistered": "This email is already registered. If you did not receive the confirmation email yet, resend it below. Otherwise sign in or reset your password."
+      },
+      "successAccountCreated": "Account created. Check your email to confirm your account, then continue to onboarding. If you do not see it soon, use the resend button below.",
+      "resendSuccess": "We sent a fresh confirmation email. Check your inbox and spam folder, then open the link to continue."
+    },
+    "forgot": {
+      "badge": "Password Recovery",
+      "titleRequest": "Reset your password",
+      "titleRecovery": "Choose a new password",
+      "descriptionRequest": "Enter your account email and we will send a secure reset link.",
+      "descriptionRecovery": "You are in recovery mode. Set a new password to regain access to your account.",
+      "remembered": "Remembered your credentials?",
+      "returnSignIn": "Return to sign in",
+      "updatePassword": "Update password",
+      "updating": "Updating...",
+      "sendReset": "Send reset link",
+      "sending": "Sending...",
+      "resetInfo": "We'll send a secure reset link to this email. The link routes back into CeenAiX so you can create a new password safely."
+    },
+    "otp": {
+      "badge": "OTP Verification",
+      "title": "Verify your secure access",
+      "description": "Enter the code sent to your registered phone number or email to continue with sign-in or account creation.",
+      "wrongDetails": "Entered the wrong details?",
+      "goBack": "Go back",
+      "verificationTarget": "Verification target",
+      "signupFlow": "This code will complete account creation.",
+      "signinFlow": "This code will sign you in.",
+      "codeLabel": "One-time code",
+      "resend": "Resend code",
+      "resending": "Resending...",
+      "verify": "Verify code",
+      "verifying": "Verifying...",
+      "resentOk": "A new verification code has been sent."
+    },
+    "onboarding": {
+      "badge": "Profile Setup",
+      "title": "Complete your profile",
+      "description": "Finish the first authenticated setup so CeenAiX can route you to the correct experience and prepare your profile data for future workflows.",
+      "fields": {
+        "fullName": "Full name",
+        "fullNamePlaceholder": "Enter your full name",
+        "email": "Email address",
+        "emailRequired": " *",
+        "emailPlaceholder": "you@example.com",
+        "phone": "Phone number",
+        "city": "City",
+        "cityPlaceholder": "Dubai, Abu Dhabi, Sharjah...",
+        "address": "Address",
+        "addressPlaceholder": "Add your preferred address for care coordination",
+        "emergencyName": "Emergency contact name",
+        "emergencyNamePlaceholder": "Who should we contact?",
+        "emergencyPhone": "Emergency contact phone",
+        "emergencyPhonePlaceholder": "+971 50 000 0000",
+        "licenseNumber": "License number",
+        "licensePlaceholder": "Professional license",
+        "bio": "Professional bio",
+        "bioPlaceholder": "Summarize your expertise and patient care focus",
+        "termsConfirm": "I confirm the profile information is accurate and consent to use CeenAiX according to the platform terms."
+      },
+      "doctor": {
+        "specialization": "Specialization",
+        "specSearchPlaceholder": "Search specializations",
+        "specHelperError": "Specializations could not be loaded yet.",
+        "specHelperOk": "Search and choose one or more specialties. Selected items appear as chips."
+      },
+      "buttons": {
+        "skip": "Skip for now",
+        "save": "Save and continue",
+        "saving": "Saving..."
+      },
+      "errors": {
+        "mustSignIn": "You must be signed in to complete onboarding.",
+        "fullNameRequired": "Full name is required.",
+        "emailRequiredOtp": "Email is required when signing up with phone OTP.",
+        "termsRequired": "Please accept the terms to complete onboarding.",
+        "specializationRequired": "Select at least one specialization to complete doctor onboarding.",
+        "specializationsSaveFailed": "Failed to save doctor specializations."
+      },
+      "successSaved": "Onboarding saved. Redirecting to your dashboard..."
+    }
+  },
+  "accountSecurity": {
+    "title": "Account Security",
+    "subtitle": "Update your password or remove a test account that has no retained care data.",
+    "changePasswordTitle": "Change password",
+    "changePasswordLead": "Use a new password for future sign-ins.",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "newPasswordPlaceholder": "Enter a new password",
+    "confirmPasswordPlaceholder": "Confirm the new password",
+    "updatePassword": "Update password",
+    "updatingPassword": "Updating password...",
+    "errorPasswordShort": "Use at least 8 characters for your new password.",
+    "errorPasswordMismatch": "The password confirmation does not match.",
+    "successPasswordUpdated": "Your password has been updated.",
+    "deleteTitle": "Delete account",
+    "deleteLead": "For safety, self-delete only works for accounts without clinical or shared care data.",
+    "deleteWarningPrefix": "Type ",
+    "deleteWarningSuffix": " to confirm. If you already have appointments, prescriptions, records, or shared care threads, contact support instead of self-deleting.",
+    "confirmationLabel": "Confirmation",
+    "deleteInputPlaceholder": "Type \"DELETE\" to continue",
+    "deleteButton": "Delete account",
+    "deletingAccount": "Deleting account...",
+    "errorTypeDelete": "Type DELETE to confirm account deletion.",
+    "confirmDeleteDialog": "Delete this account now? This cannot be undone. Accounts with clinical or shared care data cannot self-delete."
+  }
+}

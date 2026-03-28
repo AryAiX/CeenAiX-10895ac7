@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   AlertTriangle,
   FileText,
@@ -16,6 +17,7 @@ import { Navigation } from '../../components/Navigation';
 import { Skeleton } from '../../components/Skeleton';
 import { usePatientRecords } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
+import { dateTimeFormatWithNumerals, formatLocaleDigits, resolveLocale } from '../../lib/i18n-ui';
 import { supabase } from '../../lib/supabase';
 import type { AllergySeverity, ConditionStatus } from '../../types';
 
@@ -29,6 +31,7 @@ interface RecordEntry {
   subtitle: string | null;
   description: string | null;
   statusLabel: string;
+  displayStatus: string;
   sortValue: string | null;
   dateLabel: string | null;
   metadata: string[];
@@ -81,7 +84,7 @@ const initialVaccinationForm: VaccinationFormState = {
   nextDoseDue: '',
 };
 
-const formatDate = (value: string | null | undefined) => {
+const formatDate = (value: string | null | undefined, language: string) => {
   if (!value) {
     return null;
   }
@@ -92,23 +95,14 @@ const formatDate = (value: string | null | undefined) => {
     return null;
   }
 
-  return parsed.toLocaleDateString('en-AE', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-};
-
-const getCategoryLabel = (category: RecordCategory) => {
-  if (category === 'condition') {
-    return 'Condition';
-  }
-
-  if (category === 'allergy') {
-    return 'Allergy';
-  }
-
-  return 'Vaccination';
+  return parsed.toLocaleDateString(
+    resolveLocale(language),
+    dateTimeFormatWithNumerals(language, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })
+  );
 };
 
 const getStatusClasses = (category: RecordCategory, statusLabel: string) => {
@@ -152,6 +146,14 @@ const getCategoryIcon = (category: RecordCategory) => {
 };
 
 export const PatientRecords: React.FC = () => {
+  const { t, i18n } = useTranslation();
+  const recordCategoryLabel = (c: RecordCategory) =>
+    c === 'condition'
+      ? t('patient.records.categoryCondition')
+      : c === 'allergy'
+        ? t('patient.records.categoryAllergy')
+        : t('patient.records.categoryVax');
+
   const { user } = useAuth();
   const {
     data,
@@ -175,24 +177,53 @@ export const PatientRecords: React.FC = () => {
   const vaccinations = useMemo(() => data?.vaccinations ?? [], [data?.vaccinations]);
 
   const records = useMemo<RecordEntry[]>(() => {
+    const cat = (c: RecordCategory) =>
+      c === 'condition'
+        ? t('patient.records.categoryCondition')
+        : c === 'allergy'
+          ? t('patient.records.categoryAllergy')
+          : t('patient.records.categoryVax');
+
+    const conditionStatusDisplay = (status: string) => {
+      if (status === 'active') {
+        return t('patient.records.statusActive');
+      }
+      if (status === 'chronic') {
+        return t('patient.records.statusChronic');
+      }
+      if (status === 'resolved') {
+        return t('patient.records.statusResolved');
+      }
+      return status.replace(/_/g, ' ');
+    };
+
+    const allergySeverityDisplay = (severity: string) => {
+      if (severity === 'severe') {
+        return t('patient.records.severitySevere');
+      }
+      if (severity === 'moderate') {
+        return t('patient.records.severityModerate');
+      }
+      return t('patient.records.severityMild');
+    };
+
     const conditionEntries = conditions.map((condition) => ({
       id: condition.id,
       category: 'condition' as const,
       title: condition.condition_name,
-      subtitle: condition.icd_code ? `ICD ${condition.icd_code}` : null,
+      subtitle: condition.icd_code ? t('patient.records.icdPrefix', { code: condition.icd_code }) : null,
       description: condition.notes ?? null,
       statusLabel: condition.status,
+      displayStatus: conditionStatusDisplay(condition.status),
       sortValue: condition.diagnosed_date ?? condition.created_at,
-      dateLabel: formatDate(condition.diagnosed_date) ?? formatDate(condition.created_at),
-      metadata: [
-        getCategoryLabel('condition'),
-        condition.status.replace('_', ' '),
-      ],
+      dateLabel: formatDate(condition.diagnosed_date, i18n.language) ?? formatDate(condition.created_at, i18n.language),
+      metadata: [cat('condition'), conditionStatusDisplay(condition.status)],
       searchText: [
         condition.condition_name,
         condition.icd_code,
         condition.notes,
         condition.status,
+        conditionStatusDisplay(condition.status),
       ]
         .filter(Boolean)
         .join(' ')
@@ -203,57 +234,71 @@ export const PatientRecords: React.FC = () => {
       id: allergy.id,
       category: 'allergy' as const,
       title: allergy.allergen,
-      subtitle: allergy.reaction ? `Reaction: ${allergy.reaction}` : null,
+      subtitle: allergy.reaction ? t('patient.records.reactionPrefix', { reaction: allergy.reaction }) : null,
       description: allergy.confirmed_by_doctor
-        ? 'Marked as doctor-confirmed in your profile.'
-        : 'Patient-entered allergy record.',
+        ? t('patient.records.allergyDetailDoctor')
+        : t('patient.records.allergyDetailSelf'),
       statusLabel: allergy.severity,
+      displayStatus: allergySeverityDisplay(allergy.severity),
       sortValue: allergy.created_at,
-      dateLabel: formatDate(allergy.created_at),
+      dateLabel: formatDate(allergy.created_at, i18n.language),
       metadata: [
-        getCategoryLabel('allergy'),
-        allergy.confirmed_by_doctor ? 'Doctor confirmed' : 'Self reported',
+        cat('allergy'),
+        allergy.confirmed_by_doctor ? t('patient.records.doctorConfirmed') : t('patient.records.selfReported'),
       ],
       searchText: [
         allergy.allergen,
         allergy.reaction,
         allergy.severity,
-        allergy.confirmed_by_doctor ? 'doctor confirmed' : 'self reported',
+        allergy.confirmed_by_doctor ? t('patient.records.doctorConfirmed') : t('patient.records.selfReported'),
       ]
         .filter(Boolean)
         .join(' ')
         .toLowerCase(),
     }));
 
-    const vaccinationEntries = vaccinations.map((vaccination) => ({
-      id: vaccination.id,
-      category: 'vaccination' as const,
-      title: vaccination.vaccine_name,
-      subtitle: vaccination.administered_by ? `Given by ${vaccination.administered_by}` : null,
-      description: vaccination.next_dose_due
-        ? `Next dose due ${formatDate(vaccination.next_dose_due) ?? 'soon'}`
-        : 'No next dose scheduled.',
-      statusLabel:
-        vaccination.dose_number !== null ? `Dose ${vaccination.dose_number}` : 'Recorded',
-      sortValue: vaccination.administered_date ?? vaccination.created_at,
-      dateLabel: formatDate(vaccination.administered_date) ?? formatDate(vaccination.created_at),
-      metadata: [
-        getCategoryLabel('vaccination'),
-        vaccination.next_dose_due ? 'Follow-up due' : 'Course logged',
-      ],
-      searchText: [
-        vaccination.vaccine_name,
-        vaccination.administered_by,
-        vaccination.next_dose_due,
-        vaccination.dose_number?.toString(),
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase(),
-    }));
+    const vaccinationEntries = vaccinations.map((vaccination) => {
+      const nextFormatted = formatDate(vaccination.next_dose_due, i18n.language);
+      return {
+        id: vaccination.id,
+        category: 'vaccination' as const,
+        title: vaccination.vaccine_name,
+        subtitle: vaccination.administered_by
+          ? t('patient.records.givenByPrefix', { name: vaccination.administered_by })
+          : null,
+        description: vaccination.next_dose_due
+          ? t('patient.records.nextDoseLine', {
+              date: nextFormatted ?? t('patient.records.nextDoseSoon'),
+            })
+          : t('patient.records.noNextDose'),
+        statusLabel:
+          vaccination.dose_number !== null ? `dose-${vaccination.dose_number}` : 'recorded',
+        displayStatus:
+          vaccination.dose_number !== null
+            ? t('patient.records.doseN', { n: vaccination.dose_number })
+            : t('patient.records.recorded'),
+        sortValue: vaccination.administered_date ?? vaccination.created_at,
+        dateLabel:
+          formatDate(vaccination.administered_date, i18n.language) ??
+          formatDate(vaccination.created_at, i18n.language),
+        metadata: [
+          cat('vaccination'),
+          vaccination.next_dose_due ? t('patient.records.followUpDue') : t('patient.records.courseLogged'),
+        ],
+        searchText: [
+          vaccination.vaccine_name,
+          vaccination.administered_by,
+          vaccination.next_dose_due,
+          vaccination.dose_number?.toString(),
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase(),
+      };
+    });
 
     return [...conditionEntries, ...allergyEntries, ...vaccinationEntries];
-  }, [allergies, conditions, vaccinations]);
+  }, [allergies, conditions, i18n.language, t, vaccinations]);
 
   const filteredRecords = useMemo(
     () =>
@@ -322,7 +367,7 @@ export const PatientRecords: React.FC = () => {
       return;
     }
 
-    setFeedback({ type: 'success', message: 'Condition added to your medical record.' });
+    setFeedback({ type: 'success', message: t('patient.records.successCondition') });
     resetForms();
     refetch();
   };
@@ -352,7 +397,7 @@ export const PatientRecords: React.FC = () => {
       return;
     }
 
-    setFeedback({ type: 'success', message: 'Allergy added to your medical record.' });
+    setFeedback({ type: 'success', message: t('patient.records.successAllergy') });
     resetForms();
     refetch();
   };
@@ -387,7 +432,7 @@ export const PatientRecords: React.FC = () => {
       return;
     }
 
-    setFeedback({ type: 'success', message: 'Vaccination record added successfully.' });
+    setFeedback({ type: 'success', message: t('patient.records.successVax') });
     resetForms();
     refetch();
   };
@@ -423,51 +468,62 @@ export const PatientRecords: React.FC = () => {
       return;
     }
 
-    setFeedback({ type: 'success', message: `${getCategoryLabel(record.category)} removed from your record.` });
+    setFeedback({
+      type: 'success',
+      message: t('patient.records.removed', { category: recordCategoryLabel(record.category) }),
+    });
     refetch();
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
       <Navigation role="patient" />
 
-      <div className="relative bg-gradient-to-r from-cyan-600 to-blue-600 overflow-hidden">
+      <div className="relative bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <img
             src="https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg?auto=compress&cs=tinysrgb&w=1920"
-            alt="Medical Records"
+            alt={t('patient.records.title')}
             className="w-full h-full object-cover"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-600/80 to-blue-600/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-ceenai-navy/90 to-ceenai-blue/85"></div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="text-4xl font-bold text-white mb-2">Medical Records</h1>
-          <p className="text-cyan-100 text-lg">Access and manage your health documents</p>
+          <h1 className="text-4xl font-bold text-white mb-2">{t('patient.records.title')}</h1>
+          <p className="text-cyan-100 text-lg">{t('patient.records.subtitle')}</p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid gap-4 md:grid-cols-4 mb-8">
           <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-600">Conditions</p>
-            <p className="mt-2 text-3xl font-bold text-gray-900">{conditions.length}</p>
-            <p className="mt-1 text-sm text-cyan-600">Tracked diagnoses</p>
+            <p className="text-sm font-medium text-gray-600">{t('patient.records.conditions')}</p>
+            <p className="mt-2 text-3xl font-bold text-gray-900">
+              {formatLocaleDigits(conditions.length, i18n.language)}
+            </p>
+            <p className="mt-1 text-sm text-cyan-600">{t('patient.records.conditionsSub')}</p>
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-600">Allergies</p>
-            <p className="mt-2 text-3xl font-bold text-gray-900">{allergies.length}</p>
-            <p className="mt-1 text-sm text-amber-600">Severity-aware alerts</p>
+            <p className="text-sm font-medium text-gray-600">{t('patient.records.allergies')}</p>
+            <p className="mt-2 text-3xl font-bold text-gray-900">
+              {formatLocaleDigits(allergies.length, i18n.language)}
+            </p>
+            <p className="mt-1 text-sm text-amber-600">{t('patient.records.allergiesSub')}</p>
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-600">Vaccinations</p>
-            <p className="mt-2 text-3xl font-bold text-gray-900">{vaccinations.length}</p>
-            <p className="mt-1 text-sm text-violet-600">Immunization history</p>
+            <p className="text-sm font-medium text-gray-600">{t('patient.records.vaccinations')}</p>
+            <p className="mt-2 text-3xl font-bold text-gray-900">
+              {formatLocaleDigits(vaccinations.length, i18n.language)}
+            </p>
+            <p className="mt-1 text-sm text-violet-600">{t('patient.records.vaccinationsSub')}</p>
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-600">Total entries</p>
-            <p className="mt-2 text-3xl font-bold text-gray-900">{totalRecords}</p>
-            <p className="mt-1 text-sm text-emerald-600">Patient-managed records</p>
+            <p className="text-sm font-medium text-gray-600">{t('patient.records.totalEntries')}</p>
+            <p className="mt-2 text-3xl font-bold text-gray-900">
+              {formatLocaleDigits(totalRecords, i18n.language)}
+            </p>
+            <p className="mt-1 text-sm text-emerald-600">{t('patient.records.totalSub')}</p>
           </div>
         </div>
 
@@ -477,7 +533,7 @@ export const PatientRecords: React.FC = () => {
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search conditions, allergies, vaccinations..."
+                placeholder={t('patient.records.searchPh')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
@@ -492,10 +548,10 @@ export const PatientRecords: React.FC = () => {
                   onChange={(e) => setFilterType(e.target.value as RecordCategoryFilter)}
                   className="pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent font-medium appearance-none bg-white cursor-pointer"
                 >
-                  <option value="all">All Records</option>
-                  <option value="condition">Conditions</option>
-                  <option value="allergy">Allergies</option>
-                  <option value="vaccination">Vaccinations</option>
+                  <option value="all">{t('patient.records.filterAllRecords')}</option>
+                  <option value="condition">{t('patient.records.filterCondition')}</option>
+                  <option value="allergy">{t('patient.records.filterAllergy')}</option>
+                  <option value="vaccination">{t('patient.records.filterVax')}</option>
                 </select>
               </div>
 
@@ -504,16 +560,16 @@ export const PatientRecords: React.FC = () => {
                 onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest' | 'alphabetical')}
                 className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent font-medium appearance-none bg-white cursor-pointer"
               >
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="alphabetical">Alphabetical</option>
+                <option value="newest">{t('patient.records.sortNewest')}</option>
+                <option value="oldest">{t('patient.records.sortOldest')}</option>
+                <option value="alphabetical">{t('patient.records.sortAlpha')}</option>
               </select>
             </div>
           </div>
 
           <div className="mt-4 flex items-center justify-between">
             <p className="text-sm text-gray-600">
-              Showing <span className="font-semibold text-gray-900">{sortedRecords.length}</span> of <span className="font-semibold text-gray-900">{totalRecords}</span> records
+              {t('patient.records.showing', { shown: sortedRecords.length, total: totalRecords })}
             </p>
             <div className="flex flex-wrap gap-2">
               <button
@@ -522,7 +578,7 @@ export const PatientRecords: React.FC = () => {
                 className="inline-flex items-center gap-2 rounded-xl border border-cyan-200 px-3 py-2 text-sm font-semibold text-cyan-700 transition hover:bg-cyan-50"
               >
                 <Plus className="h-4 w-4" />
-                Add condition
+                {t('patient.records.addCondition')}
               </button>
               <button
                 type="button"
@@ -530,7 +586,7 @@ export const PatientRecords: React.FC = () => {
                 className="inline-flex items-center gap-2 rounded-xl border border-amber-200 px-3 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-50"
               >
                 <Plus className="h-4 w-4" />
-                Add allergy
+                {t('patient.records.addAllergy')}
               </button>
               <button
                 type="button"
@@ -538,7 +594,7 @@ export const PatientRecords: React.FC = () => {
                 className="inline-flex items-center gap-2 rounded-xl border border-violet-200 px-3 py-2 text-sm font-semibold text-violet-700 transition hover:bg-violet-50"
               >
                 <Plus className="h-4 w-4" />
-                Add vaccination
+                {t('patient.records.addVax')}
               </button>
             </div>
           </div>
@@ -558,7 +614,7 @@ export const PatientRecords: React.FC = () => {
 
         {error ? (
           <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-            We could not load your medical record right now. Please try again shortly.
+            {t('patient.records.loadError')}
           </div>
         ) : null}
 
@@ -566,21 +622,21 @@ export const PatientRecords: React.FC = () => {
           <form onSubmit={handleCreateCondition} className="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Add condition</h2>
-                <p className="mt-1 text-sm text-gray-600">Capture diagnoses and important health history for future care.</p>
+                <h2 className="text-xl font-bold text-gray-900">{t('patient.records.addCondition')}</h2>
+                <p className="mt-1 text-sm text-gray-600">{t('patient.records.addConditionSub')}</p>
               </div>
               <button
                 type="button"
                 onClick={resetForms}
                 className="rounded-xl border border-gray-200 p-2 text-gray-500 transition hover:bg-gray-50 hover:text-gray-700"
-                aria-label="Close form"
+                aria-label={t('patient.records.closeForm')}
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">Condition name</span>
+                <span className="text-sm font-semibold text-gray-700">{t('patient.records.conditionName')}</span>
                 <input
                   required
                   type="text"
@@ -592,7 +648,7 @@ export const PatientRecords: React.FC = () => {
                 />
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">ICD code</span>
+                <span className="text-sm font-semibold text-gray-700">{t('patient.records.icdCode')}</span>
                 <input
                   type="text"
                   value={conditionForm.icdCode}
@@ -603,7 +659,7 @@ export const PatientRecords: React.FC = () => {
                 />
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">Diagnosed date</span>
+                <span className="text-sm font-semibold text-gray-700">{t('patient.records.diagnosedDate')}</span>
                 <input
                   type="date"
                   value={conditionForm.diagnosedDate}
@@ -614,7 +670,7 @@ export const PatientRecords: React.FC = () => {
                 />
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">Status</span>
+                <span className="text-sm font-semibold text-gray-700">{t('patient.records.status')}</span>
                 <select
                   value={conditionForm.status}
                   onChange={(event) =>
@@ -625,13 +681,13 @@ export const PatientRecords: React.FC = () => {
                   }
                   className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
                 >
-                  <option value="active">Active</option>
-                  <option value="chronic">Chronic</option>
-                  <option value="resolved">Resolved</option>
+                  <option value="active">{t('patient.records.statusActive')}</option>
+                  <option value="chronic">{t('patient.records.statusChronic')}</option>
+                  <option value="resolved">{t('patient.records.statusResolved')}</option>
                 </select>
               </label>
               <label className="block space-y-2 md:col-span-2">
-                <span className="text-sm font-semibold text-gray-700">Notes</span>
+                <span className="text-sm font-semibold text-gray-700">{t('patient.records.notes')}</span>
                 <textarea
                   rows={4}
                   value={conditionForm.notes}
@@ -646,17 +702,17 @@ export const PatientRecords: React.FC = () => {
               <button
                 type="submit"
                 disabled={submittingForm === 'condition'}
-                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan px-5 py-3 text-sm font-semibold text-white transition hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Save className="h-4 w-4" />
-                {submittingForm === 'condition' ? 'Saving...' : 'Save condition'}
+                {submittingForm === 'condition' ? t('patient.records.saving') : t('patient.records.saveCondition')}
               </button>
               <button
                 type="button"
                 onClick={resetForms}
                 className="rounded-xl border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
               >
-                Cancel
+                {t('patient.records.cancel')}
               </button>
             </div>
           </form>
@@ -666,21 +722,21 @@ export const PatientRecords: React.FC = () => {
           <form onSubmit={handleCreateAllergy} className="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Add allergy</h2>
-                <p className="mt-1 text-sm text-gray-600">Document allergens and reactions so they are always visible during care.</p>
+                <h2 className="text-xl font-bold text-gray-900">{t('patient.records.addAllergy')}</h2>
+                <p className="mt-1 text-sm text-gray-600">{t('patient.records.addAllergySub')}</p>
               </div>
               <button
                 type="button"
                 onClick={resetForms}
                 className="rounded-xl border border-gray-200 p-2 text-gray-500 transition hover:bg-gray-50 hover:text-gray-700"
-                aria-label="Close form"
+                aria-label={t('patient.records.closeForm')}
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">Allergen</span>
+                <span className="text-sm font-semibold text-gray-700">{t('patient.records.allergen')}</span>
                 <input
                   required
                   type="text"
@@ -692,7 +748,7 @@ export const PatientRecords: React.FC = () => {
                 />
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">Severity</span>
+                <span className="text-sm font-semibold text-gray-700">{t('patient.records.severity')}</span>
                 <select
                   value={allergyForm.severity}
                   onChange={(event) =>
@@ -703,13 +759,13 @@ export const PatientRecords: React.FC = () => {
                   }
                   className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10"
                 >
-                  <option value="mild">Mild</option>
-                  <option value="moderate">Moderate</option>
-                  <option value="severe">Severe</option>
+                  <option value="mild">{t('patient.records.severityMild')}</option>
+                  <option value="moderate">{t('patient.records.severityModerate')}</option>
+                  <option value="severe">{t('patient.records.severitySevere')}</option>
                 </select>
               </label>
               <label className="block space-y-2 md:col-span-2">
-                <span className="text-sm font-semibold text-gray-700">Reaction</span>
+                <span className="text-sm font-semibold text-gray-700">{t('patient.records.reaction')}</span>
                 <textarea
                   rows={4}
                   value={allergyForm.reaction}
@@ -731,7 +787,7 @@ export const PatientRecords: React.FC = () => {
                   }
                   className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
                 />
-                Mark this allergy as doctor-confirmed
+                {t('patient.records.confirmAllergyDoctor')}
               </label>
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
@@ -741,14 +797,14 @@ export const PatientRecords: React.FC = () => {
                 className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-3 text-sm font-semibold text-white transition hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Save className="h-4 w-4" />
-                {submittingForm === 'allergy' ? 'Saving...' : 'Save allergy'}
+                {submittingForm === 'allergy' ? t('patient.records.saving') : t('patient.records.saveAllergy')}
               </button>
               <button
                 type="button"
                 onClick={resetForms}
                 className="rounded-xl border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
               >
-                Cancel
+                {t('patient.records.cancel')}
               </button>
             </div>
           </form>
@@ -758,21 +814,21 @@ export const PatientRecords: React.FC = () => {
           <form onSubmit={handleCreateVaccination} className="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Add vaccination</h2>
-                <p className="mt-1 text-sm text-gray-600">Log immunizations and any future doses you need to follow up on.</p>
+                <h2 className="text-xl font-bold text-gray-900">{t('patient.records.addVax')}</h2>
+                <p className="mt-1 text-sm text-gray-600">{t('patient.records.addVaxSub')}</p>
               </div>
               <button
                 type="button"
                 onClick={resetForms}
                 className="rounded-xl border border-gray-200 p-2 text-gray-500 transition hover:bg-gray-50 hover:text-gray-700"
-                aria-label="Close form"
+                aria-label={t('patient.records.closeForm')}
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">Vaccine name</span>
+                <span className="text-sm font-semibold text-gray-700">{t('patient.records.vaccineName')}</span>
                 <input
                   required
                   type="text"
@@ -784,7 +840,7 @@ export const PatientRecords: React.FC = () => {
                 />
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">Dose number</span>
+                <span className="text-sm font-semibold text-gray-700">{t('patient.records.doseNumber')}</span>
                 <input
                   type="number"
                   min="1"
@@ -796,7 +852,7 @@ export const PatientRecords: React.FC = () => {
                 />
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">Administered date</span>
+                <span className="text-sm font-semibold text-gray-700">{t('patient.records.administeredDate')}</span>
                 <input
                   type="date"
                   value={vaccinationForm.administeredDate}
@@ -810,7 +866,7 @@ export const PatientRecords: React.FC = () => {
                 />
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">Administered by</span>
+                <span className="text-sm font-semibold text-gray-700">{t('patient.records.administeredBy')}</span>
                 <input
                   type="text"
                   value={vaccinationForm.administeredBy}
@@ -824,7 +880,7 @@ export const PatientRecords: React.FC = () => {
                 />
               </label>
               <label className="block space-y-2 md:col-span-2">
-                <span className="text-sm font-semibold text-gray-700">Next dose due</span>
+                <span className="text-sm font-semibold text-gray-700">{t('patient.records.nextDose')}</span>
                 <input
                   type="date"
                   value={vaccinationForm.nextDoseDue}
@@ -842,14 +898,14 @@ export const PatientRecords: React.FC = () => {
                 className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-indigo-500 px-5 py-3 text-sm font-semibold text-white transition hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Save className="h-4 w-4" />
-                {submittingForm === 'vaccination' ? 'Saving...' : 'Save vaccination'}
+                {submittingForm === 'vaccination' ? t('patient.records.saving') : t('patient.records.saveVax')}
               </button>
               <button
                 type="button"
                 onClick={resetForms}
                 className="rounded-xl border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
               >
-                Cancel
+                {t('patient.records.cancel')}
               </button>
             </div>
           </form>
@@ -866,25 +922,23 @@ export const PatientRecords: React.FC = () => {
             <div className="absolute top-0 right-0 w-64 h-64 opacity-5">
               <img
                 src="https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg?auto=compress&cs=tinysrgb&w=400"
-                alt="Medical Records"
+                alt={t('patient.records.title')}
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="relative p-12 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <div className="w-20 h-20 bg-gradient-to-br from-ceenai-cyan to-ceenai-blue rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <FileText className="w-10 h-10 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">No matching records yet</h3>
-              <p className="text-gray-600">
-                Add conditions, allergies, and vaccinations so your medical history is available throughout the patient experience.
-              </p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('patient.records.noMatchTitle')}</h3>
+              <p className="text-gray-600">{t('patient.records.emptyStateBody')}</p>
               <button
                 type="button"
                 onClick={() => setActiveForm('condition')}
-                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:shadow-lg"
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan px-5 py-3 text-sm font-semibold text-white transition hover:shadow-lg"
               >
                 <Plus className="h-4 w-4" />
-                Add your first record
+                {t('patient.records.emptyStateCta')}
               </button>
             </div>
           </div>
@@ -899,7 +953,7 @@ export const PatientRecords: React.FC = () => {
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="text-xl font-bold text-gray-900">{record.title}</h3>
                         <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold uppercase text-gray-600">
-                          {getCategoryLabel(record.category)}
+                          {recordCategoryLabel(record.category)}
                         </span>
                       </div>
                       {record.subtitle ? (
@@ -910,10 +964,10 @@ export const PatientRecords: React.FC = () => {
                   <span
                     className={`w-fit rounded-full px-3 py-1 text-xs font-semibold uppercase ${getStatusClasses(
                       record.category,
-                      record.statusLabel
+                      record.category === 'vaccination' ? 'recorded' : record.statusLabel
                     )}`}
                   >
-                    {record.statusLabel}
+                    {record.displayStatus}
                   </span>
                 </div>
 
@@ -928,7 +982,7 @@ export const PatientRecords: React.FC = () => {
                   ))}
                   {record.dateLabel ? (
                     <span className="rounded-full border border-gray-200 px-3 py-1 text-xs font-medium text-gray-600">
-                      Recorded {record.dateLabel}
+                      {t('patient.records.recordedOn', { date: record.dateLabel })}
                     </span>
                   ) : null}
                 </div>
@@ -947,7 +1001,7 @@ export const PatientRecords: React.FC = () => {
                     className="inline-flex items-center gap-2 rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <Trash2 className="h-4 w-4" />
-                    {busyDeleteId === record.id ? 'Removing...' : 'Remove'}
+                    {busyDeleteId === record.id ? t('patient.records.removing') : t('patient.records.remove')}
                   </button>
                 </div>
               </div>
@@ -959,9 +1013,7 @@ export const PatientRecords: React.FC = () => {
           <div className="mt-8 rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-4 text-sm text-cyan-900">
             <div className="flex items-start gap-3">
               <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-cyan-700" />
-              <p>
-                Keep this record current so future AI and care workflows can use accurate medical history automatically.
-              </p>
+              <p>{t('patient.records.footerDisclaimer')}</p>
             </div>
           </div>
         ) : null}

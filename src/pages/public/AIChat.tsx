@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Send, User, Bot, Calendar, Sparkles } from 'lucide-react';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
+import { dateTimeFormatWithNumerals, resolveLocale } from '../../lib/i18n-ui';
 
 interface Message {
   id: string;
@@ -13,6 +15,9 @@ interface Message {
 }
 
 export const AIChat: React.FC = () => {
+  const { i18n } = useTranslation('common');
+  const locale = resolveLocale(i18n.language);
+  const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(i18n.language, options);
   const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const conversationContextRef = useRef<string[]>([]);
@@ -300,7 +305,7 @@ export const AIChat: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex flex-col relative">
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-gradient-to-b from-slate-50 via-white to-white">
       <div className="absolute inset-0 z-0 opacity-5">
         <img
           src="https://images.pexels.com/photos/8438971/pexels-photo-8438971.jpeg?auto=compress&cs=tinysrgb&w=1920"
@@ -310,18 +315,18 @@ export const AIChat: React.FC = () => {
       </div>
       <Header />
 
-      <div className="flex-1 max-w-5xl w-full mx-auto px-4 py-6 flex flex-col relative z-10">
-        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-4 mb-4 flex items-start space-x-3 shadow-sm">
-          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-            <Sparkles className="w-5 h-5 text-blue-600" />
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-8">
+        <div className="mb-6 flex items-start space-x-3 rounded-[2rem] border border-cyan-200 bg-white/95 p-5 shadow-sm backdrop-blur">
+          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-cyan-50">
+            <Sparkles className="h-5 w-5 text-ceenai-blue" />
           </div>
           <div className="flex-1">
-            <h3 className="text-sm font-semibold text-blue-900 mb-1">AI Health Assistant</h3>
-            <p className="text-xs text-blue-800">
+            <h3 className="mb-1 text-sm font-semibold text-slate-900">AI Health Assistant</h3>
+            <p className="text-sm text-slate-600">
               Get instant health guidance powered by medical knowledge. For appointments and records,{' '}
               <button
                 onClick={() => navigate('/auth')}
-                className="underline hover:text-blue-700 font-medium"
+                className="font-semibold text-ceenai-blue underline hover:text-ceenai-blue-dark"
               >
                 create a free account
               </button>
@@ -330,20 +335,20 @@ export const AIChat: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex-1 bg-white rounded-2xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
-          <div className="bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-4">
+        <div className="flex flex-1 flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-200 bg-slate-950 px-6 py-5">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <Bot className="w-6 h-6 text-white" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm">
+                <Bot className="h-6 w-6 text-cyan-300" />
               </div>
               <div>
-                <h2 className="text-white font-semibold">AI Health Chat</h2>
-                <p className="text-blue-100 text-xs">Always here to help</p>
+                <h2 className="font-semibold text-white">AI Health Chat</h2>
+                <p className="text-xs text-slate-300">Always here to help</p>
               </div>
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gradient-to-b from-gray-50/50 to-white">
+          <div className="flex-1 space-y-6 overflow-y-auto bg-gradient-to-b from-slate-50/70 to-white p-6">
             {messages.map((message) => (
               <div key={message.id} className="animate-fade-in">
                 <div
@@ -352,36 +357,39 @@ export const AIChat: React.FC = () => {
                   }`}
                 >
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${
+                    className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl shadow-sm ${
                       message.role === 'user'
-                        ? 'bg-gradient-to-br from-blue-600 to-blue-700'
-                        : 'bg-gradient-to-br from-green-100 to-cyan-100'
+                        ? 'bg-gradient-to-br from-ceenai-blue to-ceenai-navy'
+                        : 'bg-gradient-to-br from-cyan-100 to-blue-100'
                     }`}
                   >
                     {message.role === 'user' ? (
-                      <User className="w-5 h-5 text-white" />
+                      <User className="h-5 w-5 text-white" />
                     ) : (
-                      <Bot className="w-5 h-5 text-green-600" />
+                      <Bot className="h-5 w-5 text-ceenai-blue" />
                     )}
                   </div>
                   <div className="flex-1 max-w-2xl">
                     <div
-                      className={`px-5 py-3 rounded-2xl shadow-sm ${
+                      className={`rounded-[1.5rem] px-5 py-4 shadow-sm ${
                         message.role === 'user'
-                          ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white'
-                          : 'bg-white border border-gray-200 text-gray-900'
+                          ? 'bg-gradient-to-br from-ceenai-blue to-ceenai-navy text-white'
+                          : 'border border-slate-200 bg-white text-slate-900'
                       }`}
                     >
-                      <p className="text-sm leading-relaxed whitespace-pre-line">{message.content}</p>
+                      <p className="whitespace-pre-line text-sm leading-relaxed">{message.content}</p>
                       <p
                         className={`text-xs mt-2 ${
-                          message.role === 'user' ? 'text-blue-200' : 'text-gray-400'
+                          message.role === 'user' ? 'text-blue-100' : 'text-slate-400'
                         }`}
                       >
-                        {message.timestamp.toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
+                        {message.timestamp.toLocaleTimeString(
+                          locale,
+                          dtOpts({
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })
+                        )}
                       </p>
                     </div>
                     {message.suggestions && message.suggestions.length > 0 && (
@@ -390,7 +398,7 @@ export const AIChat: React.FC = () => {
                           <button
                             key={idx}
                             onClick={() => handleSuggestionClick(suggestion)}
-                            className="px-4 py-2 bg-gradient-to-r from-blue-50 to-cyan-50 hover:from-blue-100 hover:to-cyan-100 border border-blue-200 text-blue-700 rounded-full text-xs font-medium transition-all hover:shadow-md hover:scale-105"
+                            className="rounded-full border border-cyan-200 bg-cyan-50 px-4 py-2 text-xs font-medium text-cyan-800 transition-all hover:bg-cyan-100 hover:shadow-sm"
                           >
                             {suggestion}
                           </button>
@@ -404,10 +412,10 @@ export const AIChat: React.FC = () => {
 
             {isTyping && (
               <div className="flex items-start space-x-3 animate-fade-in">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-100 to-cyan-100 flex items-center justify-center shadow-md">
-                  <Bot className="w-5 h-5 text-green-600" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-100 to-blue-100 shadow-sm">
+                  <Bot className="h-5 w-5 text-ceenai-blue" />
                 </div>
-                <div className="bg-white border border-gray-200 px-5 py-3 rounded-2xl shadow-sm">
+                <div className="rounded-[1.5rem] border border-slate-200 bg-white px-5 py-3 shadow-sm">
                   <div className="flex space-x-2">
                     <div className="w-2.5 h-2.5 bg-blue-400 rounded-full animate-bounce"></div>
                     <div className="w-2.5 h-2.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
@@ -419,7 +427,7 @@ export const AIChat: React.FC = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="border-t border-gray-200 bg-white p-4 sm:p-6">
+          <div className="border-t border-slate-200 bg-white p-4 sm:p-6">
             <form onSubmit={handleSendMessage} className="flex items-end space-x-3">
               <div className="flex-1">
                 <textarea
@@ -433,48 +441,48 @@ export const AIChat: React.FC = () => {
                   }}
                   placeholder="Ask me anything about your health..."
                   rows={1}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 resize-none transition-colors"
+                  className="w-full resize-none rounded-[1.5rem] border border-slate-200 bg-slate-50/70 px-4 py-3 outline-none transition focus:border-ceenai-cyan focus:bg-white focus:ring-2 focus:ring-ceenai-cyan/20"
                   style={{ minHeight: '48px', maxHeight: '120px' }}
                 />
               </div>
               <button
                 type="submit"
                 disabled={!input.trim() || isTyping}
-                className="p-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 disabled:from-gray-300 disabled:to-gray-300 text-white rounded-xl transition-all shadow-md hover:shadow-lg disabled:cursor-not-allowed flex-shrink-0"
+                className="flex-shrink-0 rounded-2xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue p-3 text-white shadow-sm transition-all hover:shadow-lg disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-300"
               >
                 <Send className="w-5 h-5" />
               </button>
             </form>
             <div className="mt-3 flex items-center justify-between">
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-slate-500">
                 Press Enter to send, Shift+Enter for new line
               </p>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-slate-400">
                 AI-powered health guidance
               </p>
             </div>
           </div>
         </div>
 
-        <div className="mt-4 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl p-4 shadow-lg">
+        <div className="mt-6 rounded-[2rem] bg-slate-950 p-5 shadow-xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Calendar className="w-6 h-6 text-white" />
+              <Calendar className="h-6 w-6 text-cyan-300" />
               <div>
-                <p className="text-white font-semibold text-sm">Ready for professional care?</p>
-                <p className="text-blue-100 text-xs">Book with verified specialists instantly</p>
+                <p className="text-sm font-semibold text-white">Ready for professional care?</p>
+                <p className="text-xs text-slate-300">Book with verified specialists instantly</p>
               </div>
             </div>
             <button
               onClick={() => navigate('/find-doctor')}
-              className="px-6 py-2.5 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition-all shadow-md hover:shadow-lg"
+              className="rounded-full bg-white px-6 py-2.5 font-semibold text-slate-950 transition-all hover:bg-slate-100"
             >
               Find Doctors
             </button>
           </div>
         </div>
 
-        <p className="text-xs text-center text-gray-500 mt-4 px-4">
+        <p className="mt-4 px-4 text-center text-xs text-slate-500">
           This AI assistant provides general health information only and is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.
         </p>
       </div>

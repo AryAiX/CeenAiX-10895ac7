@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface PageHeaderProps {
   title: string;
@@ -20,6 +21,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   actions
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
 
   const handleBack = () => {
     if (backTo) {
@@ -38,7 +40,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
               <button
                 onClick={handleBack}
                 className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all duration-200 group"
-                aria-label="Go back"
+                aria-label={t('pageHeader.goBack')}
               >
                 <ArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-gray-900 transition-colors" />
               </button>

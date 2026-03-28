@@ -5,7 +5,7 @@ import { PageHeader } from '../../components/PageHeader';
 
 export const DoctorMessages: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
       <Navigation role="doctor" />
       <PageHeader
         title="Messages"

@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, Calendar, Clock, ChevronLeft, ChevronRight, MapPin, Video } from 'lucide-react';
+import { dateTimeFormatWithNumerals, resolveLocale } from '../lib/i18n-ui';
 import { supabase } from '../lib/supabase';
 
 interface Doctor {
@@ -23,6 +25,9 @@ interface TimeSlot {
 }
 
 export const BookingModal: React.FC<BookingModalProps> = ({ doctor, onClose, onBookingComplete }) => {
+  const { i18n } = useTranslation('common');
+  const locale = resolveLocale(i18n.language);
+  const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(i18n.language, options);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [appointmentType, setAppointmentType] = useState<'in-person' | 'video'>('in-person');
@@ -326,12 +331,15 @@ export const BookingModal: React.FC<BookingModalProps> = ({ doctor, onClose, onB
                     <span className="font-semibold text-gray-900">Selected Appointment</span>
                   </div>
                   <p className="text-gray-700">
-                    {selectedDate.toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
+                    {selectedDate.toLocaleDateString(
+                      locale,
+                      dtOpts({
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })
+                    )}
                   </p>
                   <p className="text-gray-700 font-semibold">{selectedTime}</p>
                   <p className="text-sm text-gray-600 mt-1">{appointmentType === 'video' ? 'Video Consultation' : 'In-Person Visit'}</p>
