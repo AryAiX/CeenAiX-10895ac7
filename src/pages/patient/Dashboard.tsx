@@ -18,15 +18,18 @@ import {
   AlertCircle,
   CheckCircle2,
 } from 'lucide-react';
+import { MedicationNameDisplay } from '../../components/MedicationNameDisplay';
 import { Skeleton } from '../../components/Skeleton';
 import { useAuth } from '../../lib/auth-context';
 import { usePatientDashboard } from '../../hooks';
 import {
   appointmentTypeLabel,
   dateTimeFormatWithNumerals,
+  formatLocaleDigits,
   formatRelativeTime,
   resolveLocale,
 } from '../../lib/i18n-ui';
+import { formatMedicationDetailLine } from '../../lib/medication-display';
 
 const getDisplayName = (fullName: string | null | undefined, firstName: string | null | undefined, email?: string) => {
   if (firstName?.trim()) {
@@ -51,7 +54,8 @@ export const PatientDashboard: React.FC = () => {
   const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(i18n.language, options);
   const { profile, user } = useAuth();
   const { data: dashboardData, loading: dashboardLoading, error: dashboardError } = usePatientDashboard(
-    user?.id
+    user?.id,
+    i18n.language
   );
 
   const quickActions = useMemo(
@@ -150,7 +154,7 @@ export const PatientDashboard: React.FC = () => {
                 <Skeleton className="mb-2 h-9 w-12" />
               ) : (
                 <p className="text-3xl font-bold text-gray-900 mb-1">
-                  {dashboardData?.upcomingAppointmentsCount ?? 0}
+                  {formatLocaleDigits(dashboardData?.upcomingAppointmentsCount ?? 0, i18n.language)}
                 </p>
               )}
               <p className="text-sm text-cyan-600 font-medium">{t('nav.appointments')}</p>
@@ -180,7 +184,7 @@ export const PatientDashboard: React.FC = () => {
                 <Skeleton className="mb-2 h-9 w-12" />
               ) : (
                 <p className="text-3xl font-bold text-gray-900 mb-1">
-                  {dashboardData?.activePrescriptionsCount ?? 0}
+                  {formatLocaleDigits(dashboardData?.activePrescriptionsCount ?? 0, i18n.language)}
                 </p>
               )}
               <p className="text-sm text-cyan-600 font-medium">{t('nav.prescriptions')}</p>
@@ -210,7 +214,7 @@ export const PatientDashboard: React.FC = () => {
                 <Skeleton className="mb-2 h-9 w-12" />
               ) : (
                 <p className="text-3xl font-bold text-gray-900 mb-1">
-                  {dashboardData?.unreadMessagesCount ?? 0}
+                  {formatLocaleDigits(dashboardData?.unreadMessagesCount ?? 0, i18n.language)}
                 </p>
               )}
               <p className="text-sm text-cyan-600 font-medium">{t('nav.messages')}</p>
@@ -439,10 +443,25 @@ export const PatientDashboard: React.FC = () => {
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <p className="font-semibold text-gray-900 text-sm">{medication.medicationName}</p>
+                            <div className="text-sm">
+                              <MedicationNameDisplay
+                                canonicalName={medication.medicationName}
+                                localizedName={medication.medicationNameAr}
+                                language={i18n.language ?? 'en'}
+                                primaryClassName="block font-semibold text-gray-900"
+                                secondaryClassName="block text-xs font-normal text-gray-500 mt-0.5"
+                              />
+                            </div>
                             <p className="text-xs text-gray-600 mt-1 flex items-center">
                               <Clock className="w-3 h-3 mr-1" />
-                              {medication.detail}
+                              {formatMedicationDetailLine(t, i18n.language, {
+                                dosage: medication.dosage,
+                                frequency: medication.frequency,
+                                duration: medication.duration,
+                                detail: medication.detail,
+                                frequencyFromVocab: medication.frequencyFromVocab ?? undefined,
+                                durationFromVocab: medication.durationFromVocab ?? undefined,
+                              })}
                             </p>
                           </div>
                           {medication.isDispensed ? (

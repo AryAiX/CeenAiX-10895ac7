@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabase';
+import { resolveClinicalVocabLabel, type PrescriptionClinicalVocabRow } from '../lib/prescription-vocab';
 import { useQuery } from './use-query';
-import type { NotificationType } from '../types';
+import type { NotificationType, PrescriptionItem } from '../types';
 
 interface DashboardAppointment {
   id: string;
@@ -10,10 +11,18 @@ interface DashboardAppointment {
   type: 'in_person' | 'virtual';
 }
 
-interface DashboardMedication {
+export interface DashboardMedication {
   id: string;
   medicationName: string;
+  dosage: string | null;
+  frequency: string | null;
+  duration: string | null;
+  /** Joined English fallback when parts are missing */
   detail: string;
+  /** Resolved from `prescription_clinical_vocab` for current UI language */
+  frequencyFromVocab: string | null;
+  durationFromVocab: string | null;
+  medicationNameAr: string | null;
   isDispensed: boolean;
 }
 
@@ -37,7 +46,7 @@ export interface PatientDashboardData {
 
 const UPCOMING_STATUSES = new Set(['scheduled', 'confirmed', 'in_progress']);
 
-export function usePatientDashboard(userId: string | null | undefined) {
+export function usePatientDashboard(userId: string | null | undefined, uiLanguage: string) {
   return useQuery<PatientDashboardData | null>(async () => {
     if (!userId) {
       return null;
@@ -46,11 +55,16 @@ export function usePatientDashboard(userId: string | null | undefined) {
     const now = new Date();
 
     const [
+      { data: vocabData, error: vocabError },
       { data: appointments, error: appointmentsError },
       { data: prescriptions, error: prescriptionsError },
       { data: notifications, error: notificationsError },
       { data: conversations, error: conversationsError },
     ] = await Promise.all([
+      supabase
+        .from('prescription_clinical_vocab')
+        .select('category, code, label_en, label_ar, legacy_match')
+        .eq('is_active', true),
       supabase
         .from('appointments')
         .select('id, doctor_id, type, status, scheduled_at')
@@ -87,6 +101,13 @@ export function usePatientDashboard(userId: string | null | undefined) {
 
     if (conversationsError) {
       throw conversationsError;
+    }
+
+    let vocabRows: PrescriptionClinicalVocabRow[] = [];
+    if (vocabError) {
+      console.warn('[usePatientDashboard] prescription_clinical_vocab unavailable:', vocabError.message);
+    } else {
+      vocabRows = (vocabData ?? []) as PrescriptionClinicalVocabRow[];
     }
 
     const safeAppointments = appointments ?? [];
@@ -147,7 +168,9 @@ export function usePatientDashboard(userId: string | null | undefined) {
     if (activePrescriptionIds.length > 0) {
       const { data: prescriptionItems, error: prescriptionItemsError } = await supabase
         .from('prescription_items')
-        .select('id, medication_name, dosage, frequency, duration, is_dispensed')
+        .select(
+          'id, medication_name, medication_name_ar, dosage, frequency, duration, frequency_code, duration_code, is_dispensed'
+        )
         .in('prescription_id', activePrescriptionIds)
         .order('created_at', { ascending: false })
         .limit(3);
@@ -157,12 +180,39 @@ export function usePatientDashboard(userId: string | null | undefined) {
       }
 
       medications =
-        prescriptionItems?.map((item) => ({
-          id: item.id,
-          medicationName: item.medication_name,
-          detail: [item.dosage, item.frequency, item.duration].filter(Boolean).join(' • ') || 'Active prescription',
-          isDispensed: item.is_dispensed,
-        })) ?? [];
+        prescriptionItems?.map((raw) => {
+          const item = raw as PrescriptionItem;
+          const dosage = item.dosage?.trim() || null;
+          const frequency = item.frequency?.trim() || null;
+          const duration = item.duration?.trim() || null;
+          const joined = [dosage, frequency, duration].filter(Boolean).join(' • ');
+          const frequencyFromVocab = resolveClinicalVocabLabel(
+            vocabRows,
+            'frequency',
+            item.frequency_code,
+            frequency,
+            uiLanguage
+          );
+          const durationFromVocab = resolveClinicalVocabLabel(
+            vocabRows,
+            'duration',
+            item.duration_code,
+            duration,
+            uiLanguage
+          );
+          return {
+            id: item.id,
+            medicationName: item.medication_name,
+            medicationNameAr: item.medication_name_ar?.trim() || null,
+            dosage,
+            frequency,
+            duration,
+            detail: joined || 'Active prescription',
+            frequencyFromVocab,
+            durationFromVocab,
+            isDispensed: item.is_dispensed,
+          };
+        }) ?? [];
     }
 
     const conversationIds = (conversations ?? []).map((conversation) => conversation.id);
@@ -212,5 +262,5 @@ export function usePatientDashboard(userId: string | null | undefined) {
       medications,
       recentActivity,
     };
-  }, [userId]);
+  }, [userId, uiLanguage]);
 }

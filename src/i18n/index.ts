@@ -2,11 +2,13 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import arCommon from '../locales/ar/common.json';
 import arExtra from '../locales/ar/extra.json';
+import arInsurancePage from '../locales/ar/insurancePage.json';
 import enCommon from '../locales/en/common.json';
 import enExtra from '../locales/en/extra.json';
+import enInsurancePage from '../locales/en/insurancePage.json';
 
-const enMerged = { ...enCommon, ...enExtra };
-const arMerged = { ...arCommon, ...arExtra };
+const enMerged = { ...enCommon, ...enExtra, ...enInsurancePage };
+const arMerged = { ...arCommon, ...arExtra, ...arInsurancePage };
 
 export const LOCALE_STORAGE_KEY = 'ceenaix.lang';
 

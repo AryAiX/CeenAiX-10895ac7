@@ -69,9 +69,13 @@
     },
     "stats": {
       "patients": "مرضى",
+      "patientsValue": "١٥ ألف+",
       "doctors": "أطباء",
+      "doctorsValue": "٨٥٠+",
       "appointments": "مواعيد",
-      "aiSupport": "دعم ذكاء اصطناعي"
+      "appointmentsValue": "٧٥ ألف+",
+      "aiSupport": "دعم ذكاء اصطناعي",
+      "aiSupportValue": "٢٤/٧"
     },
     "featureSection": {
       "title": "كل ما تحتاجه للرعاية الحديثة",
@@ -129,6 +133,210 @@
       "lead": "انضم إلى المرضى والأطباء الذين يستخدمون سينآي إكس لحجز أذكى واستعداد أفضل ورحلات رعاية أكثر اتصالاً.",
       "patientPortal": "بوابة المريض",
       "doctorPortal": "بوابة الطبيب"
+    }
+  },
+  "findDoctor": {
+    "backToHome": "العودة للرئيسية",
+    "titleLine1": "تواصل مع",
+    "titleLine2": "أطباء خبراء",
+    "lead": "تصفّح شبكة المختصين المعتمدين لدينا واحجز المواعيد فوراً",
+    "heroDoctorsValue": "٨٥٠+",
+    "heroDoctorsLabel": "أطباء موثّقون",
+    "heroRatingValue": "٤٫٩★",
+    "heroRatingLabel": "متوسط التقييم",
+    "heroAvailabilityValue": "٢٤/٧",
+    "heroAvailabilityLabel": "التوفر",
+    "searchPlaceholder": "ابحث بالاسم أو التخصص...",
+    "doctorsAvailable": "{{count}} طبيب متاح",
+    "verifiedProfessionals": "جميع المختصين موثّقون",
+    "videoConsult": "فيديو",
+    "slotsAvailable": "{{slots}} أوقات متاحة",
+    "bookAppointment": "احجز موعداً",
+    "noResultsTitle": "لا يوجد أطباء",
+    "noResultsLead": "جرّب تعديل البحث أو عوامل التصفية",
+    "clearFilters": "مسح التصفية",
+    "altHero": "مختصون صحيون",
+    "displayNames": {
+      "drSarahAhmed": "د. سارة أحمد",
+      "drMohammedHassan": "د. محمد حسن",
+      "drFatimaAlRashid": "د. فاطمة الرشيد",
+      "drAhmedKhalil": "د. أحمد خليل",
+      "drPriyaSharma": "د. بريا شارما",
+      "drOmarAlMansouri": "د. عمر المنصوري",
+      "drJenniferWong": "د. جينيفر وونغ",
+      "drYoussefIbrahim": "د. يوسف إبراهيم",
+      "drMarinaIvanova": "د. مارينا إيفانوفا",
+      "drRajeshPatel": "د. راجيش باتيل",
+      "drLaylaHassan": "د. ليلى حسن",
+      "drMichaelChen": "د. مايكل تشن",
+      "drAishaAlZaabi": "د. عائشة الزعابي",
+      "drCarlosRodriguez": "د. كارلوس رودريغيز",
+      "drNadiaMalik": "د. نادية مالك",
+      "drHassanFarooq": "د. حسن فاروق"
+    },
+    "specialtyLabels": {
+      "generalMedicine": "الطب العام",
+      "cardiology": "أمراض القلب",
+      "dermatology": "الأمراض الجلدية",
+      "orthopedics": "جراحة العظام",
+      "pediatrics": "طب الأطفال",
+      "neurology": "الأعصاب",
+      "gynecology": "النساء والتوليد",
+      "ophthalmology": "العيون",
+      "psychiatry": "الطب النفسي",
+      "gastroenterology": "الجهاز الهضمي",
+      "endocrinology": "الغدد الصماء",
+      "pulmonology": "الأمراض الصدرية",
+      "rheumatology": "الروماتيزم",
+      "urology": "المسالك البولية",
+      "allergyImmunology": "الحساسية والمناعة",
+      "oncology": "الأورام"
+    },
+    "locationLabels": {
+      "dubaiHealthcareCity": "مدينة دبي الطبية",
+      "alZahraHospital": "مستشفى الزهراء",
+      "mediclinicCityHospital": "مستشفى ميديكلينيك سيتي",
+      "nmcRoyalHospital": "مستشفى إن إم سي رويال",
+      "asterHospital": "مستشفى أستر",
+      "mediclinicParkview": "ميديكلينيك بارك فيو",
+      "burjeelHospital": "مستشفى برجيل",
+      "moorfieldsEyeHospital": "مستشفى مورفيلدز للعيون",
+      "americanHospitalDubai": "المستشفى الأمريكي — دبي",
+      "emiratesHospital": "مستشفى الإمارات",
+      "saudiGermanHospital": "مستشفى السعودي الألماني",
+      "rashidHospital": "مستشفى راشد",
+      "clevelandClinicAbuDhabi": "كليفلاند كلينيك أبوظبي",
+      "zulekhaHospital": "مستشفى زليخة",
+      "primeHospital": "مستشفى برايم"
+    },
+    "specialties": {
+      "all": "جميع التخصصات",
+      "cardiologist": "أخصائي قلب",
+      "pediatrician": "طبيب أطفال",
+      "dermatologist": "أخصائي جلدية",
+      "orthopedicSurgeon": "جراح عظام",
+      "generalPractitioner": "طبيب عام",
+      "neurologist": "أخصائي أعصاب",
+      "gynecologist": "أخصائي نساء وتوليد",
+      "ophthalmologist": "أخصائي عيون",
+      "psychiatrist": "أخصائي نفسي",
+      "endocrinologist": "أخصائي غدد صماء"
+    }
+  },
+  "pharmacyPage": {
+    "heroTitle": "اعثر على أقرب صيدلية",
+    "heroLead": "اكتشف صيدليات موثوقة في منطقتك مع خيارات توصيل وخدمة على مدار الساعة",
+    "heroAlt": "صيدلية",
+    "searchPlaceholder": "ابحث باسم الصيدلية أو الموقع...",
+    "filterAll": "كل الصيدليات",
+    "filter24h": "مفتوحة ٢٤/٧",
+    "filterDelivery": "توصيل متاح",
+    "badge24h": "٢٤/٧",
+    "badgeDelivery": "توصيل",
+    "reviews": "({{count}} تقييماً)",
+    "distanceKm": "{{km}} كم",
+    "locationDistance": "{{location}} • {{distance}}",
+    "orderNow": "اطلب الآن",
+    "directions": "الاتجاهات",
+    "noResultsTitle": "لا توجد صيدليات",
+    "noResultsLead": "جرّب تعديل البحث أو عوامل التصفية",
+    "stores": {
+      "lifeCare": {
+        "name": "صيدلية لايف كير",
+        "location": "شارع الشيخ زايد، دبي",
+        "hours": "٢٤/٧"
+      },
+      "mediplus": {
+        "name": "صيدلية ميدي بلس",
+        "location": "دبي مارينا",
+        "hours": "٨:٠٠ ص – ١٠:٠٠ م"
+      },
+      "healthFirst": {
+        "name": "صيدلية هيلث فرست",
+        "location": "طريق شاطئ جميرا",
+        "hours": "٢٤/٧"
+      },
+      "city": {
+        "name": "صيدلية سيتي",
+        "location": "الخليج التجاري",
+        "hours": "٧:٠٠ ص – ١١:٠٠ م"
+      },
+      "wellness": {
+        "name": "صيدلية ويلنس",
+        "location": "وسط مدينة دبي",
+        "hours": "٩:٠٠ ص – ٩:٠٠ م"
+      },
+      "quickMed": {
+        "name": "صيدلية كويك ميد",
+        "location": "ديرة سيتي سنتر",
+        "hours": "٢٤/٧"
+      }
+    }
+  },
+  "laboratoryPage": {
+    "heroBadge": "تشخيص معتمد",
+    "heroTitle": "ابحث عن مختبر",
+    "heroLead": "احجز الفحوصات التشخيصية والفحوصات الصحية في مختبرات معتمدة بنتائج دقيقة",
+    "heroBgAlt": "مختبر طبي",
+    "searchPlaceholder": "ابحث بالاسم أو الموقع...",
+    "allLocations": "كل المواقع",
+    "loading": "جاري تحميل المختبرات...",
+    "emptyState": "لا توجد مختبرات مطابقة لمعاييرك",
+    "featuredLab": "مختبر مميز",
+    "servicesLabel": "الخدمات:",
+    "testsAvailable": "{{count}}+ فحص متاح",
+    "moreServices": "+{{count}} أخرى",
+    "bookTest": "احجز فحصاً",
+    "benefitsTitle": "لماذا تختار مختبرات شركائنا؟",
+    "benefit1Title": "معتمد من هيئة دبي الصحية",
+    "benefit1Body": "جميع المختبرات تستوفي معايير هيئة الصحة في دبي",
+    "benefit2Title": "فحوصات متقدمة",
+    "benefit2Body": "معدات حديثة ونتائج دقيقة",
+    "benefit3Title": "نتائج سريعة",
+    "benefit3Body": "تسليم سريع مع إمكانية الاطلاع على النتائج إلكترونياً",
+    "labNames": {
+      "dubaiAdvanced": "مختبر دبي المتطور",
+      "healthCheck": "مركز هيلث تشيك للمختبرات",
+      "alBarshaMed": "المختبر الطبي في البرشاء",
+      "emiratesDiagnostic": "مركز الإمارات التشخيصي",
+      "cityLab": "سيتي لاب والتشخيص",
+      "premierMedical": "المختبر الطبي بريمير"
+    },
+    "locations": {
+      "dubaiHealthcareCity": "مدينة دبي الطبية",
+      "jumeirah": "جميرا",
+      "alBarsha": "البرشاء",
+      "dubaiMarina": "دبي مارينا",
+      "deira": "ديرة",
+      "businessBay": "الخليج التجاري"
+    },
+    "hours": {
+      "sevenToNine": "٧:٠٠ ص – ٩:٠٠ م",
+      "eightToEight": "٨:٠٠ ص – ٨:٠٠ م",
+      "eightToSeven": "٨:٠٠ ص – ٧:٠٠ م",
+      "sevenToTen": "٧:٠٠ ص – ١٠:٠٠ م",
+      "open24": "٢٤/٧"
+    },
+    "services": {
+      "bloodTests": "تحاليل دم",
+      "radiology": "الأشعة",
+      "pathology": "علم الأمراض",
+      "geneticTesting": "الفحص الجيني",
+      "covidPcr": "مسحة كوفيد-١٩ (PCR)",
+      "urineAnalysis": "تحليل بول",
+      "xRay": "أشعة سينية",
+      "ultrasound": "موجات فوق صوتية",
+      "ecg": "تخطيط كهربائية القلب",
+      "microbiology": "الأحياء الدقيقة",
+      "immunology": "المناعة",
+      "mri": "رنين مغناطيسي",
+      "ctScan": "أشعة مقطعية",
+      "nuclearMedicine": "الطب النووي",
+      "chemistry": "الكيمياء الحيوية",
+      "hematology": "أمراض الدم",
+      "advancedDiagnostics": "تشخيص متقدم",
+      "molecularTesting": "فحص جزيئي",
+      "toxicology": "علم السموم"
     }
   },
   "auth": {

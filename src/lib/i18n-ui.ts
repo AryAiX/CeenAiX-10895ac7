@@ -75,3 +75,42 @@ export const formatLocaleDigits = (value: number, language: string): string => {
     return String(value);
   }
 };
+
+/** Format decimals (e.g. star ratings) with locale-appropriate digits and separator */
+export const formatLocaleDecimal = (
+  value: number,
+  language: string,
+  fractionDigits = 1
+): string => {
+  if (!usesArabicEasternNumerals(language)) {
+    return value.toFixed(fractionDigits);
+  }
+  try {
+    return new Intl.NumberFormat('ar-AE', {
+      numberingSystem: 'arab',
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits,
+    }).format(value);
+  } catch {
+    return value.toFixed(fractionDigits);
+  }
+};
+
+const WESTERN_TO_ARABIC_INDIC: Record<string, string> = {
+  '0': '٠',
+  '1': '١',
+  '2': '٢',
+  '3': '٣',
+  '4': '٤',
+  '5': '٥',
+  '6': '٦',
+  '7': '٧',
+  '8': '٨',
+  '9': '٩',
+};
+
+/** Phone strings: keep + and spacing; map ASCII digits to Eastern Arabic-Indic in Arabic UI */
+export const formatLocalePhoneDisplay = (phone: string, language: string): string => {
+  if (!usesArabicEasternNumerals(language)) return phone;
+  return phone.replace(/[0-9]/g, (d) => WESTERN_TO_ARABIC_INDIC[d] ?? d);
+};

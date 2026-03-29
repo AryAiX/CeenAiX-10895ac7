@@ -10,6 +10,7 @@ import {
   appointmentStatusLabel,
   appointmentTypeLabel,
   dateTimeFormatWithNumerals,
+  formatLocaleDigits,
   resolveLocale,
 } from '../../lib/i18n-ui';
 
@@ -22,8 +23,9 @@ const getDisplayName = (fullName: string | null | undefined, firstName: string |
 export const DoctorDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation('common');
-  const locale = resolveLocale(i18n.language);
-  const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(i18n.language, options);
+  const uiLang = i18n.language ?? 'en';
+  const locale = resolveLocale(uiLang);
+  const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(uiLang, options);
   const { profile, user } = useAuth();
   const { data, loading, error } = useDoctorDashboard(user?.id);
 
@@ -75,7 +77,9 @@ export const DoctorDashboard: React.FC = () => {
                   {loading ? (
                     <Skeleton className="mt-2 h-9 w-12" />
                   ) : (
-                    <p className="text-3xl font-bold text-blue-600 mt-2">{data?.totalPatients ?? 0}</p>
+                    <p className="text-3xl font-bold text-blue-600 mt-2">
+                      {formatLocaleDigits(data?.totalPatients ?? 0, uiLang)}
+                    </p>
                   )}
                 </div>
                 <Users className="w-10 h-10 text-blue-200" />
@@ -88,7 +92,9 @@ export const DoctorDashboard: React.FC = () => {
                   {loading ? (
                     <Skeleton className="mt-2 h-9 w-12" />
                   ) : (
-                    <p className="text-3xl font-bold text-green-600 mt-2">{data?.todayAppointments ?? 0}</p>
+                    <p className="text-3xl font-bold text-green-600 mt-2">
+                      {formatLocaleDigits(data?.todayAppointments ?? 0, uiLang)}
+                    </p>
                   )}
                 </div>
                 <Calendar className="w-10 h-10 text-green-200" />
@@ -101,7 +107,9 @@ export const DoctorDashboard: React.FC = () => {
                   {loading ? (
                     <Skeleton className="mt-2 h-9 w-12" />
                   ) : (
-                    <p className="text-3xl font-bold text-orange-600 mt-2">{data?.pendingReviews ?? 0}</p>
+                    <p className="text-3xl font-bold text-orange-600 mt-2">
+                      {formatLocaleDigits(data?.pendingReviews ?? 0, uiLang)}
+                    </p>
                   )}
                 </div>
                 <FileText className="w-10 h-10 text-orange-200" />
@@ -114,7 +122,9 @@ export const DoctorDashboard: React.FC = () => {
                   {loading ? (
                     <Skeleton className="mt-2 h-9 w-12" />
                   ) : (
-                    <p className="text-3xl font-bold text-purple-600 mt-2">{data?.unreadMessages ?? 0}</p>
+                    <p className="text-3xl font-bold text-purple-600 mt-2">
+                      {formatLocaleDigits(data?.unreadMessages ?? 0, uiLang)}
+                    </p>
                   )}
                 </div>
                 <MessageSquare className="w-10 h-10 text-purple-200" />

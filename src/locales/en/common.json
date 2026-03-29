@@ -69,9 +69,13 @@
     },
     "stats": {
       "patients": "Patients",
+      "patientsValue": "15K+",
       "doctors": "Doctors",
+      "doctorsValue": "850+",
       "appointments": "Appointments",
-      "aiSupport": "AI Support"
+      "appointmentsValue": "75K+",
+      "aiSupport": "AI Support",
+      "aiSupportValue": "24/7"
     },
     "featureSection": {
       "title": "Everything you need for modern care",
@@ -129,6 +133,210 @@
       "lead": "Join patients and doctors using CeenAiX for smarter booking, better preparation, and more connected healthcare journeys.",
       "patientPortal": "Patient portal",
       "doctorPortal": "Doctor portal"
+    }
+  },
+  "findDoctor": {
+    "backToHome": "Back to Home",
+    "titleLine1": "Connect with",
+    "titleLine2": "Expert Doctors",
+    "lead": "Browse through our network of certified healthcare professionals and book appointments instantly",
+    "heroDoctorsValue": "850+",
+    "heroDoctorsLabel": "Verified Doctors",
+    "heroRatingValue": "4.9★",
+    "heroRatingLabel": "Average Rating",
+    "heroAvailabilityValue": "24/7",
+    "heroAvailabilityLabel": "Availability",
+    "searchPlaceholder": "Search by name or specialty...",
+    "doctorsAvailable": "{{count}} doctors available",
+    "verifiedProfessionals": "All verified professionals",
+    "videoConsult": "Video",
+    "slotsAvailable": "{{slots}} slots available",
+    "bookAppointment": "Book Appointment",
+    "noResultsTitle": "No doctors found",
+    "noResultsLead": "Try adjusting your search or filters",
+    "clearFilters": "Clear Filters",
+    "altHero": "Healthcare professionals",
+    "displayNames": {
+      "drSarahAhmed": "Dr. Sarah Ahmed",
+      "drMohammedHassan": "Dr. Mohammed Hassan",
+      "drFatimaAlRashid": "Dr. Fatima Al-Rashid",
+      "drAhmedKhalil": "Dr. Ahmed Khalil",
+      "drPriyaSharma": "Dr. Priya Sharma",
+      "drOmarAlMansouri": "Dr. Omar Al-Mansouri",
+      "drJenniferWong": "Dr. Jennifer Wong",
+      "drYoussefIbrahim": "Dr. Youssef Ibrahim",
+      "drMarinaIvanova": "Dr. Marina Ivanova",
+      "drRajeshPatel": "Dr. Rajesh Patel",
+      "drLaylaHassan": "Dr. Layla Hassan",
+      "drMichaelChen": "Dr. Michael Chen",
+      "drAishaAlZaabi": "Dr. Aisha Al-Zaabi",
+      "drCarlosRodriguez": "Dr. Carlos Rodriguez",
+      "drNadiaMalik": "Dr. Nadia Malik",
+      "drHassanFarooq": "Dr. Hassan Farooq"
+    },
+    "specialtyLabels": {
+      "generalMedicine": "General Medicine",
+      "cardiology": "Cardiology",
+      "dermatology": "Dermatology",
+      "orthopedics": "Orthopedics",
+      "pediatrics": "Pediatrics",
+      "neurology": "Neurology",
+      "gynecology": "Gynecology",
+      "ophthalmology": "Ophthalmology",
+      "psychiatry": "Psychiatry",
+      "gastroenterology": "Gastroenterology",
+      "endocrinology": "Endocrinology",
+      "pulmonology": "Pulmonology",
+      "rheumatology": "Rheumatology",
+      "urology": "Urology",
+      "allergyImmunology": "Allergy & Immunology",
+      "oncology": "Oncology"
+    },
+    "locationLabels": {
+      "dubaiHealthcareCity": "Dubai Healthcare City",
+      "alZahraHospital": "Al Zahra Hospital",
+      "mediclinicCityHospital": "Mediclinic City Hospital",
+      "nmcRoyalHospital": "NMC Royal Hospital",
+      "asterHospital": "Aster Hospital",
+      "mediclinicParkview": "Mediclinic Parkview",
+      "burjeelHospital": "Burjeel Hospital",
+      "moorfieldsEyeHospital": "Moorfields Eye Hospital",
+      "americanHospitalDubai": "American Hospital Dubai",
+      "emiratesHospital": "Emirates Hospital",
+      "saudiGermanHospital": "Saudi German Hospital",
+      "rashidHospital": "Rashid Hospital",
+      "clevelandClinicAbuDhabi": "Cleveland Clinic Abu Dhabi",
+      "zulekhaHospital": "Zulekha Hospital",
+      "primeHospital": "Prime Hospital"
+    },
+    "specialties": {
+      "all": "All Specialties",
+      "cardiologist": "Cardiologist",
+      "pediatrician": "Pediatrician",
+      "dermatologist": "Dermatologist",
+      "orthopedicSurgeon": "Orthopedic Surgeon",
+      "generalPractitioner": "General Practitioner",
+      "neurologist": "Neurologist",
+      "gynecologist": "Gynecologist",
+      "ophthalmologist": "Ophthalmologist",
+      "psychiatrist": "Psychiatrist",
+      "endocrinologist": "Endocrinologist"
+    }
+  },
+  "pharmacyPage": {
+    "heroTitle": "Find Your Nearest Pharmacy",
+    "heroLead": "Discover trusted pharmacies in your area with convenient delivery options and 24/7 availability",
+    "heroAlt": "Pharmacy",
+    "searchPlaceholder": "Search by pharmacy name or location...",
+    "filterAll": "All Pharmacies",
+    "filter24h": "24/7 Open",
+    "filterDelivery": "Delivery Available",
+    "badge24h": "24/7",
+    "badgeDelivery": "Delivery",
+    "reviews": "({{count}} reviews)",
+    "distanceKm": "{{km}} km",
+    "locationDistance": "{{location}} • {{distance}}",
+    "orderNow": "Order Now",
+    "directions": "Directions",
+    "noResultsTitle": "No pharmacies found",
+    "noResultsLead": "Try adjusting your search or filters",
+    "stores": {
+      "lifeCare": {
+        "name": "LifeCare Pharmacy",
+        "location": "Sheikh Zayed Road, Dubai",
+        "hours": "24/7"
+      },
+      "mediplus": {
+        "name": "MediPlus Pharmacy",
+        "location": "Dubai Marina",
+        "hours": "8:00 AM - 10:00 PM"
+      },
+      "healthFirst": {
+        "name": "Health First Pharmacy",
+        "location": "Jumeirah Beach Road",
+        "hours": "24/7"
+      },
+      "city": {
+        "name": "City Pharmacy",
+        "location": "Business Bay",
+        "hours": "7:00 AM - 11:00 PM"
+      },
+      "wellness": {
+        "name": "Wellness Pharmacy",
+        "location": "Downtown Dubai",
+        "hours": "9:00 AM - 9:00 PM"
+      },
+      "quickMed": {
+        "name": "QuickMed Pharmacy",
+        "location": "Deira City Center",
+        "hours": "24/7"
+      }
+    }
+  },
+  "laboratoryPage": {
+    "heroBadge": "Certified Diagnostics",
+    "heroTitle": "Find a Laboratory",
+    "heroLead": "Book diagnostic tests and health checkups at certified labs with accurate results",
+    "heroBgAlt": "Medical laboratory",
+    "searchPlaceholder": "Search by name or location...",
+    "allLocations": "All Locations",
+    "loading": "Loading laboratories...",
+    "emptyState": "No laboratories found matching your criteria",
+    "featuredLab": "FEATURED LAB",
+    "servicesLabel": "Services:",
+    "testsAvailable": "{{count}}+ Tests Available",
+    "moreServices": "+{{count}} more",
+    "bookTest": "Book Test",
+    "benefitsTitle": "Why Choose Our Partner Laboratories?",
+    "benefit1Title": "DHA Certified",
+    "benefit1Body": "All labs meet Dubai Health Authority standards",
+    "benefit2Title": "Advanced Testing",
+    "benefit2Body": "State-of-the-art equipment and accurate results",
+    "benefit3Title": "Fast Results",
+    "benefit3Body": "Quick turnaround time with online result access",
+    "labNames": {
+      "dubaiAdvanced": "Dubai Advanced Laboratory",
+      "healthCheck": "HealthCheck Lab Center",
+      "alBarshaMed": "Al Barsha Medical Lab",
+      "emiratesDiagnostic": "Emirates Diagnostic Center",
+      "cityLab": "City Lab & Diagnostics",
+      "premierMedical": "Premier Medical Laboratory"
+    },
+    "locations": {
+      "dubaiHealthcareCity": "Dubai Healthcare City",
+      "jumeirah": "Jumeirah",
+      "alBarsha": "Al Barsha",
+      "dubaiMarina": "Dubai Marina",
+      "deira": "Deira",
+      "businessBay": "Business Bay"
+    },
+    "hours": {
+      "sevenToNine": "7:00 AM - 9:00 PM",
+      "eightToEight": "8:00 AM - 8:00 PM",
+      "eightToSeven": "8:00 AM - 7:00 PM",
+      "sevenToTen": "7:00 AM - 10:00 PM",
+      "open24": "24/7"
+    },
+    "services": {
+      "bloodTests": "Blood Tests",
+      "radiology": "Radiology",
+      "pathology": "Pathology",
+      "geneticTesting": "Genetic Testing",
+      "covidPcr": "COVID-19 PCR",
+      "urineAnalysis": "Urine Analysis",
+      "xRay": "X-Ray",
+      "ultrasound": "Ultrasound",
+      "ecg": "ECG",
+      "microbiology": "Microbiology",
+      "immunology": "Immunology",
+      "mri": "MRI",
+      "ctScan": "CT Scan",
+      "nuclearMedicine": "Nuclear Medicine",
+      "chemistry": "Chemistry",
+      "hematology": "Hematology",
+      "advancedDiagnostics": "Advanced Diagnostics",
+      "molecularTesting": "Molecular Testing",
+      "toxicology": "Toxicology"
     }
   },
   "auth": {

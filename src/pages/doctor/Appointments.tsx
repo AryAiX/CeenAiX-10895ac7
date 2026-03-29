@@ -48,9 +48,9 @@ const formatDateKey = (date: Date) => {
 
 export const DoctorAppointments: React.FC = () => {
   const { t, i18n } = useTranslation('common');
-  const locale = resolveLocale(i18n.language);
-  const lang = i18n.language;
-  const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(lang, options);
+  const uiLang = i18n.language ?? 'en';
+  const locale = resolveLocale(uiLang);
+  const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(uiLang, options);
   const weekdayLabels = useMemo(() => calendarWeekdayShort(t), [t]);
   const { user } = useAuth();
   const {
@@ -256,7 +256,7 @@ export const DoctorAppointments: React.FC = () => {
                   {viewMode === 'calendar'
                     ? visibleAppointments.length === 1
                       ? t('doctor.appointments.calendarSubOne', {
-                          count: visibleAppointments.length,
+                          count: formatLocaleDigits(visibleAppointments.length, uiLang),
                           date: selectedCalendarDate.toLocaleDateString(
                             locale,
                             dtOpts({
@@ -268,7 +268,7 @@ export const DoctorAppointments: React.FC = () => {
                           ),
                         })
                       : t('doctor.appointments.calendarSubMany', {
-                          count: visibleAppointments.length,
+                          count: formatLocaleDigits(visibleAppointments.length, uiLang),
                           date: selectedCalendarDate.toLocaleDateString(
                             locale,
                             dtOpts({
@@ -280,8 +280,12 @@ export const DoctorAppointments: React.FC = () => {
                           ),
                         })
                     : appointments.length === 1
-                      ? t('doctor.appointments.listSubOne', { count: appointments.length })
-                      : t('doctor.appointments.listSubMany', { count: appointments.length })}
+                      ? t('doctor.appointments.listSubOne', {
+                          count: formatLocaleDigits(appointments.length, uiLang),
+                        })
+                      : t('doctor.appointments.listSubMany', {
+                          count: formatLocaleDigits(appointments.length, uiLang),
+                        })}
                 </p>
               </div>
 
@@ -336,8 +340,12 @@ export const DoctorAppointments: React.FC = () => {
                       </p>
                       <p className="text-xs text-gray-500">
                         {currentMonthAppointmentCount === 1
-                          ? t('doctor.appointments.apptCountOne', { count: currentMonthAppointmentCount })
-                          : t('doctor.appointments.apptCountMany', { count: currentMonthAppointmentCount })}
+                          ? t('doctor.appointments.apptCountOne', {
+                              count: formatLocaleDigits(currentMonthAppointmentCount, uiLang),
+                            })
+                          : t('doctor.appointments.apptCountMany', {
+                              count: formatLocaleDigits(currentMonthAppointmentCount, uiLang),
+                            })}
                       </p>
                     </div>
                     <button
@@ -393,7 +401,7 @@ export const DoctorAppointments: React.FC = () => {
                               isSelected ? 'text-cyan-700' : 'text-gray-900'
                             }`}
                           >
-                            {formatLocaleDigits(date.getDate(), lang)}
+                            {formatLocaleDigits(date.getDate(), uiLang)}
                           </span>
                           {isToday ? (
                             <>
@@ -408,12 +416,16 @@ export const DoctorAppointments: React.FC = () => {
                           {appointmentCount > 0 ? (
                             <>
                               <span className="inline-flex rounded-full bg-cyan-100 px-1.5 py-0.5 text-[10px] font-semibold text-cyan-700 sm:hidden">
-                                {formatLocaleDigits(appointmentCount, lang)}
+                                {formatLocaleDigits(appointmentCount, uiLang)}
                               </span>
                               <p className="hidden text-xs text-cyan-700 sm:block">
                                 {appointmentCount === 1
-                                  ? t('doctor.appointments.apptCountOne', { count: appointmentCount })
-                                  : t('doctor.appointments.apptCountMany', { count: appointmentCount })}
+                                  ? t('doctor.appointments.apptCountOne', {
+                                      count: formatLocaleDigits(appointmentCount, uiLang),
+                                    })
+                                  : t('doctor.appointments.apptCountMany', {
+                                      count: formatLocaleDigits(appointmentCount, uiLang),
+                                    })}
                               </p>
                             </>
                           ) : (
@@ -477,25 +489,35 @@ export const DoctorAppointments: React.FC = () => {
                               : 'bg-gradient-to-r from-blue-500 to-cyan-500'
                           }`}
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                              <div className="rounded-lg bg-white/20 p-2 backdrop-blur-sm">
+                          <div className="flex flex-wrap items-start justify-between gap-3">
+                            <div className="flex min-w-0 flex-1 items-start gap-3">
+                              <div className="shrink-0 rounded-lg bg-white/20 p-2 backdrop-blur-sm">
                                 {appointment.type === 'virtual' ? (
                                   <Video className="w-5 h-5 text-white" />
                                 ) : (
                                   <MapPin className="w-5 h-5 text-white" />
                                 )}
                               </div>
-                              <div>
+                              <div className="min-w-0 flex-1">
                                 <h3 className="text-lg font-bold text-white">
                                   {patientNameById.get(appointment.patient_id) ?? t('shared.patient')}
                                 </h3>
                                 <p className="text-sm text-white/90">
-                                  {appointment.chief_complaint ?? t('shared.scheduledConsultation')}
+                                  {appointment.chief_complaint ? (
+                                    uiLang.startsWith('ar') ? (
+                                      <span dir="ltr" className="block text-start" translate="no">
+                                        {appointment.chief_complaint}
+                                      </span>
+                                    ) : (
+                                      appointment.chief_complaint
+                                    )
+                                  ) : (
+                                    t('shared.scheduledConsultation')
+                                  )}
                                 </p>
                               </div>
                             </div>
-                            <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase text-gray-800">
+                            <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase text-gray-800">
                               {appointmentStatusLabel(t, appointment.status)}
                             </span>
                           </div>
@@ -526,7 +548,9 @@ export const DoctorAppointments: React.FC = () => {
                             <div>
                               <p className="mb-1 text-xs font-medium text-gray-500">{t('doctor.appointments.duration')}</p>
                               <p className="text-sm font-semibold text-gray-900">
-                                {t('shared.minutesUnit', { count: appointment.duration_minutes })}
+                                {t('shared.minutesUnit', {
+                                  count: formatLocaleDigits(appointment.duration_minutes, uiLang),
+                                })}
                               </p>
                             </div>
 
@@ -542,14 +566,34 @@ export const DoctorAppointments: React.FC = () => {
                             <div>
                               <p className="text-xs font-medium uppercase text-gray-500">{t('doctor.appointments.reason')}</p>
                               <p className="mt-2 text-sm text-gray-700">
-                                {appointment.chief_complaint ?? t('doctor.appointments.noReason')}
+                                {appointment.chief_complaint ? (
+                                  uiLang.startsWith('ar') ? (
+                                    <span dir="ltr" className="block text-start" translate="no">
+                                      {appointment.chief_complaint}
+                                    </span>
+                                  ) : (
+                                    appointment.chief_complaint
+                                  )
+                                ) : (
+                                  t('doctor.appointments.noReason')
+                                )}
                               </p>
                             </div>
 
                             <div>
                               <p className="text-xs font-medium uppercase text-gray-500">{t('doctor.appointments.patientNotes')}</p>
                               <p className="mt-2 text-sm text-gray-700">
-                                {appointment.notes ?? t('doctor.appointments.noNotes')}
+                                {appointment.notes ? (
+                                  uiLang.startsWith('ar') ? (
+                                    <span dir="ltr" className="block text-start" translate="no">
+                                      {appointment.notes}
+                                    </span>
+                                  ) : (
+                                    appointment.notes
+                                  )
+                                ) : (
+                                  t('doctor.appointments.noNotes')
+                                )}
                               </p>
                             </div>
                           </div>
@@ -569,7 +613,13 @@ export const DoctorAppointments: React.FC = () => {
                                     {t('doctor.appointments.aiSummary')}
                                   </p>
                                   <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-700">
-                                    {preVisitAssessment.summary.summary_text}
+                                    {uiLang.startsWith('ar') ? (
+                                      <span dir="ltr" className="block text-start" translate="no">
+                                        {preVisitAssessment.summary.summary_text}
+                                      </span>
+                                    ) : (
+                                      preVisitAssessment.summary.summary_text
+                                    )}
                                   </p>
                                 </>
                               ) : (

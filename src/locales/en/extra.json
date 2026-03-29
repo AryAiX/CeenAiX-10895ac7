@@ -101,7 +101,25 @@
       "shortcutRecordsSub": "Access your documented health history",
       "shortcutRxTitle": "Prescription Support",
       "shortcutRxSub": "Check current medications and refill needs",
-      "greetingFallback": "there"
+      "greetingFallback": "there",
+      "medActiveFallback": "Active prescription",
+      "medDurationDays": "{{count}} days",
+      "medDurationWeeks": "{{count}} weeks",
+      "medUnitMg": "mg",
+      "medUnitMcg": "mcg",
+      "medUnitG": "g",
+      "medUnitMl": "ml",
+      "medFreq": {
+        "onceDaily": "Once daily",
+        "twiceDaily": "Twice daily",
+        "threeTimesDaily": "Three times daily",
+        "fourTimesDaily": "Four times daily",
+        "every12Hours": "Every 12 hours",
+        "every8Hours": "Every 8 hours",
+        "every6Hours": "Every 6 hours",
+        "asNeeded": "As needed",
+        "asNeededPain": "As needed for pain"
+      }
     },
     "appointments": {
       "title": "Appointments",
@@ -516,6 +534,32 @@
       "backHome": "Back to Home",
       "comingTitle": "Coming soon",
       "comingBody": "This directory experience is being connected to verified UAE healthcare data."
+    },
+    "guestAiChat": {
+      "heroAlt": "AI healthcare background",
+      "assistantTitle": "AI Health Assistant",
+      "assistantLead": "Get instant health guidance powered by medical knowledge. For appointments and records,",
+      "createAccountCta": "create a free account",
+      "assistantTrail": ".",
+      "chatTitle": "AI Health Chat",
+      "chatTagline": "Always here to help",
+      "inputPlaceholder": "Ask me anything about your health...",
+      "keyboardHint": "Press Enter to send, Shift+Enter for new line",
+      "footerBrand": "AI-powered health guidance",
+      "ctaTitle": "Ready for professional care?",
+      "ctaSub": "Book with verified specialists instantly",
+      "findDoctors": "Find Doctors",
+      "disclaimer": "This AI assistant provides general health information only and is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.",
+      "welcomeMessage": "Hello! I'm your AI health assistant powered by advanced medical knowledge. I can help you:\n\n• Understand symptoms and health concerns\n• Get guidance on when to see a doctor\n• Find the right specialist for your needs\n• Answer general health questions\n• Provide wellness tips\n\nWhat can I help you with today?",
+      "welcomeSuggestions": [
+        "I have a headache",
+        "Check symptoms",
+        "Find a doctor",
+        "Wellness tips"
+      ],
+      "doctorBannerTitle": "Clinician access",
+      "doctorBannerBody": "This is the public health assistant. For your schedule, patients, and prescriptions, use your doctor portal.",
+      "doctorOpenPortal": "Open practice dashboard"
     }
   }
 }

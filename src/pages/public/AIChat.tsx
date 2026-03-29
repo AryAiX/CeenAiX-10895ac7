@@ -1,9 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { Send, User, Bot, Calendar, Sparkles } from 'lucide-react';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
+import { useAuth } from '../../lib/auth-context';
 import { dateTimeFormatWithNumerals, resolveLocale } from '../../lib/i18n-ui';
 
 interface Message {
@@ -14,28 +16,68 @@ interface Message {
   suggestions?: string[];
 }
 
+function buildWelcomeMessage(tf: TFunction): Message {
+  const raw = tf('public.guestAiChat.welcomeSuggestions', { returnObjects: true });
+  const suggestions = Array.isArray(raw) ? (raw as string[]) : [];
+  return {
+    id: 'welcome',
+    role: 'assistant',
+    content: tf('public.guestAiChat.welcomeMessage'),
+    timestamp: new Date(),
+    suggestions,
+  };
+}
+
+function suggestionOpensFindDoctor(suggestion: string): boolean {
+  const t = suggestion.trim();
+  const lower = t.toLowerCase();
+  return (
+    /browse\s+all\s+doctors/i.test(lower) ||
+    /view\s+doctors/i.test(lower) ||
+    /^تصفح/.test(t) ||
+    t.includes('جميع الأطباء')
+  );
+}
+
 export const AIChat: React.FC = () => {
-  const { i18n } = useTranslation('common');
-  const locale = resolveLocale(i18n.language);
-  const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(i18n.language, options);
+  const { t, i18n } = useTranslation('common');
+  const { role } = useAuth();
+  const isDoctor = role === 'doctor';
+  const uiLang = i18n.language ?? 'en';
+  const locale = resolveLocale(uiLang);
+  const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(uiLang, options);
   const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const conversationContextRef = useRef<string[]>([]);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      role: 'assistant',
-      content: "Hello! I'm your AI health assistant powered by advanced medical knowledge. I can help you:\n\n• Understand symptoms and health concerns\n• Get guidance on when to see a doctor\n• Find the right specialist for your needs\n• Answer general health questions\n• Provide wellness tips\n\nWhat can I help you with today?",
-      timestamp: new Date(),
-      suggestions: ['I have a headache', 'Check symptoms', 'Find a doctor', 'Wellness tips'],
-    },
-  ]);
+  const welcomeMessage = useMemo(() => buildWelcomeMessage(t), [t, i18n.language]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
+
+  useEffect(() => {
+    setMessages((prev) => {
+      const userHasChatted = prev.some((m) => m.role === 'user');
+      if (userHasChatted) {
+        return prev;
+      }
+      if (prev.length === 0) {
+        return [welcomeMessage];
+      }
+      if (prev.length === 1 && prev[0].id === 'welcome') {
+        return [
+          {
+            ...welcomeMessage,
+            timestamp: prev[0].timestamp,
+          },
+        ];
+      }
+      return prev;
+    });
+  }, [welcomeMessage]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -297,7 +339,7 @@ export const AIChat: React.FC = () => {
   };
 
   const handleSuggestionClick = (suggestion: string) => {
-    if (suggestion.toLowerCase().includes('browse') || suggestion.toLowerCase().includes('view doctors')) {
+    if (suggestionOpensFindDoctor(suggestion)) {
       navigate('/find-doctor');
       return;
     }
@@ -309,7 +351,7 @@ export const AIChat: React.FC = () => {
       <div className="absolute inset-0 z-0 opacity-5">
         <img
           src="https://images.pexels.com/photos/8438971/pexels-photo-8438971.jpeg?auto=compress&cs=tinysrgb&w=1920"
-          alt="AI Healthcare Background"
+          alt={t('public.guestAiChat.heroAlt')}
           className="w-full h-full object-cover"
         />
       </div>
@@ -321,17 +363,33 @@ export const AIChat: React.FC = () => {
             <Sparkles className="h-5 w-5 text-ceenai-blue" />
           </div>
           <div className="flex-1">
-            <h3 className="mb-1 text-sm font-semibold text-slate-900">AI Health Assistant</h3>
-            <p className="text-sm text-slate-600">
-              Get instant health guidance powered by medical knowledge. For appointments and records,{' '}
-              <button
-                onClick={() => navigate('/auth')}
-                className="font-semibold text-ceenai-blue underline hover:text-ceenai-blue-dark"
-              >
-                create a free account
-              </button>
-              .
-            </p>
+            <h3 className="mb-1 text-sm font-semibold text-slate-900">
+              {isDoctor ? t('public.guestAiChat.doctorBannerTitle') : t('public.guestAiChat.assistantTitle')}
+            </h3>
+            {isDoctor ? (
+              <p className="text-sm text-slate-600">
+                {t('public.guestAiChat.doctorBannerBody')}{' '}
+                <button
+                  type="button"
+                  onClick={() => navigate('/doctor/dashboard')}
+                  className="font-semibold text-ceenai-blue underline hover:text-ceenai-blue-dark"
+                >
+                  {t('public.guestAiChat.doctorOpenPortal')}
+                </button>
+              </p>
+            ) : (
+              <p className="text-sm text-slate-600">
+                {t('public.guestAiChat.assistantLead')}{' '}
+                <button
+                  type="button"
+                  onClick={() => navigate('/auth')}
+                  className="font-semibold text-ceenai-blue underline hover:text-ceenai-blue-dark"
+                >
+                  {t('public.guestAiChat.createAccountCta')}
+                </button>
+                {t('public.guestAiChat.assistantTrail')}
+              </p>
+            )}
           </div>
         </div>
 
@@ -342,8 +400,8 @@ export const AIChat: React.FC = () => {
                 <Bot className="h-6 w-6 text-cyan-300" />
               </div>
               <div>
-                <h2 className="font-semibold text-white">AI Health Chat</h2>
-                <p className="text-xs text-slate-300">Always here to help</p>
+                <h2 className="font-semibold text-white">{t('public.guestAiChat.chatTitle')}</h2>
+                <p className="text-xs text-slate-300">{t('public.guestAiChat.chatTagline')}</p>
               </div>
             </div>
           </div>
@@ -439,7 +497,7 @@ export const AIChat: React.FC = () => {
                       handleSendMessage(e);
                     }
                   }}
-                  placeholder="Ask me anything about your health..."
+                  placeholder={t('public.guestAiChat.inputPlaceholder')}
                   rows={1}
                   className="w-full resize-none rounded-[1.5rem] border border-slate-200 bg-slate-50/70 px-4 py-3 outline-none transition focus:border-ceenai-cyan focus:bg-white focus:ring-2 focus:ring-ceenai-cyan/20"
                   style={{ minHeight: '48px', maxHeight: '120px' }}
@@ -454,37 +512,34 @@ export const AIChat: React.FC = () => {
               </button>
             </form>
             <div className="mt-3 flex items-center justify-between">
-              <p className="text-xs text-slate-500">
-                Press Enter to send, Shift+Enter for new line
-              </p>
-              <p className="text-xs text-slate-400">
-                AI-powered health guidance
-              </p>
+              <p className="text-xs text-slate-500">{t('public.guestAiChat.keyboardHint')}</p>
+              <p className="text-xs text-slate-400">{t('public.guestAiChat.footerBrand')}</p>
             </div>
           </div>
         </div>
 
-        <div className="mt-6 rounded-[2rem] bg-slate-950 p-5 shadow-xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Calendar className="h-6 w-6 text-cyan-300" />
-              <div>
-                <p className="text-sm font-semibold text-white">Ready for professional care?</p>
-                <p className="text-xs text-slate-300">Book with verified specialists instantly</p>
+        {!isDoctor ? (
+          <div className="mt-6 rounded-[2rem] bg-slate-950 p-5 shadow-xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Calendar className="h-6 w-6 text-cyan-300" />
+                <div>
+                  <p className="text-sm font-semibold text-white">{t('public.guestAiChat.ctaTitle')}</p>
+                  <p className="text-xs text-slate-300">{t('public.guestAiChat.ctaSub')}</p>
+                </div>
               </div>
+              <button
+                type="button"
+                onClick={() => navigate('/find-doctor')}
+                className="rounded-full bg-white px-6 py-2.5 font-semibold text-slate-950 transition-all hover:bg-slate-100"
+              >
+                {t('public.guestAiChat.findDoctors')}
+              </button>
             </div>
-            <button
-              onClick={() => navigate('/find-doctor')}
-              className="rounded-full bg-white px-6 py-2.5 font-semibold text-slate-950 transition-all hover:bg-slate-100"
-            >
-              Find Doctors
-            </button>
           </div>
-        </div>
+        ) : null}
 
-        <p className="mt-4 px-4 text-center text-xs text-slate-500">
-          This AI assistant provides general health information only and is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.
-        </p>
+        <p className="mt-4 px-4 text-center text-xs text-slate-500">{t('public.guestAiChat.disclaimer')}</p>
       </div>
       <Footer />
     </div>

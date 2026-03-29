@@ -120,8 +120,6 @@
 
 ---
 
-##  .'......
-
 ## 7. Public Pages (PUB)
 
 
@@ -200,3 +198,6 @@
 | UX-9 | Add Arabic localization foundation                                   | done        | 2026-03-28 | AI | Product wants Arabic available alongside the UX refresh                                                       | 2026-03-28 | `i18next` + `react-i18next`, `src/i18n/index.ts`, `src/locales/{en,ar}/common.json`, persisted `ceenaix.lang` preference |
 | UX-10 | Add RTL support and shared navigation/layout handling               | done        | 2026-03-28 | AI | Arabic requires layout direction support beyond text translation                                               | 2026-03-28 | `document.documentElement.lang` and `dir` flip on language change; Arabic body font stack in `index.css`; account menu uses logical `end-0` / `text-start` where updated |
 | UX-11 | Translate public/shared UI copy into Arabic                         | done        | 2026-03-28 | AI | Arabic support needs actual translated content for shared experiences                                          | 2026-03-28 | Arabic strings for shared nav/footer/auth shell/portal nav and landing header chrome; remaining page copy still English and can grow into namespaces over time                                                         |
+| UX-12 | DB-backed prescription frequency/duration vocab + bilingual med names | done    | 2026-03-28 | AI | UAE bilingual UX: catalog common frequency/duration labels; optional Arabic medication display next to canonical INN | 2026-03-28 | Migrations `20260328140000_prescription_clinical_vocab.sql`, `20260328190000_prescription_items_medication_name_ar.sql`; `prescription-vocab`, `medication-display`, `MedicationNameDisplay`, `usePatientDashboard` vocab + `medication_name_ar`; patient `Prescriptions` + `Dashboard`; `docs/agent/schema-reference.md` updated |
+| UX-13 | Locale-aware numerals + RTL clinical text on doctor/patient surfaces | done     | 2026-03-28 | AI | Arabic UI should use Eastern Arabic-Indic digits for counts; English chief-complaint lines stay LTR in RTL      | 2026-03-28 | `formatLocaleDigits` on patient `Prescriptions` stats, doctor `Dashboard` KPIs, doctor `Appointments` list/calendar subtitles; English `chief_complaint` / notes / AI summary in `dir="ltr"` when UI is Arabic |
+| UX-14 | Public guest `/ai-chat` i18n + doctor-specific chrome               | done     | 2026-03-28 | AI | Guest chat shell was English-only; doctors land on `/ai-chat` from the fab and should not see patient booking CTA | 2026-03-28 | `public.guestAiChat` keys (en/ar), welcome message sync on language change; hide “Find Doctors” strip for `role === 'doctor'`; clinician banner links to `/doctor/dashboard`; rule-based bot replies remain English until AI-04 |

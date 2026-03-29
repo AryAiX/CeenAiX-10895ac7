@@ -76,10 +76,10 @@ export const Home: React.FC = () => {
 
   const stats = useMemo(
     () => [
-      { value: '15K+', labelKey: 'home.stats.patients' },
-      { value: '850+', labelKey: 'home.stats.doctors' },
-      { value: '75K+', labelKey: 'home.stats.appointments' },
-      { value: '24/7', labelKey: 'home.stats.aiSupport' },
+      { valueKey: 'home.stats.patientsValue', labelKey: 'home.stats.patients' },
+      { valueKey: 'home.stats.doctorsValue', labelKey: 'home.stats.doctors' },
+      { valueKey: 'home.stats.appointmentsValue', labelKey: 'home.stats.appointments' },
+      { valueKey: 'home.stats.aiSupportValue', labelKey: 'home.stats.aiSupport' },
     ],
     []
   );
@@ -263,7 +263,7 @@ export const Home: React.FC = () => {
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 md:grid-cols-4">
           {stats.map((stat) => (
             <div key={stat.labelKey} className="text-center">
-              <div className="text-4xl font-bold md:text-5xl">{stat.value}</div>
+              <div className="text-4xl font-bold md:text-5xl">{t(stat.valueKey)}</div>
               <div className="mt-2 text-sm font-medium uppercase tracking-[0.16em] text-cyan-100">
                 {t(stat.labelKey)}
               </div>

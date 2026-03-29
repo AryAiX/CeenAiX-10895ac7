@@ -53,8 +53,16 @@ prescriptions
 
 prescription_items
   - id (PK), prescription_id (FK)
-  - medication_name, dosage, frequency, duration, quantity, instructions
+  - medication_name (canonical / Latin INN), optional medication_name_ar (Arabic display — UI shows both when locale is non-English)
+  - dosage, frequency, duration, quantity, instructions
+  - frequency_code, duration_code (optional text — match `prescription_clinical_vocab.code` by category)
   - is_dispensed (bool)
+
+prescription_clinical_vocab
+  - id (PK), category (`frequency` | `duration`), code (unique per category)
+  - label_en, label_ar, sort_order, is_active
+  - legacy_match (optional — normalize legacy free-text rows; unique per category when set)
+  - RLS: read active rows for `anon` + `authenticated`; full CRUD for `super_admin`
 
 lab_orders
   - id (PK), patient_id (FK), doctor_id (FK), appointment_id (FK)

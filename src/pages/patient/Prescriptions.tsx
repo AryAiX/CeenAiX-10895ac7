@@ -10,19 +10,26 @@ import {
   Pill,
   Search,
 } from 'lucide-react';
+import { MedicationNameDisplay } from '../../components/MedicationNameDisplay';
 import { Navigation } from '../../components/Navigation';
 import { Skeleton } from '../../components/Skeleton';
 import { usePatientPrescriptions } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
-import { dateTimeFormatWithNumerals, prescriptionStatusLabel, resolveLocale } from '../../lib/i18n-ui';
+import {
+  dateTimeFormatWithNumerals,
+  formatLocaleDigits,
+  prescriptionStatusLabel,
+  resolveLocale,
+} from '../../lib/i18n-ui';
 
 export const PatientPrescriptions: React.FC = () => {
   const { t, i18n } = useTranslation('common');
-  const locale = resolveLocale(i18n.language);
+  const uiLang = i18n.language ?? 'en';
+  const locale = resolveLocale(uiLang);
   const formatDate = (value: string) =>
     new Date(value).toLocaleDateString(
       locale,
-      dateTimeFormatWithNumerals(i18n.language, {
+      dateTimeFormatWithNumerals(uiLang, {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
@@ -62,6 +69,7 @@ export const PatientPrescriptions: React.FC = () => {
           prescription.status,
           ...prescription.items.flatMap((item) => [
             item.medication_name,
+            item.medication_name_ar,
             item.dosage,
             item.frequency,
             item.duration,
@@ -102,6 +110,24 @@ export const PatientPrescriptions: React.FC = () => {
         .filter((item) => !item.is_dispensed).length,
     [prescriptions]
   );
+
+  const activePlanCount = useMemo(
+    () => prescriptions.filter((prescription) => prescription.status === 'active').length,
+    [prescriptions]
+  );
+
+  const selectedPrescriptionItem = useMemo(() => {
+    if (!selectedMedication) {
+      return undefined;
+    }
+    for (const prescription of prescriptions) {
+      const found = prescription.items.find((item) => item.medication_name === selectedMedication);
+      if (found) {
+        return found;
+      }
+    }
+    return undefined;
+  }, [prescriptions, selectedMedication]);
 
   const handleRefillRequest = (medicationName: string) => {
     setSelectedMedication(medicationName);
@@ -167,7 +193,7 @@ export const PatientPrescriptions: React.FC = () => {
               <div>
                 <p className="text-gray-600 text-sm font-medium">{t('patient.prescriptions.activePlans')}</p>
                 <p className="text-4xl font-bold text-gray-900 mt-2">
-                  {prescriptions.filter((prescription) => prescription.status === 'active').length}
+                  {formatLocaleDigits(activePlanCount, uiLang)}
                 </p>
               </div>
               <div className="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
@@ -179,7 +205,9 @@ export const PatientPrescriptions: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium">{t('patient.prescriptions.activeMeds')}</p>
-                <p className="text-4xl font-bold text-gray-900 mt-2">{activeMedicationCount}</p>
+                <p className="text-4xl font-bold text-gray-900 mt-2">
+                  {formatLocaleDigits(activeMedicationCount, uiLang)}
+                </p>
               </div>
               <div className="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
                 <Pill className="w-6 h-6 text-cyan-600" />
@@ -190,7 +218,9 @@ export const PatientPrescriptions: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium">{t('patient.prescriptions.pendingPickup')}</p>
-                <p className="text-4xl font-bold text-gray-900 mt-2">{pendingDispenseCount}</p>
+                <p className="text-4xl font-bold text-gray-900 mt-2">
+                  {formatLocaleDigits(pendingDispenseCount, uiLang)}
+                </p>
               </div>
               <div className="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
                 <Bell className="w-6 h-6 text-cyan-600" />
@@ -223,7 +253,18 @@ export const PatientPrescriptions: React.FC = () => {
           </div>
           {selectedMedication ? (
             <div className="mt-4 rounded-xl border border-cyan-200 bg-cyan-50 p-4 text-sm text-cyan-900">
-              <span className="font-semibold">{t('patient.prescriptions.selected')}</span> {selectedMedication}
+              <span className="font-semibold">{t('patient.prescriptions.selected')}</span>{' '}
+              {selectedPrescriptionItem ? (
+                <MedicationNameDisplay
+                  canonicalName={selectedPrescriptionItem.medication_name}
+                  localizedName={selectedPrescriptionItem.medication_name_ar}
+                  language={uiLang}
+                  variant="compact"
+                  primaryClassName="text-cyan-900"
+                />
+              ) : (
+                selectedMedication
+              )}
             </div>
           ) : null}
         </div>
@@ -233,7 +274,9 @@ export const PatientPrescriptions: React.FC = () => {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">{t('patient.prescriptions.activeSection')}</h2>
               <span className="bg-cyan-100 text-cyan-700 px-4 py-2 rounded-full text-sm font-bold">
-                {t('patient.prescriptions.activeBadge', { count: activePrescriptions.length })}
+                {t('patient.prescriptions.activeBadge', {
+                  count: formatLocaleDigits(activePrescriptions.length, uiLang),
+                })}
               </span>
             </div>
 
@@ -279,10 +322,24 @@ export const PatientPrescriptions: React.FC = () => {
                             </div>
                             <div>
                               <h3 className="text-xl font-bold text-white">
-                                {prescription.items[0]?.medication_name ?? t('shared.medicationPlan')}
-                                {prescription.items.length > 1
-                                  ? ` ${t('shared.moreSuffix', { count: prescription.items.length - 1 })}`
-                                  : ''}
+                                {prescription.items[0] ? (
+                                  <>
+                                    <MedicationNameDisplay
+                                      canonicalName={prescription.items[0].medication_name}
+                                      localizedName={prescription.items[0].medication_name_ar}
+                                      language={uiLang}
+                                      primaryClassName="block text-xl font-bold text-white"
+                                      secondaryClassName="block text-sm font-normal text-cyan-100 mt-0.5"
+                                    />
+                                    {prescription.items.length > 1
+                                      ? ` ${t('shared.moreSuffix', {
+                                          count: formatLocaleDigits(prescription.items.length - 1, uiLang),
+                                        })}`
+                                      : ''}
+                                  </>
+                                ) : (
+                                  t('shared.medicationPlan')
+                                )}
                               </h3>
                               <p className="text-cyan-100 text-sm mt-1">
                                 {t('patient.prescriptions.prescribedBy')} {prescription.doctorName}
@@ -293,7 +350,9 @@ export const PatientPrescriptions: React.FC = () => {
                           <div className="flex flex-wrap items-center gap-3">
                             {pendingItems > 0 ? (
                               <span className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-bold">
-                                {t('patient.prescriptions.pendingPickupBadge', { count: pendingItems })}
+                                {t('patient.prescriptions.pendingPickupBadge', {
+                                  count: formatLocaleDigits(pendingItems, uiLang),
+                                })}
                               </span>
                             ) : null}
                             <span className="bg-white/20 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-xs font-bold border border-white/30 uppercase">
@@ -317,7 +376,9 @@ export const PatientPrescriptions: React.FC = () => {
                               <Package className="h-4 w-4" />
                               <span>{t('patient.prescriptions.medItems')}</span>
                             </div>
-                            <p className="mt-2 font-semibold text-gray-900">{prescription.items.length}</p>
+                            <p className="mt-2 font-semibold text-gray-900">
+                              {formatLocaleDigits(prescription.items.length, uiLang)}
+                            </p>
                           </div>
                           <div className="rounded-xl bg-gray-50 p-4">
                             <div className="flex items-center gap-2 text-xs font-semibold uppercase text-gray-500">
@@ -326,8 +387,11 @@ export const PatientPrescriptions: React.FC = () => {
                             </div>
                             <p className="mt-2 font-semibold text-gray-900">
                               {t('patient.prescriptions.dispensedRatio', {
-                                done: prescription.items.filter((item) => item.is_dispensed).length,
-                                total: prescription.items.length,
+                                done: formatLocaleDigits(
+                                  prescription.items.filter((item) => item.is_dispensed).length,
+                                  uiLang
+                                ),
+                                total: formatLocaleDigits(prescription.items.length, uiLang),
                               })}
                             </p>
                           </div>
@@ -338,7 +402,15 @@ export const PatientPrescriptions: React.FC = () => {
                             <div key={item.id} className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
                               <div className="flex items-start justify-between gap-3">
                                 <div>
-                                  <h4 className="text-lg font-bold text-gray-900">{item.medication_name}</h4>
+                                  <h4 className="text-lg font-bold text-gray-900">
+                                    <MedicationNameDisplay
+                                      canonicalName={item.medication_name}
+                                      localizedName={item.medication_name_ar}
+                                      language={uiLang}
+                                      primaryClassName="block"
+                                      secondaryClassName="block text-sm font-normal text-gray-500 mt-0.5"
+                                    />
+                                  </h4>
                                   <p className="mt-1 text-sm text-gray-600">
                                     {[item.dosage, item.frequency, item.duration].filter(Boolean).join(' • ') ||
                                       t('patient.prescriptions.dosagePending')}
@@ -367,7 +439,7 @@ export const PatientPrescriptions: React.FC = () => {
                               {item.quantity !== null ? (
                                 <p className="mt-4 text-sm text-gray-600">
                                   <span className="font-semibold text-gray-900">{t('patient.prescriptions.quantity')}</span>{' '}
-                                  {item.quantity}
+                                  {formatLocaleDigits(item.quantity, uiLang)}
                                 </p>
                               ) : null}
 
@@ -394,7 +466,9 @@ export const PatientPrescriptions: React.FC = () => {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">{t('patient.prescriptions.historySection')}</h2>
               <span className="bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-bold">
-                {t('patient.prescriptions.historyBadge', { count: pastPrescriptions.length })}
+                {t('patient.prescriptions.historyBadge', {
+                  count: formatLocaleDigits(pastPrescriptions.length, uiLang),
+                })}
               </span>
             </div>
 
@@ -413,10 +487,24 @@ export const PatientPrescriptions: React.FC = () => {
                         </div>
                         <div>
                           <h3 className="text-lg font-bold text-gray-900">
-                            {prescription.items[0]?.medication_name ?? t('shared.medicationPlan')}
-                            {prescription.items.length > 1
-                              ? ` ${t('shared.moreSuffix', { count: prescription.items.length - 1 })}`
-                              : ''}
+                            {prescription.items[0] ? (
+                              <>
+                                <MedicationNameDisplay
+                                  canonicalName={prescription.items[0].medication_name}
+                                  localizedName={prescription.items[0].medication_name_ar}
+                                  language={uiLang}
+                                  primaryClassName="block text-lg font-bold text-gray-900"
+                                  secondaryClassName="block text-sm font-normal text-gray-600 mt-0.5"
+                                />
+                                {prescription.items.length > 1
+                                  ? ` ${t('shared.moreSuffix', {
+                                      count: formatLocaleDigits(prescription.items.length - 1, uiLang),
+                                    })}`
+                                  : ''}
+                              </>
+                            ) : (
+                              t('shared.medicationPlan')
+                            )}
                           </h3>
                           <p className="text-gray-600 text-sm">
                             {t('patient.prescriptions.prescribedBy')} {prescription.doctorName}
@@ -436,7 +524,7 @@ export const PatientPrescriptions: React.FC = () => {
                       </div>
                       <div>
                         <span className="font-semibold text-gray-900">{t('patient.prescriptions.medItems')}:</span>{' '}
-                        {prescription.items.length}
+                        {formatLocaleDigits(prescription.items.length, uiLang)}
                       </div>
                     </div>
 
@@ -446,7 +534,12 @@ export const PatientPrescriptions: React.FC = () => {
                           key={item.id}
                           className="rounded-full border border-gray-200 px-3 py-1 text-xs font-medium text-gray-600"
                         >
-                          {item.medication_name}
+                          <MedicationNameDisplay
+                            canonicalName={item.medication_name}
+                            localizedName={item.medication_name_ar}
+                            language={uiLang}
+                            variant="compact"
+                          />
                         </span>
                       ))}
                     </div>
