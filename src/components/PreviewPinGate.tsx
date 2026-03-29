@@ -1,6 +1,7 @@
 import { type FormEvent, type ReactNode, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Lock } from 'lucide-react';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import {
   PREVIEW_PIN_CODE,
   grantPreviewAccess,
@@ -48,6 +49,9 @@ export const PreviewPinGate = ({ children }: PreviewPinGateProps) => {
 
   return (
     <div className="fixed inset-0 z-[9999] flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-ceenai-blue px-4 py-10 text-slate-100">
+      <div className="absolute top-4 end-4 z-[10000] sm:top-6 sm:end-6">
+        <LanguageSwitcher variant="dark" />
+      </div>
       <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-md">
         <div className="mb-6 flex justify-center">
           <div className="rounded-2xl bg-ceenai-blue/30 p-4 ring-1 ring-white/20">
