@@ -49,7 +49,7 @@ export const AIChat: React.FC = () => {
   const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const conversationContextRef = useRef<string[]>([]);
-  const welcomeMessage = useMemo(() => buildWelcomeMessage(t), [t, i18n.language]);
+  const welcomeMessage = useMemo(() => buildWelcomeMessage(t), [t]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);

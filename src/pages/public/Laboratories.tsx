@@ -130,7 +130,7 @@ export const Laboratories: React.FC = () => {
       const matchesLocation = selectedLocation === 'all' || lab.location === selectedLocation;
       return matchesSearch && matchesLocation;
     });
-  }, [laboratories, searchQuery, selectedLocation, t, i18n.language]);
+  }, [laboratories, searchQuery, selectedLocation, t]);
 
   const locations = useMemo(
     () => ['all', ...new Set(laboratories.map((lab) => lab.location))],

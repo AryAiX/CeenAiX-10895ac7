@@ -133,7 +133,7 @@ export const Pharmacy: React.FC = () => {
         (selectedFilter === 'delivery' && row.delivery);
       return matchesSearch && matchesFilter;
     });
-  }, [searchTerm, selectedFilter, t, i18n.language]);
+  }, [searchTerm, selectedFilter, t]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">

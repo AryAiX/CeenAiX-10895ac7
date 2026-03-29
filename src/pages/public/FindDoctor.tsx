@@ -97,7 +97,7 @@ export const FindDoctor: React.FC = () => {
       const matchesSpecialty = matchesDirectorySpecialtyFilter(doctor.specialty, selectedSpecialty);
       return matchesSearch && matchesSpecialty;
     });
-  }, [doctors, searchTerm, selectedSpecialty, t, i18n.language]);
+  }, [doctors, searchTerm, selectedSpecialty, t]);
 
   const handleBookAppointment = () => {
     navigate('/patient/appointments/book');
