@@ -59,20 +59,22 @@ Schema documentation and checklist entries (**UX-1 through UX-14**) were updated
 
 ## Details
 
-| ID     | Item                                                                 | Status | Completed  | Notes                                                                                                                                 |
-| ------ | -------------------------------------------------------------------- | ------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| UX-1   | Review external ideav2 branch for UX-only changes                    | done   | 2026-03-28 | `docs/ux/ideav2-merge-review.md`                                                                                                      |
-| UX-2   | Replace public landing with approved UX design                       | done   | 2026-03-28 | `Home.tsx`; routes preserved                                                                                                        |
-| UX-3   | Shared branding + footer/header/auth chrome                            | done   | 2026-03-28 | `favicon.svg`, `Header`, `Footer`, `AuthShell`, nav                                                                                   |
-| UX-4   | Restyle public discovery pages                                       | done   | 2026-03-28 | `FindDoctor`, `FindClinic`, public `AIChat`, `HealthEducation`                                                                       |
-| UX-5   | Restyle auth pages                                                   | done   | 2026-03-28 | Auth flows unchanged                                                                                                                |
-| UX-6   | Restyle patient portal                                               | done   | 2026-03-28 | Shells + navigation                                                                                                                   |
-| UX-7   | Restyle doctor portal                                                | done   | 2026-03-28 | Slate-emerald system                                                                                                                |
-| UX-8   | Document external functionality not merged                           | done   | 2026-03-28 | ideav2 merge review                                                                                                                   |
-| UX-9   | Arabic localization foundation                                       | done   | 2026-03-28 | `i18next`, `src/i18n`, `locales/en|ar`                                                                                                |
-| UX-10  | RTL support                                                          | done   | 2026-03-28 | `documentElement` `lang`/`dir`, CSS font stack                                                                                        |
-| UX-11  | Arabic for shared/public chrome                                      | done   | 2026-03-28 | Nav, footer, auth, landing header; namespaces grow incrementally                                                                      |
-| UX-12  | Prescription vocab + `medication_name_ar`                            | done   | 2026-03-28 | Migrations + patient dashboard/prescriptions + `MedicationNameDisplay`                                                              |
-| UX-13  | Locale numerals + LTR clinical text                                  | done   | 2026-03-28 | Prescriptions stats, doctor dashboard, doctor appointments                                                                            |
-| UX-14  | Guest `/ai-chat` i18n + doctor chrome                                | done   | 2026-03-28 | `public.guestAiChat`; hide patient CTA for doctors                                                                                    |
-| PAT-01 | Patient dashboard live data (related)                                | done   | 2026-03-15 | Extended with vocab + `medication_name_ar` + `i18n.language` for dashboard med lines                                                  |
+| ID     | Item                                              | Status | Completed  | Notes                                                                                |
+| ------ | ------------------------------------------------- | ------ | ---------- | ------------------------------------------------------------------------------------ |
+| UX-1   | Review external ideav2 branch for UX-only changes | done   | 2026-03-28 | `docs/ux/ideav2-merge-review.md`                                                     |
+| UX-2   | Replace public landing with approved UX design    | done   | 2026-03-28 | `Home.tsx`; routes preserved                                                         |
+| UX-3   | Shared branding + footer/header/auth chrome       | done   | 2026-03-28 | `favicon.svg`, `Header`, `Footer`, `AuthShell`, nav                                  |
+| UX-4   | Restyle public discovery pages                    | done   | 2026-03-28 | `FindDoctor`, `FindClinic`, public `AIChat`, `HealthEducation`                       |
+| UX-5   | Restyle auth pages                                | done   | 2026-03-28 | Auth flows unchanged                                                                 |
+| UX-6   | Restyle patient portal                            | done   | 2026-03-28 | Shells + navigation                                                                  |
+| UX-7   | Restyle doctor portal                             | done   | 2026-03-28 | Slate-emerald system                                                                 |
+| UX-8   | Document external functionality not merged        | done   | 2026-03-28 | ideav2 merge review                                                                  |
+| UX-9   | Arabic localization foundation                    | done   | 2026-03-28 | i18next, src/i18n, locales en/ar                                                                 |
+| UX-10  | RTL support                                       | done   | 2026-03-28 | `documentElement` `lang`/`dir`, CSS font stack                                       |
+| UX-11  | Arabic for shared/public chrome                   | done   | 2026-03-28 | Nav, footer, auth, landing header; namespaces grow incrementally                     |
+| UX-12  | Prescription vocab + `medication_name_ar`         | done   | 2026-03-28 | Migrations + patient dashboard/prescriptions + `MedicationNameDisplay`               |
+| UX-13  | Locale numerals + LTR clinical text               | done   | 2026-03-28 | Prescriptions stats, doctor dashboard, doctor appointments                           |
+| UX-14  | Guest `/ai-chat` i18n + doctor chrome             | done   | 2026-03-28 | `public.guestAiChat`; hide patient CTA for doctors                                   |
+| PAT-01 | Patient dashboard live data (related)             | done   | 2026-03-15 | Extended with vocab + `medication_name_ar` + `i18n.language` for dashboard med lines |
+
+
