@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Navigation } from '../../components/Navigation';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Calendar,
   Clock,
@@ -17,31 +18,18 @@ import {
   AlertCircle,
   CheckCircle2,
 } from 'lucide-react';
+import { MedicationNameDisplay } from '../../components/MedicationNameDisplay';
 import { Skeleton } from '../../components/Skeleton';
 import { useAuth } from '../../lib/auth-context';
 import { usePatientDashboard } from '../../hooks';
-
-const formatRelativeTime = (value: string) => {
-  const date = new Date(value);
-  const diffMs = Date.now() - date.getTime();
-  const diffMinutes = Math.max(1, Math.round(diffMs / 60000));
-
-  if (diffMinutes < 60) {
-    return `${diffMinutes}m ago`;
-  }
-
-  const diffHours = Math.round(diffMinutes / 60);
-
-  if (diffHours < 24) {
-    return `${diffHours}h ago`;
-  }
-
-  const diffDays = Math.round(diffHours / 24);
-  return `${diffDays}d ago`;
-};
-
-const formatAppointmentType = (value: 'in_person' | 'virtual') =>
-  value === 'in_person' ? 'In person' : 'Virtual';
+import {
+  appointmentTypeLabel,
+  dateTimeFormatWithNumerals,
+  formatLocaleDigits,
+  formatRelativeTime,
+  resolveLocale,
+} from '../../lib/i18n-ui';
+import { formatMedicationDetailLine } from '../../lib/medication-display';
 
 const getDisplayName = (fullName: string | null | undefined, firstName: string | null | undefined, email?: string) => {
   if (firstName?.trim()) {
@@ -56,30 +44,37 @@ const getDisplayName = (fullName: string | null | undefined, firstName: string |
     return email.split('@')[0];
   }
 
-  return 'there';
+  return '';
 };
 
 export const PatientDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation('common');
+  const locale = resolveLocale(i18n.language);
+  const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(i18n.language, options);
   const { profile, user } = useAuth();
   const { data: dashboardData, loading: dashboardLoading, error: dashboardError } = usePatientDashboard(
-    user?.id
+    user?.id,
+    i18n.language
   );
 
   const quickActions = useMemo(
     () => [
-      { icon: Calendar, label: 'Appointments', action: () => navigate('/patient/appointments') },
-      { icon: Pill, label: 'Prescriptions', action: () => navigate('/patient/prescriptions') },
-      { icon: MessageSquare, label: 'Messages', action: () => navigate('/patient/messages') },
-      { icon: FileText, label: 'Records', action: () => navigate('/patient/records') },
-      { icon: Users, label: 'Profile', action: () => navigate('/patient/profile') },
-      { icon: Bot, label: 'AI Health Chat', action: () => navigate('/patient/ai-chat') },
+      { icon: Calendar, labelKey: 'nav.appointments', action: () => navigate('/patient/appointments') },
+      { icon: Pill, labelKey: 'nav.prescriptions', action: () => navigate('/patient/prescriptions') },
+      { icon: MessageSquare, labelKey: 'nav.messages', action: () => navigate('/patient/messages') },
+      { icon: FileText, labelKey: 'nav.records', action: () => navigate('/patient/records') },
+      { icon: Users, labelKey: 'nav.profile', action: () => navigate('/patient/profile') },
+      { icon: Bot, labelKey: 'footer.aiHealthChat', action: () => navigate('/patient/ai-chat') },
     ],
     [navigate]
   );
 
-  const displayName = getDisplayName(profile?.full_name, profile?.first_name, user?.email);
-  const profileStatus = profile?.profile_completed ? 'Ready' : 'Pending';
+  const displayName =
+    getDisplayName(profile?.full_name, profile?.first_name, user?.email) || t('patient.dashboard.greetingFallback');
+  const profileStatus = profile?.profile_completed
+    ? t('patient.dashboard.ready')
+    : t('patient.dashboard.pending');
   const nextAppointment = dashboardData?.nextAppointment ?? null;
   const recentActivity = dashboardData?.recentActivity ?? [];
   const medications = dashboardData?.medications ?? [];
@@ -101,29 +96,31 @@ export const PatientDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
       <Navigation role="patient" />
 
       <div className="relative bg-gradient-to-r from-cyan-600 via-blue-600 to-cyan-700 overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <img
             src="https://images.pexels.com/photos/3845126/pexels-photo-3845126.jpeg?auto=compress&cs=tinysrgb&w=1920"
-            alt="Healthcare Professional"
+            alt={t('patient.dashboard.altHealthcare')}
             className="w-full h-full object-cover"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-600/80 to-blue-600/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-ceenai-navy/90 to-ceenai-blue/85"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold text-white mb-2">{`Welcome back, ${displayName}!`}</h1>
-              <p className="text-cyan-100 text-lg">Here is your care overview for today.</p>
+              <h1 className="text-4xl font-bold text-white mb-2">
+                {t('patient.dashboard.welcome', { name: displayName })}
+              </h1>
+              <p className="text-cyan-100 text-lg">{t('patient.dashboard.careOverview')}</p>
             </div>
             <div className="hidden md:block">
               <div className="flex items-center space-x-3 bg-white/10 backdrop-blur-sm rounded-xl px-6 py-3 border border-white/20">
                 <Heart className="w-6 h-6 text-white" />
                 <div>
-                  <p className="text-xs text-cyan-100">Profile Status</p>
+                  <p className="text-xs text-cyan-100">{t('patient.dashboard.profileStatus')}</p>
                   <p className="text-2xl font-bold text-white">{profileStatus}</p>
                 </div>
               </div>
@@ -141,26 +138,26 @@ export const PatientDashboard: React.FC = () => {
             <div className="absolute bottom-0 right-0 w-24 h-24 opacity-5">
               <img
                 src="https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=200"
-                alt="Calendar"
+                alt={t('patient.dashboard.altCalendar')}
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="relative p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                <div className="w-14 h-14 bg-gradient-to-br from-ceenai-cyan to-ceenai-blue rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
                   <Calendar className="w-7 h-7 text-white" />
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-600 group-hover:translate-x-1 transition-all" />
+                <ChevronRight className="w-5 h-5 text-gray-400 transition-all group-hover:text-cyan-600 group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
               </div>
-              <p className="text-gray-600 text-sm font-medium mb-1">Upcoming</p>
+              <p className="text-gray-600 text-sm font-medium mb-1">{t('patient.dashboard.statUpcoming')}</p>
               {dashboardLoading ? (
                 <Skeleton className="mb-2 h-9 w-12" />
               ) : (
                 <p className="text-3xl font-bold text-gray-900 mb-1">
-                  {dashboardData?.upcomingAppointmentsCount ?? 0}
+                  {formatLocaleDigits(dashboardData?.upcomingAppointmentsCount ?? 0, i18n.language)}
                 </p>
               )}
-              <p className="text-sm text-cyan-600 font-medium">Appointments</p>
+              <p className="text-sm text-cyan-600 font-medium">{t('nav.appointments')}</p>
             </div>
           </div>
 
@@ -171,26 +168,26 @@ export const PatientDashboard: React.FC = () => {
             <div className="absolute bottom-0 right-0 w-24 h-24 opacity-5">
               <img
                 src="https://images.pexels.com/photos/3683041/pexels-photo-3683041.jpeg?auto=compress&cs=tinysrgb&w=200"
-                alt="Medication"
+                alt={t('patient.dashboard.altMedication')}
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="relative p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                <div className="w-14 h-14 bg-gradient-to-br from-ceenai-cyan to-ceenai-blue rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
                   <Pill className="w-7 h-7 text-white" />
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-600 group-hover:translate-x-1 transition-all" />
+                <ChevronRight className="w-5 h-5 text-gray-400 transition-all group-hover:text-cyan-600 group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
               </div>
-              <p className="text-gray-600 text-sm font-medium mb-1">Active</p>
+              <p className="text-gray-600 text-sm font-medium mb-1">{t('patient.dashboard.statActive')}</p>
               {dashboardLoading ? (
                 <Skeleton className="mb-2 h-9 w-12" />
               ) : (
                 <p className="text-3xl font-bold text-gray-900 mb-1">
-                  {dashboardData?.activePrescriptionsCount ?? 0}
+                  {formatLocaleDigits(dashboardData?.activePrescriptionsCount ?? 0, i18n.language)}
                 </p>
               )}
-              <p className="text-sm text-cyan-600 font-medium">Prescriptions</p>
+              <p className="text-sm text-cyan-600 font-medium">{t('nav.prescriptions')}</p>
             </div>
           </div>
 
@@ -201,26 +198,26 @@ export const PatientDashboard: React.FC = () => {
             <div className="absolute bottom-0 right-0 w-24 h-24 opacity-5">
               <img
                 src="https://images.pexels.com/photos/7659564/pexels-photo-7659564.jpeg?auto=compress&cs=tinysrgb&w=200"
-                alt="Communication"
+                alt={t('patient.dashboard.altCommunication')}
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="relative p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                <div className="w-14 h-14 bg-gradient-to-br from-ceenai-cyan to-ceenai-blue rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
                   <MessageSquare className="w-7 h-7 text-white" />
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-600 group-hover:translate-x-1 transition-all" />
+                <ChevronRight className="w-5 h-5 text-gray-400 transition-all group-hover:text-cyan-600 group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
               </div>
-              <p className="text-gray-600 text-sm font-medium mb-1">Unread</p>
+              <p className="text-gray-600 text-sm font-medium mb-1">{t('patient.dashboard.statUnread')}</p>
               {dashboardLoading ? (
                 <Skeleton className="mb-2 h-9 w-12" />
               ) : (
                 <p className="text-3xl font-bold text-gray-900 mb-1">
-                  {dashboardData?.unreadMessagesCount ?? 0}
+                  {formatLocaleDigits(dashboardData?.unreadMessagesCount ?? 0, i18n.language)}
                 </p>
               )}
-              <p className="text-sm text-cyan-600 font-medium">Messages</p>
+              <p className="text-sm text-cyan-600 font-medium">{t('nav.messages')}</p>
             </div>
           </div>
         </div>
@@ -229,7 +226,7 @@ export const PatientDashboard: React.FC = () => {
           <div className="lg:col-span-2 space-y-6">
             {dashboardError ? (
               <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                Some dashboard data could not be loaded yet. You can still use the shortcuts below.
+                {t('patient.dashboard.loadError')}
               </div>
             ) : null}
 
@@ -237,27 +234,27 @@ export const PatientDashboard: React.FC = () => {
               <div className="absolute top-0 right-0 w-64 h-64 opacity-5">
                 <img
                   src="https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=400"
-                  alt="Medical"
+                  alt={t('patient.dashboard.altMedical')}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="relative p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                  <div className="w-1 h-6 bg-gradient-to-b from-cyan-500 to-blue-600 rounded-full mr-3"></div>
-                  Quick Actions
+                  <div className="w-1 h-6 bg-gradient-to-b from-ceenai-cyan to-ceenai-blue rounded-full mr-3"></div>
+                  {t('patient.dashboard.quickActions')}
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {quickActions.map((action) => (
                     <button
-                      key={action.label}
+                      key={action.labelKey}
                       onClick={action.action}
                       className="group bg-gradient-to-br from-gray-50 to-gray-100 hover:from-cyan-50 hover:to-blue-50 border-2 border-gray-200 hover:border-cyan-500 p-6 rounded-xl transition-all duration-200 flex flex-col items-center space-y-3"
                     >
-                      <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-md">
+                      <div className="w-12 h-12 bg-gradient-to-br from-ceenai-cyan to-ceenai-blue rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-md">
                         <action.icon className="w-6 h-6 text-white" />
                       </div>
                       <span className="text-sm font-semibold text-gray-700 group-hover:text-cyan-700 text-center transition-colors">
-                        {action.label}
+                        {t(action.labelKey)}
                       </span>
                     </button>
                   ))}
@@ -268,24 +265,24 @@ export const PatientDashboard: React.FC = () => {
             <div className="bg-white rounded-2xl shadow-xl p-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                  <div className="w-1 h-6 bg-gradient-to-b from-cyan-500 to-blue-600 rounded-full mr-3"></div>
-                  Next Appointment
+                  <div className="w-1 h-6 bg-gradient-to-b from-ceenai-cyan to-ceenai-blue rounded-full mr-3"></div>
+                  {t('patient.dashboard.nextAppointment')}
                 </h2>
                 <button
                   onClick={() => navigate('/patient/appointments')}
                   className="text-cyan-600 text-sm font-semibold hover:text-cyan-700 transition-colors"
                 >
-                  View All
+                  {t('patient.dashboard.viewAll')}
                 </button>
               </div>
               {dashboardLoading ? (
                 <Skeleton className="h-56 w-full rounded-2xl" />
               ) : nextAppointment ? (
-                <div className="relative bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl p-6 overflow-hidden">
+                <div className="relative bg-gradient-to-br from-ceenai-cyan to-ceenai-blue rounded-2xl p-6 overflow-hidden">
                   <div className="absolute inset-0 opacity-20">
                     <img
                       src="https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=800"
-                      alt="Doctor Consultation"
+                      alt={t('home.hero.altConsultation')}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -298,48 +295,52 @@ export const PatientDashboard: React.FC = () => {
                       <div className="flex-1">
                         <h3 className="text-xl font-bold mb-1">{nextAppointment.doctorName}</h3>
                         <p className="text-cyan-100 text-sm mb-4">
-                          {nextAppointment.specialty ?? 'Scheduled care visit'}
+                          {nextAppointment.specialty ?? t('shared.careVisit')}
                         </p>
                         <div className="space-y-2">
                           <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 w-fit">
                             <Calendar className="w-4 h-4" />
                             <span className="text-sm font-medium">
-                              {new Date(nextAppointment.scheduledAt).toLocaleDateString('en-US', {
-                                weekday: 'short',
-                                month: 'short',
-                                day: 'numeric',
-                              })}
+                              {new Date(nextAppointment.scheduledAt).toLocaleDateString(
+                                locale,
+                                dtOpts({
+                                  weekday: 'short',
+                                  month: 'short',
+                                  day: 'numeric',
+                                })
+                              )}
                             </span>
                           </div>
                           <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 w-fit">
                             <Clock className="w-4 h-4" />
                             <span className="text-sm font-medium">
-                              {new Date(nextAppointment.scheduledAt).toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                              })}
+                              {new Date(nextAppointment.scheduledAt).toLocaleTimeString(
+                                locale,
+                                dtOpts({
+                                  hour: 'numeric',
+                                  minute: '2-digit',
+                                })
+                              )}
                             </span>
                           </div>
                         </div>
                       </div>
                     </div>
                     <span className="bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-xs font-bold uppercase flex-shrink-0">
-                      {formatAppointmentType(nextAppointment.type)}
+                      {appointmentTypeLabel(t, nextAppointment.type)}
                     </span>
                   </div>
                 </div>
               ) : (
                 <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
                   <Calendar className="mx-auto mb-4 h-10 w-10 text-gray-400" />
-                  <h3 className="text-lg font-semibold text-gray-900">No upcoming appointments</h3>
-                  <p className="mt-2 text-sm text-gray-600">
-                    Your next scheduled visit will appear here once it is booked.
-                  </p>
+                  <h3 className="text-lg font-semibold text-gray-900">{t('patient.dashboard.noUpcomingTitle')}</h3>
+                  <p className="mt-2 text-sm text-gray-600">{t('patient.dashboard.noUpcomingBody')}</p>
                   <button
                     onClick={() => navigate('/patient/appointments')}
-                    className="mt-4 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:shadow-lg"
+                    className="mt-4 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:shadow-lg"
                   >
-                    Go to appointments
+                    {t('patient.dashboard.goToAppointments')}
                   </button>
                 </div>
               )}
@@ -349,14 +350,14 @@ export const PatientDashboard: React.FC = () => {
               <div className="absolute top-0 right-0 w-48 h-48 opacity-5">
                 <img
                   src="https://images.pexels.com/photos/4021775/pexels-photo-4021775.jpeg?auto=compress&cs=tinysrgb&w=400"
-                  alt="Medical Records"
+                  alt={t('patient.dashboard.shortcutRecordsTitle')}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="relative p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                  <div className="w-1 h-6 bg-gradient-to-b from-cyan-500 to-blue-600 rounded-full mr-3"></div>
-                  Recent Activity
+                  <div className="w-1 h-6 bg-gradient-to-b from-ceenai-cyan to-ceenai-blue rounded-full mr-3"></div>
+                  {t('patient.dashboard.recentActivity')}
                 </h2>
                 <div className="space-y-3">
                   {dashboardLoading ? (
@@ -377,7 +378,7 @@ export const PatientDashboard: React.FC = () => {
                         }}
                         className="group flex w-full items-center space-x-4 rounded-xl border-2 border-transparent bg-gray-50 p-4 text-left transition-all hover:border-cyan-200 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50"
                       >
-                        <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+                        <div className="w-12 h-12 bg-gradient-to-br from-ceenai-cyan to-ceenai-blue rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
                           {getActivityIcon(activity.type)}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -385,19 +386,19 @@ export const PatientDashboard: React.FC = () => {
                             {activity.title}
                           </p>
                           <p className="text-sm text-gray-500">
-                            {activity.detail ?? formatRelativeTime(activity.createdAt)}
+                            {activity.detail ?? formatRelativeTime(t, activity.createdAt)}
                           </p>
                         </div>
-                        <span className="text-xs font-medium text-gray-400">{formatRelativeTime(activity.createdAt)}</span>
+                        <span className="text-xs font-medium text-gray-400">
+                          {formatRelativeTime(t, activity.createdAt)}
+                        </span>
                       </button>
                     ))
                   ) : (
                     <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
                       <Bell className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                      <p className="font-semibold text-gray-900">No recent activity yet</p>
-                      <p className="mt-1 text-sm text-gray-600">
-                        Appointment, medication, and lab updates will appear here.
-                      </p>
+                      <p className="font-semibold text-gray-900">{t('patient.dashboard.noActivityTitle')}</p>
+                      <p className="mt-1 text-sm text-gray-600">{t('patient.dashboard.noActivityBody')}</p>
                     </div>
                   )}
                 </div>
@@ -410,17 +411,17 @@ export const PatientDashboard: React.FC = () => {
               <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
                 <img
                   src="https://images.pexels.com/photos/3683041/pexels-photo-3683041.jpeg?auto=compress&cs=tinysrgb&w=300"
-                  alt="Medication"
+                  alt={t('patient.dashboard.altMedication2')}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="relative p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-gray-900 flex items-center">
-                    <div className="w-1 h-5 bg-gradient-to-b from-cyan-500 to-blue-600 rounded-full mr-2"></div>
-                    Medication Reminders
+                    <div className="w-1 h-5 bg-gradient-to-b from-ceenai-cyan to-ceenai-blue rounded-full mr-2"></div>
+                    {t('patient.dashboard.medicationReminders')}
                   </h2>
-                  <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-ceenai-cyan to-ceenai-blue rounded-xl flex items-center justify-center">
                     <Bell className="w-5 h-5 text-white" />
                   </div>
                 </div>
@@ -442,14 +443,29 @@ export const PatientDashboard: React.FC = () => {
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <p className="font-semibold text-gray-900 text-sm">{medication.medicationName}</p>
+                            <div className="text-sm">
+                              <MedicationNameDisplay
+                                canonicalName={medication.medicationName}
+                                localizedName={medication.medicationNameAr}
+                                language={i18n.language ?? 'en'}
+                                primaryClassName="block font-semibold text-gray-900"
+                                secondaryClassName="block text-xs font-normal text-gray-500 mt-0.5"
+                              />
+                            </div>
                             <p className="text-xs text-gray-600 mt-1 flex items-center">
                               <Clock className="w-3 h-3 mr-1" />
-                              {medication.detail}
+                              {formatMedicationDetailLine(t, i18n.language, {
+                                dosage: medication.dosage,
+                                frequency: medication.frequency,
+                                duration: medication.duration,
+                                detail: medication.detail,
+                                frequencyFromVocab: medication.frequencyFromVocab ?? undefined,
+                                durationFromVocab: medication.durationFromVocab ?? undefined,
+                              })}
                             </p>
                           </div>
                           {medication.isDispensed ? (
-                            <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center">
+                            <div className="w-8 h-8 bg-gradient-to-br from-ceenai-cyan to-ceenai-blue rounded-lg flex items-center justify-center">
                               <CheckCircle2 className="w-5 h-5 text-white" />
                             </div>
                           ) : (
@@ -463,10 +479,8 @@ export const PatientDashboard: React.FC = () => {
                   ) : (
                     <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
                       <Pill className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                      <p className="font-semibold text-gray-900">No medication reminders right now</p>
-                      <p className="mt-1 text-sm text-gray-600">
-                        Active prescription items will appear here once they are added to your chart.
-                      </p>
+                      <p className="font-semibold text-gray-900">{t('patient.dashboard.noMedTitle')}</p>
+                      <p className="mt-1 text-sm text-gray-600">{t('patient.dashboard.noMedBody')}</p>
                     </div>
                   )}
                 </div>
@@ -477,14 +491,14 @@ export const PatientDashboard: React.FC = () => {
               <div className="absolute bottom-0 right-0 w-32 h-32 opacity-5">
                 <img
                   src="https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=300"
-                  alt="Healthcare"
+                  alt={t('patient.dashboard.altHealthcare2')}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="relative p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                  <div className="w-1 h-5 bg-gradient-to-b from-cyan-500 to-blue-600 rounded-full mr-2"></div>
-                  Patient Shortcuts
+                  <div className="w-1 h-5 bg-gradient-to-b from-ceenai-cyan to-ceenai-blue rounded-full mr-2"></div>
+                  {t('patient.dashboard.shortcuts')}
                 </h2>
                 <div className="space-y-3">
                   <button
@@ -492,15 +506,15 @@ export const PatientDashboard: React.FC = () => {
                     className="group w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 rounded-xl hover:shadow-md transition-all border-2 border-transparent hover:border-cyan-200"
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <div className="w-10 h-10 bg-gradient-to-br from-ceenai-cyan to-ceenai-blue rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                         <Users className="w-5 h-5 text-white" />
                       </div>
                       <div className="text-left">
-                        <p className="font-semibold text-gray-900 text-sm">Profile</p>
-                        <p className="text-xs text-gray-600">Review your personal details</p>
+                        <p className="font-semibold text-gray-900 text-sm">{t('patient.dashboard.shortcutProfileTitle')}</p>
+                        <p className="text-xs text-gray-600">{t('patient.dashboard.shortcutProfileSub')}</p>
                       </div>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-600 group-hover:translate-x-1 transition-all" />
+                    <ChevronRight className="w-5 h-5 text-gray-400 transition-all group-hover:text-cyan-600 group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
                   </button>
 
                   <button
@@ -508,15 +522,15 @@ export const PatientDashboard: React.FC = () => {
                     className="group w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 rounded-xl hover:shadow-md transition-all border-2 border-transparent hover:border-cyan-200"
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <div className="w-10 h-10 bg-gradient-to-br from-ceenai-cyan to-ceenai-blue rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                         <FileText className="w-5 h-5 text-white" />
                       </div>
                       <div className="text-left">
-                        <p className="font-semibold text-gray-900 text-sm">Medical Records</p>
-                        <p className="text-xs text-gray-600">Access your documented health history</p>
+                        <p className="font-semibold text-gray-900 text-sm">{t('patient.dashboard.shortcutRecordsTitle')}</p>
+                        <p className="text-xs text-gray-600">{t('patient.dashboard.shortcutRecordsSub')}</p>
                       </div>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-600 group-hover:translate-x-1 transition-all" />
+                    <ChevronRight className="w-5 h-5 text-gray-400 transition-all group-hover:text-cyan-600 group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
                   </button>
 
                   <button
@@ -524,15 +538,15 @@ export const PatientDashboard: React.FC = () => {
                     className="group w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 rounded-xl hover:shadow-md transition-all border-2 border-transparent hover:border-cyan-200"
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <div className="w-10 h-10 bg-gradient-to-br from-ceenai-cyan to-ceenai-blue rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                         <Shield className="w-5 h-5 text-white" />
                       </div>
                       <div className="text-left">
-                        <p className="font-semibold text-gray-900 text-sm">Prescription Support</p>
-                        <p className="text-xs text-gray-600">Check current medications and refill needs</p>
+                        <p className="font-semibold text-gray-900 text-sm">{t('patient.dashboard.shortcutRxTitle')}</p>
+                        <p className="text-xs text-gray-600">{t('patient.dashboard.shortcutRxSub')}</p>
                       </div>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-600 group-hover:translate-x-1 transition-all" />
+                    <ChevronRight className="w-5 h-5 text-gray-400 transition-all group-hover:text-cyan-600 group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
                   </button>
                 </div>
               </div>

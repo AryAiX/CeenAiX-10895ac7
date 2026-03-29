@@ -1,9 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight, ShieldX } from 'lucide-react';
 import { GeometricBackground } from '../../components/GeometricBackground';
 import { getDefaultRouteForRole, useAuth } from '../../lib/auth-context';
 
 export const AccessDenied = () => {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const { isAuthenticated, role, signOut } = useAuth();
   const dashboardPath = getDefaultRouteForRole(role);
@@ -25,12 +27,11 @@ export const AccessDenied = () => {
 
           <div className="mt-6 space-y-4">
             <p className="inline-flex items-center rounded-full bg-ceenai-cyan/10 px-4 py-2 text-sm font-semibold text-ceenai-blue">
-              Restricted Area
+              {t('system.accessDenied.badge')}
             </p>
-            <h1 className="text-3xl font-bold text-gray-900">Access denied</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{t('system.accessDenied.title')}</h1>
             <p className="mx-auto max-w-xl text-base leading-relaxed text-gray-600">
-              Your current account does not have permission to view this page. Use an approved role
-              or return to the correct workspace.
+              {t('system.accessDenied.body')}
             </p>
           </div>
 
@@ -39,7 +40,7 @@ export const AccessDenied = () => {
               to="/"
               className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 px-5 py-3 font-semibold text-gray-700 transition hover:border-ceenai-cyan hover:text-ceenai-blue"
             >
-              <span>Go to home</span>
+              <span>{t('system.accessDenied.home')}</span>
             </Link>
 
             {isAuthenticated ? (
@@ -50,7 +51,7 @@ export const AccessDenied = () => {
                 }}
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border border-ceenai-cyan/30 px-5 py-3 font-semibold text-ceenai-blue transition hover:bg-ceenai-cyan/10"
               >
-                <span>Use another account</span>
+                <span>{t('system.accessDenied.otherAccount')}</span>
               </button>
             ) : null}
 
@@ -58,7 +59,7 @@ export const AccessDenied = () => {
               to={dashboardPath}
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.01]"
             >
-              <span>Open my dashboard</span>
+              <span>{t('system.accessDenied.dashboard')}</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>

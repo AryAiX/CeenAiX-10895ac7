@@ -1,4 +1,5 @@
 import React, { useMemo, useState, type FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Ban,
   CalendarClock,
@@ -12,6 +13,7 @@ import { PageHeader } from '../../components/PageHeader';
 import { Skeleton } from '../../components/Skeleton';
 import { useDoctorSchedule } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
+import { dateTimeFormatWithNumerals, resolveLocale } from '../../lib/i18n-ui';
 import { supabase } from '../../lib/supabase';
 
 type FeedbackState =
@@ -61,18 +63,24 @@ const INITIAL_BLOCKED_SLOT_FORM = (): BlockedSlotFormState => ({
   reason: '',
 });
 
-const formatTimeLabel = (value: string) => {
+const formatTimeLabel = (value: string, language: string) => {
   const [hours, minutes] = value.split(':').map(Number);
   const date = new Date();
   date.setHours(hours, minutes, 0, 0);
-
-  return date.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-  });
+  const locale = resolveLocale(language);
+  return date.toLocaleTimeString(
+    locale,
+    dateTimeFormatWithNumerals(language, {
+      hour: 'numeric',
+      minute: '2-digit',
+    })
+  );
 };
 
 export const DoctorSchedule: React.FC = () => {
+  const { i18n } = useTranslation('common');
+  const locale = resolveLocale(i18n.language);
+  const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(i18n.language, options);
   const { user } = useAuth();
   const { data, loading, error, refetch } = useDoctorSchedule(user?.id);
 
@@ -247,7 +255,7 @@ export const DoctorSchedule: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
       <Navigation role="doctor" />
       <PageHeader
         title="Schedule"
@@ -380,7 +388,7 @@ export const DoctorSchedule: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isSavingAvailability}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-slate-900 to-emerald-800 px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <Plus className="h-4 w-4" />
                     <span>{isSavingAvailability ? 'Saving...' : 'Add recurring availability'}</span>
@@ -439,7 +447,7 @@ export const DoctorSchedule: React.FC = () => {
                                   </div>
                                   <div>
                                     <p className="font-semibold text-gray-900">
-                                      {formatTimeLabel(entry.start_time)} to {formatTimeLabel(entry.end_time)}
+                                      {formatTimeLabel(entry.start_time, i18n.language)} to {formatTimeLabel(entry.end_time, i18n.language)}
                                     </p>
                                     <p className="mt-1 text-sm text-gray-600">
                                       {entry.slot_duration_minutes} minute slots
@@ -593,15 +601,19 @@ export const DoctorSchedule: React.FC = () => {
                         <div className="flex items-start justify-between gap-3">
                           <div>
                             <p className="font-semibold text-gray-900">
-                              {new Date(`${slot.blocked_date}T00:00:00`).toLocaleDateString('en-US', {
-                                weekday: 'short',
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric',
-                              })}
+                              {new Date(`${slot.blocked_date}T00:00:00`).toLocaleDateString(
+                                locale,
+                                dtOpts({
+                                  weekday: 'short',
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                })
+                              )}
                             </p>
                             <p className="mt-1 text-sm text-gray-700">
-                              {formatTimeLabel(slot.start_time)} to {formatTimeLabel(slot.end_time)}
+                              {formatTimeLabel(slot.start_time, i18n.language)} to{' '}
+                              {formatTimeLabel(slot.end_time, i18n.language)}
                             </p>
                             <p className="mt-2 text-sm text-gray-600">{slot.reason ?? 'No reason added'}</p>
                           </div>

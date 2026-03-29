@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { KeyRound, Mail } from 'lucide-react';
 import { AuthShell } from '../../components/AuthShell';
 import { getDefaultRouteForRole, useAuth } from '../../lib/auth-context';
 
 export const ForgotPassword = () => {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { isAuthenticated, isLoading, requestPasswordReset, role, updatePassword } = useAuth();
@@ -86,21 +88,19 @@ export const ForgotPassword = () => {
 
   return (
     <AuthShell
-      badge="Password Recovery"
-      title={isRecoveryMode ? 'Choose a new password' : 'Reset your password'}
+      badge={t('auth.forgot.badge')}
+      title={isRecoveryMode ? t('auth.forgot.titleRecovery') : t('auth.forgot.titleRequest')}
       description={
-        isRecoveryMode
-          ? 'You are in recovery mode. Set a new password to regain access to your account.'
-          : 'Enter your account email and we will send a secure reset link.'
+        isRecoveryMode ? t('auth.forgot.descriptionRecovery') : t('auth.forgot.descriptionRequest')
       }
       footer={
-        <div className="flex flex-col gap-3 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between">
-          <span>Remembered your credentials?</span>
+        <div className="flex flex-col gap-3 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between">
+          <span>{t('auth.forgot.remembered')}</span>
           <Link
             to="/auth/login"
             className="font-semibold text-ceenai-blue transition-colors hover:text-ceenai-navy"
           >
-            Return to sign in
+            {t('auth.forgot.returnSignIn')}
           </Link>
         </div>
       }
@@ -120,12 +120,12 @@ export const ForgotPassword = () => {
       {isRecoveryMode ? (
         <form className="space-y-5" onSubmit={handleUpdatePassword}>
           <label className="block space-y-2">
-            <span className="text-sm font-semibold text-gray-700">New password</span>
+            <span className="text-sm font-semibold text-slate-700">{t('auth.login.newPassword')}</span>
             <input
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
               placeholder="Create a strong password"
               autoComplete="new-password"
               required
@@ -133,12 +133,12 @@ export const ForgotPassword = () => {
           </label>
 
           <label className="block space-y-2">
-            <span className="text-sm font-semibold text-gray-700">Confirm new password</span>
+            <span className="text-sm font-semibold text-slate-700">{t('auth.login.confirmNewPassword')}</span>
             <input
               type="password"
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
-              className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
               placeholder="Repeat your new password"
               autoComplete="new-password"
               required
@@ -151,26 +151,26 @@ export const ForgotPassword = () => {
             className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <KeyRound className="h-4 w-4" />
-            <span>{isSubmitting ? 'Updating...' : 'Update password'}</span>
+            <span>{isSubmitting ? t('auth.forgot.updating') : t('auth.forgot.updatePassword')}</span>
           </button>
         </form>
       ) : (
         <form className="space-y-5" onSubmit={handleRequestReset}>
           <label className="block space-y-2">
-            <span className="text-sm font-semibold text-gray-700">Email address</span>
+            <span className="text-sm font-semibold text-slate-700">{t('auth.login.email')}</span>
             <input
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
               placeholder="you@example.com"
               autoComplete="email"
               required
             />
           </label>
 
-          <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
-            We&apos;ll send a secure reset link to this email. The link routes back into CeenAiX so you can create a new password safely.
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+            {t('auth.forgot.resetInfo')}
           </div>
 
           <button
@@ -179,7 +179,7 @@ export const ForgotPassword = () => {
             className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Mail className="h-4 w-4" />
-            <span>{isSubmitting ? 'Sending...' : 'Send reset link'}</span>
+            <span>{isSubmitting ? t('auth.forgot.sending') : t('auth.forgot.sendReset')}</span>
           </button>
         </form>
       )}

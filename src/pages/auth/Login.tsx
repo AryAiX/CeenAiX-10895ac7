@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { KeyRound, LogIn, Smartphone } from 'lucide-react';
 import { AuthShell } from '../../components/AuthShell';
 import { getOtpRequestErrorMessage } from '../../lib/auth-error-messages';
@@ -8,6 +9,7 @@ import { getDefaultRouteForRole, useAuth } from '../../lib/auth-context';
 type LoginMode = 'password' | 'otp';
 
 export const Login = () => {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const {
@@ -126,21 +128,19 @@ export const Login = () => {
 
   return (
     <AuthShell
-      badge="Secure Sign In"
-      title={isRecoveryMode ? 'Reset your password' : 'Welcome back'}
+      badge={t('auth.login.badge')}
+      title={isRecoveryMode ? t('auth.login.titleRecovery') : t('auth.login.title')}
       description={
-        isRecoveryMode
-          ? 'Create a new password to continue securely into CeenAiX.'
-          : 'Sign in with email and password or request a phone OTP to access your role-specific dashboard.'
+        isRecoveryMode ? t('auth.login.descriptionRecovery') : t('auth.login.description')
       }
       footer={
-        <div className="flex flex-col gap-3 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between">
-          <span>Need an account?</span>
+        <div className="flex flex-col gap-3 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between">
+          <span>{t('auth.login.needAccount')}</span>
           <Link
             to="/auth/register"
             className="font-semibold text-ceenai-blue transition-colors hover:text-ceenai-navy"
           >
-            Create one now
+            {t('auth.login.createAccount')}
           </Link>
         </div>
       }
@@ -160,26 +160,26 @@ export const Login = () => {
       {isRecoveryMode ? (
         <form className="space-y-5" onSubmit={handlePasswordRecovery}>
           <label className="block space-y-2">
-            <span className="text-sm font-semibold text-gray-700">New password</span>
+            <span className="text-sm font-semibold text-slate-700">{t('auth.login.newPassword')}</span>
             <input
               type="password"
               value={newPassword}
               onChange={(event) => setNewPassword(event.target.value)}
-              className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-              placeholder="Create a strong password"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
+              placeholder={t('auth.login.newPasswordPlaceholder')}
               autoComplete="new-password"
               required
             />
           </label>
 
           <label className="block space-y-2">
-            <span className="text-sm font-semibold text-gray-700">Confirm new password</span>
+            <span className="text-sm font-semibold text-slate-700">{t('auth.login.confirmNewPassword')}</span>
             <input
               type="password"
               value={confirmNewPassword}
               onChange={(event) => setConfirmNewPassword(event.target.value)}
-              className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-              placeholder="Repeat the new password"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
+              placeholder={t('auth.login.repeatPasswordPlaceholder')}
               autoComplete="new-password"
               required
             />
@@ -191,7 +191,7 @@ export const Login = () => {
             className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <KeyRound className="h-4 w-4" />
-            <span>{isSubmitting ? 'Updating password...' : 'Save new password'}</span>
+            <span>{isSubmitting ? t('auth.login.updatingPassword') : t('auth.login.savePassword')}</span>
           </button>
         </form>
       ) : (
@@ -206,14 +206,14 @@ export const Login = () => {
               className={`rounded-2xl border px-4 py-3 text-left transition ${
                 mode === 'password'
                   ? 'border-ceenai-cyan bg-ceenai-cyan/10 text-ceenai-blue'
-                  : 'border-gray-200 bg-white text-gray-600 hover:border-ceenai-cyan/40'
+                  : 'border-slate-200 bg-white text-slate-600 hover:border-ceenai-cyan/40'
               }`}
             >
               <div className="flex items-center gap-3">
                 <LogIn className="h-5 w-5" />
                 <div>
-                  <p className="font-semibold">Email password</p>
-                  <p className="text-xs opacity-80">Fast sign-in for existing users</p>
+                  <p className="font-semibold">{t('auth.login.modePassword')}</p>
+                  <p className="text-xs opacity-80">{t('auth.login.modePasswordHint')}</p>
                 </div>
               </div>
             </button>
@@ -227,14 +227,14 @@ export const Login = () => {
               className={`rounded-2xl border px-4 py-3 text-left transition ${
                 mode === 'otp'
                   ? 'border-ceenai-cyan bg-ceenai-cyan/10 text-ceenai-blue'
-                  : 'border-gray-200 bg-white text-gray-600 hover:border-ceenai-cyan/40'
+                  : 'border-slate-200 bg-white text-slate-600 hover:border-ceenai-cyan/40'
               }`}
             >
               <div className="flex items-center gap-3">
                 <Smartphone className="h-5 w-5" />
                 <div>
-                  <p className="font-semibold">Phone OTP</p>
-                  <p className="text-xs opacity-80">Receive a one-time verification code</p>
+                  <p className="font-semibold">{t('auth.login.modeOtp')}</p>
+                  <p className="text-xs opacity-80">{t('auth.login.modeOtpHint')}</p>
                 </div>
               </div>
             </button>
@@ -243,12 +243,12 @@ export const Login = () => {
           {mode === 'password' ? (
             <form className="space-y-5" onSubmit={handlePasswordLogin}>
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">Email address</span>
+                <span className="text-sm font-semibold text-slate-700">{t('auth.login.email')}</span>
                 <input
                   type="email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
                   placeholder="you@example.com"
                   autoComplete="email"
                   required
@@ -256,12 +256,12 @@ export const Login = () => {
               </label>
 
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">Password</span>
+                <span className="text-sm font-semibold text-slate-700">{t('auth.login.password')}</span>
                 <input
                   type="password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
                   placeholder="Enter your password"
                   autoComplete="current-password"
                   required
@@ -269,12 +269,12 @@ export const Login = () => {
               </label>
 
               <div className="flex items-center justify-between gap-4 text-sm">
-                <span className="text-gray-500">Use your registered email credentials.</span>
+                <span className="text-slate-500">{t('auth.login.passwordHint')}</span>
                 <Link
                   to="/auth/forgot-password"
                   className="font-semibold text-ceenai-blue transition-colors hover:text-ceenai-navy"
                 >
-                  Forgot password?
+                  {t('auth.login.forgotPassword')}
                 </Link>
               </div>
 
@@ -284,26 +284,26 @@ export const Login = () => {
                 className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <LogIn className="h-4 w-4" />
-                <span>{isSubmitting ? 'Signing in...' : 'Sign in'}</span>
+                <span>{isSubmitting ? t('auth.login.signingIn') : t('auth.login.signIn')}</span>
               </button>
             </form>
           ) : (
             <form className="space-y-5" onSubmit={handleOtpLogin}>
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">Mobile number</span>
+                <span className="text-sm font-semibold text-slate-700">{t('auth.login.mobile')}</span>
                 <input
                   type="tel"
                   value={phone}
                   onChange={(event) => setPhone(event.target.value)}
-                  className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
                   placeholder="+971 50 123 4567"
                   autoComplete="tel"
                   required
                 />
               </label>
 
-              <p className="rounded-2xl bg-gray-50 px-4 py-3 text-sm text-gray-600">
-                We&apos;ll send a one-time code to the phone number associated with your account.
+              <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                {t('auth.login.otpHint')}
               </p>
 
               <button
@@ -312,7 +312,7 @@ export const Login = () => {
                 className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Smartphone className="h-4 w-4" />
-                <span>{isSubmitting ? 'Sending code...' : 'Send verification code'}</span>
+                <span>{isSubmitting ? t('auth.login.sendingCode') : t('auth.login.sendCode')}</span>
               </button>
             </form>
           )}

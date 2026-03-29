@@ -128,9 +128,13 @@ export interface Prescription extends BaseRecord, SoftDeletable {
 export interface PrescriptionItem extends BaseRecord {
   prescription_id: string;
   medication_name: string;
+  /** Arabic display label; optional — UI pairs with medication_name when locale is non-English */
+  medication_name_ar: string | null;
   dosage: string | null;
   frequency: string | null;
   duration: string | null;
+  frequency_code?: string | null;
+  duration_code?: string | null;
   quantity: number | null;
   instructions: string | null;
   is_dispensed: boolean;

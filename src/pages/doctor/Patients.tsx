@@ -1,13 +1,18 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Users, Search, Calendar } from 'lucide-react';
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
 import { Skeleton } from '../../components/Skeleton';
 import { useAppointments, useQuery } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
+import { dateTimeFormatWithNumerals, formatLocaleDigits, resolveLocale } from '../../lib/i18n-ui';
 import { supabase } from '../../lib/supabase';
 
 export const DoctorPatients: React.FC = () => {
+  const { i18n } = useTranslation('common');
+  const locale = resolveLocale(i18n.language);
+  const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(i18n.language, options);
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const {
@@ -71,7 +76,7 @@ export const DoctorPatients: React.FC = () => {
   }, [safeAppointments, safePatientProfiles, searchQuery]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
       <Navigation role="doctor" />
       <PageHeader
         title="Patients"
@@ -120,7 +125,7 @@ export const DoctorPatients: React.FC = () => {
                 key={patient.id}
                 className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg transition-all duration-200 hover:shadow-xl"
               >
-                <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-4">
+                <div className="bg-gradient-to-r from-ceenai-blue to-ceenai-cyan p-4">
                   <div className="flex items-center space-x-3">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 text-lg font-bold text-white backdrop-blur-sm">
                       {patient.name
@@ -132,7 +137,9 @@ export const DoctorPatients: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-white">{patient.name}</h3>
-                      <p className="text-sm text-white/90">{patient.totalAppointments} linked appointments</p>
+                      <p className="text-sm text-white/90">
+                        {formatLocaleDigits(patient.totalAppointments, i18n.language)} linked appointments
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -148,7 +155,17 @@ export const DoctorPatients: React.FC = () => {
                     <h4 className="mb-2 text-sm font-semibold text-gray-700">Last Appointment</h4>
                     <p className="text-sm text-gray-600">
                       {patient.lastAppointment
-                        ? new Date(patient.lastAppointment).toLocaleString()
+                        ? new Date(patient.lastAppointment).toLocaleString(
+                            locale,
+                            dtOpts({
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                              hour: 'numeric',
+                              minute: '2-digit',
+                            })
+                          )
                         : 'No completed visits yet'}
                     </p>
                   </div>
@@ -159,7 +176,17 @@ export const DoctorPatients: React.FC = () => {
                       <Calendar className="mt-0.5 h-4 w-4 text-gray-400" />
                       <span>
                         {patient.nextAppointment
-                          ? new Date(patient.nextAppointment).toLocaleString()
+                          ? new Date(patient.nextAppointment).toLocaleString(
+                              locale,
+                              dtOpts({
+                                weekday: 'short',
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                                hour: 'numeric',
+                                minute: '2-digit',
+                              })
+                            )
                           : 'No future appointment scheduled'}
                       </span>
                     </div>

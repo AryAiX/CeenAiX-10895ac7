@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AlertCircle, Bot, CheckCircle2, Loader2, MessageSquarePlus, PanelLeftClose, PanelLeftOpen, Paperclip, Send } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -16,6 +17,7 @@ import {
   uploadAiChatAttachment,
 } from '../../lib/ai';
 import { useAuth } from '../../lib/auth-context';
+import { dateTimeFormatWithNumerals, resolveLocale } from '../../lib/i18n-ui';
 import {
   applyCanonicalUpdateRequests,
   dismissCanonicalUpdateRequests,
@@ -31,27 +33,31 @@ interface ChatMessage {
   attachments: AiChatStoredAttachment[];
 }
 
-const STARTER_MESSAGE = {
-  id: 'patient-ai-starter',
-  role: 'assistant',
-  content: 'How can I help today?',
-  createdAt: new Date(0).toISOString(),
-  attachments: [],
-} satisfies ChatMessage;
+const PATIENT_AI_STARTER_ID = 'patient-ai-starter';
 
-const formatTimestamp = (value: string) =>
-  new Date(value).toLocaleString([], {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  });
+const formatTimestamp = (value: string, language: string) => {
+  const locale = resolveLocale(language);
+  return new Date(value).toLocaleString(
+    locale,
+    dateTimeFormatWithNumerals(language, {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    })
+  );
+};
 
-const formatSessionTimestamp = (value: string) =>
-  new Date(value).toLocaleDateString([], {
-    month: 'short',
-    day: 'numeric',
-  });
+const formatSessionTimestamp = (value: string, language: string) => {
+  const locale = resolveLocale(language);
+  return new Date(value).toLocaleDateString(
+    locale,
+    dateTimeFormatWithNumerals(language, {
+      month: 'short',
+      day: 'numeric',
+    })
+  );
+};
 
 const getFileAttachments = (message: ChatMessage) =>
   message.attachments.filter((attachment) => attachment.type === 'uploaded_file') as AiChatFileAttachment[];
@@ -74,6 +80,20 @@ const getHistoryBadges = (message: ChatMessage) => {
 const getSuggestedActions = (message: ChatMessage) => getAssistantMetadata(message)?.suggestedActions ?? [];
 
 export const PatientAIChat: React.FC = () => {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
+  const starterMessage = useMemo<ChatMessage>(
+    () => ({
+      id: PATIENT_AI_STARTER_ID,
+      role: 'assistant',
+      content: t('patient.aiChat.starterContent'),
+      createdAt: new Date(0).toISOString(),
+      attachments: [],
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- include i18n.language so greeting updates on locale switch
+    [t, i18n.language]
+  );
+
   const navigate = useNavigate();
   const { user } = useAuth();
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
@@ -119,7 +139,7 @@ export const PatientAIChat: React.FC = () => {
     }
 
     if (selectedSessionId === null) {
-      setMessages([STARTER_MESSAGE]);
+      setMessages([starterMessage]);
       return;
     }
 
@@ -128,7 +148,7 @@ export const PatientAIChat: React.FC = () => {
     }
 
     setMessages(data.messages.length > 0 ? data.messages : []);
-  }, [data, isSending, loading, selectedSessionId]);
+  }, [data, isSending, loading, selectedSessionId, starterMessage]);
 
   useEffect(() => {
     if (typeof messagesEndRef.current?.scrollIntoView === 'function') {
@@ -144,12 +164,12 @@ export const PatientAIChat: React.FC = () => {
     !loading &&
     !error &&
     messages.length === 1 &&
-    messages[0]?.id === STARTER_MESSAGE.id &&
+    messages[0]?.id === PATIENT_AI_STARTER_ID &&
     !isSending;
 
   const startNewSession = () => {
     setSelectedSessionId(null);
-    setMessages([STARTER_MESSAGE]);
+    setMessages([starterMessage]);
     setInput('');
     setPendingFiles([]);
     setSendError(null);
@@ -176,7 +196,7 @@ export const PatientAIChat: React.FC = () => {
     const nextMessage = (options?.submittedMessage ?? input).trim();
 
     if (!user) {
-      setSendError('You must be signed in to use the patient AI chat.');
+      setSendError(t('patient.aiChat.signInError'));
       return;
     }
 
@@ -204,7 +224,7 @@ export const PatientAIChat: React.FC = () => {
       setMessages((currentMessages) => {
         const nextMessages =
           selectedSessionId === null
-            ? currentMessages.filter((message) => message.id !== STARTER_MESSAGE.id)
+            ? currentMessages.filter((message) => message.id !== PATIENT_AI_STARTER_ID)
             : currentMessages;
         return [...nextMessages, optimisticUserMessage];
       });
@@ -238,7 +258,7 @@ export const PatientAIChat: React.FC = () => {
 
       await refetchCanonicalUpdates();
     } catch (sendFailure) {
-      setSendError(sendFailure instanceof Error ? sendFailure.message : 'Unable to send your question right now.');
+      setSendError(sendFailure instanceof Error ? sendFailure.message : t('patient.aiChat.sendError'));
     } finally {
       setIsSending(false);
     }
@@ -254,11 +274,11 @@ export const PatientAIChat: React.FC = () => {
       setIsApplyingRecordUpdates(true);
       setRecordUpdateFeedback(null);
       await applyCanonicalUpdateRequests(pendingCanonicalUpdates.map((update) => update.id));
-      setRecordUpdateFeedback('Your record updates were confirmed and will be used for future autofill.');
+      setRecordUpdateFeedback(t('patient.aiChat.recordUpdateOk'));
       await refetchCanonicalUpdates();
       await refetch();
     } catch (error) {
-      setRecordUpdateFeedback(error instanceof Error ? error.message : 'Unable to apply those record updates right now.');
+      setRecordUpdateFeedback(error instanceof Error ? error.message : t('patient.aiChat.recordUpdateFail'));
     } finally {
       setIsApplyingRecordUpdates(false);
     }
@@ -269,10 +289,10 @@ export const PatientAIChat: React.FC = () => {
       setIsApplyingRecordUpdates(true);
       setRecordUpdateFeedback(null);
       await dismissCanonicalUpdateRequests(pendingCanonicalUpdates.map((update) => update.id));
-      setRecordUpdateFeedback('Those chat-derived updates were dismissed for now.');
+      setRecordUpdateFeedback(t('patient.aiChat.dismissed'));
       await refetchCanonicalUpdates();
     } catch (error) {
-      setRecordUpdateFeedback(error instanceof Error ? error.message : 'Unable to dismiss those updates right now.');
+      setRecordUpdateFeedback(error instanceof Error ? error.message : t('patient.aiChat.dismissFail'));
     } finally {
       setIsApplyingRecordUpdates(false);
     }
@@ -282,8 +302,8 @@ export const PatientAIChat: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50">
       <Navigation role="patient" />
       <PageHeader
-        title="AI Health Chat"
-        subtitle="Ask your health questions and attach relevant files."
+        title={t('patient.aiChat.title')}
+        subtitle={t('patient.aiChat.subtitle')}
         backTo="/patient/dashboard"
         icon={<Bot className="h-6 w-6 text-white" />}
       />
@@ -299,14 +319,14 @@ export const PatientAIChat: React.FC = () => {
               <div className="flex items-center justify-between gap-3">
                 {isSidebarCollapsed ? null : (
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900">Chats</h2>
-                    <p className="mt-1 text-sm text-gray-500">Start fresh or reopen a previous session.</p>
+                    <h2 className="text-lg font-semibold text-gray-900">{t('patient.aiChat.chats')}</h2>
+                    <p className="mt-1 text-sm text-gray-500">{t('patient.aiChat.chatsSub')}</p>
                   </div>
                 )}
                 <button
                   type="button"
                   onClick={() => setIsSidebarCollapsed((currentValue) => !currentValue)}
-                  aria-label={isSidebarCollapsed ? 'Expand chat history' : 'Collapse chat history'}
+                  aria-label={isSidebarCollapsed ? t('patient.aiChat.expandHistory') : t('patient.aiChat.collapseHistory')}
                   className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 transition hover:bg-gray-50"
                 >
                   {isSidebarCollapsed ? (
@@ -321,7 +341,7 @@ export const PatientAIChat: React.FC = () => {
                 <button
                   type="button"
                   onClick={startNewSession}
-                  aria-label="Start new chat"
+                  aria-label={t('patient.aiChat.startNew')}
                   className={`inline-flex items-center justify-center gap-2 rounded-full px-3 py-2 text-xs font-semibold transition ${
                     selectedSessionId === null
                       ? 'bg-ceenai-blue text-white shadow-sm'
@@ -329,7 +349,7 @@ export const PatientAIChat: React.FC = () => {
                   } ${isSidebarCollapsed ? 'w-full' : ''}`}
                 >
                   <MessageSquarePlus className="h-3.5 w-3.5" />
-                  {isSidebarCollapsed ? null : 'New'}
+                  {isSidebarCollapsed ? null : t('patient.aiChat.newChatShort')}
                 </button>
               </div>
             </div>
@@ -338,8 +358,8 @@ export const PatientAIChat: React.FC = () => {
               <button
                 type="button"
                 onClick={startNewSession}
-                aria-label="Open new chat"
-                title="New chat"
+                aria-label={t('patient.aiChat.openNew')}
+                title={t('patient.aiChat.newChat')}
                 className={`w-full rounded-2xl border text-left transition ${
                   selectedSessionId === null
                     ? 'border-cyan-200 bg-cyan-50 shadow-sm'
@@ -350,8 +370,8 @@ export const PatientAIChat: React.FC = () => {
                   <MessageSquarePlus className="mx-auto h-4 w-4 text-gray-700" />
                 ) : (
                   <>
-                    <p className="text-sm font-semibold text-gray-900">New chat</p>
-                    <p className="mt-1 text-xs text-gray-500">Start a fresh conversation.</p>
+                    <p className="text-sm font-semibold text-gray-900">{t('patient.aiChat.newChat')}</p>
+                    <p className="mt-1 text-xs text-gray-500">{t('patient.aiChat.newChatSub')}</p>
                   </>
                 )}
               </button>
@@ -364,7 +384,9 @@ export const PatientAIChat: React.FC = () => {
                     setSelectedSessionId(session.id);
                     setSendError(null);
                   }}
-                  aria-label={`Open chat from ${formatSessionTimestamp(session.lastMessageAt)}`}
+                  aria-label={t('patient.aiChat.openChatFrom', {
+                    date: formatSessionTimestamp(session.lastMessageAt, lang),
+                  })}
                   title={session.preview}
                   className={`w-full rounded-2xl border text-left transition ${
                     selectedSessionId === session.id
@@ -373,12 +395,16 @@ export const PatientAIChat: React.FC = () => {
                   } ${isSidebarCollapsed ? 'px-3 py-3 text-center' : 'px-4 py-3'}`}
                 >
                   {isSidebarCollapsed ? (
-                    <p className="text-xs font-semibold text-gray-700">{formatSessionTimestamp(session.lastMessageAt)}</p>
+                    <p className="text-xs font-semibold text-gray-700">
+                      {formatSessionTimestamp(session.lastMessageAt, lang)}
+                    </p>
                   ) : (
                     <>
                       <div className="flex items-center justify-between gap-3">
-                        <p className="text-sm font-semibold text-gray-900">{formatSessionTimestamp(session.lastMessageAt)}</p>
-                        <p className="text-[11px] uppercase tracking-wide text-gray-400">Previous</p>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {formatSessionTimestamp(session.lastMessageAt, lang)}
+                        </p>
+                        <p className="text-[11px] uppercase tracking-wide text-gray-400">{t('patient.aiChat.previous')}</p>
                       </div>
                       <p className="mt-1 line-clamp-2 text-xs leading-5 text-gray-600">{session.preview}</p>
                     </>
@@ -392,7 +418,7 @@ export const PatientAIChat: React.FC = () => {
                     isSidebarCollapsed ? 'px-3 py-4 text-center text-xs' : 'px-4 py-5'
                   }`}
                 >
-                  {isSidebarCollapsed ? 'None' : 'No previous chats yet.'}
+                  {isSidebarCollapsed ? t('patient.aiChat.noneCollapsed') : t('patient.aiChat.noChats')}
                 </div>
               ) : null}
             </div>
@@ -401,7 +427,7 @@ export const PatientAIChat: React.FC = () => {
           <div className="flex min-h-0 flex-col">
             <div className="border-b border-gray-100 px-6 py-5">
               <h2 className="text-lg font-semibold text-gray-900">
-                {selectedSessionId ? 'Previous conversation' : 'New conversation'}
+                {selectedSessionId ? t('patient.aiChat.conversationPrevious') : t('patient.aiChat.conversationNew')}
               </h2>
             </div>
 
@@ -415,7 +441,7 @@ export const PatientAIChat: React.FC = () => {
 
                 {!loading && error ? (
                   <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                    Unable to load your chat history right now. Please refresh and try again.
+                    {t('patient.aiChat.loadHistoryError')}
                   </div>
                 ) : null}
 
@@ -426,10 +452,8 @@ export const PatientAIChat: React.FC = () => {
                         <AlertCircle className="h-5 w-5" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h3 className="text-sm font-semibold text-gray-900">Review updates from this chat</h3>
-                        <p className="mt-1 text-sm text-gray-700">
-                          Confirm any patient record changes you want reused in future advice and autofill.
-                        </p>
+                        <h3 className="text-sm font-semibold text-gray-900">{t('patient.aiChat.reviewUpdatesTitle')}</h3>
+                        <p className="mt-1 text-sm text-gray-700">{t('patient.aiChat.reviewUpdatesBody')}</p>
                       </div>
                     </div>
 
@@ -445,21 +469,29 @@ export const PatientAIChat: React.FC = () => {
                                   : 'bg-emerald-50 text-emerald-700'
                               }`}
                             >
-                              {update.requiresDoctorReview ? 'Doctor review' : 'Update record'}
+                              {update.requiresDoctorReview
+                                ? t('patient.aiChat.badgeDoctorReview')
+                                : t('patient.aiChat.badgeUpdateRecord')}
                             </span>
                           </div>
                           <div className="mt-3 grid gap-3 md:grid-cols-2">
                             <div className="rounded-2xl bg-gray-50 px-4 py-3">
-                              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Current</p>
+                              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                {t('patient.aiChat.fieldCurrent')}
+                              </p>
                               <p className="mt-1 text-sm text-gray-700">{formatCanonicalValueForReview(update.currentValue)}</p>
                             </div>
                             <div className="rounded-2xl bg-cyan-50/70 px-4 py-3">
-                              <p className="text-xs font-semibold uppercase tracking-wide text-cyan-700">New value</p>
+                              <p className="text-xs font-semibold uppercase tracking-wide text-cyan-700">
+                                {t('patient.aiChat.fieldNew')}
+                              </p>
                               <p className="mt-1 text-sm text-gray-900">{formatCanonicalValueForReview(update.proposedValue)}</p>
                             </div>
                           </div>
                           {typeof update.metadata.messagePreview === 'string' ? (
-                            <p className="mt-3 text-xs text-gray-500">From chat: "{update.metadata.messagePreview}"</p>
+                            <p className="mt-3 text-xs text-gray-500">
+                              {t('patient.aiChat.fromChat', { preview: update.metadata.messagePreview })}
+                            </p>
                           ) : null}
                         </article>
                       ))}
@@ -473,7 +505,7 @@ export const PatientAIChat: React.FC = () => {
                         className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:shadow-md"
                       >
                         {isApplyingRecordUpdates ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
-                        {isApplyingRecordUpdates ? 'Applying...' : 'Apply updates'}
+                        {isApplyingRecordUpdates ? t('patient.aiChat.applying') : t('patient.aiChat.applyUpdates')}
                       </button>
                       <button
                         type="button"
@@ -481,7 +513,7 @@ export const PatientAIChat: React.FC = () => {
                         disabled={isApplyingRecordUpdates}
                         className="rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
                       >
-                        Not now
+                        {t('patient.aiChat.notNow')}
                       </button>
                     </div>
                     {recordUpdateFeedback ? (
@@ -511,10 +543,10 @@ export const PatientAIChat: React.FC = () => {
                       >
                         <div className="flex items-center justify-between gap-3">
                           <p className={`text-xs font-semibold ${isAssistant ? 'text-cyan-700' : 'text-white/80'}`}>
-                            {isAssistant ? 'Ceen Agent' : 'YOU'}
+                            {isAssistant ? t('patient.aiChat.agentName') : t('patient.aiChat.youLabel')}
                           </p>
                           <p className={`text-xs ${isAssistant ? 'text-gray-500' : 'text-white/80'}`}>
-                            {formatTimestamp(message.createdAt)}
+                            {formatTimestamp(message.createdAt, lang)}
                           </p>
                         </div>
                         {isAssistant ? (
@@ -566,7 +598,7 @@ export const PatientAIChat: React.FC = () => {
                                 key={badge}
                                 className="rounded-full border border-cyan-200 bg-white px-3 py-1 text-xs font-medium text-cyan-800"
                               >
-                                Used: {badge}
+                                {t('patient.aiChat.usedPrefix', { label: badge })}
                               </span>
                             ))}
                           </div>
@@ -591,7 +623,7 @@ export const PatientAIChat: React.FC = () => {
 
                 {showStarterOptions ? (
                   <div className="mr-auto max-w-3xl rounded-3xl border border-dashed border-cyan-200 bg-cyan-50/40 p-5">
-                    <p className="text-sm font-semibold text-cyan-900">Start with one tap</p>
+                    <p className="text-sm font-semibold text-cyan-900">{t('patient.aiChat.startWithOneTap')}</p>
                     <div className="mt-3 flex flex-wrap gap-3">
                       {outstandingPreVisitAssessment ? (
                         <button
@@ -599,29 +631,29 @@ export const PatientAIChat: React.FC = () => {
                           onClick={() => navigate(`/patient/pre-visit/${outstandingPreVisitAssessment.id}`)}
                           className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-cyan-800 shadow-sm transition hover:shadow"
                         >
-                          Continue pre-visit
+                          {t('patient.aiChat.continuePreVisit')}
                         </button>
                       ) : null}
                       <button
                         type="button"
-                        onClick={() => void handleSendMessage({ submittedMessage: 'I have pain' })}
+                        onClick={() => void handleSendMessage({ submittedMessage: t('patient.aiChat.starterPain') })}
                         className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:shadow"
                       >
-                        I have pain
+                        {t('patient.aiChat.starterPain')}
                       </button>
                       <button
                         type="button"
-                        onClick={() => void handleSendMessage({ submittedMessage: 'Help me prepare for my appointment' })}
+                        onClick={() => void handleSendMessage({ submittedMessage: t('patient.aiChat.starterPrepare') })}
                         className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:shadow"
                       >
-                        Help me prepare for my appointment
+                        {t('patient.aiChat.starterPrepare')}
                       </button>
                       <button
                         type="button"
-                        onClick={() => void handleSendMessage({ submittedMessage: 'Review my history' })}
+                        onClick={() => void handleSendMessage({ submittedMessage: t('patient.aiChat.starterReviewHistory') })}
                         className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:shadow"
                       >
-                        Review my history
+                        {t('patient.aiChat.starterReviewHistory')}
                       </button>
                     </div>
                   </div>
@@ -630,7 +662,7 @@ export const PatientAIChat: React.FC = () => {
                 {isSending ? (
                   <div className="mr-auto flex max-w-3xl items-center gap-3 rounded-3xl border border-cyan-100 bg-cyan-50/70 px-5 py-4 shadow-sm">
                     <Loader2 className="h-4 w-4 animate-spin text-cyan-700" />
-                    <p className="text-sm text-gray-700">Preparing a response...</p>
+                    <p className="text-sm text-gray-700">{t('patient.aiChat.preparingResponse')}</p>
                   </div>
                 ) : null}
                 <div ref={messagesEndRef} />
@@ -667,12 +699,12 @@ export const PatientAIChat: React.FC = () => {
 
               <form className="space-y-3" onSubmit={handleSubmit}>
                 <label className="block">
-                  <span className="sr-only">Ask the AI health assistant</span>
+                  <span className="sr-only">{t('patient.aiChat.inputSrOnly')}</span>
                   <textarea
                     value={input}
                     onChange={(event) => setInput(event.target.value)}
                     rows={3}
-                    placeholder="Ask a question or add context about your attachment..."
+                    placeholder={t('patient.aiChat.inputPhLong')}
                     className="w-full resize-none rounded-3xl border border-gray-200 px-5 py-4 text-sm text-gray-900 shadow-sm outline-none transition focus:border-ceenai-cyan focus:ring-2 focus:ring-ceenai-cyan/20"
                     onKeyDown={(event) => {
                       if (event.key === 'Enter' && !event.shiftKey) {
@@ -699,7 +731,7 @@ export const PatientAIChat: React.FC = () => {
                     className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-300 hover:bg-gray-50"
                   >
                     <Paperclip className="h-4 w-4" />
-                    Attach
+                    {t('patient.aiChat.attach')}
                   </button>
                   <button
                     type="submit"
@@ -707,7 +739,7 @@ export const PatientAIChat: React.FC = () => {
                     className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <Send className="h-4 w-4" />
-                    Send
+                    {isSending ? t('patient.aiChat.sending') : t('patient.aiChat.send')}
                   </button>
                 </div>
               </form>

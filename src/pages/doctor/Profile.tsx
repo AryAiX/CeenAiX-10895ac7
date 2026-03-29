@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   User,
   Mail,
@@ -23,6 +24,7 @@ import { AccountSecurityPanel } from '../../components/AccountSecurityPanel';
 import { PageHeader } from '../../components/PageHeader';
 import { SpecializationMultiSelect } from '../../components/SpecializationMultiSelect';
 import { useDoctorPreVisitTemplates, useDoctorSpecializationIds, useSpecializations } from '../../hooks';
+import { dateTimeFormatWithNumerals, resolveLocale } from '../../lib/i18n-ui';
 import { useAuth } from '../../lib/auth-context';
 import { extractPreVisitQuestionnaire, uploadPreVisitTemplateSource } from '../../lib/ai';
 import {
@@ -108,6 +110,9 @@ const createEmptyTemplateDraft = (): PreVisitTemplateEditorState => ({
 });
 
 export const DoctorProfile: React.FC = () => {
+  const { i18n } = useTranslation('common');
+  const locale = resolveLocale(i18n.language);
+  const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(i18n.language, options);
   const { doctorProfile, isLoading, profile, refreshProfile, user } = useAuth();
   const isPhoneManagedByOtp = Boolean(user?.phone && !user?.email);
   const templateFileInputRef = useRef<HTMLInputElement | null>(null);
@@ -579,7 +584,7 @@ export const DoctorProfile: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
         <Navigation role="doctor" />
         <div className="flex items-center justify-center py-20">
           <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-teal-600" />
@@ -589,7 +594,7 @@ export const DoctorProfile: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
       <Navigation role="doctor" />
       <PageHeader
         title="Doctor Profile"
@@ -612,7 +617,7 @@ export const DoctorProfile: React.FC = () => {
       <div className="py-8">
         <div className="mx-auto max-w-4xl space-y-8 px-4">
           <div className="overflow-hidden rounded-3xl bg-white shadow-md">
-            <div className="bg-gradient-to-r from-teal-600 to-emerald-600 px-8 py-12">
+            <div className="bg-gradient-to-r from-slate-900 to-emerald-800 px-8 py-12">
               <div className="flex items-center space-x-6">
                 <div className="flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-lg">
                   <User className="w-12 h-12 text-teal-600" />
@@ -839,7 +844,10 @@ export const DoctorProfile: React.FC = () => {
                       <p className="text-sm font-medium text-gray-500">Date of Birth</p>
                       <p className="mt-1 text-base text-gray-900">
                         {formData.dateOfBirth
-                          ? new Date(formData.dateOfBirth).toLocaleDateString()
+                          ? new Date(formData.dateOfBirth).toLocaleDateString(
+                              locale,
+                              dtOpts({ year: 'numeric', month: 'short', day: 'numeric' })
+                            )
                           : 'Not provided'}
                       </p>
                     </div>

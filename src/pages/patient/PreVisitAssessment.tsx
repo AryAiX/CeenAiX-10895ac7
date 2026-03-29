@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AlertCircle, CheckCircle2, ClipboardList, Loader2, Save, Sparkles } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Navigation } from '../../components/Navigation';
@@ -15,16 +16,26 @@ import {
 import { formatPreVisitStatus, type PreVisitAnswerDraft, type PreVisitTemplateQuestionDraft } from '../../lib/pre-visit';
 import { buildPatientMemoryValue } from '../../lib/patient-memory';
 import { supabase } from '../../lib/supabase';
+import { dateTimeFormatWithNumerals, resolveLocale } from '../../lib/i18n-ui';
 
-const formatAppointmentLabel = (scheduledAt: string, doctorName: string, chiefComplaint: string | null) => {
-  const dateLabel = new Date(scheduledAt).toLocaleString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  });
+const formatAppointmentLabel = (
+  scheduledAt: string,
+  doctorName: string,
+  chiefComplaint: string | null,
+  language: string
+) => {
+  const locale = resolveLocale(language);
+  const dateLabel = new Date(scheduledAt).toLocaleString(
+    locale,
+    dateTimeFormatWithNumerals(language, {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    })
+  );
 
   return chiefComplaint ? `${dateLabel} with ${doctorName} for ${chiefComplaint}` : `${dateLabel} with ${doctorName}`;
 };
@@ -56,6 +67,9 @@ const getRequiredQuestionIssues = (
 };
 
 export const PatientPreVisitAssessment: React.FC = () => {
+  const { i18n } = useTranslation('common');
+  const locale = resolveLocale(i18n.language);
+  const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(i18n.language, options);
   const navigate = useNavigate();
   const { assessmentId } = useParams();
   const { data, loading, error, refetch } = usePreVisitAssessment(assessmentId ?? null);
@@ -328,7 +342,8 @@ export const PatientPreVisitAssessment: React.FC = () => {
       const appointmentLabel = formatAppointmentLabel(
         data.assessment.appointment.scheduledAt,
         data.assessment.appointment.doctorName,
-        data.assessment.appointment.chiefComplaint
+        data.assessment.appointment.chiefComplaint,
+        i18n.language
       );
       const summary = await generatePreVisitSummary({
         appointmentLabel,
@@ -393,7 +408,8 @@ export const PatientPreVisitAssessment: React.FC = () => {
       const appointmentLabel = formatAppointmentLabel(
         data.assessment.appointment.scheduledAt,
         data.assessment.appointment.doctorName,
-        data.assessment.appointment.chiefComplaint
+        data.assessment.appointment.chiefComplaint,
+        i18n.language
       );
       const summary = await generatePreVisitSummary({
         appointmentLabel,
@@ -472,7 +488,8 @@ export const PatientPreVisitAssessment: React.FC = () => {
                   {formatAppointmentLabel(
                     data.assessment.appointment.scheduledAt,
                     data.assessment.appointment.doctorName,
-                    data.assessment.appointment.chiefComplaint
+                    data.assessment.appointment.chiefComplaint,
+                    i18n.language
                   )}
                 </p>
               </div>
@@ -724,7 +741,17 @@ export const PatientPreVisitAssessment: React.FC = () => {
                   <div>
                     <h2 className="text-lg font-semibold text-gray-900">Latest summary for your doctor</h2>
                     <p className="text-sm text-gray-600">
-                      Generated {new Date(data.assessment.summary.generatedAt).toLocaleString()}
+                      Generated{' '}
+                      {new Date(data.assessment.summary.generatedAt).toLocaleString(
+                        locale,
+                        dtOpts({
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                          hour: 'numeric',
+                          minute: '2-digit',
+                        })
+                      )}
                     </p>
                   </div>
                 </div>

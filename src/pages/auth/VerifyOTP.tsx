@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { RefreshCcw, ShieldCheck } from 'lucide-react';
 import { AuthShell } from '../../components/AuthShell';
 import {
@@ -9,6 +10,7 @@ import {
 import { getDefaultRouteForRole, useAuth } from '../../lib/auth-context';
 
 export const VerifyOTP = () => {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { isAuthenticated, isLoading, requestOtp, role, verifyOtp } = useAuth();
@@ -103,23 +105,23 @@ export const VerifyOTP = () => {
       return;
     }
 
-    setSuccessMessage('A new verification code has been sent.');
+    setSuccessMessage(t('auth.otp.resentOk'));
     setIsResending(false);
   };
 
   return (
     <AuthShell
-      badge="OTP Verification"
-      title="Verify your secure access"
-      description="Enter the code sent to your registered phone number or email to continue with sign-in or account creation."
+      badge={t('auth.otp.badge')}
+      title={t('auth.otp.title')}
+      description={t('auth.otp.description')}
       footer={
-        <div className="flex flex-col gap-3 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between">
-          <span>Entered the wrong details?</span>
+        <div className="flex flex-col gap-3 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between">
+          <span>{t('auth.otp.wrongDetails')}</span>
           <Link
             to={shouldGoToOnboarding ? '/auth/register' : '/auth/login'}
             className="font-semibold text-ceenai-blue transition-colors hover:text-ceenai-navy"
           >
-            Go back
+            {t('auth.otp.goBack')}
           </Link>
         </div>
       }
@@ -139,24 +141,24 @@ export const VerifyOTP = () => {
       <div className="rounded-3xl border border-ceenai-cyan/20 bg-ceenai-cyan/5 p-5">
         <div className="flex items-start gap-3">
           <ShieldCheck className="mt-1 h-5 w-5 text-ceenai-blue" />
-          <div className="space-y-1 text-sm text-gray-600">
-            <p className="font-semibold text-gray-900">Verification target</p>
+          <div className="space-y-1 text-sm text-slate-600">
+            <p className="font-semibold text-slate-900">{t('auth.otp.verificationTarget')}</p>
             <p>{phone || email}</p>
-            <p>{shouldGoToOnboarding ? 'This code will complete account creation.' : 'This code will sign you in.'}</p>
+            <p>{shouldGoToOnboarding ? t('auth.otp.signupFlow') : t('auth.otp.signinFlow')}</p>
           </div>
         </div>
       </div>
 
       <form className="space-y-5" onSubmit={handleSubmit}>
         <label className="block space-y-2">
-          <span className="text-sm font-semibold text-gray-700">One-time code</span>
+          <span className="text-sm font-semibold text-slate-700">{t('auth.otp.codeLabel')}</span>
           <input
             type="text"
             inputMode="numeric"
             pattern="[0-9]*"
             value={token}
             onChange={(event) => setToken(event.target.value.replace(/\D/g, '').slice(0, 6))}
-            className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-center text-2xl tracking-[0.4em] text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center text-2xl tracking-[0.4em] text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
             placeholder="000000"
             autoComplete="one-time-code"
             required
@@ -168,10 +170,10 @@ export const VerifyOTP = () => {
             type="button"
             onClick={handleResend}
             disabled={isResending}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 px-5 py-3 font-semibold text-gray-700 transition hover:border-ceenai-cyan hover:text-ceenai-blue disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 px-5 py-3 font-semibold text-slate-700 transition hover:border-ceenai-cyan hover:text-ceenai-blue disabled:cursor-not-allowed disabled:opacity-50"
           >
             <RefreshCcw className="h-4 w-4" />
-            <span>{isResending ? 'Resending...' : 'Resend code'}</span>
+            <span>{isResending ? t('auth.otp.resending') : t('auth.otp.resend')}</span>
           </button>
 
           <button
@@ -180,7 +182,7 @@ export const VerifyOTP = () => {
             className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <ShieldCheck className="h-4 w-4" />
-            <span>{isSubmitting ? 'Verifying...' : 'Verify code'}</span>
+            <span>{isSubmitting ? t('auth.otp.verifying') : t('auth.otp.verify')}</span>
           </button>
         </div>
       </form>

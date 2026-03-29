@@ -1,12 +1,18 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AlertCircle, Calendar, ClipboardList, Clock, MapPin, Plus, User } from 'lucide-react';
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
 import { Skeleton } from '../../components/Skeleton';
 import { useAppointments, usePatientPreVisitAssessments, useQuery } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
-import { formatPreVisitStatus } from '../../lib/pre-visit';
+import {
+  appointmentStatusLabel,
+  dateTimeFormatWithNumerals,
+  preVisitStatusLabel,
+  resolveLocale,
+} from '../../lib/i18n-ui';
 import { supabase } from '../../lib/supabase';
 
 interface DoctorAppointmentProfile {
@@ -22,6 +28,9 @@ const UPCOMING_STATUSES = new Set(['scheduled', 'confirmed', 'in_progress']);
 export const PatientAppointments: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { t, i18n } = useTranslation('common');
+  const locale = resolveLocale(i18n.language);
+  const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(i18n.language, options);
   const { user } = useAuth();
   const {
     data: appointmentsData,
@@ -73,7 +82,7 @@ export const PatientAppointments: React.FC = () => {
 
       return (userProfiles ?? []).map((userProfile) => ({
         userId: userProfile.user_id,
-        fullName: userProfile.full_name ?? 'Doctor',
+        fullName: userProfile.full_name ?? t('shared.doctor'),
         specialty: doctorProfileById.get(userProfile.user_id)?.specialization ?? null,
         city: userProfile.city ?? null,
         address: userProfile.address ?? null,
@@ -131,7 +140,7 @@ export const PatientAppointments: React.FC = () => {
       return;
     }
 
-    setFeedback({ type: 'success', message: 'Appointment cancelled successfully.' });
+    setFeedback({ type: 'success', message: t('patient.appointments.cancelSuccess') });
     refetch();
   };
 
@@ -145,7 +154,7 @@ export const PatientAppointments: React.FC = () => {
     const doctorProfile = doctorProfileById.get(appointment.doctor_id);
     const location =
       [doctorProfile?.city, doctorProfile?.address].filter(Boolean).join(' • ') ||
-      'Clinic details will be confirmed after booking';
+      t('shared.clinicPending');
     const isUpcoming = upcomingAppointments.some((currentAppointment) => currentAppointment.id === appointment.id);
     const preVisitAssessment = preVisitAssessmentByAppointmentId.get(appointment.id);
 
@@ -155,7 +164,7 @@ export const PatientAppointments: React.FC = () => {
         className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm"
       >
         <div
-          className={`p-5 ${isUpcoming ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white' : 'bg-gray-50'}`}
+          className={`p-5 ${isUpcoming ? 'bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan text-white' : 'bg-gray-50'}`}
         >
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -163,9 +172,9 @@ export const PatientAppointments: React.FC = () => {
                 <User className={`h-5 w-5 ${isUpcoming ? 'text-white' : 'text-cyan-600'}`} />
               </div>
               <div>
-                <p className="text-lg font-semibold">{doctorProfile?.fullName ?? 'Doctor'}</p>
+                <p className="text-lg font-semibold">{doctorProfile?.fullName ?? t('shared.doctor')}</p>
                 <p className={`text-sm ${isUpcoming ? 'text-cyan-100' : 'text-gray-600'}`}>
-                  {doctorProfile?.specialty ?? 'Scheduled care visit'}
+                  {doctorProfile?.specialty ?? t('shared.careVisit')}
                 </p>
               </div>
             </div>
@@ -174,7 +183,7 @@ export const PatientAppointments: React.FC = () => {
                 isUpcoming ? 'bg-white/15 text-white' : 'bg-gray-200 text-gray-700'
               }`}
             >
-              {appointment.status.replace('_', ' ')}
+              {appointmentStatusLabel(t, appointment.status)}
             </span>
           </div>
         </div>
@@ -183,45 +192,53 @@ export const PatientAppointments: React.FC = () => {
           <div className="rounded-xl bg-gray-50 p-4">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase text-gray-500">
               <Calendar className="h-4 w-4" />
-              <span>Date</span>
+              <span>{t('patient.appointments.date')}</span>
             </div>
             <p className="mt-2 font-semibold text-gray-900">
-              {new Date(appointment.scheduled_at).toLocaleDateString('en-US', {
-                weekday: 'short',
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-              })}
+              {new Date(appointment.scheduled_at).toLocaleDateString(
+                locale,
+                dtOpts({
+                  weekday: 'short',
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })
+              )}
             </p>
           </div>
 
           <div className="rounded-xl bg-gray-50 p-4">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase text-gray-500">
               <Clock className="h-4 w-4" />
-              <span>Time</span>
+              <span>{t('patient.appointments.time')}</span>
             </div>
             <p className="mt-2 font-semibold text-gray-900">
-              {new Date(appointment.scheduled_at).toLocaleTimeString('en-US', {
-                hour: 'numeric',
-                minute: '2-digit',
-              })}
+              {new Date(appointment.scheduled_at).toLocaleTimeString(
+                locale,
+                dtOpts({
+                  hour: 'numeric',
+                  minute: '2-digit',
+                })
+              )}
             </p>
-            <p className="mt-1 text-sm text-gray-500">{appointment.duration_minutes} minutes</p>
+            <p className="mt-1 text-sm text-gray-500">
+              {t('shared.minutesUnit', { count: appointment.duration_minutes })}
+            </p>
           </div>
 
           <div className="rounded-xl bg-gray-50 p-4">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase text-gray-500">
               <MapPin className="h-4 w-4" />
-              <span>Location</span>
+              <span>{t('patient.appointments.location')}</span>
             </div>
             <p className="mt-2 text-sm font-medium text-gray-900">{location}</p>
           </div>
         </div>
 
         <div className="border-t border-gray-100 px-5 py-4">
-          <p className="text-xs font-semibold uppercase text-gray-500">Reason for visit</p>
+          <p className="text-xs font-semibold uppercase text-gray-500">{t('patient.appointments.reason')}</p>
           <p className="mt-2 text-sm text-gray-700">
-            {appointment.chief_complaint ?? 'Scheduled consultation'}
+            {appointment.chief_complaint ?? t('shared.scheduledConsultation')}
           </p>
 
           {preVisitAssessment ? (
@@ -230,7 +247,8 @@ export const PatientAppointments: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <ClipboardList className="h-4 w-4 text-cyan-700" />
                   <p className="text-sm font-semibold text-cyan-900">
-                    Pre-visit intake: {formatPreVisitStatus(preVisitAssessment.status)}
+                    {t('patient.appointments.preVisitPrefix')}{' '}
+                    {preVisitStatusLabel(t, preVisitAssessment.status)}
                   </p>
                 </div>
                 <button
@@ -239,8 +257,8 @@ export const PatientAppointments: React.FC = () => {
                   className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-cyan-800 shadow-sm transition hover:shadow"
                 >
                   {preVisitAssessment.status === 'completed' || preVisitAssessment.status === 'reviewed'
-                    ? 'Review intake'
-                    : 'Continue intake'}
+                    ? t('patient.appointments.reviewIntake')
+                    : t('patient.appointments.continueIntake')}
                 </button>
               </div>
             </div>
@@ -253,7 +271,7 @@ export const PatientAppointments: React.FC = () => {
                 onClick={() => navigate('/patient/appointments/book')}
                 className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
               >
-                Book another
+                {t('patient.appointments.bookAnother')}
               </button>
               <button
                 type="button"
@@ -261,7 +279,7 @@ export const PatientAppointments: React.FC = () => {
                 disabled={busyAppointmentId === appointment.id}
                 className="rounded-xl border border-cyan-200 px-4 py-2 text-sm font-semibold text-cyan-700 transition hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Reschedule
+                {t('patient.appointments.reschedule')}
               </button>
               <button
                 type="button"
@@ -269,7 +287,9 @@ export const PatientAppointments: React.FC = () => {
                 disabled={busyAppointmentId === appointment.id}
                 className="rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {busyAppointmentId === appointment.id ? 'Cancelling...' : 'Cancel appointment'}
+                {busyAppointmentId === appointment.id
+                  ? t('patient.appointments.cancelling')
+                  : t('patient.appointments.cancel')}
               </button>
             </div>
           ) : null}
@@ -284,21 +304,21 @@ export const PatientAppointments: React.FC = () => {
   const isLoadingPage = loading || doctorProfilesLoading;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
       <Navigation role="patient" />
       <PageHeader
-        title="Appointments"
-        subtitle="View your scheduled care and book your next in-person visit."
+        title={t('patient.appointments.title')}
+        subtitle={t('patient.appointments.subtitle')}
         icon={<Calendar className="h-6 w-6 text-white" />}
         backTo="/patient/dashboard"
         actions={
           <button
             type="button"
             onClick={() => navigate('/patient/appointments/book')}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:shadow-lg"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:shadow-lg"
           >
             <Plus className="h-4 w-4" />
-            <span>Book appointment</span>
+            <span>{t('patient.appointments.book')}</span>
           </button>
         }
       />
@@ -306,19 +326,19 @@ export const PatientAppointments: React.FC = () => {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {showSuccessBanner ? (
           <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-            Your appointment has been booked successfully.
+            {t('patient.appointments.bannerBooked')}
           </div>
         ) : null}
 
         {showRescheduledBanner ? (
           <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-            Your appointment has been rescheduled successfully.
+            {t('patient.appointments.bannerRescheduled')}
           </div>
         ) : null}
 
         {showPreVisitCompletedBanner ? (
           <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-            Your pre-visit intake has been completed and shared with your doctor.
+            {t('patient.appointments.bannerPreVisit')}
           </div>
         ) : null}
 
@@ -336,7 +356,7 @@ export const PatientAppointments: React.FC = () => {
 
         {error || doctorProfilesError ? (
           <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Patient appointments could not be loaded yet.
+            {t('patient.appointments.loadError')}
           </div>
         ) : null}
 
@@ -348,17 +368,15 @@ export const PatientAppointments: React.FC = () => {
         ) : upcomingAppointments.length === 0 && pastAppointments.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center shadow-sm">
             <Calendar className="mx-auto mb-4 h-10 w-10 text-gray-400" />
-            <h2 className="text-xl font-bold text-gray-900">No appointments yet</h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Book your first appointment against a doctor&apos;s published schedule.
-            </p>
+            <h2 className="text-xl font-bold text-gray-900">{t('patient.appointments.emptyTitle')}</h2>
+            <p className="mt-2 text-sm text-gray-600">{t('patient.appointments.emptyBody')}</p>
             <button
               type="button"
               onClick={() => navigate('/patient/appointments/book')}
-              className="mt-5 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-5 py-3 font-semibold text-white shadow-md transition hover:shadow-lg"
+              className="mt-5 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan px-5 py-3 font-semibold text-white shadow-md transition hover:shadow-lg"
             >
               <Plus className="h-4 w-4" />
-              <span>Book appointment</span>
+              <span>{t('patient.appointments.book')}</span>
             </button>
           </div>
         ) : (
@@ -366,21 +384,19 @@ export const PatientAppointments: React.FC = () => {
             <section>
               <div className="mb-4 flex items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Upcoming Appointments</h2>
-                  <p className="text-sm text-gray-600">Your next scheduled visits appear here.</p>
+                  <h2 className="text-2xl font-bold text-gray-900">{t('patient.appointments.upcomingTitle')}</h2>
+                  <p className="text-sm text-gray-600">{t('patient.appointments.upcomingSub')}</p>
                 </div>
                 <span className="rounded-full bg-cyan-100 px-4 py-2 text-sm font-semibold text-cyan-700">
-                  {upcomingAppointments.length} upcoming
+                  {t('patient.appointments.upcomingBadge', { count: upcomingAppointments.length })}
                 </span>
               </div>
 
               {upcomingAppointments.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-8 text-center shadow-sm">
                   <AlertCircle className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                  <p className="font-semibold text-gray-900">No upcoming appointments</p>
-                  <p className="mt-1 text-sm text-gray-600">
-                    Once you book a visit, it will appear here.
-                  </p>
+                  <p className="font-semibold text-gray-900">{t('patient.appointments.noUpcomingTitle')}</p>
+                  <p className="mt-1 text-sm text-gray-600">{t('patient.appointments.noUpcomingBody')}</p>
                 </div>
               ) : (
                 <div className="space-y-5">
@@ -391,17 +407,15 @@ export const PatientAppointments: React.FC = () => {
 
             <section>
               <div className="mb-4">
-                <h2 className="text-2xl font-bold text-gray-900">Past Activity</h2>
-                <p className="text-sm text-gray-600">Completed, cancelled, and past appointments are kept here for reference.</p>
+                <h2 className="text-2xl font-bold text-gray-900">{t('patient.appointments.pastTitle')}</h2>
+                <p className="text-sm text-gray-600">{t('patient.appointments.pastSub')}</p>
               </div>
 
               {pastAppointments.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-8 text-center shadow-sm">
                   <Clock className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                  <p className="font-semibold text-gray-900">No past appointments yet</p>
-                  <p className="mt-1 text-sm text-gray-600">
-                    Your appointment history will appear here over time.
-                  </p>
+                  <p className="font-semibold text-gray-900">{t('patient.appointments.noPastTitle')}</p>
+                  <p className="mt-1 text-sm text-gray-600">{t('patient.appointments.noPastBody')}</p>
                 </div>
               ) : (
                 <div className="space-y-5">

@@ -1,4 +1,5 @@
 import type { Appointment, BlockedSlot, DoctorAvailability } from '../types';
+import { dateTimeFormatWithNumerals, resolveLocale } from './i18n-ui';
 
 export type OccupiedAppointmentSlot = Pick<Appointment, 'status' | 'scheduled_at' | 'duration_minutes'>;
 
@@ -51,12 +52,20 @@ export const generateAvailableTimeSlots = ({
   availabilities,
   blockedSlots,
   appointments,
+  uiLanguage = 'en',
 }: {
   date: Date;
   availabilities: DoctorAvailability[];
   blockedSlots: BlockedSlot[];
   appointments: OccupiedAppointmentSlot[];
+  /** i18n language (e.g. `ar`) — affects time slot labels */
+  uiLanguage?: string;
 }) => {
+  const locale = resolveLocale(uiLanguage);
+  const timeLabelOptions = dateTimeFormatWithNumerals(uiLanguage, {
+    hour: 'numeric',
+    minute: '2-digit',
+  });
   const dateKey = formatDateKey(date);
   const dayOfWeek = date.getDay();
   const now = new Date();
@@ -112,10 +121,7 @@ export const generateAvailableTimeSlots = ({
         const iso = cursor.toISOString();
         slotMap.set(iso, {
           iso,
-          label: cursor.toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-          }),
+          label: cursor.toLocaleTimeString(locale, timeLabelOptions),
           startTime: `${pad(cursor.getHours())}:${pad(cursor.getMinutes())}`,
           endTime: `${pad(slotEnd.getHours())}:${pad(slotEnd.getMinutes())}`,
           durationMinutes: availability.slot_duration_minutes,

@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Calendar, CalendarDays, ChevronLeft, ChevronRight, ClipboardList, Clock, List, MapPin, User, Video } from 'lucide-react';
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
@@ -6,10 +7,17 @@ import { Skeleton } from '../../components/Skeleton';
 import { useAppointments, useQuery } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
 import { supabase } from '../../lib/supabase';
+import {
+  appointmentTypeLabel,
+  appointmentStatusLabel,
+  calendarWeekdayShort,
+  dateTimeFormatWithNumerals,
+  formatLocaleDigits,
+  preVisitStatusLabel,
+  resolveLocale,
+} from '../../lib/i18n-ui';
 
 type AppointmentViewMode = 'list' | 'calendar';
-
-const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 const getMonthDays = (date: Date) => {
   const year = date.getFullYear();
@@ -39,6 +47,11 @@ const formatDateKey = (date: Date) => {
 };
 
 export const DoctorAppointments: React.FC = () => {
+  const { t, i18n } = useTranslation('common');
+  const uiLang = i18n.language ?? 'en';
+  const locale = resolveLocale(uiLang);
+  const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(uiLang, options);
+  const weekdayLabels = useMemo(() => calendarWeekdayShort(t), [t]);
   const { user } = useAuth();
   const {
     data: appointmentsData,
@@ -82,9 +95,9 @@ export const DoctorAppointments: React.FC = () => {
   const patientNameById = useMemo(
     () =>
       new Map(
-        patientProfiles.map((profile) => [profile.user_id, profile.full_name ?? 'Patient'])
+        patientProfiles.map((profile) => [profile.user_id, profile.full_name ?? t('shared.patient')])
       ),
-    [patientProfiles]
+    [patientProfiles, t]
   );
   const { data: preVisitAssessmentData } = useQuery(
     async () => {
@@ -185,24 +198,24 @@ export const DoctorAppointments: React.FC = () => {
       return;
     }
 
-    setFeedback({ type: 'success', message: 'Appointment cancelled successfully.' });
+    setFeedback({ type: 'success', message: t('doctor.appointments.cancelSuccess') });
     refetch();
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
       <Navigation role="doctor" />
       <PageHeader
-        title="Appointments"
-        subtitle="Manage your patient appointments"
+        title={t('doctor.appointments.title')}
+        subtitle={t('doctor.appointments.subtitle')}
         icon={<Calendar className="w-6 h-6 text-white" />}
         backTo="/doctor/dashboard"
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Scheduled Care</h2>
-          <p className="text-gray-600">Live appointments will appear here as patients book against your profile.</p>
+          <h2 className="text-2xl font-bold text-gray-900">{t('doctor.appointments.sectionTitle')}</h2>
+          <p className="text-gray-600">{t('doctor.appointments.sectionSub')}</p>
         </div>
 
         {feedback ? (
@@ -224,36 +237,55 @@ export const DoctorAppointments: React.FC = () => {
           </div>
         ) : error ? (
           <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Doctor appointments could not be loaded yet.
+            {t('doctor.appointments.loadError')}
           </div>
         ) : appointments.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center shadow-sm">
             <Calendar className="mx-auto mb-4 h-10 w-10 text-gray-400" />
-            <h3 className="text-xl font-bold text-gray-900">No appointments yet</h3>
-            <p className="mt-2 text-sm text-gray-600">
-              This page no longer shows sample patients. Your real booked consultations will appear here.
-            </p>
+            <h3 className="text-xl font-bold text-gray-900">{t('doctor.appointments.emptyTitle')}</h3>
+            <p className="mt-2 text-sm text-gray-600">{t('doctor.appointments.emptyBody')}</p>
           </div>
         ) : (
           <div className="space-y-6">
             <div className="flex flex-col gap-4 rounded-2xl bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">
-                  {viewMode === 'calendar' ? 'Calendar View' : 'List View'}
+                  {viewMode === 'calendar' ? t('doctor.appointments.viewCalendar') : t('doctor.appointments.viewList')}
                 </h3>
                 <p className="text-sm text-gray-600">
                   {viewMode === 'calendar'
-                    ? `Showing ${visibleAppointments.length} appointment${
-                        visibleAppointments.length === 1 ? '' : 's'
-                      } on ${selectedCalendarDate.toLocaleDateString('en-US', {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}.`
-                    : `Showing all ${appointments.length} booked appointment${
-                        appointments.length === 1 ? '' : 's'
-                      } in chronological order.`}
+                    ? visibleAppointments.length === 1
+                      ? t('doctor.appointments.calendarSubOne', {
+                          count: formatLocaleDigits(visibleAppointments.length, uiLang),
+                          date: selectedCalendarDate.toLocaleDateString(
+                            locale,
+                            dtOpts({
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })
+                          ),
+                        })
+                      : t('doctor.appointments.calendarSubMany', {
+                          count: formatLocaleDigits(visibleAppointments.length, uiLang),
+                          date: selectedCalendarDate.toLocaleDateString(
+                            locale,
+                            dtOpts({
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })
+                          ),
+                        })
+                    : appointments.length === 1
+                      ? t('doctor.appointments.listSubOne', {
+                          count: formatLocaleDigits(appointments.length, uiLang),
+                        })
+                      : t('doctor.appointments.listSubMany', {
+                          count: formatLocaleDigits(appointments.length, uiLang),
+                        })}
                 </p>
               </div>
 
@@ -268,7 +300,7 @@ export const DoctorAppointments: React.FC = () => {
                   }`}
                 >
                   <List className="h-4 w-4" />
-                  <span>List</span>
+                  <span>{t('doctor.appointments.list')}</span>
                 </button>
                 <button
                   type="button"
@@ -280,7 +312,7 @@ export const DoctorAppointments: React.FC = () => {
                   }`}
                 >
                   <CalendarDays className="h-4 w-4" />
-                  <span>Calendar</span>
+                  <span>{t('doctor.appointments.calendar')}</span>
                 </button>
               </div>
             </div>
@@ -289,10 +321,8 @@ export const DoctorAppointments: React.FC = () => {
               <section className="rounded-2xl bg-white p-4 shadow-sm sm:p-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Appointment Calendar</h3>
-                    <p className="text-sm text-gray-600">
-                      Pick a day to filter the appointment list below.
-                    </p>
+                    <h3 className="text-lg font-semibold text-gray-900">{t('doctor.appointments.calTitle')}</h3>
+                    <p className="text-sm text-gray-600">{t('doctor.appointments.calSub')}</p>
                   </div>
 
                   <div className="flex items-center gap-2 self-start rounded-xl bg-gray-50 px-2 py-2 sm:gap-3 sm:px-3">
@@ -300,27 +330,29 @@ export const DoctorAppointments: React.FC = () => {
                       type="button"
                       onClick={() => handleMonthChange(-1)}
                       className="rounded-lg p-2 transition hover:bg-white"
-                      aria-label="Previous month"
+                      aria-label={t('doctor.appointments.prevMonth')}
                     >
                       <ChevronLeft className="h-5 w-5 text-gray-700" />
                     </button>
                     <div className="min-w-28 text-center sm:min-w-36">
                       <p className="text-sm font-semibold text-gray-900">
-                        {currentMonth.toLocaleDateString('en-US', {
-                          month: 'long',
-                          year: 'numeric',
-                        })}
+                        {currentMonth.toLocaleDateString(locale, dtOpts({ month: 'long', year: 'numeric' }))}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {currentMonthAppointmentCount} appointment
-                        {currentMonthAppointmentCount === 1 ? '' : 's'}
+                        {currentMonthAppointmentCount === 1
+                          ? t('doctor.appointments.apptCountOne', {
+                              count: formatLocaleDigits(currentMonthAppointmentCount, uiLang),
+                            })
+                          : t('doctor.appointments.apptCountMany', {
+                              count: formatLocaleDigits(currentMonthAppointmentCount, uiLang),
+                            })}
                       </p>
                     </div>
                     <button
                       type="button"
                       onClick={() => handleMonthChange(1)}
                       className="rounded-lg p-2 transition hover:bg-white"
-                      aria-label="Next month"
+                      aria-label={t('doctor.appointments.nextMonth')}
                     >
                       <ChevronRight className="h-5 w-5 text-gray-700" />
                     </button>
@@ -328,7 +360,7 @@ export const DoctorAppointments: React.FC = () => {
                 </div>
 
                 <div className="mt-6 grid grid-cols-7 gap-1 text-center text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:gap-2 sm:text-xs">
-                  {WEEKDAY_LABELS.map((label) => (
+                  {weekdayLabels.map((label) => (
                     <div key={label} className="py-1 sm:py-2">
                       <span className="sm:hidden">{label.charAt(0)}</span>
                       <span className="hidden sm:inline">{label}</span>
@@ -369,12 +401,12 @@ export const DoctorAppointments: React.FC = () => {
                               isSelected ? 'text-cyan-700' : 'text-gray-900'
                             }`}
                           >
-                            {date.getDate()}
+                            {formatLocaleDigits(date.getDate(), uiLang)}
                           </span>
                           {isToday ? (
                             <>
                               <span className="hidden rounded-full bg-gray-900 px-2 py-0.5 text-[10px] font-semibold uppercase text-white sm:inline">
-                                Today
+                                {t('doctor.appointments.today')}
                               </span>
                               <span className="inline h-2 w-2 rounded-full bg-gray-900 sm:hidden" />
                             </>
@@ -384,14 +416,20 @@ export const DoctorAppointments: React.FC = () => {
                           {appointmentCount > 0 ? (
                             <>
                               <span className="inline-flex rounded-full bg-cyan-100 px-1.5 py-0.5 text-[10px] font-semibold text-cyan-700 sm:hidden">
-                                {appointmentCount}
+                                {formatLocaleDigits(appointmentCount, uiLang)}
                               </span>
                               <p className="hidden text-xs text-cyan-700 sm:block">
-                                {appointmentCount} appointment{appointmentCount === 1 ? '' : 's'}
+                                {appointmentCount === 1
+                                  ? t('doctor.appointments.apptCountOne', {
+                                      count: formatLocaleDigits(appointmentCount, uiLang),
+                                    })
+                                  : t('doctor.appointments.apptCountMany', {
+                                      count: formatLocaleDigits(appointmentCount, uiLang),
+                                    })}
                               </p>
                             </>
                           ) : (
-                            <p className="hidden text-xs text-gray-400 sm:block">No appointments</p>
+                            <p className="hidden text-xs text-gray-400 sm:block">{t('doctor.appointments.noApptsDay')}</p>
                           )}
                         </div>
                       </button>
@@ -405,18 +443,21 @@ export const DoctorAppointments: React.FC = () => {
               <div>
                 <h3 className="text-xl font-bold text-gray-900">
                   {viewMode === 'calendar'
-                    ? `Appointments on ${selectedCalendarDate.toLocaleDateString('en-US', {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}`
-                    : 'All Appointments'}
+                    ? t('doctor.appointments.headingCal', {
+                        date: selectedCalendarDate.toLocaleDateString(
+                          locale,
+                          dtOpts({
+                            weekday: 'short',
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })
+                        ),
+                      })
+                    : t('doctor.appointments.headingAll')}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {viewMode === 'calendar'
-                    ? 'Only appointments scheduled for the selected day are shown here.'
-                    : 'Review every upcoming and past appointment in one list.'}
+                  {viewMode === 'calendar' ? t('doctor.appointments.subCal') : t('doctor.appointments.subAll')}
                 </p>
               </div>
             </div>
@@ -424,10 +465,8 @@ export const DoctorAppointments: React.FC = () => {
             {visibleAppointments.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center shadow-sm">
                 <CalendarDays className="mx-auto mb-4 h-10 w-10 text-gray-400" />
-                <h3 className="text-xl font-bold text-gray-900">No appointments on this day</h3>
-                <p className="mt-2 text-sm text-gray-600">
-                  Pick another date in the calendar to see that day&apos;s booked consultations.
-                </p>
+                <h3 className="text-xl font-bold text-gray-900">{t('doctor.appointments.noDayTitle')}</h3>
+                <p className="mt-2 text-sm text-gray-600">{t('doctor.appointments.noDayBody')}</p>
               </div>
             ) : (
               <div className="grid gap-6">
@@ -450,26 +489,36 @@ export const DoctorAppointments: React.FC = () => {
                               : 'bg-gradient-to-r from-blue-500 to-cyan-500'
                           }`}
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                              <div className="rounded-lg bg-white/20 p-2 backdrop-blur-sm">
+                          <div className="flex flex-wrap items-start justify-between gap-3">
+                            <div className="flex min-w-0 flex-1 items-start gap-3">
+                              <div className="shrink-0 rounded-lg bg-white/20 p-2 backdrop-blur-sm">
                                 {appointment.type === 'virtual' ? (
                                   <Video className="w-5 h-5 text-white" />
                                 ) : (
                                   <MapPin className="w-5 h-5 text-white" />
                                 )}
                               </div>
-                              <div>
+                              <div className="min-w-0 flex-1">
                                 <h3 className="text-lg font-bold text-white">
-                                  {patientNameById.get(appointment.patient_id) ?? 'Patient'}
+                                  {patientNameById.get(appointment.patient_id) ?? t('shared.patient')}
                                 </h3>
                                 <p className="text-sm text-white/90">
-                                  {appointment.chief_complaint ?? 'Scheduled consultation'}
+                                  {appointment.chief_complaint ? (
+                                    uiLang.startsWith('ar') ? (
+                                      <span dir="ltr" className="block text-start" translate="no">
+                                        {appointment.chief_complaint}
+                                      </span>
+                                    ) : (
+                                      appointment.chief_complaint
+                                    )
+                                  ) : (
+                                    t('shared.scheduledConsultation')
+                                  )}
                                 </p>
                               </div>
                             </div>
-                            <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase text-gray-800">
-                              {appointment.status.replace('_', ' ')}
+                            <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase text-gray-800">
+                              {appointmentStatusLabel(t, appointment.status)}
                             </span>
                           </div>
                         </div>
@@ -481,45 +530,70 @@ export const DoctorAppointments: React.FC = () => {
                                 <Clock className="w-4 h-4 text-blue-600" />
                               </div>
                               <div>
-                                <p className="text-xs font-medium text-gray-500">Time</p>
+                                <p className="text-xs font-medium text-gray-500">{t('doctor.appointments.time')}</p>
                                 <p className="text-sm font-semibold text-gray-900">
-                                  {new Date(appointment.scheduled_at).toLocaleString('en-US', {
-                                    month: 'short',
-                                    day: 'numeric',
-                                    hour: 'numeric',
-                                    minute: '2-digit',
-                                  })}
+                                  {new Date(appointment.scheduled_at).toLocaleString(
+                                    locale,
+                                    dtOpts({
+                                      month: 'short',
+                                      day: 'numeric',
+                                      hour: 'numeric',
+                                      minute: '2-digit',
+                                    })
+                                  )}
                                 </p>
                               </div>
                             </div>
 
                             <div>
-                              <p className="mb-1 text-xs font-medium text-gray-500">Duration</p>
+                              <p className="mb-1 text-xs font-medium text-gray-500">{t('doctor.appointments.duration')}</p>
                               <p className="text-sm font-semibold text-gray-900">
-                                {appointment.duration_minutes} min
+                                {t('shared.minutesUnit', {
+                                  count: formatLocaleDigits(appointment.duration_minutes, uiLang),
+                                })}
                               </p>
                             </div>
 
                             <div>
-                              <p className="mb-1 text-xs font-medium text-gray-500">Type</p>
+                              <p className="mb-1 text-xs font-medium text-gray-500">{t('doctor.appointments.type')}</p>
                               <p className="text-sm font-semibold text-gray-900 capitalize">
-                                {appointment.type === 'in_person' ? 'In person' : 'Virtual'}
+                                {appointmentTypeLabel(t, appointment.type)}
                               </p>
                             </div>
                           </div>
 
                           <div className="mt-4 grid gap-4 border-t border-gray-100 pt-4 md:grid-cols-2">
                             <div>
-                              <p className="text-xs font-medium uppercase text-gray-500">Reason for visit</p>
+                              <p className="text-xs font-medium uppercase text-gray-500">{t('doctor.appointments.reason')}</p>
                               <p className="mt-2 text-sm text-gray-700">
-                                {appointment.chief_complaint ?? 'No reason was provided at booking.'}
+                                {appointment.chief_complaint ? (
+                                  uiLang.startsWith('ar') ? (
+                                    <span dir="ltr" className="block text-start" translate="no">
+                                      {appointment.chief_complaint}
+                                    </span>
+                                  ) : (
+                                    appointment.chief_complaint
+                                  )
+                                ) : (
+                                  t('doctor.appointments.noReason')
+                                )}
                               </p>
                             </div>
 
                             <div>
-                              <p className="text-xs font-medium uppercase text-gray-500">Patient notes</p>
+                              <p className="text-xs font-medium uppercase text-gray-500">{t('doctor.appointments.patientNotes')}</p>
                               <p className="mt-2 text-sm text-gray-700">
-                                {appointment.notes ?? 'No additional notes were provided.'}
+                                {appointment.notes ? (
+                                  uiLang.startsWith('ar') ? (
+                                    <span dir="ltr" className="block text-start" translate="no">
+                                      {appointment.notes}
+                                    </span>
+                                  ) : (
+                                    appointment.notes
+                                  )
+                                ) : (
+                                  t('doctor.appointments.noNotes')
+                                )}
                               </p>
                             </div>
                           </div>
@@ -529,22 +603,27 @@ export const DoctorAppointments: React.FC = () => {
                               <div className="flex items-center gap-2">
                                 <ClipboardList className="h-4 w-4 text-cyan-700" />
                                 <p className="text-sm font-semibold text-cyan-900">
-                                  Pre-visit intake {preVisitAssessment.status.replace('_', ' ')}
+                                  {t('doctor.appointments.preVisitPrefix')}:{' '}
+                                  {preVisitStatusLabel(t, preVisitAssessment.status)}
                                 </p>
                               </div>
                               {preVisitAssessment.summary ? (
                                 <>
                                   <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-cyan-800">
-                                    AI summary
+                                    {t('doctor.appointments.aiSummary')}
                                   </p>
                                   <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-700">
-                                    {preVisitAssessment.summary.summary_text}
+                                    {uiLang.startsWith('ar') ? (
+                                      <span dir="ltr" className="block text-start" translate="no">
+                                        {preVisitAssessment.summary.summary_text}
+                                      </span>
+                                    ) : (
+                                      preVisitAssessment.summary.summary_text
+                                    )}
                                   </p>
                                 </>
                               ) : (
-                                <p className="mt-2 text-sm text-gray-700">
-                                  The patient has not finished the pre-visit intake yet, or the summary is still being prepared.
-                                </p>
+                                <p className="mt-2 text-sm text-gray-700">{t('doctor.appointments.preVisitPending')}</p>
                               )}
                             </div>
                           ) : null}
@@ -557,14 +636,16 @@ export const DoctorAppointments: React.FC = () => {
                                 disabled={busyAppointmentId === appointment.id}
                                 className="rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
                               >
-                                {busyAppointmentId === appointment.id ? 'Cancelling...' : 'Cancel appointment'}
+                                {busyAppointmentId === appointment.id
+                                  ? t('doctor.appointments.cancelling')
+                                  : t('doctor.appointments.cancel')}
                               </button>
                             </div>
                           ) : null}
 
                           <div className="mt-4 flex items-center space-x-2 border-t border-gray-100 pt-4 text-sm text-gray-600">
                             <User className="h-4 w-4" />
-                            <span>Patient detail flows will open from this list once the doctor patient detail route is wired.</span>
+                            <span>{t('doctor.appointments.footerHint')}</span>
                           </div>
                         </div>
                       </div>

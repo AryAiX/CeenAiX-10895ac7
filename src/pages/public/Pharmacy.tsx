@@ -1,268 +1,319 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
+import { formatLocaleDecimal, formatLocaleDigits, formatLocalePhoneDisplay } from '../../lib/i18n-ui';
 import { MapPin, Clock, Phone, Star, Search, ShoppingCart, Package, Pill } from 'lucide-react';
 
-interface Pharmacy {
+type StoreKey = 'lifeCare' | 'mediplus' | 'healthFirst' | 'city' | 'wellness' | 'quickMed';
+
+interface PharmacyRow {
   id: number;
-  name: string;
-  location: string;
-  distance: string;
-  hours: string;
-  phone: string;
-  rating: number;
-  reviews: number;
+  storeKey: StoreKey;
+  distanceKm: number;
   delivery: boolean;
   open24h: boolean;
+  rating: number;
+  reviews: number;
+  phone: string;
   image: string;
 }
 
-const pharmacies: Pharmacy[] = [
+/** English labels so search still matches when the UI is Arabic */
+const PHARMACY_SEARCH_EN: Record<StoreKey, { name: string; location: string }> = {
+  lifeCare: { name: 'LifeCare Pharmacy', location: 'Sheikh Zayed Road, Dubai' },
+  mediplus: { name: 'MediPlus Pharmacy', location: 'Dubai Marina' },
+  healthFirst: { name: 'Health First Pharmacy', location: 'Jumeirah Beach Road' },
+  city: { name: 'City Pharmacy', location: 'Business Bay' },
+  wellness: { name: 'Wellness Pharmacy', location: 'Downtown Dubai' },
+  quickMed: { name: 'QuickMed Pharmacy', location: 'Deira City Center' },
+};
+
+const PHARMACY_DATA: PharmacyRow[] = [
   {
     id: 1,
-    name: "LifeCare Pharmacy",
-    location: "Sheikh Zayed Road, Dubai",
-    distance: "1.2 km",
-    hours: "24/7",
-    phone: "+971 4 123 4567",
-    rating: 4.8,
-    reviews: 234,
+    storeKey: 'lifeCare',
+    distanceKm: 1.2,
     delivery: true,
     open24h: true,
-    image: "https://images.pexels.com/photos/5910947/pexels-photo-5910947.jpeg?auto=compress&cs=tinysrgb&w=800"
+    rating: 4.8,
+    reviews: 234,
+    phone: '+971 4 123 4567',
+    image:
+      'https://images.pexels.com/photos/5910947/pexels-photo-5910947.jpeg?auto=compress&cs=tinysrgb&w=800',
   },
   {
     id: 2,
-    name: "MediPlus Pharmacy",
-    location: "Dubai Marina",
-    distance: "2.5 km",
-    hours: "8:00 AM - 10:00 PM",
-    phone: "+971 4 234 5678",
-    rating: 4.6,
-    reviews: 187,
+    storeKey: 'mediplus',
+    distanceKm: 2.5,
     delivery: true,
     open24h: false,
-    image: "https://images.pexels.com/photos/5910948/pexels-photo-5910948.jpeg?auto=compress&cs=tinysrgb&w=800"
+    rating: 4.6,
+    reviews: 187,
+    phone: '+971 4 234 5678',
+    image:
+      'https://images.pexels.com/photos/5910948/pexels-photo-5910948.jpeg?auto=compress&cs=tinysrgb&w=800',
   },
   {
     id: 3,
-    name: "Health First Pharmacy",
-    location: "Jumeirah Beach Road",
-    distance: "3.1 km",
-    hours: "24/7",
-    phone: "+971 4 345 6789",
-    rating: 4.9,
-    reviews: 312,
+    storeKey: 'healthFirst',
+    distanceKm: 3.1,
     delivery: true,
     open24h: true,
-    image: "https://images.pexels.com/photos/3683053/pexels-photo-3683053.jpeg?auto=compress&cs=tinysrgb&w=800"
+    rating: 4.9,
+    reviews: 312,
+    phone: '+971 4 345 6789',
+    image:
+      'https://images.pexels.com/photos/3683053/pexels-photo-3683053.jpeg?auto=compress&cs=tinysrgb&w=800',
   },
   {
     id: 4,
-    name: "City Pharmacy",
-    location: "Business Bay",
-    distance: "4.2 km",
-    hours: "7:00 AM - 11:00 PM",
-    phone: "+971 4 456 7890",
-    rating: 4.5,
-    reviews: 156,
+    storeKey: 'city',
+    distanceKm: 4.2,
     delivery: false,
     open24h: false,
-    image: "https://images.pexels.com/photos/5910949/pexels-photo-5910949.jpeg?auto=compress&cs=tinysrgb&w=800"
+    rating: 4.5,
+    reviews: 156,
+    phone: '+971 4 456 7890',
+    image:
+      'https://images.pexels.com/photos/5910949/pexels-photo-5910949.jpeg?auto=compress&cs=tinysrgb&w=800',
   },
   {
     id: 5,
-    name: "Wellness Pharmacy",
-    location: "Downtown Dubai",
-    distance: "5.0 km",
-    hours: "9:00 AM - 9:00 PM",
-    phone: "+971 4 567 8901",
-    rating: 4.7,
-    reviews: 201,
+    storeKey: 'wellness',
+    distanceKm: 5.0,
     delivery: true,
     open24h: false,
-    image: "https://images.pexels.com/photos/208512/pexels-photo-208512.jpeg?auto=compress&cs=tinysrgb&w=800"
+    rating: 4.7,
+    reviews: 201,
+    phone: '+971 4 567 8901',
+    image: 'https://images.pexels.com/photos/208512/pexels-photo-208512.jpeg?auto=compress&cs=tinysrgb&w=800',
   },
   {
     id: 6,
-    name: "QuickMed Pharmacy",
-    location: "Deira City Center",
-    distance: "6.3 km",
-    hours: "24/7",
-    phone: "+971 4 678 9012",
-    rating: 4.4,
-    reviews: 143,
+    storeKey: 'quickMed',
+    distanceKm: 6.3,
     delivery: true,
     open24h: true,
-    image: "https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg?auto=compress&cs=tinysrgb&w=800"
-  }
+    rating: 4.4,
+    reviews: 143,
+    phone: '+971 4 678 9012',
+    image:
+      'https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg?auto=compress&cs=tinysrgb&w=800',
+  },
 ];
 
+function pharmacySearchHaystack(
+  t: (key: string) => string,
+  row: PharmacyRow
+): string {
+  const k = row.storeKey;
+  const en = PHARMACY_SEARCH_EN[k];
+  const parts = [
+    t(`pharmacyPage.stores.${k}.name`),
+    t(`pharmacyPage.stores.${k}.location`),
+    en.name,
+    en.location,
+  ];
+  return parts.join(' ').toLowerCase();
+}
+
 export const Pharmacy: React.FC = () => {
+  const { t, i18n } = useTranslation('common');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<'all' | '24h' | 'delivery'>('all');
 
-  const filteredPharmacies = pharmacies.filter(pharmacy => {
-    const matchesSearch = pharmacy.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         pharmacy.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = selectedFilter === 'all' ||
-                         (selectedFilter === '24h' && pharmacy.open24h) ||
-                         (selectedFilter === 'delivery' && pharmacy.delivery);
-    return matchesSearch && matchesFilter;
-  });
+  const filteredPharmacies = useMemo(() => {
+    const q = searchTerm.trim().toLowerCase();
+    return PHARMACY_DATA.filter((row) => {
+      const matchesSearch = !q || pharmacySearchHaystack(t, row).includes(q);
+      const matchesFilter =
+        selectedFilter === 'all' ||
+        (selectedFilter === '24h' && row.open24h) ||
+        (selectedFilter === 'delivery' && row.delivery);
+      return matchesSearch && matchesFilter;
+    });
+  }, [searchTerm, selectedFilter, t]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
       <Header />
 
-      <section className="relative bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 text-white py-20 overflow-hidden">
+      <section className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 py-20 text-white">
         <div className="absolute inset-0">
           <img
             src="https://images.pexels.com/photos/3683053/pexels-photo-3683053.jpeg?auto=compress&cs=tinysrgb&w=1920"
-            alt="Pharmacy"
-            className="w-full h-full object-cover opacity-20"
+            alt={t('pharmacyPage.heroAlt')}
+            className="h-full w-full object-cover opacity-20"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/90 via-cyan-600/90 to-teal-600/90"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/90 via-cyan-600/90 to-teal-600/90" />
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="flex justify-center mb-6">
-              <div className="bg-white/20 backdrop-blur-sm p-4 rounded-2xl shadow-2xl">
-                <Pill className="w-16 h-16" />
+            <div className="mb-6 flex justify-center">
+              <div className="rounded-2xl bg-white/20 p-4 shadow-2xl backdrop-blur-sm">
+                <Pill className="h-16 w-16" />
               </div>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">Find Your Nearest Pharmacy</h1>
-            <p className="text-xl text-blue-50 max-w-3xl mx-auto mb-8">
-              Discover trusted pharmacies in your area with convenient delivery options and 24/7 availability
-            </p>
+            <h1 className="mb-6 text-5xl font-bold md:text-6xl">{t('pharmacyPage.heroTitle')}</h1>
+            <p className="mx-auto mb-8 max-w-3xl text-xl text-blue-50">{t('pharmacyPage.heroLead')}</p>
           </div>
         </div>
       </section>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <div className="mb-6 flex flex-col gap-4 md:flex-row">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search by pharmacy name or location..."
+                placeholder={t('pharmacyPage.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-cyan-500 transition-colors text-lg"
+                className="w-full rounded-2xl border-2 border-gray-200 bg-white py-4 pe-4 ps-12 text-lg transition-colors focus:border-cyan-500 focus:outline-none"
               />
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <button
+              type="button"
               onClick={() => setSelectedFilter('all')}
-              className={`px-6 py-2.5 rounded-xl font-medium transition-all ${
+              className={`rounded-xl px-6 py-2.5 font-medium transition-all ${
                 selectedFilter === 'all'
                   ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                  : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
               }`}
             >
-              All Pharmacies
+              {t('pharmacyPage.filterAll')}
             </button>
             <button
+              type="button"
               onClick={() => setSelectedFilter('24h')}
-              className={`px-6 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2 ${
+              className={`flex items-center gap-2 rounded-xl px-6 py-2.5 font-medium transition-all ${
                 selectedFilter === '24h'
                   ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                  : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
               }`}
             >
-              <Clock className="w-4 h-4" />
-              24/7 Open
+              <Clock className="h-4 w-4" />
+              {t('pharmacyPage.filter24h')}
             </button>
             <button
+              type="button"
               onClick={() => setSelectedFilter('delivery')}
-              className={`px-6 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2 ${
+              className={`flex items-center gap-2 rounded-xl px-6 py-2.5 font-medium transition-all ${
                 selectedFilter === 'delivery'
                   ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                  : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
               }`}
             >
-              <Package className="w-4 h-4" />
-              Delivery Available
+              <Package className="h-4 w-4" />
+              {t('pharmacyPage.filterDelivery')}
             </button>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPharmacies.map((pharmacy) => (
-            <div
-              key={pharmacy.id}
-              className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
-            >
-              <div className="h-48 overflow-hidden relative">
-                <img
-                  src={pharmacy.image}
-                  alt={pharmacy.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-4 right-4 flex gap-2">
-                  {pharmacy.open24h && (
-                    <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      24/7
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {filteredPharmacies.map((row) => {
+            const k = row.storeKey;
+            const name = t(`pharmacyPage.stores.${k}.name`);
+            const location = t(`pharmacyPage.stores.${k}.location`);
+            const hours = t(`pharmacyPage.stores.${k}.hours`);
+            const distanceStr = t('pharmacyPage.distanceKm', {
+              km: formatLocaleDecimal(row.distanceKm, i18n.language, 1),
+            });
+            const locationLine = t('pharmacyPage.locationDistance', {
+              location,
+              distance: distanceStr,
+            });
+
+            return (
+              <div
+                key={row.id}
+                className="overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <img src={row.image} alt={name} className="h-full w-full object-cover" />
+                  <div className="absolute end-4 top-4 flex gap-2">
+                    {row.open24h && (
+                      <span className="flex items-center gap-1 rounded-full bg-green-500 px-3 py-1 text-xs font-semibold text-white">
+                        <Clock className="h-3 w-3" />
+                        {t('pharmacyPage.badge24h')}
+                      </span>
+                    )}
+                    {row.delivery && (
+                      <span className="flex items-center gap-1 rounded-full bg-blue-500 px-3 py-1 text-xs font-semibold text-white">
+                        <Package className="h-3 w-3" />
+                        {t('pharmacyPage.badgeDelivery')}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  <h3 className="mb-2 text-xl font-bold text-gray-900">{name}</h3>
+
+                  <div className="mb-3 flex items-center text-yellow-500">
+                    <Star className="h-4 w-4 fill-current" />
+                    <span className="ms-1 font-semibold text-gray-900">
+                      {formatLocaleDecimal(row.rating, i18n.language, 1)}
                     </span>
-                  )}
-                  {pharmacy.delivery && (
-                    <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                      <Package className="w-3 h-3" />
-                      Delivery
+                    <span className="ms-1 text-sm text-gray-500">
+                      {t('pharmacyPage.reviews', {
+                        count: formatLocaleDigits(row.reviews, i18n.language),
+                      })}
                     </span>
-                  )}
+                  </div>
+
+                  <div className="mb-4 space-y-2">
+                    <div className="flex items-start text-gray-600">
+                      <MapPin className="me-2 mt-0.5 h-4 w-4 flex-shrink-0 text-cyan-600" />
+                      <span className="text-sm">{locationLine}</span>
+                    </div>
+
+                    <div className="flex items-center text-gray-600">
+                      <Clock className="me-2 h-4 w-4 flex-shrink-0 text-cyan-600" />
+                      <span className="text-sm">{hours}</span>
+                    </div>
+
+                    <div className="flex items-center text-gray-600">
+                      <Phone className="me-2 h-4 w-4 flex-shrink-0 text-cyan-600" />
+                      <span className="text-sm" dir="ltr">
+                        {formatLocalePhoneDisplay(row.phone, i18n.language)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 py-2.5 font-semibold text-white shadow-md transition-all hover:from-cyan-700 hover:to-blue-700 hover:shadow-lg"
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                      {t('pharmacyPage.orderNow')}
+                    </button>
+                    <button
+                      type="button"
+                      title={t('pharmacyPage.directions')}
+                      aria-label={t('pharmacyPage.directions')}
+                      className="rounded-xl border-2 border-cyan-600 px-4 py-2.5 font-semibold text-cyan-600 transition-all hover:bg-cyan-50"
+                    >
+                      <MapPin className="h-5 w-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
-
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{pharmacy.name}</h3>
-
-                <div className="flex items-center text-yellow-500 mb-3">
-                  <Star className="w-4 h-4 fill-current" />
-                  <span className="ml-1 font-semibold text-gray-900">{pharmacy.rating}</span>
-                  <span className="ml-1 text-sm text-gray-500">({pharmacy.reviews} reviews)</span>
-                </div>
-
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-start text-gray-600">
-                    <MapPin className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0 text-cyan-600" />
-                    <span className="text-sm">{pharmacy.location} • {pharmacy.distance}</span>
-                  </div>
-
-                  <div className="flex items-center text-gray-600">
-                    <Clock className="w-4 h-4 mr-2 flex-shrink-0 text-cyan-600" />
-                    <span className="text-sm">{pharmacy.hours}</span>
-                  </div>
-
-                  <div className="flex items-center text-gray-600">
-                    <Phone className="w-4 h-4 mr-2 flex-shrink-0 text-cyan-600" />
-                    <span className="text-sm">{pharmacy.phone}</span>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <button className="flex-1 bg-gradient-to-r from-cyan-600 to-blue-600 text-white py-2.5 rounded-xl font-semibold hover:from-cyan-700 hover:to-blue-700 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
-                    <ShoppingCart className="w-4 h-4" />
-                    Order Now
-                  </button>
-                  <button className="px-4 py-2.5 border-2 border-cyan-600 text-cyan-600 rounded-xl font-semibold hover:bg-cyan-50 transition-all">
-                    <MapPin className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {filteredPharmacies.length === 0 && (
-          <div className="text-center py-16">
-            <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No pharmacies found</h3>
-            <p className="text-gray-600">Try adjusting your search or filters</p>
+          <div className="py-16 text-center">
+            <Package className="mx-auto mb-4 h-16 w-16 text-gray-300" />
+            <h3 className="mb-2 text-xl font-semibold text-gray-900">{t('pharmacyPage.noResultsTitle')}</h3>
+            <p className="text-gray-600">{t('pharmacyPage.noResultsLead')}</p>
           </div>
         )}
       </main>

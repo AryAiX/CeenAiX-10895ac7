@@ -84,53 +84,57 @@ export const HealthEducation: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 relative">
-      <div className="absolute inset-0 z-0 opacity-10">
-        <img
-          src="https://images.pexels.com/photos/3401897/pexels-photo-3401897.jpeg?auto=compress&cs=tinysrgb&w=1920"
-          alt="Health education"
-          className="w-full h-96 object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/80 to-white"></div>
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-50 via-white to-white">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-0 top-0 h-72 w-72 rounded-full bg-cyan-100/60 blur-3xl" />
+        <div className="absolute right-0 top-24 h-80 w-80 rounded-full bg-blue-100/70 blur-3xl" />
       </div>
 
       <Header />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
-          <div className="inline-flex items-center space-x-2 bg-blue-100 border border-blue-300 text-blue-700 px-5 py-2.5 rounded-full mb-6">
+          <div className="mb-6 inline-flex items-center space-x-2 rounded-full border border-cyan-200 bg-white/90 px-5 py-2.5 text-cyan-700 shadow-sm">
             <BookOpen className="w-5 h-5" />
             <span className="text-sm font-semibold">Expert Medical Content</span>
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4">Health Education Center</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">Expert articles and guides for your wellness journey, backed by medical professionals</p>
+          <h1 className="mb-4 text-5xl font-bold text-slate-900 md:text-6xl">
+            Health knowledge for
+            <span className="block bg-gradient-to-r from-ceenai-cyan to-ceenai-blue bg-clip-text text-transparent">
+              everyday decisions
+            </span>
+          </h1>
+          <p className="mx-auto max-w-3xl text-xl text-slate-600">
+            Explore trusted articles, preventive guidance, and condition explainers in the same
+            visual system as the refreshed CeenAiX experience.
+          </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="mb-8 rounded-[2rem] border border-slate-200 bg-white/95 p-6 shadow-sm backdrop-blur">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="mb-2 block text-sm font-medium text-slate-700">
                 Search articles
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search for health topics..."
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 py-3 pl-12 pr-4 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:bg-white focus:ring-2 focus:ring-ceenai-cyan/20"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="mb-2 block text-sm font-medium text-slate-700">
                 Category
               </label>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+                className="w-full appearance-none rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:bg-white focus:ring-2 focus:ring-ceenai-cyan/20"
               >
                 {categories.map((category) => (
                   <option key={category} value={category === 'All Topics' ? 'all' : category}>
@@ -143,38 +147,39 @@ export const HealthEducation: React.FC = () => {
         </div>
 
         {filteredArticles.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-            <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600">No articles found. Try adjusting your search criteria.</p>
+          <div className="rounded-[2rem] border border-slate-200 bg-white p-12 text-center shadow-sm">
+            <BookOpen className="mx-auto mb-4 h-12 w-12 text-slate-400" />
+            <p className="text-slate-600">No articles found. Try adjusting your search criteria.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredArticles.map((article) => (
               <div
                 key={article.id}
-                className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden cursor-pointer group"
+                className="group cursor-pointer overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
-                <div className="h-48 overflow-hidden">
+                <div className="relative h-52 overflow-hidden">
                   <img
                     src={article.image}
                     alt={article.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/45 via-transparent to-transparent" />
                 </div>
                 <div className="p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-800">
                       {article.category}
                     </span>
-                    <span className="text-xs text-gray-500">{article.readTime}</span>
+                    <span className="text-xs text-slate-500">{article.readTime}</span>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
+                  <h3 className="mb-2 line-clamp-2 text-lg font-bold text-slate-900 transition-colors group-hover:text-ceenai-blue">
                     {article.title}
                   </h3>
-                  <p className="text-sm text-gray-600 line-clamp-3">
+                  <p className="line-clamp-3 text-sm text-slate-600">
                     {article.excerpt}
                   </p>
-                  <button className="mt-4 text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center space-x-1">
+                  <button className="mt-4 flex items-center space-x-1 text-sm font-semibold text-ceenai-blue transition-colors hover:text-ceenai-blue-dark">
                     <span>Read more</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
@@ -184,15 +189,15 @@ export const HealthEducation: React.FC = () => {
           </div>
         )}
 
-        <div className="mt-12 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-3xl p-8 text-center text-white">
-          <BookOpen className="w-12 h-12 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-3">Want Personalized Health Insights?</h2>
-          <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
+        <div className="mt-12 rounded-[2rem] bg-slate-950 p-8 text-center text-white shadow-xl">
+          <BookOpen className="mx-auto mb-4 h-12 w-12 text-cyan-300" />
+          <h2 className="mb-3 text-2xl font-bold">Want personalized health insights?</h2>
+          <p className="mx-auto mb-6 max-w-2xl text-slate-300">
             Create a free account to get AI-powered health recommendations tailored to your needs
           </p>
           <button
             onClick={() => navigate('/auth')}
-            className="px-8 py-3 bg-white text-blue-600 hover:bg-blue-50 font-bold rounded-xl transition-colors shadow-lg"
+            className="rounded-full bg-white px-8 py-3 font-bold text-slate-950 transition-colors hover:bg-slate-100"
           >
             Get Started Free
           </button>

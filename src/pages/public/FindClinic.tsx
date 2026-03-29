@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { Header } from '../../components/Header';
+import { Footer } from '../../components/Footer';
 
 interface Hospital {
   id: string;
@@ -176,7 +177,7 @@ export const FindClinic: React.FC = () => {
     });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 relative overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-50 via-white to-white">
       <div className="absolute inset-0 z-0">
         <img
           src="https://images.pexels.com/photos/668300/pexels-photo-668300.jpeg?auto=compress&cs=tinysrgb&w=1920"
@@ -194,46 +195,52 @@ export const FindClinic: React.FC = () => {
 
       <Header />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
+      <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8 text-center animate-fade-in">
-          <h1 className="text-5xl font-bold text-gray-900 mb-3 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-white/90 px-4 py-2 text-sm font-semibold text-cyan-700 shadow-sm">
+            <Building2 className="h-4 w-4" />
+            <span>Facility discovery</span>
+          </div>
+          <h1 className="mb-3 bg-gradient-to-r from-ceenai-blue to-ceenai-cyan bg-clip-text text-5xl font-bold text-transparent">
             Find Healthcare Facilities
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="mx-auto max-w-2xl text-lg text-slate-600">
             Discover top-rated hospitals and clinics with experienced doctors near you
           </p>
         </div>
 
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-6 border border-gray-100 transform hover:shadow-2xl transition-all">
+        <div className="mb-6 rounded-[2rem] border border-slate-200 bg-white/95 p-6 shadow-sm backdrop-blur transition-all">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="mb-2 block text-sm font-semibold text-slate-700">
                 Search Hospitals & Clinics
               </label>
               <div className="relative group">
-                <Search className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                <Search className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 transition-colors group-focus-within:text-ceenai-blue" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search by name, location, or specialty..."
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 py-3 pl-12 pr-4 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:bg-white focus:ring-2 focus:ring-ceenai-cyan/20"
                 />
               </div>
             </div>
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="md:self-end px-6 py-3 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700 font-medium rounded-xl transition-all flex items-center gap-2 transform hover:scale-105"
+              className="md:self-end rounded-2xl border border-slate-200 bg-slate-50 px-6 py-3 font-medium text-slate-700 transition-all hover:bg-slate-100"
             >
-              <Filter className="w-5 h-5" />
+              <span className="inline-flex items-center gap-2">
+                <Filter className="h-5 w-5" />
               Filters
               {showFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </span>
             </button>
           </div>
 
           {showFilters && (
-            <div className="mt-6 pt-6 border-t border-gray-200 space-y-4 animate-fade-in">
+            <div className="mt-6 space-y-4 border-t border-slate-200 pt-6 animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Type</label>
@@ -622,56 +629,7 @@ export const FindClinic: React.FC = () => {
         )}
       </div>
 
-      <footer className="bg-gray-900 text-gray-300 py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <img
-                  src="/ChatGPT_Image_Feb_27,_2026,_11_30_50_AM.png"
-                  alt="CeenAiX Logo"
-                  className="h-10 w-auto"
-                />
-                <span className="text-xl font-bold text-white">CeenAiX</span>
-              </div>
-              <p className="text-gray-400 leading-relaxed">
-                Secure healthcare platform with AI-powered insights
-              </p>
-            </div>
-
-            <div>
-              <h4 className="text-white font-bold mb-4">Services</h4>
-              <ul className="space-y-2">
-                <li><button onClick={() => navigate('/find-doctor')} className="hover:text-ceenai-cyan transition-colors">Find Doctors</button></li>
-                <li><button onClick={() => navigate('/find-clinic')} className="hover:text-ceenai-cyan transition-colors">Find Clinics</button></li>
-                <li><button onClick={() => navigate('/ai-chat')} className="hover:text-ceenai-cyan transition-colors">AI Health Chat</button></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-bold mb-4">Resources</h4>
-              <ul className="space-y-2">
-                <li><button onClick={() => navigate('/health-education')} className="hover:text-ceenai-cyan transition-colors">Health Education</button></li>
-                <li><button onClick={() => navigate('/insurance')} className="hover:text-ceenai-cyan transition-colors">Insurance</button></li>
-                <li><a href="#" className="hover:text-ceenai-cyan transition-colors">Help Center</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-bold mb-4">Contact</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>support@ceenaix.com</li>
-                <li>1-800-CEENAIX</li>
-                <li>Available 24/7</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 pt-8 text-center">
-            <p className="text-sm text-gray-400">© 2026 CeenAiX. DHA-compliant healthcare technology. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       <style>{`
         @keyframes blob {

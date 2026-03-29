@@ -1,334 +1,306 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Footer } from '../../components/Footer';
+import { LanguageSwitcher } from '../../components/LanguageSwitcher';
 import {
-  MessageSquare,
-  Search,
-  Building2,
-  Shield,
-  BookOpen,
-  User,
-  Stethoscope,
-  Calendar,
-  Heart,
-  Star,
-  CheckCircle2,
+  Activity,
   ArrowRight,
-  Award
+  Calendar,
+  CheckCircle2,
+  FileText,
+  MessageSquare,
+  Pill,
+  Search,
+  Shield,
+  Sparkles,
+  TestTube,
+  Users,
 } from 'lucide-react';
-import { GeometricBackground } from '../../components/GeometricBackground';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
-  const openRegistration = (role: 'patient' | 'doctor') => {
+  const { t } = useTranslation('common');
+
+  const openRegistration = useCallback((role: 'patient' | 'doctor') => {
     navigate(`/auth/register?role=${role}&reset=1`);
-  };
+  }, [navigate]);
 
-  const features = [
-    {
-      icon: MessageSquare,
-      title: 'AI Health Chat',
-      description: 'Get instant medical guidance from our AI-powered health assistant',
-      action: () => navigate('/ai-chat'),
-      gradient: 'from-ceenai-cyan to-ceenai-blue',
-      image: 'https://images.pexels.com/photos/8438971/pexels-photo-8438971.jpeg?auto=compress&cs=tinysrgb&w=400'
-    },
-    {
-      icon: Search,
-      title: 'Find a Doctor',
-      description: 'Browse specialists by expertise, location, and availability',
-      action: () => navigate('/find-doctor'),
-      gradient: 'from-ceenai-blue to-ceenai-navy',
-      image: 'https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=400'
-    },
-    {
-      icon: Building2,
-      title: 'Find Clinics',
-      description: 'Discover healthcare facilities near you',
-      action: () => navigate('/find-clinic'),
-      gradient: 'from-ceenai-cyan-light to-ceenai-cyan',
-      image: 'https://images.pexels.com/photos/668300/pexels-photo-668300.jpeg?auto=compress&cs=tinysrgb&w=400'
-    },
-    {
-      icon: Shield,
-      title: 'Insurance Plans',
-      description: 'Compare coverage options and find the right plan',
-      action: () => navigate('/insurance'),
-      gradient: 'from-ceenai-blue-dark to-ceenai-blue',
-      image: 'https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg?auto=compress&cs=tinysrgb&w=400'
-    },
-    {
-      icon: BookOpen,
-      title: 'Health Education',
-      description: 'Access medical articles and preventive care guides',
-      action: () => navigate('/health-education'),
-      gradient: 'from-ceenai-cyan to-ceenai-blue-light',
-      image: 'https://images.pexels.com/photos/3401897/pexels-photo-3401897.jpeg?auto=compress&cs=tinysrgb&w=400'
-    },
-    {
-      icon: User,
-      title: 'Patient Profile',
-      description: 'Manage your health information and medical history',
-      action: () => openRegistration('patient'),
-      gradient: 'from-ceenai-blue to-ceenai-cyan',
-      image: 'https://images.pexels.com/photos/4386464/pexels-photo-4386464.jpeg?auto=compress&cs=tinysrgb&w=400'
-    },
-  ];
+  const features = useMemo(
+    () => [
+      {
+        icon: Calendar,
+        titleKey: 'home.featureCards.scheduling.title',
+        descriptionKey: 'home.featureCards.scheduling.description',
+        action: () => navigate('/find-doctor'),
+        color: 'from-blue-500 to-cyan-500',
+      },
+      {
+        icon: FileText,
+        titleKey: 'home.featureCards.records.title',
+        descriptionKey: 'home.featureCards.records.description',
+        action: () => openRegistration('patient'),
+        color: 'from-emerald-500 to-teal-500',
+      },
+      {
+        icon: Pill,
+        titleKey: 'home.featureCards.prescription.title',
+        descriptionKey: 'home.featureCards.prescription.description',
+        action: () => navigate('/patient/prescriptions'),
+        color: 'from-violet-500 to-fuchsia-500',
+      },
+      {
+        icon: TestTube,
+        titleKey: 'home.featureCards.intake.title',
+        descriptionKey: 'home.featureCards.intake.description',
+        action: () => navigate('/ai-chat'),
+        color: 'from-amber-500 to-orange-500',
+      },
+      {
+        icon: Sparkles,
+        titleKey: 'home.featureCards.aiChat.title',
+        descriptionKey: 'home.featureCards.aiChat.description',
+        action: () => navigate('/ai-chat'),
+        color: 'from-pink-500 to-rose-500',
+      },
+      {
+        icon: Shield,
+        titleKey: 'home.featureCards.secure.title',
+        descriptionKey: 'home.featureCards.secure.description',
+        action: () => navigate('/health-education'),
+        color: 'from-indigo-500 to-blue-600',
+      },
+    ],
+    [navigate, openRegistration]
+  );
 
-  const stats = [
-    { icon: User, value: '15,000+', label: 'Active Patients' },
-    { icon: Stethoscope, value: '850+', label: 'Expert Doctors' },
-    { icon: Calendar, value: '75,000+', label: 'Appointments' },
-    { icon: Star, value: '4.9/5', label: 'Patient Rating' }
-  ];
+  const stats = useMemo(
+    () => [
+      { valueKey: 'home.stats.patientsValue', labelKey: 'home.stats.patients' },
+      { valueKey: 'home.stats.doctorsValue', labelKey: 'home.stats.doctors' },
+      { valueKey: 'home.stats.appointmentsValue', labelKey: 'home.stats.appointments' },
+      { valueKey: 'home.stats.aiSupportValue', labelKey: 'home.stats.aiSupport' },
+    ],
+    []
+  );
 
-  const testimonials = [
-    {
-      name: 'Sarah Mitchell',
-      role: 'Patient',
-      image: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=200',
-      comment: 'CeenAiX has completely transformed how I manage my healthcare. The AI chat feature is incredibly helpful and booking appointments is seamless.',
-      rating: 5
-    },
-    {
-      name: 'Dr. James Martinez',
-      role: 'Cardiologist',
-      image: 'https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=200',
-      comment: 'This platform streamlined my practice management. I can focus more on patient care and less on administrative tasks.',
-      rating: 5
-    },
-    {
-      name: 'Emily Chen',
-      role: 'Patient',
-      image: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=200',
-      comment: 'The convenience of accessing my health records and communicating with my doctor anytime is unmatched. Highly recommended!',
-      rating: 5
-    }
-  ];
+  const steps = useMemo(
+    () => [
+      {
+        stepKey: 'home.steps.one.num',
+        titleKey: 'home.steps.one.title',
+        descriptionKey: 'home.steps.one.description',
+        icon: Users,
+      },
+      {
+        stepKey: 'home.steps.two.num',
+        titleKey: 'home.steps.two.title',
+        descriptionKey: 'home.steps.two.description',
+        icon: Search,
+      },
+      {
+        stepKey: 'home.steps.three.num',
+        titleKey: 'home.steps.three.title',
+        descriptionKey: 'home.steps.three.description',
+        icon: Activity,
+      },
+    ],
+    []
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-ceenai-cyan/5 relative overflow-hidden">
-      <GeometricBackground />
-
-      <nav className="bg-white/95 backdrop-blur-lg shadow-soft sticky top-0 z-50 border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            <div className="flex items-center space-x-3">
-              <img
-                src="/ChatGPT_Image_Feb_27,_2026,_11_30_50_AM.png"
-                alt="CeenAiX Logo"
-                className="h-12 w-auto"
-              />
-              <span className="text-2xl font-bold bg-gradient-to-r from-ceenai-cyan via-ceenai-blue to-ceenai-navy bg-clip-text text-transparent">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur-lg">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <img src="/favicon.svg" alt="CeenAiX" className="h-10 w-10 rounded-xl" />
+            <div>
+              <p className="bg-gradient-to-r from-ceenai-cyan to-ceenai-blue bg-clip-text text-2xl font-bold text-transparent">
                 CeenAiX
-              </span>
-            </div>
-
-            <div className="hidden md:flex items-center space-x-8">
-              <button onClick={() => navigate('/find-doctor')} className="text-gray-700 hover:text-ceenai-blue font-medium transition-colors">
-                Doctors
-              </button>
-              <button onClick={() => navigate('/find-clinic')} className="text-gray-700 hover:text-ceenai-blue font-medium transition-colors">
-                Clinics
-              </button>
-              <button onClick={() => navigate('/pharmacy')} className="text-gray-700 hover:text-ceenai-blue font-medium transition-colors">
-                Pharmacy
-              </button>
-              <button onClick={() => navigate('/laboratories')} className="text-gray-700 hover:text-ceenai-blue font-medium transition-colors">
-                Laboratories
-              </button>
-              <button onClick={() => navigate('/insurance')} className="text-gray-700 hover:text-ceenai-blue font-medium transition-colors">
-                Insurance
-              </button>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => openRegistration('patient')}
-                className="px-6 py-2.5 bg-gradient-to-r from-ceenai-cyan to-ceenai-blue hover:from-ceenai-cyan-dark hover:to-ceenai-blue-dark text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg hover:scale-105"
-              >
-                Patient
-              </button>
-              <button
-                onClick={() => openRegistration('doctor')}
-                className="px-6 py-2.5 border-2 border-ceenai-navy text-ceenai-navy hover:bg-ceenai-navy hover:text-white font-semibold rounded-xl transition-all"
-              >
-                Doctor
-              </button>
+              </p>
+              <p className="text-xs font-medium uppercase tracking-[0.24em] text-slate-400">
+                {t('brand.tagline')}
+              </p>
             </div>
           </div>
+
+          <nav className="hidden items-center gap-8 md:flex">
+            <a href="#features" className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900">
+              {t('home.features')}
+            </a>
+            <a href="#how-it-works" className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900">
+              {t('home.howItWorks')}
+            </a>
+            <button
+              type="button"
+              onClick={() => navigate('/find-doctor')}
+              className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
+            >
+              {t('home.findCare')}
+            </button>
+          </nav>
+
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher dense />
+            <button
+              type="button"
+              onClick={() => openRegistration('patient')}
+              className="rounded-full bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition hover:shadow-xl"
+            >
+              {t('header.patient')}
+            </button>
+            <button
+              type="button"
+              onClick={() => openRegistration('doctor')}
+              className="rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 transition hover:border-ceenai-cyan hover:text-ceenai-blue"
+            >
+              {t('header.doctor')}
+            </button>
+          </div>
         </div>
-      </nav>
+      </header>
 
-      <section className="relative min-h-screen flex items-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=1920"
-            alt="Modern healthcare"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-transparent"></div>
-        </div>
+      <section className="relative overflow-hidden px-4 pb-28 pt-20 sm:px-6 lg:px-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(34,211,238,0.16),_transparent_36%),radial-gradient(circle_at_bottom_right,_rgba(37,99,235,0.14),_transparent_34%)]" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8 animate-slide-up">
-              <div className="inline-flex items-center space-x-2 bg-ceenai-cyan/10 border border-ceenai-cyan/30 text-ceenai-blue px-5 py-2.5 rounded-full backdrop-blur-sm">
-                <Award className="w-5 h-5" />
-                <span className="text-sm font-semibold">Trusted by 15,000+ Patients</span>
-              </div>
-
-              <h1 className="text-5xl md:text-7xl font-bold text-gray-900 leading-tight">
-                Your Health,
-                <span className="block mt-2 bg-gradient-to-r from-ceenai-cyan via-ceenai-blue to-ceenai-navy bg-clip-text text-transparent">
-                  Reimagined
-                </span>
-              </h1>
-
-              <p className="text-xl text-gray-600 leading-relaxed max-w-xl">
-                Experience healthcare powered by AI. Get instant medical insights, connect with top specialists,
-                and manage your health journey all in one intelligent platform.
-              </p>
-
-              <div className="flex flex-wrap gap-4">
-                <button
-                  onClick={() => navigate('/find-doctor')}
-                  className="group px-8 py-4 bg-gradient-to-r from-ceenai-cyan to-ceenai-blue text-white rounded-xl font-semibold shadow-medium hover:shadow-hard transition-all duration-300 hover:scale-105 flex items-center space-x-2"
-                >
-                  <span>Find a Doctor</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </button>
-                <button
-                  onClick={() => navigate('/ai-chat')}
-                  className="px-8 py-4 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:border-ceenai-cyan hover:text-ceenai-blue transition-all duration-300 hover:shadow-lg"
-                >
-                  Try AI Assistant
-                </button>
-              </div>
-
-              <div className="flex items-center gap-8 pt-4">
-                <div className="flex items-center space-x-2">
-                  <CheckCircle2 className="w-6 h-6 text-green-500" />
-                  <span className="text-gray-700 font-medium">No waiting time</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <CheckCircle2 className="w-6 h-6 text-green-500" />
-                  <span className="text-gray-700 font-medium">24/7 available</span>
-                </div>
-              </div>
+        <div className="relative mx-auto grid max-w-7xl gap-16 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 rounded-full bg-cyan-50 px-4 py-2 text-sm font-medium text-cyan-900">
+              <Sparkles className="h-4 w-4 text-cyan-600" />
+              {t('home.hero.badge')}
             </div>
 
-            <div className="relative animate-fade-in lg:block hidden">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-4">
-                  <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300 h-64">
-                    <img
-                      src="https://images.pexels.com/photos/4173239/pexels-photo-4173239.jpeg?auto=compress&cs=tinysrgb&w=600"
-                      alt="Doctor with patient"
-                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300 h-80">
-                    <img
-                      src="https://images.pexels.com/photos/7579831/pexels-photo-7579831.jpeg?auto=compress&cs=tinysrgb&w=600"
-                      alt="Healthcare technology"
-                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-4 pt-12">
-                  <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300 h-80">
-                    <img
-                      src="https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=600"
-                      alt="Medical professional"
-                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="relative rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300 h-64">
-                    <img
-                      src="https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=600"
-                      alt="Modern clinic"
-                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-                </div>
-              </div>
+            <h1 className="mt-8 text-5xl font-bold tracking-tight text-slate-900 sm:text-6xl lg:text-7xl">
+              {t('home.hero.line1')}
+              <span className="block bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent">
+                {t('home.hero.line2')}
+              </span>
+            </h1>
 
-              <div className="absolute -bottom-8 -left-8 bg-white rounded-2xl shadow-hard p-6 animate-bounce-in border border-gray-100 z-20">
-                <div className="flex items-center space-x-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
-                    <Heart className="w-8 h-8 text-white" />
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
+              {t('home.hero.lead')}
+            </p>
+
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+              <button
+                type="button"
+                onClick={() => navigate('/find-doctor')}
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 to-teal-600 px-8 py-4 text-lg font-semibold text-white shadow-xl shadow-cyan-500/20 transition hover:-translate-y-0.5 hover:shadow-2xl"
+              >
+                {t('home.hero.ctaFindDoctor')}
+                <ArrowRight className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/ai-chat')}
+                className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-8 py-4 text-lg font-semibold text-slate-900 shadow-sm transition hover:border-cyan-500 hover:text-cyan-700"
+              >
+                {t('home.hero.ctaAi')}
+              </button>
+            </div>
+
+            <div className="mt-10 flex flex-wrap gap-6 text-sm font-medium text-slate-600">
+              <div className="inline-flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                {t('home.hero.checkBooking')}
+              </div>
+              <div className="inline-flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                {t('home.hero.checkIntake')}
+              </div>
+              <div className="inline-flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                {t('home.hero.checkRecords')}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div className="space-y-5 sm:pt-10">
+              <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
+                <img
+                  src="https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=900"
+                  alt={t('home.hero.altConsultation')}
+                  className="h-64 w-full object-cover"
+                />
+              </div>
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white">
+                    <MessageSquare className="h-7 w-7" />
                   </div>
                   <div>
-                    <p className="text-3xl font-bold text-gray-900">24/7</p>
-                    <p className="text-sm text-gray-600 font-medium">Healthcare Support</p>
+                    <p className="text-2xl font-bold text-slate-900">{t('home.hero.supportValue')}</p>
+                    <p className="text-sm text-slate-600">{t('home.hero.supportCaption')}</p>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <div className="space-y-5">
+              <div className="rounded-3xl border border-slate-200 bg-slate-900 p-6 text-white shadow-xl">
+                <div className="inline-flex rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
+                  {t('home.hero.sideBadge')}
+                </div>
+                <h2 className="mt-5 text-2xl font-semibold">{t('home.hero.sideTitle')}</h2>
+                <p className="mt-3 text-sm leading-6 text-slate-300">
+                  {t('home.hero.sideBody')}
+                </p>
+              </div>
+              <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
+                <img
+                  src="https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=900"
+                  alt={t('home.hero.altDoctorTools')}
+                  className="h-80 w-full object-cover"
+                />
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-16 px-4 bg-gradient-to-r from-ceenai-cyan via-ceenai-blue to-ceenai-navy relative">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div
-                key={index}
-                className="text-center animate-bounce-in"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <stat.icon className="w-12 h-12 text-white/90 mx-auto mb-4" />
-                <p className="text-4xl md:text-5xl font-bold text-white mb-2">{stat.value}</p>
-                <p className="text-ceenai-cyan-light font-medium">{stat.label}</p>
+      <section className="bg-gradient-to-r from-cyan-600 to-teal-600 px-4 py-14 text-white sm:px-6 lg:px-8">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 md:grid-cols-4">
+          {stats.map((stat) => (
+            <div key={stat.labelKey} className="text-center">
+              <div className="text-4xl font-bold md:text-5xl">{t(stat.valueKey)}</div>
+              <div className="mt-2 text-sm font-medium uppercase tracking-[0.16em] text-cyan-100">
+                {t(stat.labelKey)}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </section>
 
-      <section className="py-24 px-4 relative z-10">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16 animate-slide-up">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Everything You Need for Better Health
+      <section id="features" className="bg-white px-4 py-24 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+              {t('home.featureSection.title')}
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Comprehensive healthcare solutions designed for the modern patient
+            <p className="mt-4 text-lg text-slate-600">
+              {t('home.featureSection.lead')}
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => {
+          <div className="mt-16 grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+            {features.map((feature) => {
               const Icon = feature.icon;
 
               return (
                 <button
-                  key={index}
+                  key={feature.titleKey}
+                  type="button"
                   onClick={feature.action}
-                  className="group bg-white rounded-3xl shadow-soft hover:shadow-hard transition-all duration-500 overflow-hidden text-left border border-gray-100 hover:border-ceenai-cyan/50 hover:-translate-y-2 animate-scale-in"
-                  style={{ animationDelay: `${index * 0.1}s` }}
+                  className="group rounded-3xl border border-slate-200 bg-slate-50 p-8 text-left shadow-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:bg-white hover:shadow-xl"
                 >
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={feature.image}
-                      alt={feature.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                    <div className={`absolute bottom-4 left-4 w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
-                      <Icon className="w-7 h-7 text-white" />
-                    </div>
+                  <div className={`inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${feature.color} text-white shadow-lg`}>
+                    <Icon className="h-7 w-7" />
                   </div>
-
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-ceenai-blue transition-colors">
-                      {feature.title}
-                    </h3>
-                    <p className="text-gray-600 leading-relaxed">
-                      {feature.description}
-                    </p>
-                  </div>
+                  <h3 className="mt-6 text-2xl font-semibold text-slate-900 transition group-hover:text-cyan-700">
+                    {t(feature.titleKey)}
+                  </h3>
+                  <p className="mt-3 text-base leading-7 text-slate-600">{t(feature.descriptionKey)}</p>
                 </button>
               );
             })}
@@ -336,133 +308,64 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      <section className="py-24 px-4 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16 animate-slide-up">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Loved by Patients & Doctors
+      <section id="how-it-works" className="bg-gradient-to-b from-slate-50 to-white px-4 py-24 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+              {t('home.howItWorksSection.title')}
             </h2>
-            <p className="text-xl text-gray-600">
-              See what our community has to say
-            </p>
+            <p className="mt-4 text-lg text-slate-600">{t('home.howItWorksSection.lead')}</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-2xl p-8 shadow-soft hover:shadow-medium transition-all duration-300 border border-gray-100 animate-scale-in"
-                style={{ animationDelay: `${index * 0.15}s` }}
-              >
-                <div className="flex items-center mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-gray-700 mb-6 leading-relaxed italic">
-                  "{testimonial.comment}"
-                </p>
-                <div className="flex items-center space-x-4">
-                  <img
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    className="w-14 h-14 rounded-full object-cover ring-2 ring-ceenai-cyan/30"
-                  />
-                  <div>
-                    <p className="font-bold text-gray-900">{testimonial.name}</p>
-                    <p className="text-sm text-gray-500">{testimonial.role}</p>
+          <div className="mt-16 grid gap-10 md:grid-cols-3">
+            {steps.map((step) => {
+              const Icon = step.icon;
+
+              return (
+                <div key={step.stepKey} className="relative">
+                  <div className="mb-5 text-6xl font-bold text-cyan-100">{t(step.stepKey)}</div>
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 text-white">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-semibold text-slate-900">{t(step.titleKey)}</h3>
+                      <p className="mt-2 text-slate-600">{t(step.descriptionKey)}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
-      <section className="py-24 px-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="relative overflow-hidden bg-gradient-to-r from-ceenai-cyan via-ceenai-blue to-ceenai-navy rounded-3xl p-16 text-center shadow-hard">
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse-slow" />
-              <div className="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse-slow" />
-            </div>
-            <div className="relative z-10">
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                Ready to Transform Your Healthcare?
-              </h2>
-              <p className="text-xl text-ceenai-cyan-light mb-10 max-w-2xl mx-auto">
-                Join thousands of patients and healthcare providers using CeenAiX for smarter,
-                faster, and more personalized care.
-              </p>
-              <div className="flex flex-wrap gap-4 justify-center">
-                <button
-                  onClick={() => openRegistration('patient')}
-                  className="px-10 py-4 bg-white text-ceenai-blue hover:bg-gray-50 font-bold rounded-xl transition-all text-lg shadow-xl hover:shadow-2xl hover:scale-105"
-                >
-                  Patient Portal
-                </button>
-                <button
-                  onClick={() => openRegistration('doctor')}
-                  className="px-10 py-4 bg-white/10 backdrop-blur-sm border-2 border-white text-white hover:bg-white/20 font-bold rounded-xl transition-all text-lg"
-                >
-                  Doctor Portal
-                </button>
-              </div>
-            </div>
+      <section className="px-4 py-24 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-5xl overflow-hidden rounded-[2rem] bg-gradient-to-r from-ceenai-cyan via-ceenai-blue to-ceenai-navy px-8 py-16 text-center text-white shadow-2xl sm:px-12">
+          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl">{t('home.cta.title')}</h2>
+          <p className="mx-auto mt-5 max-w-2xl text-lg text-cyan-50">
+            {t('home.cta.lead')}
+          </p>
+          <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
+            <button
+              type="button"
+              onClick={() => openRegistration('patient')}
+              className="rounded-2xl bg-white px-8 py-4 text-lg font-semibold text-ceenai-blue shadow-xl transition hover:-translate-y-0.5 hover:bg-slate-50"
+            >
+              {t('home.cta.patientPortal')}
+            </button>
+            <button
+              type="button"
+              onClick={() => openRegistration('doctor')}
+              className="rounded-2xl border-2 border-white/70 bg-white/10 px-8 py-4 text-lg font-semibold text-white transition hover:bg-white/20"
+            >
+              {t('home.cta.doctorPortal')}
+            </button>
           </div>
         </div>
       </section>
 
-      <footer className="bg-gray-900 text-gray-300 py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <img
-                  src="/ChatGPT_Image_Feb_27,_2026,_11_30_50_AM.png"
-                  alt="CeenAiX Logo"
-                  className="h-10 w-auto"
-                />
-                <span className="text-xl font-bold text-white">CeenAiX</span>
-              </div>
-              <p className="text-gray-400 leading-relaxed">
-                Secure healthcare platform with AI-powered insights
-              </p>
-            </div>
-
-            <div>
-              <h4 className="text-white font-bold mb-4">Services</h4>
-              <ul className="space-y-2">
-                <li><button onClick={() => navigate('/find-doctor')} className="hover:text-ceenai-cyan transition-colors">Find Doctors</button></li>
-                <li><button onClick={() => navigate('/find-clinic')} className="hover:text-ceenai-cyan transition-colors">Find Clinics</button></li>
-                <li><button onClick={() => navigate('/ai-chat')} className="hover:text-ceenai-cyan transition-colors">AI Health Chat</button></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-bold mb-4">Resources</h4>
-              <ul className="space-y-2">
-                <li><button onClick={() => navigate('/health-education')} className="hover:text-ceenai-cyan transition-colors">Health Education</button></li>
-                <li><button onClick={() => navigate('/insurance')} className="hover:text-ceenai-cyan transition-colors">Insurance</button></li>
-                <li><a href="#" className="hover:text-ceenai-cyan transition-colors">Help Center</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-bold mb-4">Contact</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>support@ceenaix.com</li>
-                <li>1-800-CEENAIX</li>
-                <li>Available 24/7</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 pt-8 text-center">
-            <p className="text-sm text-gray-400">© 2026 CeenAiX. DHA-compliant healthcare technology. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

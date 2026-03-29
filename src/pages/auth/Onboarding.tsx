@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight, UserCheck } from 'lucide-react';
 import { AuthShell } from '../../components/AuthShell';
 import { SpecializationMultiSelect } from '../../components/SpecializationMultiSelect';
@@ -60,6 +61,7 @@ const getOnboardingRole = (role: UserRole | null, metadataRole: unknown): UserRo
 };
 
 export const Onboarding = () => {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const { doctorProfile, patientProfile, profile, refreshProfile, role, user } = useAuth();
 
@@ -161,27 +163,27 @@ export const Onboarding = () => {
     setSuccessMessage(null);
 
     if (!user) {
-      setErrorMessage('You must be signed in to complete onboarding.');
+      setErrorMessage(t('auth.onboarding.errors.mustSignIn'));
       return;
     }
 
     if (!form.fullName.trim()) {
-      setErrorMessage('Full name is required.');
+      setErrorMessage(t('auth.onboarding.errors.fullNameRequired'));
       return;
     }
 
     if (!user.email && !form.email.trim()) {
-      setErrorMessage('Email is required when signing up with phone OTP.');
+      setErrorMessage(t('auth.onboarding.errors.emailRequiredOtp'));
       return;
     }
 
     if (!form.termsAccepted) {
-      setErrorMessage('Please accept the terms to complete onboarding.');
+      setErrorMessage(t('auth.onboarding.errors.termsRequired'));
       return;
     }
 
     if (activeRole === 'doctor' && form.selectedSpecializationIds.length === 0) {
-      setErrorMessage('Select at least one specialization to complete doctor onboarding.');
+      setErrorMessage(t('auth.onboarding.errors.specializationRequired'));
       return;
     }
 
@@ -267,23 +269,25 @@ export const Onboarding = () => {
       try {
         await syncDoctorSpecializations(user.id, form.selectedSpecializationIds);
       } catch (error) {
-        setErrorMessage(error instanceof Error ? error.message : 'Failed to save doctor specializations.');
+        setErrorMessage(
+          error instanceof Error ? error.message : t('auth.onboarding.errors.specializationsSaveFailed')
+        );
         setIsSubmitting(false);
         return;
       }
     }
 
     await refreshProfile();
-    setSuccessMessage('Onboarding saved. Redirecting to your dashboard...');
+    setSuccessMessage(t('auth.onboarding.successSaved'));
     setIsSubmitting(false);
     navigate(getDefaultRouteForRole(activeRole), { replace: true });
   };
 
   return (
     <AuthShell
-      badge="Profile Setup"
-      title="Complete your profile"
-      description="Finish the first authenticated setup so CeenAiX can route you to the correct experience and prepare your profile data for future workflows."
+      badge={t('auth.onboarding.badge')}
+      title={t('auth.onboarding.title')}
+      description={t('auth.onboarding.description')}
     >
       {errorMessage ? (
         <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -299,13 +303,13 @@ export const Onboarding = () => {
 
       <form className="space-y-5" onSubmit={handleSubmit}>
         <label className="block space-y-2">
-          <span className="text-sm font-semibold text-gray-700">Full name</span>
+          <span className="text-sm font-semibold text-gray-700">{t('auth.onboarding.fields.fullName')}</span>
           <input
             type="text"
             value={form.fullName}
             onChange={(event) => updateField('fullName', event.target.value)}
             className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-            placeholder="Enter your full name"
+            placeholder={t('auth.onboarding.fields.fullNamePlaceholder')}
             autoComplete="name"
             required
           />
@@ -314,15 +318,15 @@ export const Onboarding = () => {
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="block space-y-2">
             <span className="text-sm font-semibold text-gray-700">
-              Email address
-              {!user?.email ? ' *' : ''}
+              {t('auth.onboarding.fields.email')}
+              {!user?.email ? t('auth.onboarding.fields.emailRequired') : ''}
             </span>
             <input
               type="email"
               value={form.email}
               onChange={(event) => updateField('email', event.target.value)}
               className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-              placeholder="you@example.com"
+              placeholder={t('auth.onboarding.fields.emailPlaceholder')}
               autoComplete="email"
               required={!user?.email}
               disabled={Boolean(user?.email)}
@@ -331,13 +335,13 @@ export const Onboarding = () => {
 
           {!isPhoneManagedByOtp ? (
             <label className="block space-y-2">
-              <span className="text-sm font-semibold text-gray-700">Phone number</span>
+              <span className="text-sm font-semibold text-gray-700">{t('auth.onboarding.fields.phone')}</span>
               <input
                 type="tel"
                 value={form.phone}
                 onChange={(event) => updateField('phone', event.target.value)}
                 className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                placeholder="+971 50 123 4567"
+                placeholder={t('auth.register.mobilePlaceholder')}
                 autoComplete="tel"
               />
             </label>
@@ -345,48 +349,52 @@ export const Onboarding = () => {
         </div>
 
         <label className="block space-y-2">
-          <span className="text-sm font-semibold text-gray-700">City</span>
+          <span className="text-sm font-semibold text-gray-700">{t('auth.onboarding.fields.city')}</span>
           <input
             type="text"
             value={form.city}
             onChange={(event) => updateField('city', event.target.value)}
             className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-            placeholder="Dubai, Abu Dhabi, Sharjah..."
+            placeholder={t('auth.onboarding.fields.cityPlaceholder')}
           />
         </label>
 
         <label className="block space-y-2">
-          <span className="text-sm font-semibold text-gray-700">Address</span>
+          <span className="text-sm font-semibold text-gray-700">{t('auth.onboarding.fields.address')}</span>
           <textarea
             value={form.address}
             onChange={(event) => updateField('address', event.target.value)}
             rows={3}
             className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-            placeholder="Add your preferred address for care coordination"
+            placeholder={t('auth.onboarding.fields.addressPlaceholder')}
           />
         </label>
 
         {activeRole === 'patient' ? (
           <div className="grid gap-5 sm:grid-cols-2">
             <label className="block space-y-2">
-              <span className="text-sm font-semibold text-gray-700">Emergency contact name</span>
+              <span className="text-sm font-semibold text-gray-700">
+                {t('auth.onboarding.fields.emergencyName')}
+              </span>
               <input
                 type="text"
                 value={form.emergencyContactName}
                 onChange={(event) => updateField('emergencyContactName', event.target.value)}
                 className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                placeholder="Who should we contact?"
+                placeholder={t('auth.onboarding.fields.emergencyNamePlaceholder')}
               />
             </label>
 
             <label className="block space-y-2">
-              <span className="text-sm font-semibold text-gray-700">Emergency contact phone</span>
+              <span className="text-sm font-semibold text-gray-700">
+                {t('auth.onboarding.fields.emergencyPhone')}
+              </span>
               <input
                 type="tel"
                 value={form.emergencyContactPhone}
                 onChange={(event) => updateField('emergencyContactPhone', event.target.value)}
                 className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                placeholder="+971 50 000 0000"
+                placeholder={t('auth.onboarding.fields.emergencyPhonePlaceholder')}
               />
             </label>
           </div>
@@ -395,39 +403,42 @@ export const Onboarding = () => {
         {activeRole === 'doctor' ? (
           <>
             <SpecializationMultiSelect
-              label="Specialization"
+              label={t('auth.onboarding.doctor.specialization')}
               options={specializationOptions}
               selectedIds={form.selectedSpecializationIds}
               onChange={(value) => updateField('selectedSpecializationIds', value)}
               loading={specializationsLoading || doctorSpecializationIdsLoading}
+              placeholder={t('auth.onboarding.doctor.specSearchPlaceholder')}
               helperText={
                 specializationsError
-                  ? 'Specializations could not be loaded yet.'
-                  : 'Search and choose one or more specialties. Selected items appear as chips.'
+                  ? t('auth.onboarding.doctor.specHelperError')
+                  : t('auth.onboarding.doctor.specHelperOk')
               }
             />
 
             <div className="grid gap-5 sm:grid-cols-2">
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">License number</span>
+                <span className="text-sm font-semibold text-gray-700">
+                  {t('auth.onboarding.fields.licenseNumber')}
+                </span>
                 <input
                   type="text"
                   value={form.licenseNumber}
                   onChange={(event) => updateField('licenseNumber', event.target.value)}
                   className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                  placeholder="Professional license"
+                  placeholder={t('auth.onboarding.fields.licensePlaceholder')}
                 />
               </label>
             </div>
 
             <label className="block space-y-2">
-              <span className="text-sm font-semibold text-gray-700">Professional bio</span>
+              <span className="text-sm font-semibold text-gray-700">{t('auth.onboarding.fields.bio')}</span>
               <textarea
                 value={form.bio}
                 onChange={(event) => updateField('bio', event.target.value)}
                 rows={4}
                 className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                placeholder="Summarize your expertise and patient care focus"
+                placeholder={t('auth.onboarding.fields.bioPlaceholder')}
               />
             </label>
           </>
@@ -441,7 +452,7 @@ export const Onboarding = () => {
             className="mt-1 h-4 w-4 rounded border-gray-300 text-ceenai-blue focus:ring-ceenai-cyan"
           />
           <span className="text-sm leading-relaxed text-gray-600">
-            I confirm the profile information is accurate and consent to use CeenAiX according to the platform terms.
+            {t('auth.onboarding.fields.termsConfirm')}
           </span>
         </label>
 
@@ -451,7 +462,7 @@ export const Onboarding = () => {
             onClick={() => navigate(getDefaultRouteForRole(activeRole), { replace: true })}
             className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 px-5 py-3 font-semibold text-gray-700 transition hover:border-ceenai-cyan hover:text-ceenai-blue"
           >
-            Skip for now
+            {t('auth.onboarding.buttons.skip')}
           </button>
 
           <button
@@ -460,7 +471,9 @@ export const Onboarding = () => {
             className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <UserCheck className="h-4 w-4" />
-            <span>{isSubmitting ? 'Saving...' : 'Save and continue'}</span>
+            <span>
+              {isSubmitting ? t('auth.onboarding.buttons.saving') : t('auth.onboarding.buttons.save')}
+            </span>
             <ArrowRight className="h-4 w-4" />
           </button>
         </div>

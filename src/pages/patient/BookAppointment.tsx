@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Calendar,
   CalendarDays,
@@ -18,6 +19,7 @@ import { useBookableDoctors, useDoctorBookingAvailability, useQuery, useSpeciali
 import { useAuth } from '../../lib/auth-context';
 import { generateAvailableTimeSlots, type AvailableTimeSlot } from '../../lib/appointment-booking';
 import { supabase } from '../../lib/supabase';
+import { calendarWeekdayShort, dateTimeFormatWithNumerals, formatLocaleDigits, resolveLocale } from '../../lib/i18n-ui';
 
 const getMonthDays = (date: Date) => {
   const year = date.getFullYear();
@@ -58,6 +60,10 @@ interface RescheduleAppointment {
 export const BookAppointment: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { t, i18n } = useTranslation('common');
+  const locale = resolveLocale(i18n.language);
+  const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(i18n.language, options);
+  const weekdayLabels = useMemo(() => calendarWeekdayShort(t), [t]);
   const { user } = useAuth();
   const rescheduleAppointmentId = searchParams.get('reschedule');
   const isRescheduling = Boolean(rescheduleAppointmentId);
@@ -256,8 +262,9 @@ export const BookAppointment: React.FC = () => {
       availabilities: availabilityData.availabilities,
       blockedSlots: availabilityData.blockedSlots,
       appointments: availabilityData.upcomingAppointments,
+      uiLanguage: i18n.language,
     });
-  }, [availabilityData, selectedDate]);
+  }, [availabilityData, i18n.language, selectedDate]);
 
   const selectedSlot =
     availableSlotsForSelectedDate.find((slot) => slot.iso === selectedSlotIso) ?? null;
@@ -277,12 +284,13 @@ export const BookAppointment: React.FC = () => {
         availabilities: availabilityData.availabilities,
         blockedSlots: availabilityData.blockedSlots,
         appointments: availabilityData.upcomingAppointments,
+        uiLanguage: i18n.language,
       });
 
       map.set(date.toDateString(), slots.length);
       return map;
     }, new Map());
-  }, [availabilityData, currentMonth]);
+  }, [availabilityData, currentMonth, i18n.language]);
 
   const handleDoctorSelection = (doctorId: string) => {
     if (isRescheduling) {
@@ -303,17 +311,17 @@ export const BookAppointment: React.FC = () => {
 
   const handleBooking = async () => {
     if (!user || !selectedDoctor || !selectedDate || !selectedSlot) {
-      setFeedback({ type: 'error', message: 'Choose a doctor, date, and time slot before booking.' });
+      setFeedback({ type: 'error', message: t('patient.book.errPickSlot') });
       return;
     }
 
     if (isRescheduling && !rescheduleAppointment) {
-      setFeedback({ type: 'error', message: 'The appointment being rescheduled could not be loaded.' });
+      setFeedback({ type: 'error', message: t('patient.book.errRescheduleLoad') });
       return;
     }
 
     if (!chiefComplaint.trim()) {
-      setFeedback({ type: 'error', message: 'Add the reason for your visit before booking.' });
+      setFeedback({ type: 'error', message: t('patient.book.errReason') });
       return;
     }
 
@@ -379,15 +387,11 @@ export const BookAppointment: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
       <Navigation role="patient" />
       <PageHeader
-        title={isRescheduling ? 'Reschedule Appointment' : 'Book Appointment'}
-        subtitle={
-          isRescheduling
-            ? 'Choose a new slot for your existing visit with the same doctor.'
-            : 'Choose a doctor, pick an available slot, and confirm your visit.'
-        }
+        title={isRescheduling ? t('patient.book.titleReschedule') : t('patient.book.title')}
+        subtitle={isRescheduling ? t('patient.book.subReschedule') : t('patient.book.sub')}
         icon={<CalendarDays className="h-6 w-6 text-white" />}
         backTo="/patient/appointments"
       />
@@ -407,84 +411,84 @@ export const BookAppointment: React.FC = () => {
 
         {doctorsError ? (
           <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Bookable doctors could not be loaded yet.
+            {t('patient.book.doctorsError')}
           </div>
         ) : null}
 
         {specializationsError ? (
           <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Specialties could not be loaded yet.
+            {t('patient.book.specError')}
           </div>
         ) : null}
 
         {rescheduleError ? (
           <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            The appointment to reschedule could not be loaded.
+            {t('patient.book.rescheduleLoadError')}
           </div>
         ) : null}
 
         {availabilityError ? (
           <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Doctor availability could not be loaded yet.
+            {t('patient.book.availabilityError')}
           </div>
         ) : null}
 
         <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           <section className="rounded-2xl bg-white p-6 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900">
-              {isRescheduling ? 'Current Doctor' : 'Choose a Doctor'}
+              {isRescheduling ? t('patient.book.currentDoctor') : t('patient.book.chooseDoctor')}
             </h2>
             <p className="mt-1 text-sm text-gray-600">
-              {isRescheduling
-                ? 'Your rescheduled appointment stays with the same doctor. Pick a new slot on the right.'
-                : 'Only doctors with active schedule availability are shown here.'}
+              {isRescheduling ? t('patient.book.rescheduleDoctorSub') : t('patient.book.chooseDoctorSub')}
             </p>
 
             {isRescheduling && rescheduleAppointment ? (
               <div className="mt-5 rounded-2xl border border-cyan-200 bg-cyan-50 p-4 text-sm text-cyan-900">
-                Current appointment:
-                {' '}
-                {new Date(rescheduleAppointment.scheduled_at).toLocaleString('en-US', {
-                  weekday: 'short',
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                  hour: 'numeric',
-                  minute: '2-digit',
-                })}
+                {t('patient.book.currentAppt')}{' '}
+                {new Date(rescheduleAppointment.scheduled_at).toLocaleString(
+                  locale,
+                  dtOpts({
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                  })
+                )}
               </div>
             ) : (
               <div className="mt-5 grid gap-6 md:grid-cols-[320px_minmax(0,1fr)] md:items-start">
                 <div className="space-y-4">
                   <label className="block space-y-2">
-                    <span className="text-sm font-semibold text-gray-700">Search</span>
+                    <span className="text-sm font-semibold text-gray-700">{t('patient.book.search')}</span>
                     <div className="relative">
                       <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                       <input
                         type="text"
                         value={searchTerm}
                         onChange={(event) => setSearchTerm(event.target.value)}
-                        placeholder="Name, specialty, or city"
+                        placeholder={t('patient.book.searchPh')}
                         className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-11 pr-4 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
                       />
                     </div>
                   </label>
 
                   <SpecializationMultiSelect
-                    label="Specialty"
+                    label={t('patient.book.specialty')}
                     options={specializationOptions}
                     selectedIds={selectedSpecializationIds}
                     onChange={setSelectedSpecializationIds}
                     selectionMode="single"
                     loading={specializationsLoading}
-                    placeholder="Search specialties"
-                    helperText="Leave empty to show all specialties."
+                    placeholder={t('patient.book.specSearchPh')}
+                    helperText={t('patient.book.specHelper')}
                   />
                 </div>
 
                 <div className="min-w-0 space-y-3">
                   <div className="rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3 text-sm text-gray-600">
-                    Matching doctors
+                    {t('patient.book.matching')}
                   </div>
                   <div className="space-y-3">
                     {doctorsLoading || (isRescheduling && rescheduleLoading) ? (
@@ -496,10 +500,8 @@ export const BookAppointment: React.FC = () => {
                     ) : filteredDoctors.length === 0 ? (
                       <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
                         <Stethoscope className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                        <p className="font-semibold text-gray-900">No doctors match your filters</p>
-                        <p className="mt-1 text-sm text-gray-600">
-                          Adjust the search or specialty filter to see available doctors.
-                        </p>
+                        <p className="font-semibold text-gray-900">{t('patient.book.noDoctors')}</p>
+                        <p className="mt-1 text-sm text-gray-600">{t('patient.book.noDoctorsSub')}</p>
                       </div>
                     ) : (
                       filteredDoctors.map((doctor) => {
@@ -519,14 +521,16 @@ export const BookAppointment: React.FC = () => {
                               <div>
                                 <p className="text-lg font-semibold text-gray-900">{doctor.fullName}</p>
                                 <p className="mt-1 text-sm text-cyan-700">
-                                  {doctor.specialty ?? 'General practice'}
+                                  {doctor.specialty ?? t('shared.generalPractice')}
                                 </p>
                                 <p className="mt-2 text-sm text-gray-600">
-                                  {[doctor.city, doctor.address].filter(Boolean).join(' • ') || 'Clinic location to be confirmed'}
+                                  {[doctor.city, doctor.address].filter(Boolean).join(' • ') || t('shared.clinicTbd')}
                                 </p>
                               </div>
                               <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm">
-                                {doctor.activeAvailabilityCount} window{doctor.activeAvailabilityCount === 1 ? '' : 's'}
+                                {doctor.activeAvailabilityCount === 1
+                                  ? t('shared.windowOne', { count: doctor.activeAvailabilityCount })
+                                  : t('shared.windowMany', { count: doctor.activeAvailabilityCount })}
                               </span>
                             </div>
                           </button>
@@ -549,10 +553,8 @@ export const BookAppointment: React.FC = () => {
                 ) : filteredDoctors.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
                     <Stethoscope className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                    <p className="font-semibold text-gray-900">No doctors match your filters</p>
-                    <p className="mt-1 text-sm text-gray-600">
-                      Adjust the search or specialty filter to see available doctors.
-                    </p>
+                    <p className="font-semibold text-gray-900">{t('patient.book.noDoctors')}</p>
+                    <p className="mt-1 text-sm text-gray-600">{t('patient.book.noDoctorsSub')}</p>
                   </div>
                 ) : (
                   filteredDoctors.map((doctor) => {
@@ -572,14 +574,16 @@ export const BookAppointment: React.FC = () => {
                           <div>
                             <p className="text-lg font-semibold text-gray-900">{doctor.fullName}</p>
                             <p className="mt-1 text-sm text-cyan-700">
-                              {doctor.specialty ?? 'General practice'}
+                              {doctor.specialty ?? t('shared.generalPractice')}
                             </p>
                             <p className="mt-2 text-sm text-gray-600">
-                              {[doctor.city, doctor.address].filter(Boolean).join(' • ') || 'Clinic location to be confirmed'}
+                              {[doctor.city, doctor.address].filter(Boolean).join(' • ') || t('shared.clinicTbd')}
                             </p>
                           </div>
                           <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm">
-                            {doctor.activeAvailabilityCount} window{doctor.activeAvailabilityCount === 1 ? '' : 's'}
+                            {doctor.activeAvailabilityCount === 1
+                              ? t('shared.windowOne', { count: doctor.activeAvailabilityCount })
+                              : t('shared.windowMany', { count: doctor.activeAvailabilityCount })}
                           </span>
                         </div>
                       </button>
@@ -591,29 +595,27 @@ export const BookAppointment: React.FC = () => {
           </section>
 
           <section className="rounded-2xl bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-gray-900">Pick a Slot</h2>
-            <p className="mt-1 text-sm text-gray-600">
-              Booking currently supports in-person visits against the doctor&apos;s published schedule.
-            </p>
+            <h2 className="text-xl font-bold text-gray-900">{t('patient.book.pickSlot')}</h2>
+            <p className="mt-1 text-sm text-gray-600">{t('patient.book.pickSlotSub')}</p>
 
             {!selectedDoctor ? (
               <div className="mt-6 rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
                 <Calendar className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                <p className="font-semibold text-gray-900">Choose a doctor first</p>
-                <p className="mt-1 text-sm text-gray-600">
-                  Available dates and time slots will appear here after you select a doctor.
-                </p>
+                <p className="font-semibold text-gray-900">{t('patient.book.chooseDoctorFirst')}</p>
+                <p className="mt-1 text-sm text-gray-600">{t('patient.book.chooseDoctorFirstSub')}</p>
               </div>
             ) : (
               <>
                 <div className="mt-6 rounded-2xl bg-cyan-50 p-4">
                   <p className="text-lg font-semibold text-gray-900">{selectedDoctor.fullName}</p>
-                  <p className="mt-1 text-sm text-cyan-700">{selectedDoctor.specialty ?? 'General practice'}</p>
+                  <p className="mt-1 text-sm text-cyan-700">
+                    {selectedDoctor.specialty ?? t('shared.generalPractice')}
+                  </p>
                   <p className="mt-2 text-sm text-gray-600 flex items-center gap-2">
                     <MapPin className="h-4 w-4" />
                     <span>
                       {[selectedDoctor.city, selectedDoctor.address].filter(Boolean).join(' • ') ||
-                        'Clinic details will be confirmed after booking'}
+                        t('shared.clinicAfterBooking')}
                     </span>
                   </p>
                 </div>
@@ -638,7 +640,7 @@ export const BookAppointment: React.FC = () => {
                         <ChevronLeft className="h-5 w-5 text-gray-700" />
                       </button>
                       <h3 className="font-semibold text-gray-900">
-                        {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                        {currentMonth.toLocaleDateString(locale, dtOpts({ month: 'long', year: 'numeric' }))}
                       </h3>
                       <button
                         type="button"
@@ -655,7 +657,7 @@ export const BookAppointment: React.FC = () => {
 
                     <div className="mt-4 rounded-2xl border border-gray-200 p-4">
                       <div className="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-gray-500">
-                        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((label) => (
+                        {weekdayLabels.map((label) => (
                           <div key={label} className="py-2">
                             {label}
                           </div>
@@ -686,7 +688,7 @@ export const BookAppointment: React.FC = () => {
                                     : 'border-gray-100 bg-gray-50 text-gray-300'
                               }`}
                             >
-                              {date.getDate()}
+                              {formatLocaleDigits(date.getDate(), i18n.language)}
                             </button>
                           );
                         })}
@@ -694,18 +696,21 @@ export const BookAppointment: React.FC = () => {
                     </div>
 
                     <div className="mt-6">
-                      <h3 className="font-semibold text-gray-900">Available time slots</h3>
+                      <h3 className="font-semibold text-gray-900">{t('patient.book.slotsTitle')}</h3>
                       {selectedDate ? (
                         <p className="mt-1 text-sm text-gray-600">
-                          {selectedDate.toLocaleDateString('en-US', {
-                            weekday: 'long',
-                            month: 'long',
-                            day: 'numeric',
-                            year: 'numeric',
-                          })}
+                          {selectedDate.toLocaleDateString(
+                            locale,
+                            dtOpts({
+                              weekday: 'long',
+                              month: 'long',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })
+                          )}
                         </p>
                       ) : (
-                        <p className="mt-1 text-sm text-gray-600">Select a date to see available appointment times.</p>
+                        <p className="mt-1 text-sm text-gray-600">{t('patient.book.selectDateHint')}</p>
                       )}
 
                       <div className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -727,10 +732,8 @@ export const BookAppointment: React.FC = () => {
                         ) : (
                           <div className="sm:col-span-3 lg:col-span-4 rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
                             <Clock className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                            <p className="font-semibold text-gray-900">No open slots for this date</p>
-                            <p className="mt-1 text-sm text-gray-600">
-                              Try another day with active schedule availability.
-                            </p>
+                            <p className="font-semibold text-gray-900">{t('patient.book.noSlots')}</p>
+                            <p className="mt-1 text-sm text-gray-600">{t('patient.book.noSlotsSub')}</p>
                           </div>
                         )}
                       </div>
@@ -738,35 +741,46 @@ export const BookAppointment: React.FC = () => {
 
                     <div className="mt-6 space-y-4">
                       <label className="block space-y-2">
-                        <span className="text-sm font-semibold text-gray-700">Reason for visit</span>
+                        <span className="text-sm font-semibold text-gray-700">{t('patient.book.reasonLabel')}</span>
                         <textarea
                           value={chiefComplaint}
                           onChange={(event) => setChiefComplaint(event.target.value)}
                           rows={4}
                           className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
-                          placeholder="Describe your main concern or symptoms"
+                          placeholder={t('patient.book.reasonPh')}
                         />
                       </label>
 
                       <label className="block space-y-2">
-                        <span className="text-sm font-semibold text-gray-700">Additional notes</span>
+                        <span className="text-sm font-semibold text-gray-700">{t('patient.book.notesLabel')}</span>
                         <textarea
                           value={notes}
                           onChange={(event) => setNotes(event.target.value)}
                           rows={3}
                           className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
-                          placeholder="Optional context to share before the visit"
+                          placeholder={t('patient.book.notesPh')}
                         />
                       </label>
                     </div>
 
                     <div className="mt-6 rounded-2xl bg-gray-50 p-4">
                       <p className="text-sm font-semibold text-gray-900">
-                        {isRescheduling ? 'Reschedule summary' : 'Booking summary'}
+                        {isRescheduling ? t('patient.book.summaryReschedule') : t('patient.book.summaryBook')}
                       </p>
                       <p className="mt-2 text-sm text-gray-600">
                         {selectedDoctor.fullName}
-                        {selectedSlot ? ` • ${new Date(selectedSlot.iso).toLocaleString()}` : ' • Select a date and time'}
+                        {selectedSlot
+                          ? ` • ${new Date(selectedSlot.iso).toLocaleString(
+                              locale,
+                              dtOpts({
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                                hour: 'numeric',
+                                minute: '2-digit',
+                              })
+                            )}`
+                          : ` • ${t('patient.book.selectDateTime')}`}
                       </p>
                     </div>
 
@@ -776,23 +790,23 @@ export const BookAppointment: React.FC = () => {
                         onClick={() => navigate('/patient/appointments')}
                         className="rounded-xl border border-gray-200 px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
                       >
-                        Cancel
+                        {t('patient.book.cancel')}
                       </button>
                       <button
                         type="button"
                         onClick={handleBooking}
                         disabled={isSubmitting || !selectedSlot || !chiefComplaint.trim()}
-                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-5 py-3 font-semibold text-white shadow-md transition hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan px-5 py-3 font-semibold text-white shadow-md transition hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         <Calendar className="h-4 w-4" />
                         <span>
                           {isSubmitting
                             ? isRescheduling
-                              ? 'Rescheduling...'
-                              : 'Booking...'
+                              ? t('patient.book.rescheduling')
+                              : t('patient.book.booking')
                             : isRescheduling
-                              ? 'Confirm reschedule'
-                              : 'Confirm appointment'}
+                              ? t('patient.book.confirmReschedule')
+                              : t('patient.book.confirmBook')}
                         </span>
                       </button>
                     </div>
