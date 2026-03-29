@@ -10,6 +10,7 @@ import {
 } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import type { Session, User } from '@supabase/supabase-js';
+import { clearPreviewAccess } from './preview-access';
 import { supabase } from './supabase';
 import type { DoctorProfile, PatientProfile, UserProfile, UserRole } from '../types';
 
@@ -389,9 +390,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
       if (!active) {
         return;
+      }
+
+      if (event === 'SIGNED_OUT') {
+        clearPreviewAccess();
       }
 
       void syncSession(nextSession);
