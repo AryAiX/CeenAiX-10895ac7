@@ -531,5 +531,13 @@
     "deletingAccount": "Deleting account...",
     "errorTypeDelete": "Type DELETE to confirm account deletion.",
     "confirmDeleteDialog": "Delete this account now? This cannot be undone. Accounts with clinical or shared care data cannot self-delete."
+  },
+  "previewPinGate": {
+    "title": "Preview access",
+    "subtitle": "This environment is not public yet. Enter the access code to continue.",
+    "pinLabel": "Access code",
+    "continue": "Continue",
+    "invalidPin": "That code is not valid. Try again.",
+    "footerNote": "You will stay signed in to this preview until you log out of your account or close this browser tab."
   }
 }
