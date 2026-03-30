@@ -6,7 +6,7 @@ Scope: UX refresh merge (Arabic/RTL), bilingual prescription display, locale num
 
 ## Executive Summary
 
-For the week of 2026-03-23, CeenAiX absorbed the approved **ideav2** visual system across public, auth, patient, and doctor surfaces while keeping **behavior and canonical data paths unchanged**. Arabic is now a first-class UI language with **RTL document layout**, shared chrome translated, and **Eastern Arabic–Indic numerals** applied to dashboard and prescription counts where the product already had English-only digits.
+For the week of 2026-03-29, CeenAiX absorbed the approved **ideav2** visual system across public, auth, patient, and doctor surfaces while keeping **behavior and canonical data paths unchanged**. Arabic is now a first-class UI language with **RTL document layout**, shared chrome translated, and **Eastern Arabic–Indic numerals** applied to dashboard and prescription counts where the product already had English-only digits.
 
 The platform also gained **database-backed bilingual vocabulary** for common prescription **frequency and duration** labels, plus an optional **Arabic medication display name** column that pairs with the canonical Latin/English INN on patient prescriptions and the patient dashboard. **Guest** `/ai-chat` is fully internationalized for shell copy and the opening assistant message; **clinicians** who open that route no longer see the patient “Find Doctors” call-to-action, with a clear path back to the **doctor portal**.
 
