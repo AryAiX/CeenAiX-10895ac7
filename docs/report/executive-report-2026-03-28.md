@@ -10,8 +10,6 @@ For the week of 2026-03-23, CeenAiX absorbed the approved **ideav2** visual syst
 
 The platform also gained **database-backed bilingual vocabulary** for common prescription **frequency and duration** labels, plus an optional **Arabic medication display name** column that pairs with the canonical Latin/English INN on patient prescriptions and the patient dashboard. **Guest** `/ai-chat` is fully internationalized for shell copy and the opening assistant message; **clinicians** who open that route no longer see the patient “Find Doctors” call-to-action, with a clear path back to the **doctor portal**.
 
-Schema documentation and checklist entries (**UX-1 through UX-14**) were updated to reflect this delivery; two Supabase migrations were added for `prescription_clinical_vocab`, `prescription_items.frequency_code` / `duration_code`, and `prescription_items.medication_name_ar`.
-
 ## What We Accomplished
 
 ### 1. Merged the ideav2 UX refresh without functional drift
@@ -44,11 +42,6 @@ Schema documentation and checklist entries (**UX-1 through UX-14**) were updated
 
 - Moved guest **`/ai-chat`** marketing and chrome strings into **`public.guestAiChat`** (English and Arabic); welcome message and chips follow **language changes** until the user starts a thread.
 - When **`role === 'doctor'`**, hid the patient **“Find Doctors”** strip and replaced the signup promo with **clinician-oriented** copy and a link to **`/doctor/dashboard`**. Rule-based bot replies remain English until the public route is aligned with **AI-04** (Edge Function).
-
-### 6. Engineering hygiene
-
-- Fixed a corrupted markdown separator in **`CHECKLIST.md`** and appended **UX-12–UX-14** rows.
-- Landed migrations in repo; remote database was brought forward via documented Supabase workflow where applicable.
 
 ## Business Impact
 
