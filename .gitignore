@@ -25,3 +25,7 @@ dist-ssr
 .vercel
 .env*.local
 docs/keys.local.md
+
+# Generated SQL chunks/bundles (scripts/split-migrations-for-remote.mjs)
+supabase/.temp/migration-chunk-*.sql
+supabase/.temp/bundle-*.sql
