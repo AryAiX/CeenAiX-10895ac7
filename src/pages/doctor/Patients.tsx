@@ -1,102 +1,83 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Users, Search, Calendar } from 'lucide-react';
+import { Users, Search, Calendar, ArrowRight, HeartPulse, MessageSquare } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
 import { Skeleton } from '../../components/Skeleton';
-import { useAppointments, useQuery } from '../../hooks';
+import { useDoctorPatients } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
-import { dateTimeFormatWithNumerals, formatLocaleDigits, resolveLocale } from '../../lib/i18n-ui';
-import { supabase } from '../../lib/supabase';
+import { dateTimeFormatWithNumerals, resolveLocale } from '../../lib/i18n-ui';
 
 export const DoctorPatients: React.FC = () => {
-  const { i18n } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
+  const navigate = useNavigate();
   const locale = resolveLocale(i18n.language);
   const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(i18n.language, options);
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const {
-    data: appointments = [],
-    loading,
-    error,
-  } = useAppointments({ role: 'doctor', userId: user?.id ?? '' });
-  const safeAppointments = useMemo(() => appointments ?? [], [appointments]);
+  const { data, loading, error } = useDoctorPatients(user?.id);
+  const rawPatients = useMemo(() => data ?? [], [data]);
 
-  const patientIds = useMemo(
-    () => Array.from(new Set(safeAppointments.map((appointment) => appointment.patient_id))),
-    [safeAppointments]
-  );
+  const filteredPatients = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    if (!normalizedQuery) {
+      return rawPatients;
+    }
 
-  const { data: patientProfiles = [] } = useQuery(
-    async () => {
-      if (patientIds.length === 0) {
-        return [];
-      }
+    return rawPatients.filter((patient) =>
+      [
+        patient.name,
+        patient.email ?? '',
+        patient.phone ?? '',
+        patient.bloodType ?? '',
+        patient.latestChiefComplaint ?? '',
+      ]
+        .join(' ')
+        .toLowerCase()
+        .includes(normalizedQuery)
+    );
+  }, [rawPatients, searchQuery]);
 
-      const { data, error: patientProfilesError } = await supabase
-        .from('user_profiles')
-        .select('user_id, full_name, email, phone')
-        .in('user_id', patientIds);
+  const renderConcern = (value: string | null) => {
+    if (!value?.trim()) {
+      return t('doctor.patients.noRecentConcern');
+    }
 
-      if (patientProfilesError) throw patientProfilesError;
-      return data ?? [];
-    },
-    [patientIds.join(',')]
-  );
-  const safePatientProfiles = useMemo(() => patientProfiles ?? [], [patientProfiles]);
-
-  const patients = useMemo(() => {
-    return safePatientProfiles
-      .map((profile) => {
-        const patientAppointments = safeAppointments.filter(
-          (appointment) => appointment.patient_id === profile.user_id
-        );
-        const sortedAppointments = [...patientAppointments].sort((a, b) =>
-          a.scheduled_at.localeCompare(b.scheduled_at)
-        );
-        const nextAppointment =
-          sortedAppointments.find((appointment) => new Date(appointment.scheduled_at).getTime() >= Date.now()) ??
-          null;
-        const lastAppointment =
-          [...sortedAppointments]
-            .reverse()
-            .find((appointment) => new Date(appointment.scheduled_at).getTime() < Date.now()) ?? null;
-
-        return {
-          id: profile.user_id,
-          name: profile.full_name ?? 'Patient',
-          email: profile.email ?? 'Not provided',
-          phone: profile.phone ?? 'Not provided',
-          nextAppointment: nextAppointment?.scheduled_at ?? null,
-          lastAppointment: lastAppointment?.scheduled_at ?? null,
-          totalAppointments: patientAppointments.length,
-        };
-      })
-      .filter((patient) => patient.name.toLowerCase().includes(searchQuery.trim().toLowerCase()));
-  }, [safeAppointments, safePatientProfiles, searchQuery]);
+    return i18n.language.startsWith('ar') ? (
+      <span dir="ltr" className="block text-start" translate="no">
+        {value}
+      </span>
+    ) : (
+      value
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
       <Navigation role="doctor" />
       <PageHeader
-        title="Patients"
-        subtitle="Manage your patient records"
+        title={t('doctor.patients.title')}
+        subtitle={t('doctor.patients.subtitle')}
         icon={<Users className="w-6 h-6 text-white" />}
         backTo="/doctor/dashboard"
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-4">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 rtl:left-auto rtl:right-4" />
               <input
                 type="text"
-                placeholder="Search patients by name..."
+                placeholder={t('doctor.patients.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 font-medium"
+                className="w-full rounded-xl border-2 border-gray-200 py-3 pl-12 pr-4 font-medium transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 rtl:pl-4 rtl:pr-12"
               />
+            </div>
+            <div className="hidden rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm md:block">
+              {t('doctor.patients.count', { count: filteredPatients.length })}
             </div>
           </div>
         </div>
@@ -108,19 +89,19 @@ export const DoctorPatients: React.FC = () => {
           </div>
         ) : error ? (
           <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Doctor patients could not be loaded yet.
+            {t('doctor.patients.loadError')}
           </div>
-        ) : patients.length === 0 ? (
+        ) : filteredPatients.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center shadow-sm">
             <Users className="mx-auto mb-4 h-10 w-10 text-gray-400" />
-            <h3 className="text-xl font-bold text-gray-900">No patients connected yet</h3>
+            <h3 className="text-xl font-bold text-gray-900">{t('doctor.patients.emptyTitle')}</h3>
             <p className="mt-2 text-sm text-gray-600">
-              This page no longer shows sample patients. Real patient relationships will appear here after appointments are created.
+              {t('doctor.patients.emptyBody')}
             </p>
           </div>
         ) : (
           <div className="grid gap-6">
-            {patients.map((patient) => (
+            {filteredPatients.map((patient) => (
               <div
                 key={patient.id}
                 className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg transition-all duration-200 hover:shadow-xl"
@@ -138,21 +119,21 @@ export const DoctorPatients: React.FC = () => {
                     <div>
                       <h3 className="text-lg font-bold text-white">{patient.name}</h3>
                       <p className="text-sm text-white/90">
-                        {formatLocaleDigits(patient.totalAppointments, i18n.language)} linked appointments
+                        {t('doctor.patients.linkedAppointments', { count: patient.totalAppointments })}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="grid gap-6 p-6 md:grid-cols-3">
+                <div className="grid gap-6 p-6 md:grid-cols-4">
                   <div>
-                    <h4 className="mb-2 text-sm font-semibold text-gray-700">Contact</h4>
-                    <p className="text-sm text-gray-600">{patient.phone}</p>
-                    <p className="mt-1 text-sm text-gray-600">{patient.email}</p>
+                    <h4 className="mb-2 text-sm font-semibold text-gray-700">{t('doctor.patients.contact')}</h4>
+                    <p className="text-sm text-gray-600">{patient.phone ?? t('doctor.patients.notProvided')}</p>
+                    <p className="mt-1 text-sm text-gray-600">{patient.email ?? t('doctor.patients.notProvided')}</p>
                   </div>
 
                   <div>
-                    <h4 className="mb-2 text-sm font-semibold text-gray-700">Last Appointment</h4>
+                    <h4 className="mb-2 text-sm font-semibold text-gray-700">{t('doctor.patients.lastAppointment')}</h4>
                     <p className="text-sm text-gray-600">
                       {patient.lastAppointment
                         ? new Date(patient.lastAppointment).toLocaleString(
@@ -166,12 +147,12 @@ export const DoctorPatients: React.FC = () => {
                               minute: '2-digit',
                             })
                           )
-                        : 'No completed visits yet'}
+                        : t('doctor.patients.noCompletedVisits')}
                     </p>
                   </div>
 
                   <div>
-                    <h4 className="mb-2 text-sm font-semibold text-gray-700">Next Appointment</h4>
+                    <h4 className="mb-2 text-sm font-semibold text-gray-700">{t('doctor.patients.nextAppointment')}</h4>
                     <div className="flex items-start space-x-2 text-sm text-gray-600">
                       <Calendar className="mt-0.5 h-4 w-4 text-gray-400" />
                       <span>
@@ -187,14 +168,48 @@ export const DoctorPatients: React.FC = () => {
                                 minute: '2-digit',
                               })
                             )
-                          : 'No future appointment scheduled'}
+                          : t('doctor.patients.noFutureVisits')}
                       </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="mb-2 text-sm font-semibold text-gray-700">{t('doctor.patients.bloodType')}</h4>
+                    <div className="flex items-start gap-2 text-sm text-gray-600">
+                      <HeartPulse className="mt-0.5 h-4 w-4 text-rose-400" />
+                      <span>{patient.bloodType ?? t('doctor.patients.notProvided')}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="border-t border-gray-100 px-6 py-4 text-sm text-gray-500">
-                  Patient detail and record views will use this live list once the doctor patient detail route is connected.
+                <div className="border-t border-gray-100 px-6 py-4">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        {t('doctor.patients.recentConcern')}
+                      </p>
+                      <p className="mt-1 text-sm text-gray-600">{renderConcern(patient.latestChiefComplaint)}</p>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/doctor/messages?patient=${patient.id}`)}
+                        className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100"
+                      >
+                        <MessageSquare className="h-4 w-4" />
+                        <span>{t('doctor.messages.messagePatient')}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => navigate('/doctor/appointments')}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-teal-200 hover:bg-teal-50 hover:text-teal-800"
+                      >
+                        {t('doctor.patients.viewAppointments')}
+                        <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-sm text-gray-500">{t('doctor.patients.footerHint')}</p>
                 </div>
               </div>
             ))}

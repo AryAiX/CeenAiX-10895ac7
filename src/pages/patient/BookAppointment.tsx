@@ -66,6 +66,8 @@ export const BookAppointment: React.FC = () => {
   const weekdayLabels = useMemo(() => calendarWeekdayShort(t), [t]);
   const { user } = useAuth();
   const rescheduleAppointmentId = searchParams.get('reschedule');
+  const requestedDoctorId = searchParams.get('doctor');
+  const requestSource = searchParams.get('source');
   const isRescheduling = Boolean(rescheduleAppointmentId);
   const {
     data: doctorsData,
@@ -95,6 +97,15 @@ export const BookAppointment: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [didInitializeReschedule, setDidInitializeReschedule] = useState(false);
   const [didInitializeAiPrefill, setDidInitializeAiPrefill] = useState(false);
+
+  const isDoctorSelectionLocked = useMemo(
+    () =>
+      !isRescheduling &&
+      requestSource === 'message' &&
+      Boolean(requestedDoctorId) &&
+      doctors.some((doctor) => doctor.userId === requestedDoctorId),
+    [doctors, isRescheduling, requestSource, requestedDoctorId]
+  );
 
   const {
     data: rescheduleAppointment,
@@ -132,7 +143,6 @@ export const BookAppointment: React.FC = () => {
       return;
     }
 
-    const requestedDoctorId = searchParams.get('doctor');
     if (requestedDoctorId && doctors.some((doctor) => doctor.userId === requestedDoctorId)) {
       setSelectedDoctorId(requestedDoctorId);
       return;
@@ -143,7 +153,7 @@ export const BookAppointment: React.FC = () => {
     }
 
     setSelectedDoctorId(doctors[0]?.userId ?? null);
-  }, [doctors, isRescheduling, searchParams, searchTerm, selectedDoctorId, selectedSpecializationIds]);
+  }, [doctors, isRescheduling, requestedDoctorId, searchTerm, selectedDoctorId, selectedSpecializationIds]);
 
   useEffect(() => {
     if (isRescheduling || didInitializeAiPrefill) {
@@ -179,6 +189,7 @@ export const BookAppointment: React.FC = () => {
     didInitializeAiPrefill,
     isRescheduling,
     notes,
+    requestedDoctorId,
     searchParams,
     specializationsLoading,
     specializationOptions,
@@ -212,6 +223,10 @@ export const BookAppointment: React.FC = () => {
   const filteredDoctors = useMemo(
     () =>
       doctors.filter((doctor) => {
+        if (isDoctorSelectionLocked) {
+          return doctor.userId === requestedDoctorId;
+        }
+
         if (isRescheduling) {
           if (!rescheduleAppointment) {
             return false;
@@ -235,7 +250,15 @@ export const BookAppointment: React.FC = () => {
 
         return matchesSearch && matchesSpecialty;
       }),
-    [doctors, isRescheduling, rescheduleAppointment, searchTerm, selectedSpecializationIds]
+    [
+      doctors,
+      isDoctorSelectionLocked,
+      isRescheduling,
+      requestedDoctorId,
+      rescheduleAppointment,
+      searchTerm,
+      selectedSpecializationIds,
+    ]
   );
 
   useEffect(() => {
@@ -293,7 +316,7 @@ export const BookAppointment: React.FC = () => {
   }, [availabilityData, currentMonth, i18n.language]);
 
   const handleDoctorSelection = (doctorId: string) => {
-    if (isRescheduling) {
+    if (isRescheduling || isDoctorSelectionLocked) {
       return;
     }
 
@@ -436,10 +459,16 @@ export const BookAppointment: React.FC = () => {
         <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           <section className="rounded-2xl bg-white p-6 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900">
-              {isRescheduling ? t('patient.book.currentDoctor') : t('patient.book.chooseDoctor')}
+              {isRescheduling || isDoctorSelectionLocked
+                ? t('patient.book.currentDoctor')
+                : t('patient.book.chooseDoctor')}
             </h2>
             <p className="mt-1 text-sm text-gray-600">
-              {isRescheduling ? t('patient.book.rescheduleDoctorSub') : t('patient.book.chooseDoctorSub')}
+              {isRescheduling
+                ? t('patient.book.rescheduleDoctorSub')
+                : isDoctorSelectionLocked
+                  ? t('patient.book.messageDoctorSub')
+                  : t('patient.book.chooseDoctorSub')}
             </p>
 
             {isRescheduling && rescheduleAppointment ? (
@@ -455,6 +484,38 @@ export const BookAppointment: React.FC = () => {
                     hour: 'numeric',
                     minute: '2-digit',
                   })
+                )}
+              </div>
+            ) : isDoctorSelectionLocked ? (
+              <div className="mt-6 space-y-3">
+                {doctorsLoading ? (
+                  <Skeleton className="h-28 w-full rounded-2xl" />
+                ) : selectedDoctor ? (
+                  <div className="w-full rounded-2xl border border-cyan-400 bg-cyan-50 p-4 text-left shadow-sm">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="text-lg font-semibold text-gray-900">{selectedDoctor.fullName}</p>
+                        <p className="mt-1 text-sm text-cyan-700">
+                          {selectedDoctor.specialty ?? t('shared.generalPractice')}
+                        </p>
+                        <p className="mt-2 text-sm text-gray-600">
+                          {[selectedDoctor.city, selectedDoctor.address].filter(Boolean).join(' • ') ||
+                            t('shared.clinicTbd')}
+                        </p>
+                      </div>
+                      <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm">
+                        {selectedDoctor.activeAvailabilityCount === 1
+                          ? t('shared.windowOne', { count: selectedDoctor.activeAvailabilityCount })
+                          : t('shared.windowMany', { count: selectedDoctor.activeAvailabilityCount })}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
+                    <Stethoscope className="mx-auto mb-3 h-8 w-8 text-gray-400" />
+                    <p className="font-semibold text-gray-900">{t('patient.book.noDoctors')}</p>
+                    <p className="mt-1 text-sm text-gray-600">{t('patient.book.noDoctorsSub')}</p>
+                  </div>
                 )}
               </div>
             ) : (

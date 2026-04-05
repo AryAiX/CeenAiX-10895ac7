@@ -139,6 +139,10 @@ export const router = createBrowserRouter([
     element: withProtection(<PatientMessages />, ['patient']),
   },
   {
+    path: '/patient/messages/:conversationId',
+    element: withProtection(<PatientMessages />, ['patient']),
+  },
+  {
     path: '/patient/profile',
     element: withProtection(<PatientProfile />, ['patient']),
   },
@@ -164,6 +168,10 @@ export const router = createBrowserRouter([
   },
   {
     path: '/doctor/messages',
+    element: withProtection(<DoctorMessages />, ['doctor']),
+  },
+  {
+    path: '/doctor/messages/:conversationId',
     element: withProtection(<DoctorMessages />, ['doctor']),
   },
   {

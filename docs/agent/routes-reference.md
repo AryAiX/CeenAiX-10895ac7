@@ -49,8 +49,8 @@
 | `/patient/lab-results` | PatientLabResults | not-started | lab_orders + lab_order_items (patient_id = me) |
 | `/patient/lab-results/:id` | LabResultDetail | not-started | Single lab order |
 | `/patient/prescriptions` | PatientPrescriptions | live | Reads canonical `prescriptions` + `prescription_items` and joins prescribing doctor details from `user_profiles` + `doctor_profiles` |
-| `/patient/messages` | PatientMessages | ui-only | Static conversation list; needs wiring to conversations, messages |
-| `/patient/messages/:id` | ConversationDetail | not-started | Single conversation |
+| `/patient/messages` | PatientMessages | live | Secure inbox backed by canonical `conversations` + `messages`; supports patient compose entry from appointments and prescriptions |
+| `/patient/messages/:id` | ConversationDetail | live | Route-driven conversation detail inside the same live messaging workspace |
 | `/patient/notifications` | NotificationCenter | not-started | notifications (user_id = me) |
 | `/patient/emergency-profile` | EmergencyProfile | not-started | patient_profiles emergency fields |
 | `/patient/profile` | PatientProfile | ui-only | Local state only; needs wiring to user_profiles, patient_profiles, patient_insurance |
@@ -59,18 +59,18 @@
 
 | Route | Component | Code Status | Key Data |
 |---|---|---|---|
-| `/doctor/dashboard` | DoctorDashboard | ui-only | All zeros; needs aggregated queries |
-| `/doctor/patients` | DoctorPatients | ui-only | Static list; needs query via appointments join |
+| `/doctor/dashboard` | DoctorDashboard | live | Aggregates canonical `appointments`, `consultation_notes`, `appointment_pre_visit_assessments`, `conversations`, and `messages`; shows live totals, next appointment, and today's patient queue |
+| `/doctor/patients` | DoctorPatients | live | Builds the linked patient list from canonical `appointments`, joining `user_profiles` + `patient_profiles` for contact and profile context |
 | `/doctor/patients/:id` | PatientDetail | not-started | Patient's full health record |
 | `/doctor/appointments` | DoctorAppointments | live | Reads canonical `appointments`; surfaces patient-provided reason/notes plus appointment-linked pre-visit intake status and AI summary when available |
 | `/doctor/appointments/:id` | DoctorAppointmentDetail | not-started | Appointment + notes |
-| `/doctor/prescriptions` | DoctorPrescriptions | ui-only | Empty state; needs Supabase query |
+| `/doctor/prescriptions` | DoctorPrescriptions | live | Reads canonical `prescriptions` + `prescription_items`, joining patient identity from `user_profiles`; supports doctor-side search and active/history filtering |
 | `/doctor/prescriptions/new` | CreatePrescription | not-started | Creates prescription + items |
 | `/doctor/lab-orders` | DoctorLabOrders | not-started | lab_orders (doctor_id = me) |
 | `/doctor/lab-orders/new` | CreateLabOrder | not-started | Creates lab_order + items |
 | `/doctor/schedule` | DoctorSchedule | live | doctor_availability, blocked_slots |
-| `/doctor/messages` | DoctorMessages | ui-only | Empty state; needs wiring |
-| `/doctor/messages/:id` | ConversationDetail | not-started | Single conversation |
+| `/doctor/messages` | DoctorMessages | live | Secure inbox backed by canonical `conversations` + `messages`; supports doctor compose entry from patients and prescriptions |
+| `/doctor/messages/:id` | ConversationDetail | live | Route-driven conversation detail inside the same live messaging workspace |
 | `/doctor/notifications` | NotificationCenter | not-started | notifications (user_id = me) |
 | `/doctor/profile` | DoctorProfile | live | Queries `user_profiles` + `doctor_profiles`; also manages doctor pre-visit template authoring with PDF upload, AI draft extraction, question review, and publish |
 
