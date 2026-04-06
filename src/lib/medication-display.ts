@@ -1,6 +1,72 @@
 import type { TFunction } from 'i18next';
 import { formatLocaleDecimal, formatLocaleDigits } from './i18n-ui';
 
+const DOSAGE_UNIT_TO_KEY: Record<string, string> = {
+  mg: 'medUnitMg',
+  mcg: 'medUnitMcg',
+  g: 'medUnitG',
+  gm: 'medUnitG',
+  gram: 'medUnitG',
+  grams: 'medUnitG',
+  ml: 'medUnitMl',
+  l: 'medUnitL',
+  meq: 'medUnitMeq',
+  mmol: 'medUnitMmol',
+  iu: 'medUnitIu',
+  unit: 'medUnitUnit',
+  units: 'medUnitUnits',
+  unt: 'medUnitUnit',
+};
+
+const DOSAGE_UNIT_CANONICAL: Record<string, string> = {
+  mg: 'MG',
+  mcg: 'MCG',
+  g: 'G',
+  gm: 'G',
+  gram: 'G',
+  grams: 'G',
+  ml: 'ML',
+  l: 'L',
+  meq: 'MEQ',
+  mmol: 'MMOL',
+  iu: 'IU',
+  unit: 'UNIT',
+  units: 'UNITS',
+  unt: 'UNIT',
+  'ملغ': 'MG',
+  'مغ': 'MG',
+  'مكغ': 'MCG',
+  'ميكروغرام': 'MCG',
+  'غ': 'G',
+  'غم': 'G',
+  'جرام': 'G',
+  'غرام': 'G',
+  'مل': 'ML',
+  'ل': 'L',
+  'مكافئ': 'MEQ',
+  'ميلي مكافئ': 'MEQ',
+  'مليمول': 'MMOL',
+  'وحدة': 'UNIT',
+  'وحدات': 'UNITS',
+  'دولية': 'IU',
+};
+
+const DOSAGE_UNIT_PATTERN =
+  /(^|[^A-Za-z\u0600-\u06FF])(mg|mcg|g|gm|gram|grams|ml|l|meq|mmol|iu|units?|unt|ملغ|مغ|مكغ|ميكروغرام|غ|غم|جرام|غرام|مل|ل|مكافئ|ميلي مكافئ|مليمول|وحدة|وحدات|دولية)(?=$|[^A-Za-z\u0600-\u06FF])/giu;
+
+const ARABIC_INDIC_TO_WESTERN: Record<string, string> = {
+  '٠': '0',
+  '١': '1',
+  '٢': '2',
+  '٣': '3',
+  '٤': '4',
+  '٥': '5',
+  '٦': '6',
+  '٧': '7',
+  '٨': '8',
+  '٩': '9',
+};
+
 const FREQUENCY_KEY: Record<string, string> = {
   'once daily': 'onceDaily',
   'twice daily': 'twiceDaily',
@@ -40,23 +106,65 @@ function translateDuration(t: TFunction, language: string, raw: string): string 
   return null;
 }
 
-function translateDosage(t: TFunction, language: string, raw: string): string | null {
-  const m = raw.trim().match(/^([\d.]+)\s*(mg|mcg|g|ml)$/i);
-  if (!m) return null;
-  const num = parseFloat(m[1]);
-  const unit = m[2].toLowerCase();
-  const unitKey =
-    unit === 'mg'
-      ? 'medUnitMg'
-      : unit === 'mcg'
-        ? 'medUnitMcg'
-        : unit === 'g'
-          ? 'medUnitG'
-          : 'medUnitMl';
-  const numStr = Number.isInteger(num)
-    ? formatLocaleDigits(num, language)
-    : formatLocaleDecimal(num, language, 1);
-  return `${numStr}\u00A0${t(`patient.dashboard.${unitKey}`)}`;
+const normalizeAsciiDigits = (value: string) =>
+  value
+    .replace(/[٠-٩]/g, (digit) => ARABIC_INDIC_TO_WESTERN[digit] ?? digit)
+    .replace(/٫/g, '.')
+    .replace(/،/g, ',');
+
+const localizeNumericToken = (value: string, language: string) => {
+  const normalized = normalizeAsciiDigits(value);
+  const numericValue = Number.parseFloat(normalized);
+
+  if (Number.isNaN(numericValue)) {
+    return value;
+  }
+
+  const fractionalPart = normalized.split('.')[1] ?? '';
+  return fractionalPart.length > 0
+    ? formatLocaleDecimal(numericValue, language, fractionalPart.length)
+    : formatLocaleDigits(numericValue, language);
+};
+
+export function normalizeMedicationDosageValue(raw: string): string {
+  const normalizedDigits = normalizeAsciiDigits(raw).replace(/\s*\/\s*/g, '/');
+
+  return normalizedDigits
+    .replace(DOSAGE_UNIT_PATTERN, (_match, prefix: string, unit: string) => {
+      const normalizedUnit = DOSAGE_UNIT_CANONICAL[unit.trim().toLowerCase()] ?? DOSAGE_UNIT_CANONICAL[unit.trim()] ?? unit;
+      return `${prefix}${normalizedUnit}`;
+    })
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+export function localizeMedicationDosageValue(
+  t: TFunction,
+  language: string,
+  raw: string | null | undefined
+): string | null {
+  if (!raw) {
+    return null;
+  }
+
+  const normalized = normalizeMedicationDosageValue(raw);
+
+  if (!language.startsWith('ar')) {
+    return normalized;
+  }
+
+  const digitsLocalized = normalized.replace(/\d+(?:\.\d+)?/g, (token) =>
+    localizeNumericToken(token, language)
+  );
+
+  return digitsLocalized.replace(DOSAGE_UNIT_PATTERN, (match, prefix: string, unit: string) => {
+    const key = DOSAGE_UNIT_TO_KEY[unit.trim().toLowerCase()];
+    if (!key) {
+      return match;
+    }
+
+    return `${prefix}${t(`patient.dashboard.${key}`)}`;
+  });
 }
 
 export type MedicationDetailParts = {
@@ -69,6 +177,8 @@ export type MedicationDetailParts = {
   frequencyFromVocab?: string | null;
   /** When set, skips client duration parsing */
   durationFromVocab?: string | null;
+  /** Optional explicit fallback when no dosage/frequency/duration values exist */
+  emptyFallback?: string | null;
 };
 
 /** Dashboard prescription reminder line: dosage • frequency • duration */
@@ -79,7 +189,7 @@ export const formatMedicationDetailLine = (
 ): string => {
   const parts: string[] = [];
   if (row.dosage) {
-    parts.push(translateDosage(t, language, row.dosage) ?? row.dosage);
+    parts.push(localizeMedicationDosageValue(t, language, row.dosage) ?? row.dosage);
   }
   if (row.frequencyFromVocab) {
     parts.push(row.frequencyFromVocab);
@@ -97,6 +207,9 @@ export const formatMedicationDetailLine = (
   const fallbackEn = 'Active prescription';
   if (row.detail && row.detail !== fallbackEn) {
     return row.detail;
+  }
+  if (row.emptyFallback !== undefined) {
+    return row.emptyFallback ?? '';
   }
   return t('patient.dashboard.medActiveFallback');
 };

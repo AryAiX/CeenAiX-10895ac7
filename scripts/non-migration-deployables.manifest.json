@@ -1,0 +1,53 @@
+{
+  "deployables": [
+    {
+      "id": "supabase-edge-function-ai-chat",
+      "type": "supabase-edge-function",
+      "name": "ai-chat",
+      "path": "supabase/functions/ai-chat",
+      "deployCommand": [
+        "supabase",
+        "functions",
+        "deploy",
+        "ai-chat",
+        "--no-verify-jwt"
+      ],
+      "requiredSecrets": [
+        "OPENAI_API_KEY"
+      ],
+      "notes": "Authenticated patient AI chat and retrieval-backed guidance."
+    },
+    {
+      "id": "supabase-edge-function-ai-document-analyze",
+      "type": "supabase-edge-function",
+      "name": "ai-document-analyze",
+      "path": "supabase/functions/ai-document-analyze",
+      "deployCommand": [
+        "supabase",
+        "functions",
+        "deploy",
+        "ai-document-analyze",
+        "--no-verify-jwt"
+      ],
+      "requiredSecrets": [
+        "OPENAI_API_KEY"
+      ],
+      "notes": "Doctor questionnaire PDF extraction and patient pre-visit summary generation."
+    },
+    {
+      "id": "supabase-edge-function-medication-enrich",
+      "type": "supabase-edge-function",
+      "name": "medication-enrich",
+      "path": "supabase/functions/medication-enrich",
+      "deployCommand": [
+        "supabase",
+        "functions",
+        "deploy",
+        "medication-enrich",
+        "--no-verify-jwt"
+      ],
+      "requiredSecrets": [],
+      "notes": "Authenticated RxNorm-backed medication catalog enrichment for prescribing metadata."
+    }
+  ]
+}

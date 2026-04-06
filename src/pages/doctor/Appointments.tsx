@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Calendar, CalendarDays, ChevronLeft, ChevronRight, ClipboardList, Clock, List, MapPin, User, Video } from 'lucide-react';
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
@@ -48,6 +49,7 @@ const formatDateKey = (date: Date) => {
 
 export const DoctorAppointments: React.FC = () => {
   const { t, i18n } = useTranslation('common');
+  const navigate = useNavigate();
   const uiLang = i18n.language ?? 'en';
   const locale = resolveLocale(uiLang);
   const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(uiLang, options);
@@ -628,8 +630,15 @@ export const DoctorAppointments: React.FC = () => {
                             </div>
                           ) : null}
 
-                          {canCancel ? (
-                            <div className="mt-4 flex flex-wrap gap-3 border-t border-gray-100 pt-4">
+                          <div className="mt-4 flex flex-wrap gap-3 border-t border-gray-100 pt-4">
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/doctor/appointments/${appointment.id}`)}
+                              className="rounded-xl border border-cyan-200 px-4 py-2 text-sm font-semibold text-cyan-800 transition hover:bg-cyan-50"
+                            >
+                              {t('doctor.appointmentDetail.openDetail')}
+                            </button>
+                            {canCancel ? (
                               <button
                                 type="button"
                                 onClick={() => handleCancelAppointment(appointment.id)}
@@ -640,8 +649,8 @@ export const DoctorAppointments: React.FC = () => {
                                   ? t('doctor.appointments.cancelling')
                                   : t('doctor.appointments.cancel')}
                               </button>
-                            </div>
-                          ) : null}
+                            ) : null}
+                          </div>
 
                           <div className="mt-4 flex items-center space-x-2 border-t border-gray-100 pt-4 text-sm text-gray-600">
                             <User className="h-4 w-4" />

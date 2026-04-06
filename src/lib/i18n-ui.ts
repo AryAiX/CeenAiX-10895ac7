@@ -39,6 +39,12 @@ export const prescriptionStatusLabel = (t: TFunction, status: string) => {
   return label === key ? status.replace(/_/g, ' ') : label;
 };
 
+export const labOrderStatusLabel = (t: TFunction, status: string) => {
+  const key = `shared.labOrderStatus.${status}`;
+  const label = t(key);
+  return label === key ? status.replace(/_/g, ' ') : label;
+};
+
 export const calendarWeekdayShort = (t: TFunction) =>
   [
     t('shared.weekdays.sun'),
@@ -63,6 +69,25 @@ export const dateTimeFormatWithNumerals = (
   ...(options ?? {}),
   ...(usesArabicEasternNumerals(language) ? { numberingSystem: 'arab' as const } : {}),
 });
+
+export const appointmentPickerLabel = (language: string, scheduledAt: string): string => {
+  const date = new Date(scheduledAt);
+
+  try {
+    return new Intl.DateTimeFormat(
+      resolveLocale(language),
+      dateTimeFormatWithNumerals(language, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+      })
+    ).format(date);
+  } catch {
+    return date.toLocaleString(resolveLocale(language));
+  }
+};
 
 /** Format integers for display (calendar day numbers, counts in JSX, etc.) */
 export const formatLocaleDigits = (value: number, language: string): string => {

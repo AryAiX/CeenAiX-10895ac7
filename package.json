@@ -10,7 +10,10 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "deploy:edge:functions": "node scripts/deploy-edge-functions.mjs",
+    "sync:medication-catalog": "node scripts/sync-medication-catalog.mjs",
+    "sync:lab-test-catalog": "node scripts/sync-lab-test-catalog.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",

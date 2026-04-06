@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { AlertCircle, Calendar, ClipboardList, Clock, MapPin, Plus, User } from 'lucide-react';
+import { AlertCircle, Calendar, ClipboardList, Clock, MapPin, MessageSquare, Plus, User } from 'lucide-react';
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
 import { Skeleton } from '../../components/Skeleton';
@@ -268,6 +268,14 @@ export const PatientAppointments: React.FC = () => {
             <div className="mt-4 flex flex-wrap gap-3">
               <button
                 type="button"
+                onClick={() => navigate(`/patient/messages?doctor=${appointment.doctor_id}`)}
+                className="inline-flex items-center gap-2 rounded-xl border border-cyan-200 px-4 py-2 text-sm font-semibold text-cyan-700 transition hover:bg-cyan-50"
+              >
+                <MessageSquare className="h-4 w-4" />
+                <span>{t('patient.messages.messageDoctor')}</span>
+              </button>
+              <button
+                type="button"
                 onClick={() => navigate('/patient/appointments/book')}
                 className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
               >
@@ -292,7 +300,18 @@ export const PatientAppointments: React.FC = () => {
                   : t('patient.appointments.cancel')}
               </button>
             </div>
-          ) : null}
+          ) : (
+            <div className="mt-4 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => navigate(`/patient/messages?doctor=${appointment.doctor_id}`)}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-800"
+              >
+                <MessageSquare className="h-4 w-4" />
+                <span>{t('patient.messages.followUpDoctor')}</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );

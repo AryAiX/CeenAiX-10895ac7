@@ -1,11 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import {
   AlertCircle,
   Bell,
   Calendar,
   CheckCircle,
   Clock,
+  MessageSquare,
   Package,
   Pill,
   Search,
@@ -21,9 +23,11 @@ import {
   prescriptionStatusLabel,
   resolveLocale,
 } from '../../lib/i18n-ui';
+import { formatMedicationDetailLine } from '../../lib/medication-display';
 
 export const PatientPrescriptions: React.FC = () => {
   const { t, i18n } = useTranslation('common');
+  const navigate = useNavigate();
   const uiLang = i18n.language ?? 'en';
   const locale = resolveLocale(uiLang);
   const formatDate = (value: string) =>
@@ -348,6 +352,14 @@ export const PatientPrescriptions: React.FC = () => {
                             </div>
                           </div>
                           <div className="flex flex-wrap items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/patient/messages?doctor=${prescription.doctor_id}`)}
+                              className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-xs font-bold text-white transition hover:bg-white/20"
+                            >
+                              <MessageSquare className="h-3.5 w-3.5" />
+                              <span>{t('patient.messages.messagePrescriber')}</span>
+                            </button>
                             {pendingItems > 0 ? (
                               <span className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-bold">
                                 {t('patient.prescriptions.pendingPickupBadge', {
@@ -412,7 +424,13 @@ export const PatientPrescriptions: React.FC = () => {
                                     />
                                   </h4>
                                   <p className="mt-1 text-sm text-gray-600">
-                                    {[item.dosage, item.frequency, item.duration].filter(Boolean).join(' • ') ||
+                                    {formatMedicationDetailLine(t, uiLang, {
+                                      dosage: item.dosage,
+                                      frequency: item.frequency,
+                                      duration: item.duration,
+                                      detail: '',
+                                      emptyFallback: t('patient.prescriptions.dosagePending'),
+                                    }) ||
                                       t('patient.prescriptions.dosagePending')}
                                   </p>
                                 </div>
@@ -529,6 +547,14 @@ export const PatientPrescriptions: React.FC = () => {
                     </div>
 
                     <div className="mt-4 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/patient/messages?doctor=${prescription.doctor_id}`)}
+                        className="inline-flex items-center gap-2 rounded-full border border-cyan-200 px-3 py-1 text-xs font-semibold text-cyan-700 transition hover:bg-cyan-50"
+                      >
+                        <MessageSquare className="h-3.5 w-3.5" />
+                        <span>{t('patient.messages.messagePrescriber')}</span>
+                      </button>
                       {prescription.items.map((item) => (
                         <span
                           key={item.id}

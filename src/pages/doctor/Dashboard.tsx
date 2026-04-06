@@ -11,6 +11,7 @@ import {
   appointmentTypeLabel,
   dateTimeFormatWithNumerals,
   formatLocaleDigits,
+  preVisitStatusLabel,
   resolveLocale,
 } from '../../lib/i18n-ui';
 
@@ -35,13 +36,29 @@ export const DoctorDashboard: React.FC = () => {
       { labelKey: 'nav.schedule', href: '/doctor/schedule' },
       { labelKey: 'nav.patients', href: '/doctor/patients' },
       { labelKey: 'nav.prescriptions', href: '/doctor/prescriptions' },
+      { labelKey: 'doctor.labOrders.title', href: '/doctor/lab-orders' },
       { labelKey: 'nav.messages', href: '/doctor/messages' },
+      { labelKey: 'doctor.notifications.title', href: '/doctor/notifications' },
       { labelKey: 'nav.profile', href: '/doctor/profile' },
     ],
     []
   );
 
   const displayName = getDisplayName(profile?.full_name, profile?.first_name) || t('shared.doctor');
+
+  const renderComplaint = (value: string | null | undefined, emptyLabel: string) => {
+    if (!value?.trim()) {
+      return emptyLabel;
+    }
+
+    return uiLang.startsWith('ar') ? (
+      <span dir="ltr" className="block text-start" translate="no">
+        {value}
+      </span>
+    ) : (
+      value
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
@@ -150,7 +167,7 @@ export const DoctorDashboard: React.FC = () => {
                 <div className="rounded-2xl bg-gradient-to-r from-slate-900 to-emerald-800 p-6 text-white">
                   <p className="text-lg font-bold">{data.nextAppointment.patientName}</p>
                   <p className="mt-1 text-sm text-white/85">
-                    {data.nextAppointment.chiefComplaint ?? t('shared.scheduledConsultation')}
+                    {renderComplaint(data.nextAppointment.chiefComplaint, t('shared.scheduledConsultation'))}
                   </p>
                   <div className="mt-4 flex flex-wrap gap-3 text-sm">
                     <span className="rounded-full bg-white/15 px-3 py-1">
@@ -174,6 +191,15 @@ export const DoctorDashboard: React.FC = () => {
                     <span className="rounded-full bg-white/15 px-3 py-1 capitalize">
                       {appointmentStatusLabel(t, data.nextAppointment.status)}
                     </span>
+                  </div>
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/doctor/appointments/${data.nextAppointment?.id}`)}
+                      className="rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
+                    >
+                      {t('doctor.appointmentDetail.openDetail')}
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -203,6 +229,97 @@ export const DoctorDashboard: React.FC = () => {
                 ))}
               </div>
             </div>
+          </div>
+
+          <div className="mt-8 rounded-2xl bg-white p-6 shadow">
+            <div className="mb-5 flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">{t('doctor.dashboard.todayQueue')}</h2>
+                <p className="mt-1 text-sm text-gray-600">{t('doctor.dashboard.todayQueueSub')}</p>
+              </div>
+              <button
+                onClick={() => navigate('/doctor/appointments')}
+                className="text-sm font-semibold text-teal-700 transition hover:text-teal-800"
+              >
+                {t('nav.appointments')}
+              </button>
+            </div>
+
+            {loading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-24 w-full rounded-2xl" />
+                <Skeleton className="h-24 w-full rounded-2xl" />
+              </div>
+            ) : data && data.todayQueue.length > 0 ? (
+              <div className="space-y-4">
+                {data.todayQueue.map((appointment) => (
+                  <div
+                    key={appointment.id}
+                    className="rounded-2xl border border-slate-200 bg-slate-50 p-5 transition hover:border-emerald-200 hover:bg-emerald-50/40"
+                  >
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <p className="text-lg font-semibold text-slate-900">{appointment.patientName}</p>
+                          <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase text-slate-700 shadow-sm">
+                            {appointmentStatusLabel(t, appointment.status)}
+                          </span>
+                          <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase text-slate-700 shadow-sm">
+                            {appointmentTypeLabel(t, appointment.type)}
+                          </span>
+                          {appointment.preVisitStatus ? (
+                            <span className="rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-900">
+                              {t('doctor.dashboard.preVisitLabel')}:{' '}
+                              {preVisitStatusLabel(t, appointment.preVisitStatus)}
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="mt-2 text-sm text-slate-600">
+                          {renderComplaint(appointment.chiefComplaint, t('doctor.dashboard.noChiefComplaint'))}
+                        </p>
+                      </div>
+
+                      <div className="shrink-0 rounded-2xl bg-white px-4 py-3 text-sm shadow-sm">
+                        <p className="font-semibold text-slate-900">
+                          {new Date(appointment.scheduledAt).toLocaleTimeString(
+                            locale,
+                            dtOpts({
+                              hour: 'numeric',
+                              minute: '2-digit',
+                            })
+                          )}
+                        </p>
+                        <p className="mt-1 text-slate-500">
+                          {new Date(appointment.scheduledAt).toLocaleDateString(
+                            locale,
+                            dtOpts({
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric',
+                            })
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/doctor/appointments/${appointment.id}`)}
+                        className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-200 hover:bg-emerald-50"
+                      >
+                        {t('doctor.appointmentDetail.openDetail')}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
+                <Users className="mx-auto mb-3 h-8 w-8 text-gray-400" />
+                <p className="font-semibold text-gray-900">{t('doctor.dashboard.noQueueTitle')}</p>
+                <p className="mt-2 text-sm text-gray-600">{t('doctor.dashboard.noQueueBody')}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

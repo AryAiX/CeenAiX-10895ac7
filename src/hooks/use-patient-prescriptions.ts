@@ -1,4 +1,8 @@
 import { supabase } from '../lib/supabase';
+import {
+  hydratePrescriptionItemsWithCatalog,
+  loadMedicationCatalogRowsForPrescriptionItems,
+} from '../lib/medication-catalog';
 import type { Prescription, PrescriptionItem } from '../types';
 import { useQuery } from './use-query';
 
@@ -65,9 +69,14 @@ export function usePatientPrescriptions(userId: string | null | undefined) {
       throw doctorProfilesError;
     }
 
+    const hydratedPrescriptionItems = hydratePrescriptionItemsWithCatalog(
+      (prescriptionItems ?? []) as PrescriptionItem[],
+      await loadMedicationCatalogRowsForPrescriptionItems((prescriptionItems ?? []) as PrescriptionItem[])
+    );
+
     const itemsByPrescriptionId = new Map<string, PrescriptionItem[]>();
 
-    for (const item of prescriptionItems ?? []) {
+    for (const item of hydratedPrescriptionItems) {
       const existingItems = itemsByPrescriptionId.get(item.prescription_id) ?? [];
       existingItems.push(item);
       itemsByPrescriptionId.set(item.prescription_id, existingItems);
