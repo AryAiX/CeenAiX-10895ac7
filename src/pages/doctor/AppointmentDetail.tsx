@@ -15,6 +15,7 @@ import {
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
 import { Skeleton } from '../../components/Skeleton';
+import { LabTestNameDisplay } from '../../components/LabTestNameDisplay';
 import { useDoctorAppointmentDetail } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
 import { supabase } from '../../lib/supabase';
@@ -519,7 +520,27 @@ export const DoctorAppointmentDetail: React.FC = () => {
                       data.labOrders.map((labOrder) => (
                         <div key={labOrder.id} className="rounded-xl bg-white px-3 py-3">
                           <p className="font-semibold text-slate-900">{labOrderStatusLabel(t, labOrder.status)}</p>
-                          <p className="mt-1 text-xs text-slate-500">{labOrder.items.map((item) => item.test_name).join(', ')}</p>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {labOrder.items.map((item) => (
+                              <span
+                                key={item.id}
+                                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-700"
+                              >
+                                <LabTestNameDisplay
+                                  canonicalName={item.test_name}
+                                  localizedName={item.test_name_ar}
+                                  language={uiLang}
+                                  variant="compact"
+                                  primaryClassName="text-xs font-medium text-slate-700"
+                                />
+                                {item.lab_test_catalog_suggestion_id ? (
+                                  <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-800">
+                                    {t('doctor.createLabOrder.pendingBadge')}
+                                  </span>
+                                ) : null}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       ))
                     ) : (

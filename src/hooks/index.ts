@@ -15,6 +15,7 @@ export { useDoctorPrescriptions } from './use-doctor-prescriptions';
 export { useDoctorLabOrders } from './use-doctor-lab-orders';
 export { useDoctorNotifications } from './use-doctor-notifications';
 export { useMedicationCatalogSearch } from './use-medication-catalog-search';
+export { useLabTestCatalogSearch } from './use-lab-test-catalog-search';
 export { useDoctorSchedule } from './use-doctor-schedule';
 export { useBookableDoctors } from './use-bookable-doctors';
 export { useDoctorBookingAvailability } from './use-doctor-booking-availability';

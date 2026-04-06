@@ -7,6 +7,9 @@ import type {
   MedicationCatalogSource,
   MedicationCatalogSuggestionType,
   MedicationCatalogSuggestionStatus,
+  LabTestCatalogSource,
+  LabTestCatalogSuggestionType,
+  LabTestCatalogSuggestionStatus,
   LabOrderStatus,
   ConditionStatus,
   AllergySeverity,
@@ -183,6 +186,43 @@ export interface MedicationCatalogSuggestion extends BaseRecord {
   reviewed_at: string | null;
 }
 
+export interface LabTestCatalog extends BaseRecord {
+  source: LabTestCatalogSource;
+  source_code: string | null;
+  loinc_class: string | null;
+  category: string | null;
+  display_name_en: string;
+  display_name_ar: string | null;
+  short_name_en: string | null;
+  specimen: string | null;
+  property: string | null;
+  is_panel: boolean;
+  is_active: boolean;
+  is_custom: boolean;
+  source_updated_at: string | null;
+  last_synced_at: string | null;
+}
+
+export interface LabTestCatalogSuggestion extends BaseRecord {
+  lab_test_catalog_id: string | null;
+  approved_lab_test_catalog_id: string | null;
+  suggestion_type: LabTestCatalogSuggestionType;
+  status: LabTestCatalogSuggestionStatus;
+  proposed_source_code: string | null;
+  proposed_display_name_en: string | null;
+  proposed_display_name_ar: string | null;
+  proposed_short_name_en: string | null;
+  proposed_specimen: string | null;
+  proposed_property: string | null;
+  proposed_category: string | null;
+  proposed_loinc_class: string | null;
+  proposed_is_panel: boolean;
+  review_notes: string | null;
+  created_by: string;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+}
+
 export interface LabOrder extends BaseRecord, SoftDeletable {
   patient_id: string;
   doctor_id: string;
@@ -193,7 +233,10 @@ export interface LabOrder extends BaseRecord, SoftDeletable {
 
 export interface LabOrderItem extends BaseRecord {
   lab_order_id: string;
+  lab_test_catalog_id?: string | null;
+  lab_test_catalog_suggestion_id?: string | null;
   test_name: string;
+  test_name_ar?: string | null;
   test_code: string | null;
   status: LabOrderStatus;
   result_value: string | null;

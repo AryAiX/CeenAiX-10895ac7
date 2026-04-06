@@ -25,6 +25,7 @@ import {
   normalizeMedicationDosageValue,
 } from '../../lib/medication-display';
 import { enrichMedicationCatalogEntry } from '../../lib/medication-enrichment';
+import { appointmentPickerLabel } from '../../lib/i18n-ui';
 import { resolveClinicalVocabLabel, type PrescriptionClinicalVocabRow } from '../../lib/prescription-vocab';
 import { supabase } from '../../lib/supabase';
 
@@ -840,6 +841,10 @@ export const CreatePrescription: React.FC = () => {
     [vocabRows]
   );
   const appointments = useMemo(() => appointmentsData ?? [], [appointmentsData]);
+  const selectedAppointment = useMemo(
+    () => appointments.find((appointment) => appointment.id === appointmentId) ?? null,
+    [appointmentId, appointments]
+  );
 
   const updateItem = (id: string, nextState: Partial<DraftPrescriptionItem>) => {
     setItems((current) =>
@@ -996,13 +1001,23 @@ export const CreatePrescription: React.FC = () => {
                 <option value="">{t('doctor.createPrescription.selectAppointment')}</option>
                 {appointments.map((appointment) => (
                   <option key={appointment.id} value={appointment.id}>
-                    {new Date(appointment.scheduled_at).toLocaleString(
-                      i18n.language.startsWith('ar') ? 'ar-AE' : 'en-US'
-                    )}
-                    {appointment.chief_complaint ? ` • ${appointment.chief_complaint}` : ''}
+                    {appointmentPickerLabel(i18n.language, appointment.scheduled_at)}
                   </option>
                 ))}
               </select>
+              {selectedAppointment ? (
+                <div className="mt-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+                  <p className="font-semibold text-slate-900">
+                    {t('doctor.createPrescription.appointmentPreview')}
+                  </p>
+                  <p className="mt-1 text-sm font-medium text-slate-800">
+                    {appointmentPickerLabel(i18n.language, selectedAppointment.scheduled_at)}
+                  </p>
+                  <p className="mt-1 break-words text-xs text-slate-600" dir="auto">
+                    {selectedAppointment.chief_complaint?.trim() || t('doctor.appointments.noReason')}
+                  </p>
+                </div>
+              ) : null}
             </label>
 
             <label className="block">

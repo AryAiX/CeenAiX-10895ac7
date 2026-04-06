@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { MessageSquare, Plus, Search, TestTube2 } from 'lucide-react';
+import { LabTestNameDisplay } from '../../components/LabTestNameDisplay';
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
 import { Skeleton } from '../../components/Skeleton';
@@ -37,7 +38,7 @@ export const DoctorLabOrders: React.FC = () => {
           labOrder.patientName,
           labOrder.patientEmail,
           labOrder.status,
-          ...labOrder.items.map((item) => `${item.test_name} ${item.test_code ?? ''}`),
+          ...labOrder.items.map((item) => `${item.test_name} ${item.test_name_ar ?? ''} ${item.test_code ?? ''}`),
         ]
           .filter(Boolean)
           .join(' ')
@@ -209,11 +210,24 @@ export const DoctorLabOrders: React.FC = () => {
                   <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                     {labOrder.items.map((item) => (
                       <div key={item.id} className="rounded-2xl bg-slate-50 p-4">
-                        <p className="font-semibold text-slate-900">{item.test_name}</p>
+                        <LabTestNameDisplay
+                          canonicalName={item.test_name}
+                          localizedName={item.test_name_ar}
+                          language={uiLang}
+                          primaryClassName="font-semibold text-slate-900"
+                          secondaryClassName="mt-0.5 text-xs text-slate-500"
+                        />
                         <p className="mt-1 text-xs text-slate-500">{item.test_code ?? t('doctor.labOrders.noCode')}</p>
-                        <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                          {labOrderStatusLabel(t, item.status)}
-                        </p>
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            {labOrderStatusLabel(t, item.status)}
+                          </p>
+                          {item.lab_test_catalog_suggestion_id ? (
+                            <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+                              {t('doctor.createLabOrder.pendingBadge')}
+                            </span>
+                          ) : null}
+                        </div>
                       </div>
                     ))}
                   </div>

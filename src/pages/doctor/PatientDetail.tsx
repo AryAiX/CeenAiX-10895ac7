@@ -14,6 +14,7 @@ import {
 import { Navigation } from '../../components/Navigation';
 import { PageHeader } from '../../components/PageHeader';
 import { Skeleton } from '../../components/Skeleton';
+import { LabTestNameDisplay } from '../../components/LabTestNameDisplay';
 import { MedicationNameDisplay } from '../../components/MedicationNameDisplay';
 import { useDoctorPatientDetail } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
@@ -422,9 +423,20 @@ export const DoctorPatientDetail: React.FC = () => {
                           {labOrder.items.map((item) => (
                             <span
                               key={item.id}
-                              className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                             >
-                              {item.test_name}
+                              <LabTestNameDisplay
+                                canonicalName={item.test_name}
+                                localizedName={item.test_name_ar}
+                                language={uiLang}
+                                variant="compact"
+                                primaryClassName="text-xs font-medium text-slate-700"
+                              />
+                              {item.lab_test_catalog_suggestion_id ? (
+                                <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-800">
+                                  {t('doctor.createLabOrder.pendingBadge')}
+                                </span>
+                              ) : null}
                             </span>
                           ))}
                         </div>

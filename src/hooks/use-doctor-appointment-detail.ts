@@ -19,6 +19,11 @@ import {
   hydratePrescriptionItemsWithCatalog,
   loadMedicationCatalogRowsForPrescriptionItems,
 } from '../lib/medication-catalog';
+import {
+  hydrateLabOrderItemsWithCatalog,
+  loadLabTestCatalogRowsForLabOrderItems,
+  loadLabTestCatalogSuggestionRowsForLabOrderItems,
+} from '../lib/lab-test-catalog';
 
 export interface DoctorAppointmentPrescription extends Prescription {
   items: PrescriptionItem[];
@@ -183,6 +188,11 @@ export function useDoctorAppointmentDetail(
       (prescriptionItems ?? []) as PrescriptionItem[],
       await loadMedicationCatalogRowsForPrescriptionItems((prescriptionItems ?? []) as PrescriptionItem[])
     );
+    const hydratedLabOrderItems = hydrateLabOrderItemsWithCatalog(
+      (labOrderItems ?? []) as LabOrderItem[],
+      await loadLabTestCatalogRowsForLabOrderItems((labOrderItems ?? []) as LabOrderItem[]),
+      await loadLabTestCatalogSuggestionRowsForLabOrderItems((labOrderItems ?? []) as LabOrderItem[])
+    );
 
     const prescriptionItemsByPrescriptionId = new Map<string, PrescriptionItem[]>();
     for (const item of hydratedPrescriptionItems) {
@@ -192,7 +202,7 @@ export function useDoctorAppointmentDetail(
     }
 
     const labOrderItemsByLabOrderId = new Map<string, LabOrderItem[]>();
-    for (const item of (labOrderItems ?? []) as LabOrderItem[]) {
+    for (const item of hydratedLabOrderItems) {
       const existingItems = labOrderItemsByLabOrderId.get(item.lab_order_id) ?? [];
       existingItems.push(item);
       labOrderItemsByLabOrderId.set(item.lab_order_id, existingItems);

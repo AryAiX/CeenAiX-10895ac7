@@ -1,4 +1,9 @@
 import type { LabOrder, LabOrderItem } from '../types';
+import {
+  hydrateLabOrderItemsWithCatalog,
+  loadLabTestCatalogRowsForLabOrderItems,
+  loadLabTestCatalogSuggestionRowsForLabOrderItems,
+} from '../lib/lab-test-catalog';
 import { useQuery } from './use-query';
 import { supabase } from '../lib/supabase';
 
@@ -54,6 +59,12 @@ export function useDoctorLabOrders(userId: string | null | undefined) {
       throw patientProfilesError;
     }
 
+    const hydratedLabOrderItems = hydrateLabOrderItemsWithCatalog(
+      (labOrderItems ?? []) as LabOrderItem[],
+      await loadLabTestCatalogRowsForLabOrderItems((labOrderItems ?? []) as LabOrderItem[]),
+      await loadLabTestCatalogSuggestionRowsForLabOrderItems((labOrderItems ?? []) as LabOrderItem[])
+    );
+
     const patientProfileById = new Map(
       (patientProfiles ?? []).map((profile) => [
         profile.user_id,
@@ -65,7 +76,7 @@ export function useDoctorLabOrders(userId: string | null | undefined) {
     );
 
     const itemsByLabOrderId = new Map<string, LabOrderItem[]>();
-    for (const item of (labOrderItems ?? []) as LabOrderItem[]) {
+    for (const item of hydratedLabOrderItems) {
       const existingItems = itemsByLabOrderId.get(item.lab_order_id) ?? [];
       existingItems.push(item);
       itemsByLabOrderId.set(item.lab_order_id, existingItems);

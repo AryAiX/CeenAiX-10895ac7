@@ -70,6 +70,25 @@ export const dateTimeFormatWithNumerals = (
   ...(usesArabicEasternNumerals(language) ? { numberingSystem: 'arab' as const } : {}),
 });
 
+export const appointmentPickerLabel = (language: string, scheduledAt: string): string => {
+  const date = new Date(scheduledAt);
+
+  try {
+    return new Intl.DateTimeFormat(
+      resolveLocale(language),
+      dateTimeFormatWithNumerals(language, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+      })
+    ).format(date);
+  } catch {
+    return date.toLocaleString(resolveLocale(language));
+  }
+};
+
 /** Format integers for display (calendar day numbers, counts in JSX, etc.) */
 export const formatLocaleDigits = (value: number, language: string): string => {
   if (!usesArabicEasternNumerals(language)) {
