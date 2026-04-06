@@ -1,0 +1,31 @@
+[
+  {
+    "query": "metformin",
+    "display_name_ar": null
+  },
+  {
+    "query": "amoxicillin",
+    "display_name_ar": "أموكسيسيلين"
+  },
+  {
+    "query": "ibuprofen",
+    "display_name_ar": "إيبوبروفين"
+  },
+  {
+    "query": "atorvastatin",
+    "display_name_ar": "أتورفاستاتين"
+  },
+  {
+    "query": "paracetamol",
+    "brand_name_en": "Paracetamol",
+    "display_name_ar": null
+  },
+  {
+    "query": "amlodipine",
+    "display_name_ar": null
+  },
+  {
+    "query": "losartan",
+    "display_name_ar": "لوسارتان"
+  }
+]

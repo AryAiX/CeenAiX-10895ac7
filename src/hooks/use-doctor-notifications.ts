@@ -1,0 +1,186 @@
+import type { Notification } from '../types';
+import { useQuery } from './use-query';
+import { supabase } from '../lib/supabase';
+
+export interface DoctorDerivedNotification {
+  id: string;
+  kind: 'message' | 'pre_visit' | 'patient_update';
+  title: string;
+  body: string;
+  createdAt: string;
+  actionUrl: string;
+}
+
+export interface DoctorNotificationsData {
+  notifications: Notification[];
+  derivedNotifications: DoctorDerivedNotification[];
+}
+
+export function useDoctorNotifications(userId: string | null | undefined) {
+  return useQuery<DoctorNotificationsData | null>(async () => {
+    if (!userId) {
+      return null;
+    }
+
+    const [
+      { data: notifications, error: notificationsError },
+      { data: conversations, error: conversationsError },
+      { data: completedAssessments, error: completedAssessmentsError },
+      { data: doctorReviewUpdates, error: doctorReviewUpdatesError },
+    ] = await Promise.all([
+      supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(50),
+      supabase.from('conversations').select('id'),
+      supabase
+        .from('appointment_pre_visit_assessments')
+        .select('id, appointment_id, patient_id, completed_at, updated_at')
+        .eq('doctor_id', userId)
+        .eq('status', 'completed')
+        .order('completed_at', { ascending: false })
+        .limit(12),
+      supabase
+        .from('patient_canonical_update_requests')
+        .select('id, patient_id, display_label, created_at, updated_at')
+        .eq('requires_doctor_review', true)
+        .eq('status', 'applied')
+        .order('updated_at', { ascending: false })
+        .limit(12),
+    ]);
+
+    if (notificationsError) throw notificationsError;
+    if (conversationsError) throw conversationsError;
+    if (completedAssessmentsError) throw completedAssessmentsError;
+    if (doctorReviewUpdatesError) throw doctorReviewUpdatesError;
+
+    const derivedNotifications: DoctorDerivedNotification[] = [];
+
+    const conversationIds = (conversations ?? []).map((conversation) => conversation.id);
+
+    if (conversationIds.length > 0) {
+      const { data: unreadMessages, error: unreadMessagesError } = await supabase
+        .from('messages')
+        .select('id, conversation_id, sender_id, body, sent_at')
+        .in('conversation_id', conversationIds)
+        .neq('sender_id', userId)
+        .is('read_at', null)
+        .order('sent_at', { ascending: false })
+        .limit(20);
+
+      if (unreadMessagesError) {
+        throw unreadMessagesError;
+      }
+
+      const senderIds = Array.from(
+        new Set((unreadMessages ?? []).map((message) => message.sender_id).filter(Boolean))
+      );
+      const { data: senderProfiles, error: senderProfilesError } = senderIds.length
+        ? await supabase.from('user_profiles').select('user_id, full_name').in('user_id', senderIds)
+        : { data: [], error: null };
+
+      if (senderProfilesError) {
+        throw senderProfilesError;
+      }
+
+      const senderNameById = new Map(
+        (senderProfiles ?? []).map((profile) => [profile.user_id, profile.full_name ?? 'Patient'])
+      );
+
+      for (const message of unreadMessages ?? []) {
+        derivedNotifications.push({
+          id: `message-${message.id}`,
+          kind: 'message',
+          title: `New message from ${senderNameById.get(message.sender_id) ?? 'Patient'}`,
+          body: message.body?.trim() || 'Open the thread to review the latest care message.',
+          createdAt: message.sent_at,
+          actionUrl: `/doctor/messages/${message.conversation_id}`,
+        });
+      }
+    }
+
+    const assessmentPatientIds = Array.from(
+      new Set((completedAssessments ?? []).map((assessment) => assessment.patient_id))
+    );
+    const assessmentAppointmentIds = (completedAssessments ?? []).map((assessment) => assessment.appointment_id);
+
+    const [
+      { data: assessmentPatientProfiles, error: assessmentPatientProfilesError },
+      { data: assessmentAppointments, error: assessmentAppointmentsError },
+    ] = await Promise.all([
+      assessmentPatientIds.length > 0
+        ? supabase
+            .from('user_profiles')
+            .select('user_id, full_name')
+            .in('user_id', assessmentPatientIds)
+        : Promise.resolve({ data: [], error: null }),
+      assessmentAppointmentIds.length > 0
+        ? supabase
+            .from('appointments')
+            .select('id, chief_complaint')
+            .in('id', assessmentAppointmentIds)
+        : Promise.resolve({ data: [], error: null }),
+    ]);
+
+    if (assessmentPatientProfilesError) throw assessmentPatientProfilesError;
+    if (assessmentAppointmentsError) throw assessmentAppointmentsError;
+
+    const assessmentPatientNameById = new Map(
+      (assessmentPatientProfiles ?? []).map((profile) => [profile.user_id, profile.full_name ?? 'Patient'])
+    );
+    const assessmentAppointmentById = new Map(
+      (assessmentAppointments ?? []).map((appointment) => [appointment.id, appointment])
+    );
+
+    for (const assessment of completedAssessments ?? []) {
+      const appointment = assessmentAppointmentById.get(assessment.appointment_id);
+      derivedNotifications.push({
+        id: `previsit-${assessment.id}`,
+        kind: 'pre_visit',
+        title: `${assessmentPatientNameById.get(assessment.patient_id) ?? 'Patient'} completed pre-visit intake`,
+        body:
+          appointment?.chief_complaint?.trim() ||
+          'Review the appointment detail to see the patient summary and intake answers.',
+        createdAt: assessment.completed_at ?? assessment.updated_at,
+        actionUrl: `/doctor/appointments/${assessment.appointment_id}`,
+      });
+    }
+
+    const reviewPatientIds = Array.from(
+      new Set((doctorReviewUpdates ?? []).map((update) => update.patient_id))
+    );
+    const { data: reviewPatientProfiles, error: reviewPatientProfilesError } = reviewPatientIds.length
+      ? await supabase.from('user_profiles').select('user_id, full_name').in('user_id', reviewPatientIds)
+      : { data: [], error: null };
+
+    if (reviewPatientProfilesError) {
+      throw reviewPatientProfilesError;
+    }
+
+    const reviewPatientNameById = new Map(
+      (reviewPatientProfiles ?? []).map((profile) => [profile.user_id, profile.full_name ?? 'Patient'])
+    );
+
+    for (const update of doctorReviewUpdates ?? []) {
+      derivedNotifications.push({
+        id: `patient-update-${update.id}`,
+        kind: 'patient_update',
+        title: `${reviewPatientNameById.get(update.patient_id) ?? 'Patient'} updated chart information`,
+        body: `Review ${update.display_label.toLowerCase()} in the patient detail workspace.`,
+        createdAt: update.updated_at ?? update.created_at,
+        actionUrl: `/doctor/patients/${update.patient_id}`,
+      });
+    }
+
+    derivedNotifications.sort(
+      (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
+    );
+
+    return {
+      notifications: (notifications ?? []) as Notification[],
+      derivedNotifications,
+    };
+  }, [userId ?? '']);
+}

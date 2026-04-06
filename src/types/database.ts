@@ -3,6 +3,10 @@ import type {
   AppointmentType,
   AppointmentStatus,
   PrescriptionStatus,
+  MedicationCatalogEnrichmentStatus,
+  MedicationCatalogSource,
+  MedicationCatalogSuggestionType,
+  MedicationCatalogSuggestionStatus,
   LabOrderStatus,
   ConditionStatus,
   AllergySeverity,
@@ -127,6 +131,8 @@ export interface Prescription extends BaseRecord, SoftDeletable {
 
 export interface PrescriptionItem extends BaseRecord {
   prescription_id: string;
+  medication_catalog_id?: string | null;
+  medication_catalog_suggestion_id?: string | null;
   medication_name: string;
   /** Arabic display label; optional — UI pairs with medication_name when locale is non-English */
   medication_name_ar: string | null;
@@ -138,6 +144,43 @@ export interface PrescriptionItem extends BaseRecord {
   quantity: number | null;
   instructions: string | null;
   is_dispensed: boolean;
+}
+
+export interface MedicationCatalog extends BaseRecord {
+  source: MedicationCatalogSource;
+  source_code: string | null;
+  generic_name_en: string;
+  brand_name_en: string | null;
+  display_name_ar: string | null;
+  strength: string | null;
+  dosage_form: string | null;
+  manufacturer: string | null;
+  rxnorm_tty: string | null;
+  ingredient_name_en: string | null;
+  enrichment_status: MedicationCatalogEnrichmentStatus;
+  enrichment_error: string | null;
+  last_enriched_at: string | null;
+  is_active: boolean;
+  is_custom: boolean;
+  source_updated_at: string | null;
+  last_synced_at: string | null;
+}
+
+export interface MedicationCatalogSuggestion extends BaseRecord {
+  medication_catalog_id: string | null;
+  approved_medication_catalog_id: string | null;
+  suggestion_type: MedicationCatalogSuggestionType;
+  status: MedicationCatalogSuggestionStatus;
+  proposed_generic_name_en: string | null;
+  proposed_brand_name_en: string | null;
+  proposed_display_name_ar: string | null;
+  proposed_strength: string | null;
+  proposed_dosage_form: string | null;
+  proposed_manufacturer: string | null;
+  review_notes: string | null;
+  created_by: string;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
 }
 
 export interface LabOrder extends BaseRecord, SoftDeletable {

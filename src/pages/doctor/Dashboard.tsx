@@ -36,7 +36,9 @@ export const DoctorDashboard: React.FC = () => {
       { labelKey: 'nav.schedule', href: '/doctor/schedule' },
       { labelKey: 'nav.patients', href: '/doctor/patients' },
       { labelKey: 'nav.prescriptions', href: '/doctor/prescriptions' },
+      { labelKey: 'doctor.labOrders.title', href: '/doctor/lab-orders' },
       { labelKey: 'nav.messages', href: '/doctor/messages' },
+      { labelKey: 'doctor.notifications.title', href: '/doctor/notifications' },
       { labelKey: 'nav.profile', href: '/doctor/profile' },
     ],
     []
@@ -190,6 +192,15 @@ export const DoctorDashboard: React.FC = () => {
                       {appointmentStatusLabel(t, data.nextAppointment.status)}
                     </span>
                   </div>
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/doctor/appointments/${data.nextAppointment?.id}`)}
+                      className="rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
+                    >
+                      {t('doctor.appointmentDetail.openDetail')}
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
@@ -289,6 +300,15 @@ export const DoctorDashboard: React.FC = () => {
                           )}
                         </p>
                       </div>
+                    </div>
+                    <div className="mt-4 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/doctor/appointments/${appointment.id}`)}
+                        className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-200 hover:bg-emerald-50"
+                      >
+                        {t('doctor.appointmentDetail.openDetail')}
+                      </button>
                     </div>
                   </div>
                 ))}

@@ -19,6 +19,14 @@ export type AppointmentStatus =
 
 export type PrescriptionStatus = 'active' | 'completed' | 'cancelled';
 
+export type MedicationCatalogSource = 'rxnorm' | 'custom';
+
+export type MedicationCatalogEnrichmentStatus = 'pending' | 'enriched' | 'failed';
+
+export type MedicationCatalogSuggestionType = 'translation' | 'new_medication';
+
+export type MedicationCatalogSuggestionStatus = 'pending' | 'approved' | 'rejected';
+
 export type LabOrderStatus =
   | 'ordered'
   | 'collected'

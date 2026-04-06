@@ -27,9 +27,15 @@ import { PatientMessages } from '../pages/patient/Messages';
 import { Profile as PatientProfile } from '../pages/patient/Profile';
 import { DoctorDashboard } from '../pages/doctor/Dashboard';
 import { DoctorAppointments } from '../pages/doctor/Appointments';
+import { DoctorAppointmentDetail } from '../pages/doctor/AppointmentDetail';
 import { DoctorPrescriptions } from '../pages/doctor/Prescriptions';
+import { CreatePrescription } from '../pages/doctor/CreatePrescription';
 import { DoctorPatients } from '../pages/doctor/Patients';
+import { DoctorPatientDetail } from '../pages/doctor/PatientDetail';
+import { DoctorLabOrders } from '../pages/doctor/LabOrders';
+import { CreateLabOrder } from '../pages/doctor/CreateLabOrder';
 import { DoctorMessages } from '../pages/doctor/Messages';
+import { DoctorNotifications } from '../pages/doctor/Notifications';
 import { DoctorSchedule } from '../pages/doctor/Schedule';
 import { DoctorProfile } from '../pages/doctor/Profile';
 import { AppointmentDesignShowcase } from '../pages/AppointmentDesignShowcase';
@@ -155,8 +161,16 @@ export const router = createBrowserRouter([
     element: withProtection(<DoctorAppointments />, ['doctor']),
   },
   {
+    path: '/doctor/appointments/:appointmentId',
+    element: withProtection(<DoctorAppointmentDetail />, ['doctor']),
+  },
+  {
     path: '/doctor/patients',
     element: withProtection(<DoctorPatients />, ['doctor']),
+  },
+  {
+    path: '/doctor/patients/:patientId',
+    element: withProtection(<DoctorPatientDetail />, ['doctor']),
   },
   {
     path: '/doctor/schedule',
@@ -165,6 +179,18 @@ export const router = createBrowserRouter([
   {
     path: '/doctor/prescriptions',
     element: withProtection(<DoctorPrescriptions />, ['doctor']),
+  },
+  {
+    path: '/doctor/prescriptions/new',
+    element: withProtection(<CreatePrescription />, ['doctor']),
+  },
+  {
+    path: '/doctor/lab-orders',
+    element: withProtection(<DoctorLabOrders />, ['doctor']),
+  },
+  {
+    path: '/doctor/lab-orders/new',
+    element: withProtection(<CreateLabOrder />, ['doctor']),
   },
   {
     path: '/doctor/messages',
@@ -177,5 +203,9 @@ export const router = createBrowserRouter([
   {
     path: '/doctor/profile',
     element: withProtection(<DoctorProfile />, ['doctor']),
+  },
+  {
+    path: '/doctor/notifications',
+    element: withProtection(<DoctorNotifications />, ['doctor']),
   },
 ]);

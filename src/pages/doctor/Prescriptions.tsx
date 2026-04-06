@@ -14,6 +14,7 @@ import {
   prescriptionStatusLabel,
   resolveLocale,
 } from '../../lib/i18n-ui';
+import { formatMedicationDetailLine } from '../../lib/medication-display';
 
 export const DoctorPrescriptions: React.FC = () => {
   const { t, i18n } = useTranslation('common');
@@ -128,6 +129,17 @@ export const DoctorPrescriptions: React.FC = () => {
       />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-6 flex justify-end">
+          <button
+            type="button"
+            onClick={() => navigate('/doctor/prescriptions/new')}
+            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
+          >
+            <Pill className="h-4 w-4" />
+            <span>{t('doctor.createPrescription.create')}</span>
+          </button>
+        </div>
+
         {error ? (
           <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
             {t('doctor.prescriptions.loadError')}
@@ -265,8 +277,19 @@ export const DoctorPrescriptions: React.FC = () => {
                                   primaryClassName="font-semibold text-gray-900"
                                   secondaryClassName="text-xs text-gray-500 mt-0.5"
                                 />
+                              {item.medication_catalog_suggestion_id ? (
+                                <p className="mt-2 inline-flex rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-semibold text-amber-800">
+                                  {t('doctor.createPrescription.pendingBadge')}
+                                </p>
+                              ) : null}
                                 <p className="mt-1 text-sm text-gray-600">
-                                  {[item.dosage, item.frequency, item.duration].filter(Boolean).join(' • ') ||
+                                  {formatMedicationDetailLine(t, uiLang, {
+                                    dosage: item.dosage,
+                                    frequency: item.frequency,
+                                    duration: item.duration,
+                                    detail: '',
+                                    emptyFallback: t('doctor.prescriptions.noMedicationDetail'),
+                                  }) ||
                                     t('doctor.prescriptions.noMedicationDetail')}
                                 </p>
                                 {item.instructions ? (

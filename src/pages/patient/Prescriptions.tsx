@@ -23,6 +23,7 @@ import {
   prescriptionStatusLabel,
   resolveLocale,
 } from '../../lib/i18n-ui';
+import { formatMedicationDetailLine } from '../../lib/medication-display';
 
 export const PatientPrescriptions: React.FC = () => {
   const { t, i18n } = useTranslation('common');
@@ -423,7 +424,13 @@ export const PatientPrescriptions: React.FC = () => {
                                     />
                                   </h4>
                                   <p className="mt-1 text-sm text-gray-600">
-                                    {[item.dosage, item.frequency, item.duration].filter(Boolean).join(' • ') ||
+                                    {formatMedicationDetailLine(t, uiLang, {
+                                      dosage: item.dosage,
+                                      frequency: item.frequency,
+                                      duration: item.duration,
+                                      detail: '',
+                                      emptyFallback: t('patient.prescriptions.dosagePending'),
+                                    }) ||
                                       t('patient.prescriptions.dosagePending')}
                                   </p>
                                 </div>

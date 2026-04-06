@@ -1,5 +1,9 @@
 import { supabase } from '../lib/supabase';
 import { resolveClinicalVocabLabel, type PrescriptionClinicalVocabRow } from '../lib/prescription-vocab';
+import {
+  hydratePrescriptionItemsWithCatalog,
+  loadMedicationCatalogRowsForPrescriptionItems,
+} from '../lib/medication-catalog';
 import { useQuery } from './use-query';
 import type { NotificationType, PrescriptionItem } from '../types';
 
@@ -169,7 +173,7 @@ export function usePatientDashboard(userId: string | null | undefined, uiLanguag
       const { data: prescriptionItems, error: prescriptionItemsError } = await supabase
         .from('prescription_items')
         .select(
-          'id, medication_name, medication_name_ar, dosage, frequency, duration, frequency_code, duration_code, is_dispensed'
+          'id, prescription_id, medication_catalog_id, medication_name, medication_name_ar, dosage, frequency, duration, frequency_code, duration_code, is_dispensed'
         )
         .in('prescription_id', activePrescriptionIds)
         .order('created_at', { ascending: false })
@@ -179,9 +183,13 @@ export function usePatientDashboard(userId: string | null | undefined, uiLanguag
         throw prescriptionItemsError;
       }
 
+      const hydratedPrescriptionItems = hydratePrescriptionItemsWithCatalog(
+        (prescriptionItems ?? []) as PrescriptionItem[],
+        await loadMedicationCatalogRowsForPrescriptionItems((prescriptionItems ?? []) as PrescriptionItem[])
+      );
+
       medications =
-        prescriptionItems?.map((raw) => {
-          const item = raw as PrescriptionItem;
+        hydratedPrescriptionItems.map((item) => {
           const dosage = item.dosage?.trim() || null;
           const frequency = item.frequency?.trim() || null;
           const duration = item.duration?.trim() || null;

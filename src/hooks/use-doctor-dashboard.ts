@@ -62,6 +62,7 @@ export function useDoctorDashboard(userId: string | null | undefined) {
       { data: appointments, error: appointmentsError },
       { count: pendingNotesCount, error: pendingNotesError },
       { data: conversations, error: conversationsError },
+      { count: patientUpdateReviewCount, error: patientUpdateReviewError },
     ] = await Promise.all([
       supabase
         .from('appointments')
@@ -77,11 +78,17 @@ export function useDoctorDashboard(userId: string | null | undefined) {
         .eq('is_deleted', false),
       // RLS limits visible conversations to ones the current doctor participates in.
       supabase.from('conversations').select('id'),
+      supabase
+        .from('patient_canonical_update_requests')
+        .select('id', { count: 'exact', head: true })
+        .eq('requires_doctor_review', true)
+        .eq('status', 'applied'),
     ]);
 
     if (appointmentsError) throw appointmentsError;
     if (pendingNotesError) throw pendingNotesError;
     if (conversationsError) throw conversationsError;
+    if (patientUpdateReviewError) throw patientUpdateReviewError;
 
     const safeAppointments = (appointments ?? []) as AppointmentRow[];
     const patientIds = Array.from(new Set(safeAppointments.map((appointment) => appointment.patient_id)));
@@ -166,7 +173,7 @@ export function useDoctorDashboard(userId: string | null | undefined) {
       totalPatients: patientIds.length,
       todayAppointments,
       unreadMessages,
-      pendingReviews: (pendingNotesCount ?? 0) + preVisitReviewCount,
+      pendingReviews: (pendingNotesCount ?? 0) + preVisitReviewCount + (patientUpdateReviewCount ?? 0),
       nextAppointment: nextAppointmentSource
         ? {
             id: nextAppointmentSource.id,

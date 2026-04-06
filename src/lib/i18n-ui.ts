@@ -39,6 +39,12 @@ export const prescriptionStatusLabel = (t: TFunction, status: string) => {
   return label === key ? status.replace(/_/g, ' ') : label;
 };
 
+export const labOrderStatusLabel = (t: TFunction, status: string) => {
+  const key = `shared.labOrderStatus.${status}`;
+  const label = t(key);
+  return label === key ? status.replace(/_/g, ' ') : label;
+};
+
 export const calendarWeekdayShort = (t: TFunction) =>
   [
     t('shared.weekdays.sun'),
