@@ -102,6 +102,10 @@
 | ADM-01 | Admin dashboard (`/admin/dashboard`)                  | pending | 2026-02-28 | `docs/agent/mvp-scope.md` — Admin Pages; basic platform overview      |           | Depends on AUTH-06 |
 | ADM-02 | User management (`/admin/users`) — CRUD               | pending | 2026-02-28 | `docs/agent/mvp-scope.md` — Admin Pages; create/edit/suspend accounts |           |                    |
 | ADM-03 | Insurance plan management (`/admin/insurance`) — CRUD | pending | 2026-02-28 | `docs/agent/mvp-scope.md` — Admin Pages                               |           |                    |
+| ADM-04 | Admin login and role-gated admin entry flow           | pending | 2026-04-12 | Correct UX reference repo includes dedicated admin entry surfaces such as `src/pages/AdminLogin.tsx` |           | Keep current auth architecture and route guards in this repo; use source only as UX/product reference |
+| ADM-05 | Admin platform operations dashboard                   | pending | 2026-04-12 | Correct UX reference repo includes richer admin monitoring/overview surfaces such as `src/pages/AdminDashboard.tsx` |           | Scope should be reconciled with MVP minimal admin requirements before implementation |
+| ADM-06 | Admin analytics, integrations, and system-health review surfaces | pending | 2026-04-12 | Correct UX reference repo includes `src/pages/AIAnalytics.tsx` and `src/pages/SystemHealthIntegrations.tsx` |           | Treat as future admin capability unless product explicitly pulls it into current scope |
+| ADM-07 | Organization management, portal access, and audit/compliance tooling | pending | 2026-04-12 | Correct UX reference repo includes organization-management and compliance/security components |           | Future admin expansion beyond MVP CRUD; do not import backend/schema drift blindly |
 
 
 ---
@@ -201,10 +205,49 @@
 | UX-12 | DB-backed prescription frequency/duration vocab + bilingual med names | done    | 2026-03-28 | UAE bilingual UX: catalog common frequency/duration labels; optional Arabic medication display next to canonical INN | 2026-03-28 | Migrations `20260328140000_prescription_clinical_vocab.sql`, `20260328190000_prescription_items_medication_name_ar.sql`; `prescription-vocab`, `medication-display`, `MedicationNameDisplay`, `usePatientDashboard` vocab + `medication_name_ar`; patient `Prescriptions` + `Dashboard`; `docs/agent/schema-reference.md` updated |
 | UX-13 | Locale-aware numerals + RTL clinical text on doctor/patient surfaces | done     | 2026-03-28 | Arabic UI should use Eastern Arabic-Indic digits for counts; English chief-complaint lines stay LTR in RTL      | 2026-03-28 | `formatLocaleDigits` on patient `Prescriptions` stats, doctor `Dashboard` KPIs, doctor `Appointments` list/calendar subtitles; English `chief_complaint` / notes / AI summary in `dir="ltr"` when UI is Arabic |
 | UX-14 | Public guest `/ai-chat` i18n + doctor-specific chrome               | done     | 2026-03-28 | Guest chat shell was English-only; doctors land on `/ai-chat` from the fab and should not see patient booking CTA | 2026-03-28 | `public.guestAiChat` keys (en/ar), welcome message sync on language change; hide “Find Doctors” strip for `role === 'doctor'`; clinician banner links to `/doctor/dashboard`; rule-based bot replies remain English until AI-04 |
+| UX-15 | Review extracted `CeenAiX-final-main` source for selective UX import scope | done | 2026-04-12 | User corrected the source repo; checklist should now track the right visual reference before new implementation starts | 2026-04-12 | Source is the user-provided `CeenAiX-final-main.zip`, using `src/pages/LandingPage.tsx`, `Login.tsx`, `SignUp.tsx`, `PatientDashboard.tsx`, and `DoctorDashboard.tsx` as the primary UX references |
+| UX-16 | Refresh shared visual foundations, logo treatment, and top-level branding from `CeenAiX-final-main` | done | 2026-04-12 | The correct reference repo has a distinct visual language for logo lockup, top nav, card chrome, and hero polish | 2026-04-12 | Added shared surface utilities in `src/index.css`, refreshed logo/top-level brand treatment, and aligned shared chrome like `PageHeader`, `Footer`, auth shell, and router-level portal shell without changing app architecture |
+| UX-17 | Rebuild landing page look and feel from correct source without changing current public functionality | done | 2026-04-12 | User explicitly wants the landing page driven by the new UX reference rather than the older mistaken source | 2026-04-12 | `src/pages/public/Home.tsx` now follows the corrected source's fixed-nav, centered hero, portal-access, and polished card composition while preserving the current repo's CTA destinations and public routes |
+| UX-18 | Rebuild sign-in and sign-up experience from correct source without changing auth logic | done | 2026-04-12 | User explicitly called out sign-in/sign-up experience as part of the import scope, and the correct repo includes `Login.tsx` and `SignUp.tsx` | 2026-04-12 | `AuthShell`, `Login`, and `Register` now use the corrected visual language and interaction polish while keeping current `useAuth`, OTP, recovery, onboarding, and redirect behavior intact |
+| UX-19 | Apply correct source patient dashboard and patient shell styling to current patient experience | done | 2026-04-12 | Correct source repo includes richer patient shell/navigation patterns in `PatientDashboard.tsx` and `src/components/patient/` | 2026-04-12 | Added router-level patient shell/navigation via `PortalShell` and refreshed patient dashboard card/hero treatment without changing patient hooks, routes, records, AI, messaging, or canonical schema integration |
+| UX-20 | Apply correct source doctor dashboard and doctor shell styling to current doctor experience | done | 2026-04-12 | Correct source repo includes doctor shell/dashboard patterns in `DoctorDashboard.tsx`, `DoctorDashboardNew.tsx`, and `src/components/doctor/` | 2026-04-12 | Added router-level doctor shell/navigation via `PortalShell` and refreshed doctor dashboard hero/KPI/queue surfaces while keeping live doctor workflows, queue logic, schedule, messages, prescriptions, lab orders, and detail flows unchanged |
+| UX-21 | Extend the imported visual language across current patient and doctor pages after dashboard alignment | done | 2026-04-12 | Once landing/auth/dashboard surfaces match the new reference, the rest of the portal should feel visually coherent | 2026-04-12 | Applied the updated role chrome across current patient and doctor routes through the router-level shell and shared `PageHeader`, so appointments, profile, messages, prescriptions, records, and related portal pages inherit the refreshed look without behavior changes |
+| UX-22 | Enforce import guardrails for the correct source repo               | done | 2026-04-12 | The correct reference repo also contains additional product scope and backend/schema drift beyond the current repo | 2026-04-12 | Implemented the UX as selective visual transfer only: preserved this repo's router, auth context, OTP/recovery flows, bilingual support, AI/chat flows, hooks, and canonical schema integrations rather than importing the source repo's mock navigation or backend assumptions wholesale |
 
 ---
 
-## 12. Suggested Enhancements (SUG)
+## 12. Pharmacy Features (PHM)
+
+| ID     | Item                                                   | Status  | Added      | Justification                                                                                                    | Completed | Notes                                                                                                                                     |
+| ------ | ------------------------------------------------------ | ------- | ---------- | ---------------------------------------------------------------------------------------------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| PHM-01 | Pharmacy dashboard and portal shell                    | pending | 2026-04-12 | Correct source repo includes `src/pages/PharmacyDashboard.tsx`, `src/pages/pharmacy/PharmacyPortal.tsx`, and related sidebar/topbar components |           | Future feature area; do not import the full implementation blindly into the current repo                                                 |
+| PHM-02 | Pharmacy prescription inbox and dispensing workspace   | pending | 2026-04-12 | Correct source repo includes `PharmacyPrescriptions.tsx` and `PharmacyDispensingWorkspace.tsx`                  |           | Align with Phase 3 pharmacy role and eventual prescription dispatch workflow                                                             |
+| PHM-03 | Pharmacy inventory management                          | pending | 2026-04-12 | Correct source repo includes `src/pages/InventoryManagement.tsx` and inventory schema work                       |           | Requires explicit product/schema review before implementation in this repo                                                               |
+| PHM-04 | Pharmacy messaging and reporting surfaces              | pending | 2026-04-12 | Correct source repo includes `PharmacyMessages.tsx` and `PharmacyReports.tsx`                                   |           | Track as future pharmacy operations tooling                                                                                              |
+
+---
+
+## 13. Laboratory / Radiology Features (LBR)
+
+| ID     | Item                                                   | Status  | Added      | Justification                                                                                                    | Completed | Notes                                                                                                                                 |
+| ------ | ------------------------------------------------------ | ------- | ---------- | ---------------------------------------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| LBR-01 | Laboratory dashboard and lab/radiology portal shell    | pending | 2026-04-12 | Correct source repo includes `src/pages/LaboratoryDashboard.tsx`, `LabRadiologyPortal.tsx`, and `src/pages/labradiology/` surfaces |           | Treat as future role area; preserve current MVP boundaries unless product explicitly expands scope                                  |
+| LBR-02 | Lab referral inbox and result entry workflow           | pending | 2026-04-12 | Correct source repo includes `src/pages/LabReferrals.tsx` and `LabResultEntry.tsx`                              |           | Align with current doctor lab-order work and future Phase 3 lab role                                                                 |
+| LBR-03 | Diagnostics, MRI/CT, and radiology reporting surfaces  | pending | 2026-04-12 | Correct source repo includes `MRICTAnalysis.tsx`, `MRIScans.tsx`, diagnostics pages, and radiology report views |           | Product/spec review required before splitting these from current patient lab-result and doctor lab-order surfaces                  |
+
+---
+
+## 14. Insurance Features (INS)
+
+| ID     | Item                                                   | Status  | Added      | Justification                                                                                  | Completed | Notes                                                                                                                        |
+| ------ | ------------------------------------------------------ | ------- | ---------- | ---------------------------------------------------------------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| INS-01 | Insurance dashboard and portal shell                   | pending | 2026-04-12 | Correct source repo includes `src/pages/InsuranceDashboard.tsx` and `InsurancePortal.tsx`    |           | Future insurance/admin feature area; do not import source backend/schema expectations without review                        |
+| INS-02 | Patient insurance workspace                            | pending | 2026-04-12 | Correct source repo includes `src/pages/PatientInsurance.tsx`                                  |           | Could eventually connect to patient insurance profile, plan visibility, and claim tracking                                  |
+| INS-03 | Insurance-specific analytics and operational tooling   | pending | 2026-04-12 | Correct source repo includes insurance role navigation and dashboard structures                |           | Coordinate with admin and billing roadmap decisions                                                                          |
+
+---
+
+## 15. Suggested Enhancements (SUG)
 
 | ID     | Item                                                                 | Status  | Added      | Justification                                                                                           | Completed | Notes                                                                                                                                                                  |
 | ------ | -------------------------------------------------------------------- | ------- | ---------- | ------------------------------------------------------------------------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -217,7 +260,7 @@
 
 ---
 
-## 13. Assumptions Made
+## 16. Assumptions Made
 
 | ID     | Assumption | Added | Notes |
 | ------ | ---------- | ----- | ----- |

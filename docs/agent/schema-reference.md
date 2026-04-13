@@ -72,6 +72,11 @@ lab_order_items
   - id (PK), lab_order_id (FK)
   - test_name, test_code, status, result_value, result_unit, reference_range
   - is_abnormal (bool), resulted_at
+
+patient_vitals
+  - id (PK), patient_id (FK → auth.users), appointment_id (FK → appointments, nullable), recorded_by (FK → auth.users, nullable)
+  - recorded_at, systolic_bp, diastolic_bp, heart_rate, temperature_c, spo2_percent, weight_kg, height_cm, bmi
+  - source (text: manual/device/imported), notes
 ```
 
 ### Medical Records
@@ -200,7 +205,7 @@ insurance_plans
 
 patient_insurance
   - id (PK), patient_id (FK), insurance_plan_id (FK)
-  - policy_number, member_id, card_photo_url, valid_from, valid_until, is_primary (bool)
+  - policy_number, member_id, card_photo_url, valid_from, valid_until, is_primary (bool), annual_limit_used
 ```
 
 ### Scheduling

@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import { Layout } from '../components/Layout';
+import { PortalShell } from '../components/PortalShell';
 import { ProtectedRoute } from './auth-context';
-import type { UserRole } from '../types';
 import { Home } from '../pages/public/Home';
 import { AIChat } from '../pages/public/AIChat';
 import { FindDoctor } from '../pages/public/FindDoctor';
@@ -12,6 +12,7 @@ import { HealthEducation } from '../pages/public/HealthEducation';
 import { Laboratories } from '../pages/public/Laboratories';
 import { Pharmacy } from '../pages/public/Pharmacy';
 import { Login } from '../pages/auth/Login';
+import { PortalAccess } from '../pages/auth/PortalAccess';
 import { Register } from '../pages/auth/Register';
 import { ForgotPassword } from '../pages/auth/ForgotPassword';
 import { VerifyOTP } from '../pages/auth/VerifyOTP';
@@ -43,8 +44,10 @@ import { AccessDenied } from '../pages/system/AccessDenied';
 
 const withLayout = (page: ReactNode) => <Layout>{page}</Layout>;
 
-const withProtection = (page: ReactNode, allowedRoles?: UserRole[]) => (
-  <ProtectedRoute allowedRoles={allowedRoles}>{withLayout(page)}</ProtectedRoute>
+const withPortalProtection = (page: ReactNode, role: 'patient' | 'doctor') => (
+  <ProtectedRoute allowedRoles={[role]}>
+    {withLayout(<PortalShell role={role}>{page}</PortalShell>)}
+  </ProtectedRoute>
 );
 
 export const router = createBrowserRouter([
@@ -55,6 +58,10 @@ export const router = createBrowserRouter([
   {
     path: '/appointment-showcase',
     element: withLayout(<AppointmentDesignShowcase />),
+  },
+  {
+    path: '/auth/portal-access',
+    element: <PortalAccess />,
   },
   {
     path: '/auth/login',
@@ -86,7 +93,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/patient/dashboard',
-    element: withProtection(<PatientDashboard />, ['patient']),
+    element: withPortalProtection(<PatientDashboard />, 'patient'),
   },
   {
     path: '/ai-chat',
@@ -114,15 +121,15 @@ export const router = createBrowserRouter([
   },
   {
     path: '/patient/appointments',
-    element: withProtection(<PatientAppointments />, ['patient']),
+    element: withPortalProtection(<PatientAppointments />, 'patient'),
   },
   {
     path: '/patient/appointments/book',
-    element: withProtection(<BookAppointment />, ['patient']),
+    element: withPortalProtection(<BookAppointment />, 'patient'),
   },
   {
     path: '/patient/prescriptions',
-    element: withProtection(<PatientPrescriptions />, ['patient']),
+    element: withPortalProtection(<PatientPrescriptions />, 'patient'),
   },
   {
     path: '/pharmacy',
@@ -130,82 +137,82 @@ export const router = createBrowserRouter([
   },
   {
     path: '/patient/records',
-    element: withProtection(<PatientRecords />, ['patient']),
+    element: withPortalProtection(<PatientRecords />, 'patient'),
   },
   {
     path: '/patient/ai-chat',
-    element: withProtection(<PatientAIChat />, ['patient']),
+    element: withPortalProtection(<PatientAIChat />, 'patient'),
   },
   {
     path: '/patient/pre-visit/:assessmentId',
-    element: withProtection(<PatientPreVisitAssessment />, ['patient']),
+    element: withPortalProtection(<PatientPreVisitAssessment />, 'patient'),
   },
   {
     path: '/patient/messages',
-    element: withProtection(<PatientMessages />, ['patient']),
+    element: withPortalProtection(<PatientMessages />, 'patient'),
   },
   {
     path: '/patient/messages/:conversationId',
-    element: withProtection(<PatientMessages />, ['patient']),
+    element: withPortalProtection(<PatientMessages />, 'patient'),
   },
   {
     path: '/patient/profile',
-    element: withProtection(<PatientProfile />, ['patient']),
+    element: withPortalProtection(<PatientProfile />, 'patient'),
   },
   {
     path: '/doctor/dashboard',
-    element: withProtection(<DoctorDashboard />, ['doctor']),
+    element: withPortalProtection(<DoctorDashboard />, 'doctor'),
   },
   {
     path: '/doctor/appointments',
-    element: withProtection(<DoctorAppointments />, ['doctor']),
+    element: withPortalProtection(<DoctorAppointments />, 'doctor'),
   },
   {
     path: '/doctor/appointments/:appointmentId',
-    element: withProtection(<DoctorAppointmentDetail />, ['doctor']),
+    element: withPortalProtection(<DoctorAppointmentDetail />, 'doctor'),
   },
   {
     path: '/doctor/patients',
-    element: withProtection(<DoctorPatients />, ['doctor']),
+    element: withPortalProtection(<DoctorPatients />, 'doctor'),
   },
   {
     path: '/doctor/patients/:patientId',
-    element: withProtection(<DoctorPatientDetail />, ['doctor']),
+    element: withPortalProtection(<DoctorPatientDetail />, 'doctor'),
   },
   {
     path: '/doctor/schedule',
-    element: withProtection(<DoctorSchedule />, ['doctor']),
+    element: withPortalProtection(<DoctorSchedule />, 'doctor'),
   },
   {
     path: '/doctor/prescriptions',
-    element: withProtection(<DoctorPrescriptions />, ['doctor']),
+    element: withPortalProtection(<DoctorPrescriptions />, 'doctor'),
   },
   {
     path: '/doctor/prescriptions/new',
-    element: withProtection(<CreatePrescription />, ['doctor']),
+    element: withPortalProtection(<CreatePrescription />, 'doctor'),
   },
   {
     path: '/doctor/lab-orders',
-    element: withProtection(<DoctorLabOrders />, ['doctor']),
+    element: withPortalProtection(<DoctorLabOrders />, 'doctor'),
   },
   {
     path: '/doctor/lab-orders/new',
-    element: withProtection(<CreateLabOrder />, ['doctor']),
+    element: withPortalProtection(<CreateLabOrder />, 'doctor'),
   },
   {
     path: '/doctor/messages',
-    element: withProtection(<DoctorMessages />, ['doctor']),
+    element: withPortalProtection(<DoctorMessages />, 'doctor'),
   },
   {
     path: '/doctor/messages/:conversationId',
-    element: withProtection(<DoctorMessages />, ['doctor']),
+    element: withPortalProtection(<DoctorMessages />, 'doctor'),
   },
   {
     path: '/doctor/profile',
-    element: withProtection(<DoctorProfile />, ['doctor']),
+    element: withPortalProtection(<DoctorProfile />, 'doctor'),
   },
   {
     path: '/doctor/notifications',
-    element: withProtection(<DoctorNotifications />, ['doctor']),
+    element: withPortalProtection(<DoctorNotifications />, 'doctor'),
   },
 ]);

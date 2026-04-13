@@ -246,6 +246,23 @@ export interface LabOrderItem extends BaseRecord {
   resulted_at: string | null;
 }
 
+export interface PatientVital extends BaseRecord, SoftDeletable {
+  patient_id: string;
+  appointment_id: string | null;
+  recorded_by: string | null;
+  recorded_at: string;
+  systolic_bp: number | null;
+  diastolic_bp: number | null;
+  heart_rate: number | null;
+  temperature_c: number | null;
+  spo2_percent: number | null;
+  weight_kg: number | null;
+  height_cm: number | null;
+  bmi: number | null;
+  source: string;
+  notes: string | null;
+}
+
 // ---------------------------------------------------------------------------
 // Medical Records
 // ---------------------------------------------------------------------------
@@ -491,6 +508,7 @@ export interface PatientInsurance extends BaseRecord {
   valid_from: string | null;
   valid_until: string | null;
   is_primary: boolean;
+  annual_limit_used: number;
 }
 
 // ---------------------------------------------------------------------------

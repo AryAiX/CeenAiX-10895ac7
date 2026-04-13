@@ -32,39 +32,33 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   };
 
   return (
-    <div className="bg-white border-b border-gray-200 sticky top-16 z-30 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            {showBack && (
-              <button
-                onClick={handleBack}
-                className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all duration-200 group"
-                aria-label={t('pageHeader.goBack')}
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-gray-900 transition-colors" />
-              </button>
-            )}
-            <div className="flex items-center space-x-3">
-              {icon && (
-                <div className="bg-gradient-to-br from-blue-500 to-cyan-500 p-3 rounded-xl shadow-lg">
-                  {icon}
-                </div>
-              )}
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{title}</h1>
-                {subtitle && (
-                  <p className="text-sm text-gray-600 mt-1">{subtitle}</p>
-                )}
+    <div className="ceenai-card ceenai-soft-shadow mb-6 rounded-[2rem] border border-white/70 p-5 sm:p-6">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-start gap-4">
+          {showBack ? (
+            <button
+              onClick={handleBack}
+              className="group inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white transition hover:border-slate-300 hover:bg-slate-50"
+              aria-label={t('pageHeader.goBack')}
+            >
+              <ArrowLeft className="h-5 w-5 text-slate-600 transition-colors group-hover:text-slate-900" />
+            </button>
+          ) : null}
+          <div className="flex min-w-0 items-start gap-4">
+            {icon ? (
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[1.25rem] bg-gradient-to-br from-cyan-600 via-blue-600 to-teal-500 text-white shadow-lg">
+                {icon}
               </div>
+            ) : null}
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-[1.9rem]">{title}</h1>
+              {subtitle ? (
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">{subtitle}</p>
+              ) : null}
             </div>
           </div>
-          {actions && (
-            <div className="flex items-center space-x-3">
-              {actions}
-            </div>
-          )}
         </div>
+        {actions ? <div className="flex flex-wrap items-center gap-3">{actions}</div> : null}
       </div>
     </div>
   );

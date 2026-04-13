@@ -98,7 +98,7 @@ export const ForgotPassword = () => {
           <span>{t('auth.forgot.remembered')}</span>
           <Link
             to="/auth/login"
-            className="font-semibold text-ceenai-blue transition-colors hover:text-ceenai-navy"
+            className="font-semibold text-teal-600 transition-colors hover:text-teal-700"
           >
             {t('auth.forgot.returnSignIn')}
           </Link>
@@ -125,7 +125,7 @@ export const ForgotPassword = () => {
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
               placeholder="Create a strong password"
               autoComplete="new-password"
               required
@@ -138,7 +138,7 @@ export const ForgotPassword = () => {
               type="password"
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
-              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
               placeholder="Repeat your new password"
               autoComplete="new-password"
               required
@@ -148,7 +148,7 @@ export const ForgotPassword = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-teal-600 px-5 py-3 font-semibold text-white shadow-lg transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <KeyRound className="h-4 w-4" />
             <span>{isSubmitting ? t('auth.forgot.updating') : t('auth.forgot.updatePassword')}</span>
@@ -162,7 +162,7 @@ export const ForgotPassword = () => {
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
               placeholder="you@example.com"
               autoComplete="email"
               required
@@ -176,7 +176,7 @@ export const ForgotPassword = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-teal-600 px-5 py-3 font-semibold text-white shadow-lg transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Mail className="h-4 w-4" />
             <span>{isSubmitting ? t('auth.forgot.sending') : t('auth.forgot.sendReset')}</span>

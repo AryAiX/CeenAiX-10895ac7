@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { KeyRound, LogIn, Smartphone } from 'lucide-react';
+import { ArrowLeft, KeyRound, LogIn, Mail, Smartphone, Stethoscope, UserRound } from 'lucide-react';
 import { AuthShell } from '../../components/AuthShell';
 import { getOtpRequestErrorMessage } from '../../lib/auth-error-messages';
 import { getDefaultRouteForRole, useAuth } from '../../lib/auth-context';
 
 type LoginMode = 'password' | 'otp';
+type LoginRole = 'patient' | 'doctor';
 
 export const Login = () => {
   const { t } = useTranslation('common');
@@ -20,6 +21,12 @@ export const Login = () => {
     signInWithPassword,
     updatePassword,
   } = useAuth();
+  const requestedRole = searchParams.get('role');
+  const selectedRole: LoginRole | null =
+    requestedRole === 'doctor' || requestedRole === 'patient' ? requestedRole : null;
+  const selectedRoleTitle =
+    selectedRole === 'doctor' ? t('auth.login.roleDoctorTitle') : t('auth.login.rolePatientTitle');
+  const SelectedRoleIcon = selectedRole === 'doctor' ? Stethoscope : UserRound;
 
   const [mode, setMode] = useState<LoginMode>('password');
   const [email, setEmail] = useState('');
@@ -129,16 +136,26 @@ export const Login = () => {
   return (
     <AuthShell
       badge={t('auth.login.badge')}
-      title={isRecoveryMode ? t('auth.login.titleRecovery') : t('auth.login.title')}
+      title={
+        isRecoveryMode
+          ? t('auth.login.titleRecovery')
+          : selectedRole
+            ? t('auth.login.signIn')
+            : t('auth.login.title')
+      }
       description={
-        isRecoveryMode ? t('auth.login.descriptionRecovery') : t('auth.login.description')
+        isRecoveryMode
+          ? t('auth.login.descriptionRecovery')
+          : selectedRole
+            ? t('auth.login.selectedRoleLead')
+            : t('auth.login.description')
       }
       footer={
         <div className="flex flex-col gap-3 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between">
           <span>{t('auth.login.needAccount')}</span>
           <Link
-            to="/auth/register"
-            className="font-semibold text-ceenai-blue transition-colors hover:text-ceenai-navy"
+            to={selectedRole ? `/auth/register?role=${selectedRole}` : '/auth/register'}
+            className="font-semibold text-teal-600 transition-colors hover:text-teal-700"
           >
             {t('auth.login.createAccount')}
           </Link>
@@ -157,6 +174,28 @@ export const Login = () => {
         </div>
       ) : null}
 
+      {!isRecoveryMode && selectedRole ? (
+        <>
+          <Link
+            to="/auth/portal-access?intent=login"
+            className="inline-flex items-center gap-2 text-sm text-slate-500 transition-colors hover:text-slate-700"
+          >
+            <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+            <span>{t('auth.login.backToRoleSelection')}</span>
+          </Link>
+
+          <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-teal-600">
+              <SelectedRoleIcon className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-slate-900">{selectedRoleTitle}</p>
+              <p className="text-xs text-slate-500">{t('auth.login.roleAccessBadge')}</p>
+            </div>
+          </div>
+        </>
+      ) : null}
+
       {isRecoveryMode ? (
         <form className="space-y-5" onSubmit={handlePasswordRecovery}>
           <label className="block space-y-2">
@@ -165,7 +204,7 @@ export const Login = () => {
               type="password"
               value={newPassword}
               onChange={(event) => setNewPassword(event.target.value)}
-              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
               placeholder={t('auth.login.newPasswordPlaceholder')}
               autoComplete="new-password"
               required
@@ -178,7 +217,7 @@ export const Login = () => {
               type="password"
               value={confirmNewPassword}
               onChange={(event) => setConfirmNewPassword(event.target.value)}
-              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
               placeholder={t('auth.login.repeatPasswordPlaceholder')}
               autoComplete="new-password"
               required
@@ -188,7 +227,7 @@ export const Login = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-teal-600 px-5 py-3 font-semibold text-white shadow-lg transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <KeyRound className="h-4 w-4" />
             <span>{isSubmitting ? t('auth.login.updatingPassword') : t('auth.login.savePassword')}</span>
@@ -203,14 +242,16 @@ export const Login = () => {
                 resetFeedback();
                 setMode('password');
               }}
-              className={`rounded-2xl border px-4 py-3 text-left transition ${
+              className={`rounded-3xl border px-5 py-4 text-left transition ${
                 mode === 'password'
-                  ? 'border-ceenai-cyan bg-ceenai-cyan/10 text-ceenai-blue'
-                  : 'border-slate-200 bg-white text-slate-600 hover:border-ceenai-cyan/40'
+                  ? 'border-teal-200 bg-teal-50 text-teal-700 shadow-sm'
+                  : 'border-slate-200 bg-white text-slate-600 hover:border-teal-200 hover:bg-slate-50'
               }`}
             >
               <div className="flex items-center gap-3">
-                <LogIn className="h-5 w-5" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white shadow-sm">
+                  <LogIn className="h-5 w-5" />
+                </div>
                 <div>
                   <p className="font-semibold">{t('auth.login.modePassword')}</p>
                   <p className="text-xs opacity-80">{t('auth.login.modePasswordHint')}</p>
@@ -224,14 +265,16 @@ export const Login = () => {
                 resetFeedback();
                 setMode('otp');
               }}
-              className={`rounded-2xl border px-4 py-3 text-left transition ${
+              className={`rounded-3xl border px-5 py-4 text-left transition ${
                 mode === 'otp'
-                  ? 'border-ceenai-cyan bg-ceenai-cyan/10 text-ceenai-blue'
-                  : 'border-slate-200 bg-white text-slate-600 hover:border-ceenai-cyan/40'
+                  ? 'border-teal-200 bg-teal-50 text-teal-700 shadow-sm'
+                  : 'border-slate-200 bg-white text-slate-600 hover:border-teal-200 hover:bg-slate-50'
               }`}
             >
               <div className="flex items-center gap-3">
-                <Smartphone className="h-5 w-5" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white shadow-sm">
+                  <Smartphone className="h-5 w-5" />
+                </div>
                 <div>
                   <p className="font-semibold">{t('auth.login.modeOtp')}</p>
                   <p className="text-xs opacity-80">{t('auth.login.modeOtpHint')}</p>
@@ -241,38 +284,44 @@ export const Login = () => {
           </div>
 
           {mode === 'password' ? (
-            <form className="space-y-5" onSubmit={handlePasswordLogin}>
-              <label className="block space-y-2">
-                <span className="text-sm font-semibold text-slate-700">{t('auth.login.email')}</span>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                  required
-                />
-              </label>
+            <form className="space-y-5 rounded-[1.75rem] border border-slate-200 bg-slate-50/70 p-5" onSubmit={handlePasswordLogin}>
+              <div className="space-y-1.5">
+                <label className="block text-xs font-medium text-slate-600">{t('auth.login.emailShort')}</label>
+                <div className="relative">
+                  <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
+                    placeholder="you@example.com"
+                    autoComplete="email"
+                    required
+                  />
+                </div>
+              </div>
 
-              <label className="block space-y-2">
-                <span className="text-sm font-semibold text-slate-700">{t('auth.login.password')}</span>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                  placeholder="Enter your password"
-                  autoComplete="current-password"
-                  required
-                />
-              </label>
+              <div className="space-y-1.5">
+                <label className="block text-xs font-medium text-slate-600">{t('auth.login.passwordShort')}</label>
+                <div className="relative">
+                  <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
+                    placeholder={t('auth.login.passwordPlaceholder')}
+                    autoComplete="current-password"
+                    required
+                  />
+                </div>
+              </div>
 
               <div className="flex items-center justify-between gap-4 text-sm">
                 <span className="text-slate-500">{t('auth.login.passwordHint')}</span>
                 <Link
                   to="/auth/forgot-password"
-                  className="font-semibold text-ceenai-blue transition-colors hover:text-ceenai-navy"
+                  className="font-semibold text-teal-600 transition-colors hover:text-teal-700"
                 >
                   {t('auth.login.forgotPassword')}
                 </Link>
@@ -281,26 +330,29 @@ export const Login = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-teal-600 px-5 py-3 font-semibold text-white shadow-lg transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <LogIn className="h-4 w-4" />
                 <span>{isSubmitting ? t('auth.login.signingIn') : t('auth.login.signIn')}</span>
               </button>
             </form>
           ) : (
-            <form className="space-y-5" onSubmit={handleOtpLogin}>
-              <label className="block space-y-2">
-                <span className="text-sm font-semibold text-slate-700">{t('auth.login.mobile')}</span>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(event) => setPhone(event.target.value)}
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                  placeholder="+971 50 123 4567"
-                  autoComplete="tel"
-                  required
-                />
-              </label>
+            <form className="space-y-5 rounded-[1.75rem] border border-slate-200 bg-slate-50/70 p-5" onSubmit={handleOtpLogin}>
+              <div className="space-y-1.5">
+                <label className="block text-xs font-medium text-slate-600">{t('auth.login.mobileShort')}</label>
+                <div className="relative">
+                  <Smartphone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(event) => setPhone(event.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
+                    placeholder="+971 50 123 4567"
+                    autoComplete="tel"
+                    required
+                  />
+                </div>
+              </div>
 
               <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
                 {t('auth.login.otpHint')}
@@ -309,7 +361,7 @@ export const Login = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-teal-600 px-5 py-3 font-semibold text-white shadow-lg transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Smartphone className="h-4 w-4" />
                 <span>{isSubmitting ? t('auth.login.sendingCode') : t('auth.login.sendCode')}</span>
