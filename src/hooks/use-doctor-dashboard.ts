@@ -344,34 +344,12 @@ export function useDoctorDashboard(userId: string | null | undefined) {
       criticalResults = normalizedLabResults
         .filter((item) => item.isAbnormal && item.labOrderStatus === 'resulted')
         .slice(0, 3)
-        .map((item) => ({
-          id: item.id,
-          labOrderId: item.labOrderId,
-          patientId: item.patientId,
-          patientName: item.patientName,
-          testName: item.testName,
-          resultValue: item.resultValue,
-          resultUnit: item.resultUnit,
-          referenceRange: item.referenceRange,
-          resultedAt: item.resultedAt,
-          labOrderStatus: item.labOrderStatus,
-        }));
+        .map(({ isAbnormal: _isAbnormal, ...item }) => item);
 
       recentLabResults = normalizedLabResults
         .filter((item) => item.isAbnormal)
         .slice(0, 4)
-        .map((item) => ({
-          id: item.id,
-          labOrderId: item.labOrderId,
-          patientId: item.patientId,
-          patientName: item.patientName,
-          testName: item.testName,
-          resultValue: item.resultValue,
-          resultUnit: item.resultUnit,
-          referenceRange: item.referenceRange,
-          resultedAt: item.resultedAt,
-          labOrderStatus: item.labOrderStatus,
-        }));
+        .map(({ isAbnormal: _isAbnormal, ...item }) => item);
     }
 
     return {
