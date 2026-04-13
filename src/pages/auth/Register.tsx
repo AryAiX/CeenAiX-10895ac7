@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
-import { ArrowLeft, ArrowRight, CheckCircle2, ShieldCheck, Stethoscope, UserRound } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, KeyRound, Mail, ShieldCheck, Smartphone, Stethoscope, UserRound } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthShell } from '../../components/AuthShell';
@@ -86,6 +86,8 @@ export const Register = () => {
   };
 
   const normalizedEmail = email.trim();
+  const selectedRoleTitle =
+    selectedRole === 'doctor' ? t('auth.register.roleDoctorTitle') : t('auth.register.rolePatientTitle');
 
   const handleResendConfirmation = async () => {
     if (!normalizedEmail) {
@@ -213,8 +215,12 @@ export const Register = () => {
   };
 
   const stepTitles = useMemo(
-    () => [t('auth.register.step1'), t('auth.register.step2'), t('auth.register.step3')],
-    [t]
+    () => [
+      t('auth.register.step1'),
+      safeRequestedRole ? t('auth.register.step2Details') : t('auth.register.step2'),
+      t('auth.register.step3'),
+    ],
+    [safeRequestedRole, t]
   );
 
   return (
@@ -226,8 +232,8 @@ export const Register = () => {
         <div className="flex flex-col gap-3 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between">
           <span>{t('auth.register.haveAccount')}</span>
           <Link
-            to="/auth/login"
-            className="font-semibold text-ceenai-blue transition-colors hover:text-ceenai-navy"
+            to={`/auth/login?role=${selectedRole}`}
+            className="font-semibold text-teal-600 transition-colors hover:text-teal-700"
           >
             {t('auth.register.signInInstead')}
           </Link>
@@ -242,9 +248,9 @@ export const Register = () => {
           return (
             <div
               key={stepTitle}
-              className={`rounded-2xl border px-4 py-3 transition ${
+              className={`rounded-3xl border px-4 py-4 transition ${
                 completed || active
-                  ? 'border-ceenai-cyan bg-ceenai-cyan/10'
+                  ? 'border-teal-200 bg-teal-50 shadow-sm'
                   : 'border-slate-200 bg-white'
               }`}
             >
@@ -252,7 +258,7 @@ export const Register = () => {
                 <div
                   className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
                     completed || active
-                      ? 'bg-gradient-to-r from-ceenai-cyan to-ceenai-blue text-white'
+                      ? 'bg-teal-600 text-white'
                       : 'bg-slate-100 text-slate-500'
                   }`}
                 >
@@ -278,13 +284,13 @@ export const Register = () => {
       ) : null}
 
       {(successMessage || duplicateEmailConflict) && mode === 'email-password' ? (
-        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-ceenai-cyan/20 bg-ceenai-cyan/10 px-4 py-3 text-sm text-ceenai-blue">
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-700">
           <span>{t('auth.register.resendPrompt')}</span>
           <button
             type="button"
             onClick={() => void handleResendConfirmation()}
             disabled={isSubmitting || isResendingConfirmation || !normalizedEmail}
-            className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-ceenai-blue shadow-sm transition hover:shadow disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-teal-600 shadow-sm transition hover:shadow disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isResendingConfirmation ? t('auth.register.resending') : t('auth.register.resendButton')}
           </button>
@@ -298,7 +304,7 @@ export const Register = () => {
       ) : null}
 
       {isResettingSession ? (
-        <div className="rounded-2xl border border-ceenai-cyan/20 bg-ceenai-cyan/10 px-4 py-3 text-sm text-ceenai-blue">
+        <div className="rounded-2xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-700">
           {t('auth.register.resettingSession')}
         </div>
       ) : null}
@@ -312,13 +318,15 @@ export const Register = () => {
                 resetFeedback();
                 setMode('email-password');
               }}
-              className={`rounded-3xl border p-5 text-left transition ${
+              className={`rounded-[1.75rem] border p-5 text-left transition ${
                 mode === 'email-password'
-                  ? 'border-ceenai-cyan bg-ceenai-cyan/10'
-                  : 'border-gray-200 hover:border-ceenai-cyan/40'
+                  ? 'border-teal-200 bg-teal-50 shadow-sm'
+                  : 'border-gray-200 bg-white hover:border-teal-200 hover:bg-slate-50'
               }`}
             >
-              <ShieldCheck className="h-6 w-6 text-ceenai-blue" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
+                <ShieldCheck className="h-6 w-6 text-teal-600" />
+              </div>
               <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.modeEmailTitle')}</h3>
               <p className="mt-2 text-sm leading-relaxed text-gray-600">
                 {t('auth.register.modeEmailDesc')}
@@ -331,13 +339,15 @@ export const Register = () => {
                 resetFeedback();
                 setMode('phone-otp');
               }}
-              className={`rounded-3xl border p-5 text-left transition ${
+              className={`rounded-[1.75rem] border p-5 text-left transition ${
                 mode === 'phone-otp'
-                  ? 'border-ceenai-cyan bg-ceenai-cyan/10'
-                  : 'border-gray-200 hover:border-ceenai-cyan/40'
+                  ? 'border-teal-200 bg-teal-50 shadow-sm'
+                  : 'border-gray-200 bg-white hover:border-teal-200 hover:bg-slate-50'
               }`}
             >
-              <UserRound className="h-6 w-6 text-ceenai-blue" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
+                <UserRound className="h-6 w-6 text-teal-600" />
+              </div>
               <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.modePhoneTitle')}</h3>
               <p className="mt-2 text-sm leading-relaxed text-gray-600">
                 {t('auth.register.modePhoneDesc')}
@@ -347,125 +357,176 @@ export const Register = () => {
         ) : null}
 
         {step === 1 ? (
-          <div className="space-y-5">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <button
-                type="button"
-                onClick={() => setSelectedRole('patient')}
-                className={`rounded-3xl border p-5 text-left transition ${
-                  selectedRole === 'patient'
-                    ? 'border-ceenai-cyan bg-ceenai-cyan/10'
-                    : 'border-gray-200 hover:border-ceenai-cyan/40'
-                }`}
+          <div className="space-y-5 rounded-[1.75rem] border border-slate-200 bg-slate-50/70 p-5">
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3">
+              <div>
+                <p className="text-sm font-semibold text-slate-900">{t('auth.register.roleStepLabel')}</p>
+                <p className="text-xs text-slate-500">{t('auth.register.roleStepHint')}</p>
+              </div>
+              <Link
+                to="/auth/portal-access?intent=register"
+                className="text-sm font-semibold text-teal-600 transition-colors hover:text-teal-700"
               >
-                <UserRound className="h-6 w-6 text-ceenai-blue" />
-                <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.rolePatientTitle')}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                  {t('auth.register.rolePatientDesc')}
-                </p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setSelectedRole('doctor')}
-                className={`rounded-3xl border p-5 text-left transition ${
-                  selectedRole === 'doctor'
-                    ? 'border-ceenai-cyan bg-ceenai-cyan/10'
-                    : 'border-gray-200 hover:border-ceenai-cyan/40'
-                }`}
-              >
-                <Stethoscope className="h-6 w-6 text-ceenai-blue" />
-                <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.roleDoctorTitle')}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                  {t('auth.register.roleDoctorDesc')}
-                </p>
-              </button>
+                {t('auth.register.changeRole')}
+              </Link>
             </div>
 
-            <label className="block space-y-2">
-              <span className="text-sm font-semibold text-gray-700">{t('auth.register.fullName')}</span>
-              <input
-                type="text"
-                value={fullName}
-                onChange={(event) => setFullName(event.target.value)}
-                className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                placeholder={t('auth.register.fullNamePlaceholder')}
-                autoComplete="name"
-                required
-              />
-            </label>
+            {safeRequestedRole ? (
+              <div className="flex items-center gap-3 rounded-xl border border-teal-200 bg-teal-50 p-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white">
+                  {selectedRole === 'doctor' ? (
+                    <Stethoscope className="h-5 w-5 text-teal-600" />
+                  ) : (
+                    <UserRound className="h-5 w-5 text-teal-600" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-slate-900">{selectedRoleTitle}</h3>
+                  <p className="text-xs text-slate-500">{t('auth.login.roleAccessBadge')}</p>
+                </div>
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedRole('patient')}
+                  className={`rounded-[1.75rem] border p-5 text-left transition ${
+                    selectedRole === 'patient'
+                      ? 'border-teal-200 bg-teal-50 shadow-sm'
+                      : 'border-gray-200 bg-white hover:border-teal-200 hover:bg-white'
+                  }`}
+                >
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
+                    <UserRound className="h-6 w-6 text-teal-600" />
+                  </div>
+                  <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.rolePatientTitle')}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                    {t('auth.register.rolePatientDesc')}
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedRole('doctor')}
+                  className={`rounded-[1.75rem] border p-5 text-left transition ${
+                    selectedRole === 'doctor'
+                      ? 'border-teal-200 bg-teal-50 shadow-sm'
+                      : 'border-gray-200 bg-white hover:border-teal-200 hover:bg-white'
+                  }`}
+                >
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
+                    <Stethoscope className="h-6 w-6 text-teal-600" />
+                  </div>
+                  <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.roleDoctorTitle')}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                    {t('auth.register.roleDoctorDesc')}
+                  </p>
+                </button>
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-medium text-slate-600">{t('auth.register.fullNameShort')}</label>
+              <div className="relative">
+                <UserRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={fullName}
+                  onChange={(event) => setFullName(event.target.value)}
+                  className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
+                  placeholder={t('auth.register.fullNamePlaceholder')}
+                  autoComplete="name"
+                  required
+                />
+              </div>
+            </div>
           </div>
         ) : null}
 
         {step === 2 ? (
-          <div className="space-y-5">
+          <div className="space-y-5 rounded-[1.75rem] border border-slate-200 bg-slate-50/70 p-5">
             {mode === 'email-password' ? (
               <>
-                <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-gray-700">{t('auth.register.email')}</span>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                    placeholder={t('auth.register.emailPlaceholder')}
-                    autoComplete="email"
-                    required
-                  />
-                </label>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-medium text-slate-600">{t('auth.register.emailShort')}</label>
+                  <div className="relative">
+                    <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
+                      placeholder={t('auth.register.emailPlaceholder')}
+                      autoComplete="email"
+                      required
+                    />
+                  </div>
+                </div>
 
-                <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-gray-700">{t('auth.register.mobile')}</span>
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(event) => setPhone(event.target.value)}
-                    className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                    placeholder={t('auth.register.mobilePlaceholder')}
-                    autoComplete="tel"
-                  />
-                </label>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-medium text-slate-600">{t('auth.register.mobileShortOptional')}</label>
+                  <div className="relative">
+                    <Smartphone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(event) => setPhone(event.target.value)}
+                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
+                      placeholder={t('auth.register.mobilePlaceholder')}
+                      autoComplete="tel"
+                    />
+                  </div>
+                </div>
 
-                <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-gray-700">{t('auth.register.password')}</span>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                    placeholder={t('auth.register.passwordPlaceholder')}
-                    autoComplete="new-password"
-                    required
-                  />
-                </label>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-medium text-slate-600">{t('auth.register.passwordShort')}</label>
+                  <div className="relative">
+                    <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
+                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
+                      placeholder={t('auth.register.passwordPlaceholder')}
+                      autoComplete="new-password"
+                      required
+                    />
+                  </div>
+                </div>
 
-                <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-gray-700">{t('auth.register.confirmPassword')}</span>
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(event) => setConfirmPassword(event.target.value)}
-                    className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                    placeholder={t('auth.register.confirmPasswordPlaceholder')}
-                    autoComplete="new-password"
-                    required
-                  />
-                </label>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-medium text-slate-600">{t('auth.register.confirmPasswordShort')}</label>
+                  <div className="relative">
+                    <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(event) => setConfirmPassword(event.target.value)}
+                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
+                      placeholder={t('auth.register.confirmPasswordPlaceholder')}
+                      autoComplete="new-password"
+                      required
+                    />
+                  </div>
+                </div>
               </>
             ) : (
               <>
-                <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-gray-700">{t('auth.register.mobile')}</span>
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(event) => setPhone(event.target.value)}
-                    className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
-                    placeholder={t('auth.register.mobilePlaceholder')}
-                    autoComplete="tel"
-                    required
-                  />
-                </label>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-medium text-slate-600">{t('auth.register.mobileShort')}</label>
+                  <div className="relative">
+                    <Smartphone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(event) => setPhone(event.target.value)}
+                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
+                      placeholder={t('auth.register.mobilePlaceholder')}
+                      autoComplete="tel"
+                      required
+                    />
+                  </div>
+                </div>
 
                 <div className="rounded-2xl bg-gray-50 px-4 py-3 text-sm text-gray-600">
                   {t('auth.register.otpNextHint')}
@@ -478,7 +539,7 @@ export const Register = () => {
                 type="checkbox"
                 checked={termsAccepted}
                 onChange={(event) => setTermsAccepted(event.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-ceenai-blue focus:ring-ceenai-cyan"
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
               />
               <span className="text-sm leading-relaxed text-gray-600">
                 {t('auth.register.termsLabel')}
@@ -492,7 +553,7 @@ export const Register = () => {
             type="button"
             onClick={previousStep}
             disabled={step === 0 || isSubmitting || isResettingSession}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 px-5 py-3 font-semibold text-gray-700 transition hover:border-ceenai-cyan hover:text-ceenai-blue disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 px-5 py-3 font-semibold text-gray-700 transition hover:border-teal-500 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>{t('auth.register.btnBack')}</span>
@@ -501,7 +562,7 @@ export const Register = () => {
           <button
             type="submit"
             disabled={isSubmitting || isResettingSession}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-teal-600 px-5 py-3 font-semibold text-white shadow-lg transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <span>
               {step < 2

@@ -119,7 +119,7 @@ export const VerifyOTP = () => {
           <span>{t('auth.otp.wrongDetails')}</span>
           <Link
             to={shouldGoToOnboarding ? '/auth/register' : '/auth/login'}
-            className="font-semibold text-ceenai-blue transition-colors hover:text-ceenai-navy"
+            className="font-semibold text-teal-600 transition-colors hover:text-teal-700"
           >
             {t('auth.otp.goBack')}
           </Link>
@@ -138,9 +138,9 @@ export const VerifyOTP = () => {
         </div>
       ) : null}
 
-      <div className="rounded-3xl border border-ceenai-cyan/20 bg-ceenai-cyan/5 p-5">
+      <div className="rounded-3xl border border-teal-200 bg-teal-50 p-5">
         <div className="flex items-start gap-3">
-          <ShieldCheck className="mt-1 h-5 w-5 text-ceenai-blue" />
+          <ShieldCheck className="mt-1 h-5 w-5 text-teal-600" />
           <div className="space-y-1 text-sm text-slate-600">
             <p className="font-semibold text-slate-900">{t('auth.otp.verificationTarget')}</p>
             <p>{phone || email}</p>
@@ -158,7 +158,7 @@ export const VerifyOTP = () => {
             pattern="[0-9]*"
             value={token}
             onChange={(event) => setToken(event.target.value.replace(/\D/g, '').slice(0, 6))}
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center text-2xl tracking-[0.4em] text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center text-2xl tracking-[0.4em] text-slate-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
             placeholder="000000"
             autoComplete="one-time-code"
             required
@@ -170,7 +170,7 @@ export const VerifyOTP = () => {
             type="button"
             onClick={handleResend}
             disabled={isResending}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 px-5 py-3 font-semibold text-slate-700 transition hover:border-ceenai-cyan hover:text-ceenai-blue disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 px-5 py-3 font-semibold text-slate-700 transition hover:border-teal-500 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <RefreshCcw className="h-4 w-4" />
             <span>{isResending ? t('auth.otp.resending') : t('auth.otp.resend')}</span>
@@ -179,7 +179,7 @@ export const VerifyOTP = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-3 font-semibold text-white shadow-lg transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-teal-600 px-5 py-3 font-semibold text-white shadow-lg transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <ShieldCheck className="h-4 w-4" />
             <span>{isSubmitting ? t('auth.otp.verifying') : t('auth.otp.verify')}</span>
