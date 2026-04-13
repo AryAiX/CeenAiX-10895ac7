@@ -8,6 +8,7 @@ export { usePatientPrescriptions } from './use-patient-prescriptions';
 export { usePatientRecords } from './use-patient-records';
 export { useMessagingHub } from './use-messaging-hub';
 export { useDoctorDashboard } from './use-doctor-dashboard';
+export { useDoctorPortalChrome } from './use-doctor-portal-chrome';
 export { useDoctorPatients } from './use-doctor-patients';
 export { useDoctorPatientDetail } from './use-doctor-patient-detail';
 export { useDoctorAppointmentDetail } from './use-doctor-appointment-detail';
