@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, UserCheck } from 'lucide-react';
+import { ArrowRight, LogOut, UserCheck } from 'lucide-react';
 import { AuthShell } from '../../components/AuthShell';
 import { SpecializationMultiSelect } from '../../components/SpecializationMultiSelect';
 import { useDoctorSpecializationIds, useSpecializations } from '../../hooks';
@@ -63,7 +63,7 @@ const getOnboardingRole = (role: UserRole | null, metadataRole: unknown): UserRo
 export const Onboarding = () => {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
-  const { doctorProfile, patientProfile, profile, refreshProfile, role, user } = useAuth();
+  const { doctorProfile, patientProfile, profile, refreshProfile, role, signOut, user } = useAuth();
 
   const [hasInitialized, setHasInitialized] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -476,6 +476,20 @@ export const Onboarding = () => {
               {isSubmitting ? t('auth.onboarding.buttons.saving') : t('auth.onboarding.buttons.save')}
             </span>
             <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="flex items-center justify-center border-t border-slate-200 pt-4">
+          <button
+            type="button"
+            onClick={async () => {
+              await signOut();
+              navigate('/auth/login', { replace: true });
+            }}
+            className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition-colors hover:text-cyan-600"
+          >
+            <LogOut className="h-4 w-4" />
+            <span>{t('auth.onboarding.buttons.useAnotherAccount')}</span>
           </button>
         </div>
       </form>

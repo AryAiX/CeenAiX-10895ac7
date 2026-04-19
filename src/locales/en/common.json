@@ -638,8 +638,10 @@
       "modeOtpHint": "Receive a one-time verification code",
       "email": "Email address",
       "emailShort": "Email",
+      "emailPlaceholder": "you@example.com",
       "password": "Password",
       "passwordShort": "Password",
+      "passwordPlaceholder": "Enter your password",
       "passwordHint": "Use your registered email credentials.",
       "forgotPassword": "Forgot password?",
       "signIn": "Sign in",
@@ -829,7 +831,8 @@
       "buttons": {
         "skip": "Skip for now",
         "save": "Save and continue",
-        "saving": "Saving..."
+        "saving": "Saving...",
+        "useAnotherAccount": "Sign out and use another account"
       },
       "errors": {
         "mustSignIn": "You must be signed in to complete onboarding.",
