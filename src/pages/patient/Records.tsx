@@ -13,7 +13,6 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
-import { Navigation } from '../../components/Navigation';
 import { Skeleton } from '../../components/Skeleton';
 import { usePatientRecords } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
@@ -476,54 +475,41 @@ export const PatientRecords: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
-      <Navigation role="patient" />
-
-      <div className="relative bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <img
-            src="https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg?auto=compress&cs=tinysrgb&w=1920"
-            alt={t('patient.records.title')}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-ceenai-navy/90 to-ceenai-blue/85"></div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="text-4xl font-bold text-white mb-2">{t('patient.records.title')}</h1>
-          <p className="text-cyan-100 text-lg">{t('patient.records.subtitle')}</p>
-        </div>
+    <>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">{t('patient.records.title')}</h1>
+        <p className="mt-1 text-sm text-slate-500">{t('patient.records.subtitle')}</p>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid gap-4 md:grid-cols-4 mb-8">
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-600">{t('patient.records.conditions')}</p>
-            <p className="mt-2 text-3xl font-bold text-gray-900">
+      <div>
+        <div className="grid gap-4 md:grid-cols-4 mb-6">
+          <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+            <p className="text-sm font-medium text-slate-500">{t('patient.records.conditions')}</p>
+            <p className="mt-2 text-2xl font-bold text-slate-900">
               {formatLocaleDigits(conditions.length, i18n.language)}
             </p>
-            <p className="mt-1 text-sm text-cyan-600">{t('patient.records.conditionsSub')}</p>
+            <p className="mt-1 text-xs font-medium text-teal-600">{t('patient.records.conditionsSub')}</p>
           </div>
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-600">{t('patient.records.allergies')}</p>
-            <p className="mt-2 text-3xl font-bold text-gray-900">
+          <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+            <p className="text-sm font-medium text-slate-500">{t('patient.records.allergies')}</p>
+            <p className="mt-2 text-2xl font-bold text-slate-900">
               {formatLocaleDigits(allergies.length, i18n.language)}
             </p>
-            <p className="mt-1 text-sm text-amber-600">{t('patient.records.allergiesSub')}</p>
+            <p className="mt-1 text-xs font-medium text-amber-600">{t('patient.records.allergiesSub')}</p>
           </div>
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-600">{t('patient.records.vaccinations')}</p>
-            <p className="mt-2 text-3xl font-bold text-gray-900">
+          <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+            <p className="text-sm font-medium text-slate-500">{t('patient.records.vaccinations')}</p>
+            <p className="mt-2 text-2xl font-bold text-slate-900">
               {formatLocaleDigits(vaccinations.length, i18n.language)}
             </p>
-            <p className="mt-1 text-sm text-violet-600">{t('patient.records.vaccinationsSub')}</p>
+            <p className="mt-1 text-xs font-medium text-violet-600">{t('patient.records.vaccinationsSub')}</p>
           </div>
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-600">{t('patient.records.totalEntries')}</p>
-            <p className="mt-2 text-3xl font-bold text-gray-900">
+          <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+            <p className="text-sm font-medium text-slate-500">{t('patient.records.totalEntries')}</p>
+            <p className="mt-2 text-2xl font-bold text-slate-900">
               {formatLocaleDigits(totalRecords, i18n.language)}
             </p>
-            <p className="mt-1 text-sm text-emerald-600">{t('patient.records.totalSub')}</p>
+            <p className="mt-1 text-xs font-medium text-emerald-600">{t('patient.records.totalSub')}</p>
           </div>
         </div>
 
@@ -1010,14 +996,14 @@ export const PatientRecords: React.FC = () => {
         )}
 
         {!loading && totalRecords > 0 ? (
-          <div className="mt-8 rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-4 text-sm text-cyan-900">
+          <div className="mt-6 rounded-xl border border-teal-100 bg-teal-50 px-4 py-3 text-sm text-teal-700">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-cyan-700" />
+              <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-teal-600" />
               <p>{t('patient.records.footerDisclaimer')}</p>
             </div>
           </div>
         ) : null}
       </div>
-    </div>
+    </>
   );
 };

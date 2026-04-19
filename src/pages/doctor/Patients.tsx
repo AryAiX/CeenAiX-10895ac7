@@ -2,8 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Users, Search, Calendar, ArrowRight, HeartPulse, MessageSquare } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Navigation } from '../../components/Navigation';
-import { PageHeader } from '../../components/PageHeader';
 import { Skeleton } from '../../components/Skeleton';
 import { useDoctorPatients } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
@@ -54,16 +52,13 @@ export const DoctorPatients: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
-      <Navigation role="doctor" />
-      <PageHeader
-        title={t('doctor.patients.title')}
-        subtitle={t('doctor.patients.subtitle')}
-        icon={<Users className="w-6 h-6 text-white" />}
-        backTo="/doctor/dashboard"
-      />
+    <>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">{t('doctor.patients.title')}</h1>
+        <p className="mt-1 text-sm text-slate-500">{t('doctor.patients.subtitle')}</p>
+      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div>
         <div className="mb-6">
           <div className="flex items-center justify-between gap-4">
             <div className="relative flex-1 max-w-md">
@@ -224,6 +219,6 @@ export const DoctorPatients: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 };

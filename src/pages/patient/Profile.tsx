@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigation } from '../../components/Navigation';
-import { PageHeader } from '../../components/PageHeader';
 import { FamilyTree } from '../../components/FamilyTree';
 import { AccountSecurityPanel } from '../../components/AccountSecurityPanel';
 import { Upload, Camera, User, Shield, Users, Plus, Trash2, CreditCard as Edit2, Save } from 'lucide-react';
@@ -97,18 +95,14 @@ export const Profile: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
-      <Navigation role="patient" />
-      <PageHeader
-        title={t('patient.profile.title')}
-        subtitle={t('patient.profile.subtitle')}
-        icon={<User className="w-6 h-6 text-white" />}
-        backTo="/patient/dashboard"
-      />
+    <>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">{t('patient.profile.title')}</h1>
+        <p className="mt-1 text-sm text-slate-500">{t('patient.profile.subtitle')}</p>
+      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100/50 backdrop-blur-sm sticky top-8">
               <div className="text-center">
@@ -693,6 +687,6 @@ export const Profile: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };

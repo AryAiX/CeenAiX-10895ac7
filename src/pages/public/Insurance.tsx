@@ -401,7 +401,7 @@ export const Insurance: React.FC = () => {
             return (
               <div
                 key={plan.id}
-                className={`overflow-hidden rounded-2xl bg-white shadow-lg transition-all hover:shadow-2xl ${
+                className={`card-hover overflow-hidden rounded-2xl bg-white shadow-lg ${
                   plan.popular ? 'ring-2 ring-blue-500' : ''
                 } ${isSelected ? 'ring-2 ring-green-500' : ''}`}
               >
@@ -420,10 +420,10 @@ export const Insurance: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => togglePlanSelection(plan.id)}
-                      className={`rounded-lg border-2 px-3 py-1 text-sm font-semibold transition-all ${
+                      className={`rounded-lg border px-3 py-1 text-xs font-semibold transition-all ${
                         isSelected
-                          ? 'border-green-500 bg-green-100 text-green-700'
-                          : 'border-gray-300 bg-gray-100 text-gray-700 hover:border-blue-500'
+                          ? 'border-emerald-400 bg-emerald-50 text-emerald-700'
+                          : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-cyan-400 hover:text-cyan-600'
                       }`}
                     >
                       {isSelected ? t('insurancePage.selected') : t('insurancePage.compare')}
@@ -470,10 +470,10 @@ export const Insurance: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => navigate('/auth/register?role=patient&reset=1')}
-                    className={`w-full rounded-xl py-3 font-semibold shadow-md transition-all hover:shadow-lg ${
+                    className={`w-full rounded-xl py-3 font-semibold transition-all duration-300 ${
                       plan.popular
-                        ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700'
-                        : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                        ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md hover:shadow-lg hover:shadow-cyan-500/30'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                     }`}
                   >
                     {t('insurancePage.getStarted')}

@@ -190,7 +190,7 @@ export const FindClinic: React.FC = () => {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
         <div className="absolute top-0 left-0 w-96 h-96 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-0 right-1/2 w-96 h-96 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+        <div className="absolute bottom-0 right-1/2 w-96 h-96 bg-sky-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
       <Header />
@@ -359,7 +359,7 @@ export const FindClinic: React.FC = () => {
             {filteredHospitals.map((hospital, index) => (
               <div
                 key={hospital.id}
-                className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 transform hover:-translate-y-1 animate-fade-in-up"
+                className="card-hover bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden border border-gray-100 animate-fade-in-up"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="lg:flex">
@@ -505,7 +505,7 @@ export const FindClinic: React.FC = () => {
                       <div className="relative">
                         <button
                           onClick={() => setShowNavMenu(showNavMenu === hospital.id ? null : hospital.id)}
-                          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-xl transform hover:scale-105"
+                          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-2.5 font-semibold text-white shadow-md transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/30"
                         >
                           <Navigation className="w-4 h-4" />
                           Get Directions
@@ -546,7 +546,7 @@ export const FindClinic: React.FC = () => {
                         {hospitalDoctors[hospital.id].map((doctor, idx) => (
                           <div
                             key={doctor.id}
-                            className="bg-white rounded-xl p-4 shadow-md hover:shadow-xl transition-all border border-gray-100 transform hover:-translate-y-1 animate-fade-in-up"
+                            className="card-hover bg-white rounded-xl p-4 shadow-md border border-gray-100 animate-fade-in-up"
                             style={{ animationDelay: `${idx * 50}ms` }}
                           >
                             <div className="flex items-start gap-3 mb-3">

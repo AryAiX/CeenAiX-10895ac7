@@ -309,7 +309,7 @@ export const Onboarding = () => {
             type="text"
             value={form.fullName}
             onChange={(event) => updateField('fullName', event.target.value)}
-            className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
+            className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
             placeholder={t('auth.onboarding.fields.fullNamePlaceholder')}
             autoComplete="name"
             required
@@ -326,7 +326,7 @@ export const Onboarding = () => {
               type="email"
               value={form.email}
               onChange={(event) => updateField('email', event.target.value)}
-              className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
+              className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
               placeholder={t('auth.onboarding.fields.emailPlaceholder')}
               autoComplete="email"
               required={!user?.email}
@@ -341,7 +341,7 @@ export const Onboarding = () => {
                 type="tel"
                 value={form.phone}
                 onChange={(event) => updateField('phone', event.target.value)}
-                className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
+                className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
                 placeholder={t('auth.register.mobilePlaceholder')}
                 autoComplete="tel"
               />
@@ -355,7 +355,7 @@ export const Onboarding = () => {
             type="text"
             value={form.city}
             onChange={(event) => updateField('city', event.target.value)}
-            className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
+            className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
             placeholder={t('auth.onboarding.fields.cityPlaceholder')}
           />
         </label>
@@ -366,7 +366,7 @@ export const Onboarding = () => {
             value={form.address}
             onChange={(event) => updateField('address', event.target.value)}
             rows={3}
-            className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
+            className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
             placeholder={t('auth.onboarding.fields.addressPlaceholder')}
           />
         </label>
@@ -381,7 +381,7 @@ export const Onboarding = () => {
                 type="text"
                 value={form.emergencyContactName}
                 onChange={(event) => updateField('emergencyContactName', event.target.value)}
-                className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
+                className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
                 placeholder={t('auth.onboarding.fields.emergencyNamePlaceholder')}
               />
             </label>
@@ -394,7 +394,7 @@ export const Onboarding = () => {
                 type="tel"
                 value={form.emergencyContactPhone}
                 onChange={(event) => updateField('emergencyContactPhone', event.target.value)}
-                className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
+                className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
                 placeholder={t('auth.onboarding.fields.emergencyPhonePlaceholder')}
               />
             </label>
@@ -426,7 +426,7 @@ export const Onboarding = () => {
                   type="text"
                   value={form.licenseNumber}
                   onChange={(event) => updateField('licenseNumber', event.target.value)}
-                  className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
+                  className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
                   placeholder={t('auth.onboarding.fields.licensePlaceholder')}
                 />
               </label>
@@ -438,7 +438,7 @@ export const Onboarding = () => {
                 value={form.bio}
                 onChange={(event) => updateField('bio', event.target.value)}
                 rows={4}
-                className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
+                className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
                 placeholder={t('auth.onboarding.fields.bioPlaceholder')}
               />
             </label>
@@ -450,7 +450,7 @@ export const Onboarding = () => {
             type="checkbox"
             checked={form.termsAccepted}
             onChange={(event) => updateField('termsAccepted', event.target.checked)}
-            className="mt-1 h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+            className="mt-1 h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
           />
           <span className="text-sm leading-relaxed text-gray-600">
             {t('auth.onboarding.fields.termsConfirm')}
@@ -461,7 +461,7 @@ export const Onboarding = () => {
           <button
             type="button"
             onClick={() => navigate(getDefaultRouteForRole(activeRole), { replace: true })}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 px-5 py-3 font-semibold text-gray-700 transition hover:border-teal-500 hover:text-teal-700"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 px-5 py-3 font-semibold text-gray-700 transition hover:border-cyan-500 hover:text-cyan-700"
           >
             {t('auth.onboarding.buttons.skip')}
           </button>
@@ -469,7 +469,7 @@ export const Onboarding = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-teal-600 px-5 py-3 font-semibold text-white shadow-lg transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-3 font-semibold text-white shadow-lg shadow-cyan-500/20 transition hover:shadow-xl hover:shadow-cyan-500/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
           >
             <UserCheck className="h-4 w-4" />
             <span>

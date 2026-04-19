@@ -29,3 +29,13 @@ docs/keys.local.md
 # Generated SQL chunks/bundles (scripts/split-migrations-for-remote.mjs)
 supabase/.temp/migration-chunk-*.sql
 supabase/.temp/bundle-*.sql
+
+# UI parity pass scratch space (scripts/ui-parity-servers.sh + ui-parity-capture.mjs).
+# Dev-server pids, logs, and the ephemeral playwright cache are never committed.
+.ui-parity/
+.reference/
+
+# UI parity screenshot artifacts. We version-control the directory
+# structure via .gitkeep / README files, but the PNG baselines change with
+# every port pass and are regenerated on demand.
+docs/ui-parity/**/*.png

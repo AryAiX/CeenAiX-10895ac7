@@ -196,19 +196,19 @@ export const FindDoctor: React.FC = () => {
         </div>
 
         {loading && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 shadow-soft border border-gray-100 animate-pulse">
-                <div className="flex items-start space-x-4 mb-4">
-                  <div className="w-20 h-20 bg-gray-200 rounded-xl"></div>
+              <div key={i} className="animate-pulse rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="mb-4 flex items-start gap-4">
+                  <div className="h-20 w-20 rounded-xl bg-slate-100"></div>
                   <div className="flex-1">
-                    <div className="h-5 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                    <div className="mb-2 h-5 rounded bg-slate-100"></div>
+                    <div className="h-4 w-2/3 rounded bg-slate-100"></div>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <div className="h-4 bg-gray-200 rounded"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-4 rounded bg-slate-100"></div>
+                  <div className="h-4 w-3/4 rounded bg-slate-100"></div>
                 </div>
               </div>
             ))}
@@ -225,7 +225,7 @@ export const FindDoctor: React.FC = () => {
               return (
               <div
                 key={doctor.id}
-                className="group animate-scale-in overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm transition-all duration-500 hover:-translate-y-1 hover:border-ceenai-cyan/40 hover:shadow-xl"
+                className="group card-hover animate-scale-in overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm hover:border-ceenai-cyan/40"
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
                 <div className="relative h-48 overflow-hidden bg-gradient-to-br from-ceenai-cyan/10 to-ceenai-blue/10">

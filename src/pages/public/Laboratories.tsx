@@ -156,12 +156,12 @@ export const Laboratories: React.FC = () => {
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-teal-300 bg-teal-100 px-5 py-2.5 text-teal-700">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-cyan-50 px-5 py-2.5 text-cyan-700">
             <TestTube className="h-5 w-5" />
             <span className="text-sm font-semibold">{t('laboratoryPage.heroBadge')}</span>
           </div>
-          <h1 className="mb-4 text-5xl font-bold text-gray-900 md:text-6xl">{t('laboratoryPage.heroTitle')}</h1>
-          <p className="mx-auto max-w-3xl text-xl text-gray-600">{t('laboratoryPage.heroLead')}</p>
+          <h1 className="mb-4 text-5xl font-bold text-slate-900 md:text-6xl">{t('laboratoryPage.heroTitle')}</h1>
+          <p className="mx-auto max-w-3xl text-xl text-slate-600">{t('laboratoryPage.heroLead')}</p>
         </div>
 
         <div className="mb-8 rounded-2xl bg-white p-6 shadow-lg">
@@ -216,7 +216,7 @@ export const Laboratories: React.FC = () => {
               return (
                 <div
                   key={lab.id}
-                  className={`overflow-hidden rounded-2xl bg-white shadow-lg transition-all hover:shadow-2xl ${
+                  className={`card-hover overflow-hidden rounded-2xl bg-white shadow-lg ${
                     lab.featured ? 'ring-2 ring-blue-500' : ''
                   }`}
                 >

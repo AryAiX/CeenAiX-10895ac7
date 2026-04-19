@@ -3,8 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Loader2, Plus, Search, TestTube2, Trash2 } from 'lucide-react';
 import { LabTestNameDisplay } from '../../components/LabTestNameDisplay';
-import { Navigation } from '../../components/Navigation';
-import { PageHeader } from '../../components/PageHeader';
 import {
   useDoctorPatients,
   useLabTestCatalogSearch,
@@ -752,19 +750,16 @@ export const CreateLabOrder: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
-      <Navigation role="doctor" />
-      <PageHeader
-        title={t('doctor.createLabOrder.title')}
-        subtitle={t('doctor.createLabOrder.subtitle')}
-        icon={<TestTube2 className="w-6 h-6 text-white" />}
-        backTo="/doctor/lab-orders"
-      />
+    <>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">{t('doctor.createLabOrder.title')}</h1>
+        <p className="mt-1 text-sm text-slate-500">{t('doctor.createLabOrder.subtitle')}</p>
+      </div>
 
-      <div className="mx-auto max-w-5xl space-y-6 px-4 py-8">
+      <div className="mx-auto w-full max-w-5xl space-y-6">
         {feedback ? (
           <div
-            className={`rounded-2xl border px-4 py-3 text-sm ${
+            className={`rounded-xl border px-4 py-3 text-sm ${
               feedback.type === 'success'
                 ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
                 : 'border-red-200 bg-red-50 text-red-700'
@@ -866,6 +861,6 @@ export const CreateLabOrder: React.FC = () => {
           </button>
         </div>
       </div>
-    </div>
+    </>
   );
 };

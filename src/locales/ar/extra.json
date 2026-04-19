@@ -69,6 +69,15 @@
       "home": "الذهاب للرئيسية",
       "otherAccount": "استخدام حساب آخر",
       "dashboard": "فتح لوحة التحكم"
+    },
+    "phaseStub": {
+      "phasePlanned": "مُخطط له",
+      "phaseBeta": "إصدار تجريبي",
+      "phaseActivation": "في انتظار التفعيل",
+      "phaseFeaturePreview": "معاينة الميزة",
+      "backToDashboard": "العودة إلى لوحة التحكم",
+      "requestEarlyAccess": "طلب الوصول المبكر",
+      "readTheSpec": "قراءة المواصفات"
     }
   },
   "patient": {
@@ -502,6 +511,88 @@
       "complete": "إكمال الاستقبال",
       "completing": "جاري الإكمال...",
       "requiredHint": "يرجى إكمال الأسئلة المطلوبة أدناه."
+    },
+    "labResults": {
+      "title": "نتائج المختبر",
+      "subtitle": "راجع نتائج الفحوصات واطلب من المساعد الذكي شرحها بلغة مبسّطة.",
+      "loadError": "تعذّر تحميل نتائج المختبر الآن.",
+      "emptyTitle": "لا توجد نتائج مختبر بعد",
+      "emptyBody": "عندما يطلب طبيبك فحوصات مختبرية، ستظهر النتائج هنا بعد معالجتها.",
+      "orderedOn": "طُلبت في {{date}}",
+      "orderedBy": "طُلبت بواسطة {{name}}",
+      "orderedByFallback": "فريق الرعاية",
+      "statusLabel": "حالة الطلب",
+      "abnormalBadge": "نتائج غير طبيعية",
+      "resultedCount_one": "{{count}} نتيجة متاحة",
+      "resultedCount_other": "{{count}} نتائج متاحة",
+      "pendingCount_one": "{{count}} فحص في انتظار النتيجة",
+      "pendingCount_other": "{{count}} فحوصات في انتظار النتيجة",
+      "referenceRange": "المدى المرجعي",
+      "testStatus": "الحالة",
+      "testResult": "النتيجة",
+      "noResultYet": "قيد المعالجة",
+      "explainWithAi": "اشرح بالذكاء الاصطناعي",
+      "openAppointment": "عرض الزيارة المرتبطة"
+    },
+    "notifications": {
+      "title": "الإشعارات",
+      "subtitle": "تابع مواعيدك ونتائج فحوصاتك ورسائل فريق الرعاية.",
+      "unreadCount": "إشعارات غير مقروءة في السجل",
+      "refresh": "تحديث",
+      "markAllRead": "تعليم الكل كمقروء",
+      "liveAttention": "بحاجة إلى انتباهك",
+      "noLiveAttention": "لا يوجد جديد الآن. سنخبرك عندما يحتاج شيء ما إلى انتباهك.",
+      "logTitle": "سجل الإشعارات",
+      "emptyLog": "لم يتم تسليم أي إشعارات بعد.",
+      "unreadBadge": "غير مقروء",
+      "open": "فتح",
+      "markRead": "تعليم كمقروء",
+      "loadError": "تعذّر تحميل الإشعارات الآن."
+    },
+    "telemedicine": {
+      "title": "الاستشارة الافتراضية",
+      "subtitle": "ستفتح هنا جلسات الفيديو الآمنة مع فريق الرعاية عند تفعيل خدمة الطب عن بُعد.",
+      "featureVideoTitle": "فيديو بجودة عيادية",
+      "featureVideoBody": "غرف صوت وفيديو بكمون منخفض مع غرفة انتظار وأدوات تحكم للطبيب.",
+      "featureSecureTitle": "خصوصية المريض من التصميم",
+      "featureSecureBody": "رموز غرف مقيدة بالدور وموافقة صريحة قبل أي تسجيل.",
+      "featureHandoffTitle": "انتقال سريري سلس",
+      "featureHandoffBody": "تُرحّل ملخصات الجلسات وإجراءات المتابعة إلى سجل موعدك.",
+      "actionViewAppointment": "عرض الموعد",
+      "actionTalkToSupport": "التحدث مع الدعم"
+    },
+    "settings": {
+      "title": "الإعدادات",
+      "subtitle": "اضبط الإشعارات واللغة والخصوصية والخدمات المرتبطة من مكان واحد.",
+      "featureNotificationsTitle": "تفضيلات الإشعارات",
+      "featureNotificationsBody": "اختر كيف تُخطَر بالمواعيد والرسائل والنتائج الجديدة.",
+      "featurePrivacyTitle": "الخصوصية والموافقة",
+      "featurePrivacyBody": "تحكّم بمشاركة البيانات مع الأطباء والصيدليات وشركات التأمين.",
+      "featureLanguageTitle": "اللغة وإمكانية الوصول",
+      "featureLanguageBody": "اختر لغة الواجهة وخيارات القراءة عالية التباين.",
+      "actionManageProfile": "إدارة الملف الشخصي"
+    },
+    "imaging": {
+      "title": "الأشعة والفحوصات",
+      "subtitle": "مكان موحد لمشاهدة الدراسات الشعاعية والانطباعات الذكية والمقارنات.",
+      "featureViewerTitle": "عارض DICOM عالي الدقة",
+      "featureViewerBody": "استعراض دراسات MRI وCT والأشعة السينية والموجات فوق الصوتية مع التنقل بين السلاسل.",
+      "featureAiReadingTitle": "قراءة بمساعدة الذكاء الاصطناعي",
+      "featureAiReadingBody": "انطباعات بلغة مبسّطة مع تمييز النتائج بجانب تقرير الطبيب.",
+      "featureShareTitle": "المشاركة مع الأطباء",
+      "featureShareBody": "امنح وصولاً محدداً بوقت لطبيب آخر للحصول على رأي ثانٍ.",
+      "actionBackRecords": "العودة إلى السجلات"
+    },
+    "insurance": {
+      "title": "تأميني",
+      "subtitle": "تابع التغطية والمطالبات والاعتمادات المسبقة والأهلية في جميع وثائقك.",
+      "featureCoverageTitle": "ملخص التغطية",
+      "featureCoverageBody": "اطّلع على البوليصة والشبكة والخصومات وما هو مغطى هذا العام.",
+      "featureClaimsTitle": "نشاط المطالبات",
+      "featureClaimsBody": "حالة المطالبات لحظياً ومساهمة العضو عند تفعيل تكامل المدفوعات.",
+      "featureEligibilityTitle": "أهلية فورية",
+      "featureEligibilityBody": "تحقّق من التغطية قبل الحجز مع أي عيادة أو مختبر.",
+      "actionFindPlans": "استعراض الخطط"
     }
   },
   "doctor": {
@@ -858,6 +949,62 @@
       "unreadBadge": "غير مقروء",
       "open": "فتح",
       "markRead": "تحديد كمقروء"
+    },
+    "consultationWorkspace": {
+      "title": "مساحة الاستشارة",
+      "subtitle": "حرّر ملاحظات SOAP وسياق المريض والذكاء السريري في لوحة واحدة مرتبطة بالزيارة.",
+      "featureSoapTitle": "محرر SOAP",
+      "featureSoapBody": "ملاحظات منظّمة مع اقتراحات ذكية وتاريخ المريض مباشرة.",
+      "featureContextTitle": "شريط سياق المريض",
+      "featureContextBody": "الحساسيات والأدوية والحالات والخط الزمني بجانب كل استشارة.",
+      "featureAiTitle": "مساعد سريري بالذكاء الاصطناعي",
+      "featureAiBody": "اقتراحات تفريقية ومساعدات توثيق مُعلّمة كذكاء اصطناعي.",
+      "actionOpenAppointment": "فتح الموعد المرتبط",
+      "actionBackAppointments": "العودة إلى المواعيد"
+    },
+    "settings": {
+      "title": "الإعدادات",
+      "subtitle": "إدارة التوفر والإعدادات السريرية الافتراضية والإشعارات والتكاملات.",
+      "featureAvailabilityTitle": "نوافذ التوفر",
+      "featureAvailabilityBody": "حدد متى يمكن للمرضى الحجز، بما في ذلك مواعيد الطب عن بُعد.",
+      "featureClinicalTitle": "الإعدادات السريرية",
+      "featureClinicalBody": "القوالب المفضّلة ومقتطفات الوصفات ولوحات المختبر.",
+      "featureNotificationsTitle": "توجيه الإشعارات",
+      "featureNotificationsBody": "حدّد كيف تصلك التنبيهات الحرجة عبر الويب والجوال والرسائل.",
+      "actionOpenProfile": "فتح ملفي"
+    },
+    "imaging": {
+      "title": "مركز الأشعة",
+      "subtitle": "راجع الدراسات الشعاعية والانطباعات الذكية والمقارنات قبل استشارتك التالية.",
+      "featureQueueTitle": "قائمة الأشعة",
+      "featureQueueBody": "قائمة مفروزة بدراسات المرضى بانتظار التوقيع.",
+      "featureViewerTitle": "عارض متقدم",
+      "featureViewerBody": "سلاسل MRI وCT والأشعة السينية بدقة كاملة مع تمييز بالذكاء الاصطناعي.",
+      "featureHandoffTitle": "تسليم الطلب",
+      "featureHandoffBody": "أرسل نتائج الدراسة مباشرة إلى الموعد الأصلي.",
+      "actionBackPatients": "العودة إلى المرضى"
+    },
+    "earnings": {
+      "title": "الأرباح",
+      "subtitle": "رؤية واضحة لدخل الاستشارات وتعويضات التأمين ونشاط التعليم المستمر.",
+      "featureSummaryTitle": "ملخص الدفع",
+      "featureSummaryBody": "الإجماليات الشهرية والاتجاه والخصومات من العيادة.",
+      "featureClaimsTitle": "مطالبات التأمين",
+      "featureClaimsBody": "خط حالة المطالبات عند تفعيل تكامل المدفوعات.",
+      "featureTaxTitle": "تقارير ضريبية جاهزة",
+      "featureTaxBody": "كشوفات PDF وCSV قابلة للتصدير لمحاسبك.",
+      "actionOpenDashboard": "فتح لوحة التحكم السريرية"
+    },
+    "portal": {
+      "title": "مركز بوابة الطبيب",
+      "subtitle": "صفحة هبوط موحّدة للأطباء المتعددين عبر العيادات لإدارة المناوبات والأدوار والأرباح.",
+      "featureMultiClinicTitle": "التنقّل بين العيادات",
+      "featureMultiClinicBody": "تنقّل بين عياداتك المرتبطة بنقرة واحدة.",
+      "featureCpdTitle": "التعليم المستمر والاعتمادات",
+      "featureCpdBody": "تابع تجديد تراخيص DOH/DHA والتعليم المستمر.",
+      "featureReportingTitle": "تقارير موحدة",
+      "featureReportingBody": "عدد المرضى والأرباح ورضاهم عبر جميع العيادات.",
+      "actionOpenDashboard": "فتح لوحة التحكم السريرية"
     }
   },
   "public": {
@@ -891,6 +1038,179 @@
       "doctorBannerTitle": "وصول الطبيب",
       "doctorBannerBody": "هذا مساعد الصحة العام. للجدول والمرضى والوصفات، استخدم بوابة الطبيب.",
       "doctorOpenPortal": "فتح لوحة الممارسة"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "لوحة تحكم المشرف",
+      "subtitle": "ستعرض قمرة قيادة المشرف الأعلى صحة المنصة والموافقات والتأمين وتحليلات الذكاء عند تفعيل المرحلة 3.",
+      "featureHealthTitle": "صحة المنصة",
+      "featureHealthBody": "وقت تشغيل لحظي وميزانيات الأخطاء والأداء الإقليمي.",
+      "featureApprovalsTitle": "اعتمادات الأطباء",
+      "featureApprovalsBody": "قائمة انضمام الأطباء مع فحوصات التراخيص والمؤهلات.",
+      "featureInsightsTitle": "رؤى الذكاء والرعاية",
+      "featureInsightsBody": "الاستخدام والرضا والنتائج عبر بوابتَي المريض والطبيب.",
+      "actionHome": "العودة إلى الرئيسية"
+    },
+    "compliance": {
+      "title": "الامتثال",
+      "subtitle": "تقارير الامتثال لدى DOH وDHA وMOH عند تفعيل تصدير التدقيق.",
+      "featureAuditTitle": "مستكشف سجل التدقيق",
+      "featureAuditBody": "أثر تدقيق غير قابل للتعديل لكل وصول إلى بيانات صحية.",
+      "featureReportsTitle": "تقارير الجهات التنظيمية",
+      "featureReportsBody": "حزم DOH/DHA جاهزة مع أدلة قابلة للتصدير.",
+      "featureIncidentsTitle": "سجل الحوادث",
+      "featureIncidentsBody": "تتبع حوادث الخصوصية وسير العمل التصحيحي.",
+      "actionBack": "العودة إلى المشرف"
+    },
+    "systemHealth": {
+      "title": "صحة النظام",
+      "subtitle": "مراقبة حية لـ Supabase ودوال الحافة والتكاملات الخارجية.",
+      "featureServicesTitle": "حالة الخدمات",
+      "featureServicesBody": "صحة قاعدة البيانات والمصادقة والتخزين ودوال الحافة.",
+      "featureLatencyTitle": "اتجاهات زمن الاستجابة",
+      "featureLatencyBody": "رسومات زمن الاستجابة الإقليمية وتنبيهات P95/P99.",
+      "featureIntegrationsTitle": "جاهزية التكاملات",
+      "featureIntegrationsBody": "إمكانية الوصول إلى DOH وDHA والتأمين والمدفوعات.",
+      "actionBack": "العودة إلى المشرف"
+    },
+    "organizations": {
+      "title": "المنظمات",
+      "subtitle": "إدارة مستأجرين للمستشفيات والعيادات عبر المنصة.",
+      "featureTenantsTitle": "المستأجرون",
+      "featureTenantsBody": "توفير العيادات وتعيين المستخدمين المتميزين وضبط العلامة التجارية.",
+      "featureAgreementsTitle": "الاتفاقيات",
+      "featureAgreementsBody": "حالة BAA والتعاقد لكل منظمة.",
+      "featureBillingTitle": "الفوترة والاستخدام",
+      "featureBillingBody": "استهلاك المقاعد وحجم الاستشارات وحالة الفواتير.",
+      "actionBack": "العودة إلى المشرف"
+    },
+    "users": {
+      "title": "المستخدمون",
+      "subtitle": "دليل المستخدمين العام مع الدور والحالة وتقدم التهيئة.",
+      "featureDirectoryTitle": "الدليل",
+      "featureDirectoryBody": "ابحث حسب الدور والمنظمة وحالة التهيئة.",
+      "featureRolesTitle": "إدارة الأدوار",
+      "featureRolesBody": "منح أو سحب أدوار الطبيب والممرض والصيدلية والمختبر والإدارة.",
+      "featureImpersonationTitle": "انتحال آمن",
+      "featureImpersonationBody": "انتحال دعم مُسجَّل تدقيقياً مع تراجع تلقائي.",
+      "actionBack": "العودة إلى المشرف"
+    },
+    "diagnostics": {
+      "title": "التشخيصات",
+      "subtitle": "أدوات تشخيص لمشغلي المنصة وفرق SRE.",
+      "featureJobsTitle": "المهام الخلفية",
+      "featureJobsBody": "صحة قوائم الانتظار لعمال الذكاء الاصطناعي والتذكيرات وتوليد التقارير.",
+      "featureLogsTitle": "بحث السجلات",
+      "featureLogsBody": "بحث مركزي عبر سجلات الواجهة ودوال الحافة وقاعدة البيانات.",
+      "featureFeatureFlagsTitle": "أعلام الميزات",
+      "featureFeatureFlagsBody": "تبديل ميزات MVP والمرحلة 2 والمرحلة 3 لكل بيئة.",
+      "actionBack": "العودة إلى المشرف"
+    },
+    "aiAnalytics": {
+      "title": "تحليلات الذكاء الاصطناعي",
+      "subtitle": "استخدام النماذج وإشارات الأمان ومقاييس النتائج لكل سطح للذكاء الاصطناعي.",
+      "featureUsageTitle": "الاستخدام",
+      "featureUsageBody": "الجلسات حسب النموذج والميزة والمنطقة.",
+      "featureSafetyTitle": "الأمان",
+      "featureSafetyBody": "المخرجات المبلّغ عنها وتقارير المستخدمين واتجاهات الحوادث.",
+      "featureOutcomesTitle": "النتائج",
+      "featureOutcomesBody": "الارتباط بين إرشاد الذكاء الاصطناعي وقرارات الطبيب.",
+      "actionBack": "العودة إلى المشرف"
+    }
+  },
+  "lab": {
+    "dashboard": {
+      "title": "لوحة تحكم المختبر",
+      "subtitle": "مساحة عمل موحدة لأخصائيي التحاليل والفنيين عند تفعيل دور المختبر.",
+      "featureQueueTitle": "قائمة الطلبات",
+      "featureQueueBody": "طلبات المختبر الواردة مرتبة بين عاجل وروتيني وقيد التنفيذ.",
+      "featureResultsTitle": "إدخال النتائج",
+      "featureResultsBody": "إدخال منظّم مع مجالات مرجعية ووسم تلقائي للشذوذ.",
+      "featureQualityTitle": "ضبط الجودة",
+      "featureQualityBody": "معايرة الأجهزة وسير عمل مراجعة الجودة.",
+      "actionBack": "العودة إلى الرئيسية"
+    },
+    "referrals": {
+      "title": "إحالات المختبر",
+      "subtitle": "راجع الإحالات الواردة من العيادات في جميع أنحاء الإمارات.",
+      "featureFilterTitle": "فلاتر ذكية",
+      "featureFilterBody": "فلترة حسب العيادة والطبيب واللوحة والأولوية.",
+      "featurePatientTitle": "جاهزية المريض",
+      "featurePatientBody": "تحقق من الصيام والنتائج السابقة وملاحظات ما قبل السحب.",
+      "featureSlaTitle": "تتبع SLA",
+      "featureSlaBody": "تتبع التزامات زمن الاستجابة لكل لوحة فحص.",
+      "actionBack": "العودة إلى المختبر"
+    },
+    "resultEntry": {
+      "title": "إدخال النتائج",
+      "subtitle": "أدخل نتائج معتمدة بإدخال مزدوج ومجالات مرجعية.",
+      "featureStructuredTitle": "إدخال منظّم",
+      "featureStructuredBody": "وحدات ومجالات مرجعية وتحقق لكل رمز فحص.",
+      "featureFlagTitle": "وسم الشذوذ",
+      "featureFlagBody": "وسم تلقائي مع أثر تدقيق عند التجاوز مع سبب.",
+      "featureSignTitle": "توقيع مزدوج",
+      "featureSignBody": "مراجعة الفني وأخصائي التحاليل قبل الإصدار.",
+      "actionBack": "العودة إلى المختبر"
+    },
+    "radiology": {
+      "title": "مساحة عمل الأشعة",
+      "subtitle": "مراجعة DICOM والتقارير والمراجعة المتبادلة لـ MRI وCT والأشعة السينية والموجات فوق الصوتية.",
+      "featureWorklistTitle": "قائمة العمل",
+      "featureWorklistBody": "دراسات مفروزة بالأولوية بانتظار تقرير أخصائي الأشعة.",
+      "featureViewerTitle": "عارض DICOM",
+      "featureViewerBody": "إعادة بناء متعددة المستويات مع تمييز بالذكاء الاصطناعي.",
+      "featureReportsTitle": "التقارير",
+      "featureReportsBody": "قوالب تقارير منظّمة مع تسليم للمراجعة المتبادلة.",
+      "actionBack": "العودة إلى المختبر"
+    }
+  },
+  "pharmacy": {
+    "dashboard": {
+      "title": "لوحة تحكم الصيدلية",
+      "subtitle": "الصرف والمخزون ومطالبات التأمين لمشغلي الصيدلية.",
+      "featureQueueTitle": "قائمة الصرف",
+      "featureQueueBody": "وصفات معلّقة من الأطباء عبر شبكتك.",
+      "featureInventoryTitle": "مراقبة المخزون",
+      "featureInventoryBody": "مستويات المخزون وتنبيهات قرب انتهاء الصلاحية وإعادة الطلب التلقائية.",
+      "featureClaimsTitle": "المطالبات والمدفوعات",
+      "featureClaimsBody": "تقديم مطالبات التأمين ومسؤولية العضو.",
+      "actionBack": "العودة إلى الرئيسية"
+    },
+    "dispensing": {
+      "title": "صرف الوصفات",
+      "subtitle": "عالج الوصفات المعتمدة مع التحقق والإرشاد والتسليم.",
+      "featureVerifyTitle": "التحقق من السلامة",
+      "featureVerifyBody": "فحوصات الحساسية والتفاعل والعلاج المكرر.",
+      "featureCounselTitle": "إرشاد المريض",
+      "featureCounselBody": "إرشادات منظّمة لكل صنف دوائي.",
+      "featureHandoverTitle": "تسليم آمن",
+      "featureHandoverBody": "تسليم موقّع برمز OTP للمريض أو مفوّض موثوق.",
+      "actionBack": "العودة إلى الصيدلية"
+    },
+    "inventory": {
+      "title": "المخزون",
+      "subtitle": "مخزون مباشر مع دفعات وصلاحية وسير عمل الشراء.",
+      "featureLotsTitle": "الدفعات والأرقام",
+      "featureLotsBody": "الصلاحية وأرقام الدفعات وتتبّع جاهز للاستدعاء.",
+      "featureStockTitle": "ذكاء المخزون",
+      "featureStockBody": "توقع الطلب من اتجاهات الوصف.",
+      "featurePurchaseTitle": "الشراء",
+      "featurePurchaseBody": "دمج الموردين ودورة حياة أمر الشراء.",
+      "actionBack": "العودة إلى الصيدلية"
+    }
+  },
+  "insurance": {
+    "portal": {
+      "title": "بوابة التأمين",
+      "subtitle": "مساحة عمل مشغّل التأمين للخطط والأهلية ومراقبة المطالبات.",
+      "featurePlansTitle": "كتالوج الخطط",
+      "featurePlansBody": "أعدّ ونشر خططاً جاهزة للمستهلك.",
+      "featureEligibilityTitle": "واجهة الأهلية",
+      "featureEligibilityBody": "قدّم أهلية لحظية للعيادات الشريكة.",
+      "featureClaimsTitle": "مراقبة المطالبات",
+      "featureClaimsBody": "تسوية تلقائية وإشارات احتيال وقائمة تصعيد.",
+      "actionBack": "العودة إلى الرئيسية"
     }
   }
 }

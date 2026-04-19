@@ -1,9 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertCircle, CheckCircle2, ClipboardList, Loader2, Save, Sparkles } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Loader2, Save, Sparkles } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Navigation } from '../../components/Navigation';
-import { PageHeader } from '../../components/PageHeader';
 import { usePreVisitAssessment } from '../../hooks';
 import { generatePreVisitSummary } from '../../lib/ai';
 import {
@@ -453,16 +451,13 @@ export const PatientPreVisitAssessment: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50">
-      <Navigation role="patient" />
-      <PageHeader
-        title="Pre-Visit Intake"
-        subtitle="Review any autofilled details, complete the missing questions, and send a summary to your doctor before the visit."
-        backTo="/patient/appointments"
-        icon={<ClipboardList className="h-6 w-6 text-white" />}
-      />
+    <>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">Pre-Visit Intake</h1>
+        <p className="mt-1 text-sm text-slate-500">Review any autofilled details, complete the missing questions, and send a summary to your doctor before the visit.</p>
+      </div>
 
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-5xl">
         {loading ? (
           <div className="flex items-center justify-center rounded-3xl bg-white p-12 shadow-sm">
             <Loader2 className="h-6 w-6 animate-spin text-ceenai-cyan" />
@@ -806,6 +801,6 @@ export const PatientPreVisitAssessment: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 };

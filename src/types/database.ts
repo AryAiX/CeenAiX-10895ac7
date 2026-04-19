@@ -556,3 +556,161 @@ export interface PlatformSetting {
   updated_by: string | null;
   updated_at: string;
 }
+
+// ---------------------------------------------------------------------------
+// Lab (backend: Phase 3 / MVP lab portal)
+// ---------------------------------------------------------------------------
+
+export interface LabProfile extends BaseRecord {
+  slug: string;
+  name: string;
+  city: string | null;
+  address: string | null;
+  phone: string | null;
+  email: string | null;
+  is_active: boolean;
+}
+
+export interface LabStaffMember extends BaseRecord {
+  user_id: string;
+  lab_id: string;
+  role_label: string;
+  is_active: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Admin (organizations, incidents, feature flags, service health snapshots)
+// ---------------------------------------------------------------------------
+
+export type OrganizationKind = 'hospital' | 'clinic' | 'lab' | 'pharmacy' | 'insurance';
+export type OrganizationStatus = 'active' | 'suspended' | 'pending' | 'archived';
+
+export interface Organization extends BaseRecord {
+  slug: string;
+  name: string;
+  kind: OrganizationKind;
+  city: string | null;
+  country: string;
+  primary_contact_name: string | null;
+  primary_contact_email: string | null;
+  baa_signed_at: string | null;
+  contract_started_at: string | null;
+  contract_ends_at: string | null;
+  seats_allocated: number;
+  seats_used: number;
+  status: OrganizationStatus;
+  notes: string | null;
+}
+
+export type AdminIncidentSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type AdminIncidentStatus = 'open' | 'investigating' | 'mitigated' | 'closed';
+
+export interface AdminIncident extends BaseRecord {
+  title: string;
+  summary: string;
+  severity: AdminIncidentSeverity;
+  status: AdminIncidentStatus;
+  detected_at: string;
+  resolved_at: string | null;
+  owner_user_id: string | null;
+  affected_records: number;
+  regulator_reported: boolean;
+  metadata: Record<string, unknown>;
+}
+
+export type FeatureFlagEnvironment = 'development' | 'staging' | 'production';
+
+export interface FeatureFlag extends BaseRecord {
+  key: string;
+  name: string;
+  description: string | null;
+  environment: FeatureFlagEnvironment;
+  is_enabled: boolean;
+  rollout_percent: number;
+  updated_by: string | null;
+}
+
+export type ServiceHealthStatus = 'healthy' | 'degraded' | 'down' | 'unknown';
+export type ServiceHealthCategory = 'core' | 'integration' | 'ai';
+
+export interface ServiceHealthSnapshot {
+  id: string;
+  service_key: string;
+  service_name: string;
+  category: ServiceHealthCategory;
+  status: ServiceHealthStatus;
+  latency_ms: number | null;
+  region: string | null;
+  message: string | null;
+  observed_at: string;
+  created_at: string;
+}
+
+// ---------------------------------------------------------------------------
+// Admin RPC return shapes
+// ---------------------------------------------------------------------------
+
+export interface AdminMetricsPayload {
+  generatedAt: string;
+  totals: {
+    users: number;
+    appointmentsToday: number;
+    completedConsultsThisMonth: number;
+    pendingApprovals: number;
+    activeIncidents: number;
+  };
+  usersByRole: Partial<Record<UserRole, number>>;
+  ai: {
+    sessions30d: number;
+    flaggedOutputs30d: number;
+  };
+  compliance: {
+    auditEvents30d: number;
+    activeIncidents: number;
+  };
+}
+
+export interface AdminSystemHealthPayload {
+  generatedAt: string;
+  services: ServiceHealthSnapshot[];
+  integrations: ServiceHealthSnapshot[];
+  aiServices: ServiceHealthSnapshot[];
+}
+
+export interface AdminAiAnalyticsPayload {
+  generatedAt: string;
+  sessions: {
+    last7Days: number;
+    last30Days: number;
+    guestLast30Days: number;
+  };
+  messages: {
+    last30Days: number;
+  };
+  safety: {
+    flaggedLast30Days: number;
+  };
+}
+
+export interface AdminUserRow {
+  user_id: string;
+  role: UserRole;
+  full_name: string;
+  email: string | null;
+  phone: string | null;
+  city: string | null;
+  profile_completed: boolean;
+  created_at: string;
+  last_sign_in_at: string | null;
+  is_dha_verified: boolean;
+}
+
+export interface AdminAuditEventRow {
+  id: string;
+  user_id: string | null;
+  actor_name: string | null;
+  action: AuditAction;
+  table_name: string;
+  record_id: string | null;
+  created_at: string;
+}

@@ -13,7 +13,6 @@ import {
   Search,
 } from 'lucide-react';
 import { MedicationNameDisplay } from '../../components/MedicationNameDisplay';
-import { Navigation } from '../../components/Navigation';
 import { Skeleton } from '../../components/Skeleton';
 import { usePatientPrescriptions } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
@@ -139,116 +138,92 @@ export const PatientPrescriptions: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
-        <Navigation role="patient" />
-        <div className="relative bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan overflow-hidden">
-          <div className="absolute inset-0 opacity-20">
-            <img
-              src="https://images.pexels.com/photos/3873146/pexels-photo-3873146.jpeg?auto=compress&cs=tinysrgb&w=1920"
-              alt={t('header.pharmacy')}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-r from-ceenai-navy/90 to-ceenai-blue/85"></div>
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <h1 className="text-4xl font-bold text-white mb-2">{t('patient.prescriptions.title')}</h1>
-          <p className="text-cyan-100 text-lg">{t('patient.prescriptions.subtitleLoading')}</p>
-          </div>
+      <>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">{t('patient.prescriptions.title')}</h1>
+          <p className="mt-1 text-sm text-slate-500">{t('patient.prescriptions.subtitleLoading')}</p>
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-4">
+        <div className="space-y-4">
           <Skeleton className="h-28 w-full rounded-2xl" />
           <Skeleton className="h-40 w-full rounded-2xl" />
           <Skeleton className="h-40 w-full rounded-2xl" />
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
-      <Navigation role="patient" />
-
-      <div className="relative bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <img
-            src="https://images.pexels.com/photos/3873146/pexels-photo-3873146.jpeg?auto=compress&cs=tinysrgb&w=1920"
-            alt={t('header.pharmacy')}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-ceenai-navy/90 to-ceenai-blue/85"></div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="text-4xl font-bold text-white mb-2">{t('patient.prescriptions.title')}</h1>
-          <p className="text-cyan-100 text-lg">{t('patient.prescriptions.subtitleLive')}</p>
-        </div>
+    <>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">{t('patient.prescriptions.title')}</h1>
+        <p className="mt-1 text-sm text-slate-500">{t('patient.prescriptions.subtitleLive')}</p>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div>
         {error ? (
-          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          <div className="mb-6 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
             {t('patient.prescriptions.loadError')}
           </div>
         ) : null}
 
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-md">
+        <div className="grid md:grid-cols-3 gap-4 mb-6">
+          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium">{t('patient.prescriptions.activePlans')}</p>
-                <p className="text-4xl font-bold text-gray-900 mt-2">
+                <p className="text-slate-500 text-sm font-medium">{t('patient.prescriptions.activePlans')}</p>
+                <p className="text-2xl font-bold text-slate-900 mt-2">
                   {formatLocaleDigits(activePlanCount, uiLang)}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-cyan-600" />
+              <div className="w-10 h-10 bg-teal-50 rounded-lg flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 text-teal-600" />
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-md">
+          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium">{t('patient.prescriptions.activeMeds')}</p>
-                <p className="text-4xl font-bold text-gray-900 mt-2">
+                <p className="text-slate-500 text-sm font-medium">{t('patient.prescriptions.activeMeds')}</p>
+                <p className="text-2xl font-bold text-slate-900 mt-2">
                   {formatLocaleDigits(activeMedicationCount, uiLang)}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
-                <Pill className="w-6 h-6 text-cyan-600" />
+              <div className="w-10 h-10 bg-teal-50 rounded-lg flex items-center justify-center">
+                <Pill className="w-5 h-5 text-teal-600" />
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-md">
+          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium">{t('patient.prescriptions.pendingPickup')}</p>
-                <p className="text-4xl font-bold text-gray-900 mt-2">
+                <p className="text-slate-500 text-sm font-medium">{t('patient.prescriptions.pendingPickup')}</p>
+                <p className="text-2xl font-bold text-slate-900 mt-2">
                   {formatLocaleDigits(pendingDispenseCount, uiLang)}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
-                <Bell className="w-6 h-6 text-cyan-600" />
+              <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center">
+                <Bell className="w-5 h-5 text-amber-600" />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-8">
-          <div className="flex flex-col md:flex-row items-center gap-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 mb-6">
+          <div className="flex flex-col md:flex-row items-center gap-3">
             <div className="flex-1 w-full relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 placeholder={t('patient.prescriptions.searchPh')}
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
               />
             </div>
             <select
               value={statusFilter}
               onChange={(event) => setStatusFilter(event.target.value as 'all' | 'active' | 'history')}
-              className="w-full md:w-auto rounded-xl border-2 border-gray-200 px-4 py-3 font-medium focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+              className="w-full md:w-auto rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
             >
               <option value="all">{t('patient.prescriptions.filterAll')}</option>
               <option value="active">{t('patient.prescriptions.filterActive')}</option>
@@ -576,10 +551,10 @@ export const PatientPrescriptions: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-8 rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-4 text-sm text-cyan-900">
+        <div className="mt-6 rounded-xl border border-teal-100 bg-teal-50 px-4 py-3 text-sm text-teal-700">
           {t('patient.prescriptions.footerNote')}
         </div>
       </div>
-    </div>
+    </>
   );
 };

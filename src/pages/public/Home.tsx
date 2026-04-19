@@ -1,646 +1,1146 @@
-import React, { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LanguageSwitcher } from '../../components/LanguageSwitcher';
 import {
   Activity,
+  ArrowRight,
   Award,
+  Bell,
   Brain,
   Check,
+  ChevronDown,
   ChevronRight,
   Clock,
+  FileText,
+  FlaskConical,
+  Globe as Globe2,
+  Heart,
+  Lock,
   Menu,
+  MessageCircle,
+  Pill,
+  Play,
   Shield,
+  Star,
+  Stethoscope,
+  TrendingUp,
   Users,
   X,
+  Zap,
 } from 'lucide-react';
+import { useInView, useCounter } from '../../hooks';
+import { LanguageSwitcher } from '../../components/LanguageSwitcher';
 
-type HomeCard = {
-  icon: typeof Activity;
-  title: string;
-  description: string;
-  action?: () => void;
-};
+/* ------------------------------------------------------------------------- */
+/*  Landing page — ported from the Bolt reference LandingPage.tsx.           */
+/*  Layout / class names / keyframes are byte-for-byte Bolt; we only swap    */
+/*  out Bolt's global `navigate()` helper for react-router's `useNavigate`,  */
+/*  route every translatable string through i18next, and use the shared     */
+/*  useInView / useCounter hooks (also ported verbatim).                    */
+/* ------------------------------------------------------------------------- */
 
-type HomePlan = {
-  name: string;
-  price: string;
-  description: string;
-  features: string[];
-  highlighted?: boolean;
-};
-
-type HomePortal = {
+interface StatCounterProps {
+  value: number;
+  suffix: string;
   label: string;
-  action: () => void;
-  borderClass?: string;
+  active: boolean;
+}
+
+const StatCounter = ({ value, suffix, label, active }: StatCounterProps) => {
+  const count = useCounter(value, active);
+  return (
+    <div className="text-center group">
+      <div className="text-5xl font-black mb-2 bg-gradient-to-br from-cyan-400 to-blue-400 bg-clip-text text-transparent tabular-nums">
+        {count.toLocaleString()}
+        {suffix}
+      </div>
+      <div className="text-cyan-100 font-medium text-sm uppercase tracking-widest">{label}</div>
+    </div>
+  );
 };
 
-export const Home: React.FC = () => {
+export const Home = () => {
   const navigate = useNavigate();
-  const { i18n } = useTranslation('common');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const isArabic = i18n.language.startsWith('ar');
+  const { t } = useTranslation('common');
 
-  const copy = useMemo(
-    () =>
-      isArabic
-        ? {
-            navFeatures: 'الميزات',
-            navHowItWorks: 'كيف يعمل',
-            navPricing: 'الأسعار',
-            navContact: 'تواصل معنا',
-            signIn: 'تسجيل الدخول',
-            brandTagline: 'صحتك، بإرشاد ذكي',
-            heroTitleLine1: 'صحتك،',
-            heroTitleLine2: 'بإرشاد ذكي',
-            heroLead:
-              'منصة الرعاية الصحية المدعومة بالذكاء الاصطناعي الرائدة في دبي. متوافقة مع هيئة الصحة بدبي ومعتمدة من NABIDH وموثوقة من آلاف المرضى ومقدمي الرعاية في الإمارات.',
-            portalTitle: 'استعرض البوابات',
-            portals: [
-              { label: 'بوابة المريض', action: () => navigate('/auth/login?role=patient&redirect=%2Fpatient%2Fdashboard') },
-              { label: 'بوابة الطبيب', action: () => navigate('/auth/login?role=doctor&redirect=%2Fdoctor%2Fdashboard') },
-              { label: 'بوابة الصيدلية', action: () => navigate('/pharmacy') },
-              { label: 'بوابة المختبر والأشعة', action: () => navigate('/laboratories') },
-              { label: 'بوابة التأمين', action: () => navigate('/insurance') },
-              { label: 'بوابة الإدارة', action: () => navigate('/auth/login'), borderClass: 'border-amber-600 hover:bg-amber-50' },
-            ] as HomePortal[],
-            stats: [
-              { value: '٥٠ ألف+', label: 'مرضى نشطون' },
-              { value: '٢٠٠+', label: 'منشآت رعاية صحية' },
-              { value: '١ مليون+', label: 'استشارات' },
-              { value: '٩٩٫٩٪', label: 'جاهزية المنصة' },
-            ],
-            featuresTitle: 'كل ما تحتاجه للرعاية الصحية الحديثة',
-            featuresLead: 'إدارة صحية شاملة مدعومة بأحدث تقنيات الذكاء الاصطناعي',
-            features: [
-              {
-                icon: Brain,
-                title: 'رؤى صحية مدعومة بالذكاء الاصطناعي',
-                description: 'احصل على توصيات صحية شخصية مدعومة بتقنيات ذكاء اصطناعي متقدمة',
-                action: () => navigate('/ai-chat'),
-              },
-              {
-                icon: Shield,
-                title: 'آمن ومتوافق مع اللوائح',
-                description: 'متوافق بالكامل مع لوائح الرعاية الصحية في الإمارات ومعتمد من NABIDH',
-                action: () => navigate('/health-education'),
-              },
-              {
-                icon: Clock,
-                title: 'مرافق صحي على مدار الساعة',
-                description: 'وصول دائم إلى بياناتك الصحية ومساعدك الذكي في أي وقت',
-                action: () => navigate('/ai-chat'),
-              },
-              {
-                icon: Users,
-                title: 'فرق رعاية متكاملة',
-                description: 'تعاون سلس بين الأطباء والصيدليات والمختبرات ضمن رحلة واحدة',
-                action: () => navigate('/find-doctor'),
-              },
-              {
-                icon: Activity,
-                title: 'متابعة لحظية',
-                description: 'تابع مؤشراتك الصحية وتلقَّ تنبيهات فورية عند الحاجة',
-                action: () => navigate('/patient/dashboard'),
-              },
-              {
-                icon: Award,
-                title: 'تجربة رعاية متميزة',
-                description: 'منصة الرعاية الصحية الرائدة في دبي والموثوقة من آلاف المستخدمين',
-                action: () => navigate('/auth/portal-access?intent=register'),
-              },
-            ] as HomeCard[],
-            howTitle: 'بسيط، سلس، وآمن',
-            howLead: 'ابدأ مع CeenAiX في دقائق قليلة فقط',
-            steps: [
-              {
-                num: '1',
-                title: 'أنشئ حسابك',
-                description: 'أنشئ حسابك مع التحقق من الهوية الإماراتية خلال أقل من 5 دقائق',
-              },
-              {
-                num: '2',
-                title: 'اربط بياناتك',
-                description: 'اربط سجلاتك الصحية الحالية ومعلومات التأمين الخاصة بك',
-              },
-              {
-                num: '3',
-                title: 'ابدأ',
-                description: 'ابدأ رحلتك الصحية الذكية مع رؤى وتوجيهات بالذكاء الاصطناعي',
-              },
-            ],
-            pricingTitle: 'اختر خطتك',
-            pricingLead: 'أسعار مرنة للأفراد والمؤسسات',
-            pricingCta: 'ابدأ الآن',
-            popular: 'الأكثر شيوعاً',
-            plans: [
-              {
-                name: 'مريض',
-                price: 'مجاني',
-                description: 'للأفراد الذين يديرون صحتهم',
-                features: [
-                  'مساعد صحي بالذكاء الاصطناعي',
-                  'سجلات صحية رقمية',
-                  'حجز المواعيد',
-                  'إدارة الوصفات',
-                  'الوصول إلى نتائج المختبر',
-                  'استشارات عن بُعد',
-                ],
-              },
-              {
-                name: 'مقدم رعاية صحية',
-                price: 'مخصص',
-                description: 'للعيادات والمستشفيات والمنشآت الصحية',
-                highlighted: true,
-                features: [
-                  'كل ما في خطة المريض، بالإضافة إلى:',
-                  'إدارة متعددة المستخدمين',
-                  'تحليلات متقدمة',
-                  'سير عمل سريري',
-                  'دعم التكامل',
-                  'دعم ذو أولوية',
-                  'أدوات امتثال',
-                ],
-              },
-              {
-                name: 'مؤسسي',
-                price: 'تواصل معنا',
-                description: 'للمؤسسات الكبيرة والأنظمة الصحية',
-                features: [
-                  'كل ما في خطة مقدم الرعاية، بالإضافة إلى:',
-                  'تكاملات مخصصة',
-                  'مدير حساب مخصص',
-                  'ضمانات SLA',
-                  'خيارات العلامة البيضاء',
-                  'أمن متقدم',
-                  'تدريب وإعداد',
-                ],
-              },
-            ] as HomePlan[],
-            ctaTitle: 'هل أنت مستعد لتحويل تجربتك الصحية؟',
-            ctaLead: 'انضم إلى آلاف المرضى ومقدمي الرعاية الصحية الذين يستخدمون CeenAiX',
-            ctaButton: 'ابدأ اليوم',
-            footerProduct: 'المنتج',
-            footerCompany: 'الشركة',
-            footerLegal: 'قانوني',
-            footerFeatureLink: 'الميزات',
-            footerPricingLink: 'الأسعار',
-            footerSecurityLink: 'الأمان',
-            footerAbout: 'من نحن',
-            footerCareers: 'الوظائف',
-            footerContactLink: 'تواصل معنا',
-            footerPrivacy: 'سياسة الخصوصية',
-            footerTerms: 'شروط الخدمة',
-            footerCompliance: 'الامتثال',
-            footerCopyright: '© 2026 CeenAiX Healthcare Technologies, Dubai, UAE. جميع الحقوق محفوظة.',
-          }
-        : {
-            navFeatures: 'Features',
-            navHowItWorks: 'How It Works',
-            navPricing: 'Pricing',
-            navContact: 'Contact',
-            signIn: 'Sign In',
-            brandTagline: 'Your Health, Intelligently Guided',
-            heroTitleLine1: 'Your Health,',
-            heroTitleLine2: 'Intelligently Guided',
-            heroLead:
-              "Dubai's leading AI-powered healthcare platform. DHA-compliant, NABIDH-certified, and trusted by thousands of patients and healthcare providers across the UAE.",
-            portalTitle: 'Access Portal Demos',
-            portals: [
-              { label: 'Patient Portal', action: () => navigate('/auth/login?role=patient&redirect=%2Fpatient%2Fdashboard') },
-              { label: 'Doctor Portal', action: () => navigate('/auth/login?role=doctor&redirect=%2Fdoctor%2Fdashboard') },
-              { label: 'Pharmacy Portal', action: () => navigate('/pharmacy') },
-              { label: 'Lab & Radiology Portal', action: () => navigate('/laboratories') },
-              { label: 'Insurance Portal', action: () => navigate('/insurance') },
-              { label: 'Admin Portal', action: () => navigate('/auth/login'), borderClass: 'border-amber-600 hover:bg-amber-50' },
-            ] as HomePortal[],
-            stats: [
-              { value: '50K+', label: 'Active Patients' },
-              { value: '200+', label: 'Healthcare Facilities' },
-              { value: '1M+', label: 'Consultations' },
-              { value: '99.9%', label: 'Uptime' },
-            ],
-            featuresTitle: 'Everything You Need for Modern Healthcare',
-            featuresLead: 'Comprehensive healthcare management powered by cutting-edge AI technology',
-            features: [
-              {
-                icon: Brain,
-                title: 'AI-Powered Health Insights',
-                description: 'Get personalized health recommendations powered by advanced AI technology',
-                action: () => navigate('/ai-chat'),
-              },
-              {
-                icon: Shield,
-                title: 'DHA-Compliant & Secure',
-                description: 'Fully compliant with UAE healthcare regulations and NABIDH-certified',
-                action: () => navigate('/health-education'),
-              },
-              {
-                icon: Clock,
-                title: '24/7 Health Guardian',
-                description: 'Round-the-clock access to your health data and AI assistant',
-                action: () => navigate('/ai-chat'),
-              },
-              {
-                icon: Users,
-                title: 'Integrated Care Teams',
-                description: 'Seamless collaboration between doctors, pharmacies, and laboratories',
-                action: () => navigate('/find-doctor'),
-              },
-              {
-                icon: Activity,
-                title: 'Real-time Monitoring',
-                description: 'Track your health metrics and receive instant alerts',
-                action: () => navigate('/patient/dashboard'),
-              },
-              {
-                icon: Award,
-                title: 'Premium Care Experience',
-                description: "Dubai's leading healthcare platform trusted by thousands",
-                action: () => navigate('/auth/portal-access?intent=register'),
-              },
-            ] as HomeCard[],
-            howTitle: 'Simple, Seamless, Secure',
-            howLead: 'Get started with CeenAiX in just a few minutes',
-            steps: [
-              {
-                num: '1',
-                title: 'Sign Up',
-                description: 'Create your account with Emirates ID verification in under 5 minutes',
-              },
-              {
-                num: '2',
-                title: 'Connect',
-                description: 'Link your existing health records and insurance information',
-              },
-              {
-                num: '3',
-                title: 'Start',
-                description: 'Begin your intelligent healthcare journey with AI-powered insights',
-              },
-            ],
-            pricingTitle: 'Choose Your Plan',
-            pricingLead: 'Flexible pricing for individuals and organizations',
-            pricingCta: 'Get Started',
-            popular: 'Most Popular',
-            plans: [
-              {
-                name: 'Patient',
-                price: 'Free',
-                description: 'For individuals managing their health',
-                features: [
-                  'AI Health Assistant',
-                  'Digital Health Records',
-                  'Appointment Booking',
-                  'Prescription Management',
-                  'Lab Results Access',
-                  'Telemedicine Consultations',
-                ],
-              },
-              {
-                name: 'Healthcare Provider',
-                price: 'Custom',
-                description: 'For clinics, hospitals, and healthcare facilities',
-                highlighted: true,
-                features: [
-                  'Everything in Patient, plus:',
-                  'Multi-user Management',
-                  'Advanced Analytics',
-                  'Clinical Workflows',
-                  'Integration Support',
-                  'Priority Support',
-                  'Compliance Tools',
-                ],
-              },
-              {
-                name: 'Enterprise',
-                price: 'Contact Us',
-                description: 'For large organizations and health systems',
-                features: [
-                  'Everything in Healthcare Provider, plus:',
-                  'Custom Integrations',
-                  'Dedicated Account Manager',
-                  'SLA Guarantees',
-                  'White-label Options',
-                  'Advanced Security',
-                  'Training & Onboarding',
-                ],
-              },
-            ] as HomePlan[],
-            ctaTitle: 'Ready to Transform Your Healthcare Experience?',
-            ctaLead: 'Join thousands of patients and healthcare providers using CeenAiX',
-            ctaButton: 'Get Started Today',
-            footerProduct: 'Product',
-            footerCompany: 'Company',
-            footerLegal: 'Legal',
-            footerFeatureLink: 'Features',
-            footerPricingLink: 'Pricing',
-            footerSecurityLink: 'Security',
-            footerAbout: 'About Us',
-            footerCareers: 'Careers',
-            footerContactLink: 'Contact',
-            footerPrivacy: 'Privacy Policy',
-            footerTerms: 'Terms of Service',
-            footerCompliance: 'Compliance',
-            footerCopyright: '© 2026 CeenAiX Healthcare Technologies, Dubai, UAE. All rights reserved.',
-          },
-    [isArabic, navigate]
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [activePortal, setActivePortal] = useState(0);
+
+  const heroRef = useInView(0.1);
+  const statsRef = useInView(0.2);
+  const featuresRef = useInView(0.1);
+  const howRef = useInView(0.1);
+  const testimonialsRef = useInView(0.1);
+  const pricingRef = useInView(0.1);
+  const ctaRef = useInView(0.2);
+
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handler);
+    return () => window.removeEventListener('scroll', handler);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => setActivePortal((p) => (p + 1) % 6), 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const portals = useMemo(
+    () => [
+      { label: t('home.landing.portals.patient'), path: '/patient/dashboard', color: 'from-cyan-500 to-blue-500', icon: Heart },
+      { label: t('home.landing.portals.doctor'), path: '/doctor/dashboard', color: 'from-blue-500 to-sky-500', icon: Stethoscope },
+      { label: t('home.landing.portals.pharmacy'), path: '/pharmacy/dashboard', color: 'from-emerald-500 to-teal-600', icon: Pill },
+      { label: t('home.landing.portals.lab'), path: '/lab/dashboard', color: 'from-violet-500 to-blue-500', icon: FlaskConical },
+      { label: t('home.landing.portals.insurance'), path: '/insurance/portal', color: 'from-amber-500 to-orange-500', icon: FileText },
+      { label: t('home.landing.portals.admin'), path: '/admin/dashboard', color: 'from-rose-500 to-pink-500', icon: Shield },
+    ],
+    [t]
   );
 
+  const features = useMemo(
+    () => [
+      {
+        key: 'ai',
+        icon: Brain,
+        photo:
+          'https://images.pexels.com/photos/8439094/pexels-photo-8439094.jpeg?auto=compress&cs=tinysrgb&w=800',
+        color: 'from-cyan-500 to-blue-600',
+      },
+      {
+        key: 'compliance',
+        icon: Shield,
+        photo:
+          'https://images.pexels.com/photos/5722164/pexels-photo-5722164.jpeg?auto=compress&cs=tinysrgb&w=800',
+        color: 'from-emerald-500 to-teal-600',
+      },
+      {
+        key: 'guardian',
+        icon: Clock,
+        photo:
+          'https://images.pexels.com/photos/7659564/pexels-photo-7659564.jpeg?auto=compress&cs=tinysrgb&w=800',
+        color: 'from-blue-500 to-sky-600',
+      },
+      {
+        key: 'teams',
+        icon: Users,
+        photo:
+          'https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg?auto=compress&cs=tinysrgb&w=800',
+        color: 'from-violet-500 to-purple-600',
+      },
+      {
+        key: 'monitoring',
+        icon: Activity,
+        photo:
+          'https://images.pexels.com/photos/6129507/pexels-photo-6129507.jpeg?auto=compress&cs=tinysrgb&w=800',
+        color: 'from-rose-500 to-pink-600',
+      },
+      {
+        key: 'premium',
+        icon: Award,
+        photo:
+          'https://images.pexels.com/photos/3259629/pexels-photo-3259629.jpeg?auto=compress&cs=tinysrgb&w=800',
+        color: 'from-amber-500 to-orange-600',
+      },
+    ],
+    []
+  );
+
+  const testimonials = useMemo(
+    () => [
+      {
+        key: 'one',
+        avatar:
+          'https://images.pexels.com/photos/5214961/pexels-photo-5214961.jpeg?auto=compress&cs=tinysrgb&w=200',
+        stars: 5,
+      },
+      {
+        key: 'two',
+        avatar:
+          'https://images.pexels.com/photos/3768726/pexels-photo-3768726.jpeg?auto=compress&cs=tinysrgb&w=200',
+        stars: 5,
+      },
+      {
+        key: 'three',
+        avatar:
+          'https://images.pexels.com/photos/6129967/pexels-photo-6129967.jpeg?auto=compress&cs=tinysrgb&w=200',
+        stars: 5,
+      },
+    ],
+    []
+  );
+
+  const plans = useMemo(
+    () => [
+      { key: 'patient', highlighted: false },
+      { key: 'provider', highlighted: true },
+      { key: 'enterprise', highlighted: false },
+    ],
+    []
+  );
+
+  const steps = useMemo(
+    () => [
+      {
+        key: 'one',
+        icon: Users,
+        photo:
+          'https://images.pexels.com/photos/5699456/pexels-photo-5699456.jpeg?auto=compress&cs=tinysrgb&w=600',
+      },
+      {
+        key: 'two',
+        icon: Globe2,
+        photo:
+          'https://images.pexels.com/photos/7089401/pexels-photo-7089401.jpeg?auto=compress&cs=tinysrgb&w=600',
+      },
+      {
+        key: 'three',
+        icon: Zap,
+        photo:
+          'https://images.pexels.com/photos/4225920/pexels-photo-4225920.jpeg?auto=compress&cs=tinysrgb&w=600',
+      },
+    ],
+    []
+  );
+
+  const securityItems = useMemo(
+    () => [
+      { key: 'dha', icon: Shield },
+      { key: 'encryption', icon: Lock },
+      { key: 'nabidh', icon: FileText },
+      { key: 'messaging', icon: MessageCircle },
+    ],
+    []
+  );
+
+  const navItems = useMemo(
+    () => [
+      { href: '#features', label: t('home.landing.nav.features') },
+      { href: '#how-it-works', label: t('home.landing.nav.howItWorks') },
+      { href: '#pricing', label: t('home.landing.nav.pricing') },
+      { href: '#contact', label: t('home.landing.nav.contact') },
+    ],
+    [t]
+  );
+
+  const goSignIn = () => navigate('/auth/portal-access?intent=login');
+  const goRegister = () => navigate('/auth/portal-access?intent=register');
+
+  const heroAvatars = [
+    'https://images.pexels.com/photos/5214961/pexels-photo-5214961.jpeg?auto=compress&cs=tinysrgb&w=80',
+    'https://images.pexels.com/photos/3768726/pexels-photo-3768726.jpeg?auto=compress&cs=tinysrgb&w=80',
+    'https://images.pexels.com/photos/6129967/pexels-photo-6129967.jpeg?auto=compress&cs=tinysrgb&w=80',
+    'https://images.pexels.com/photos/4225920/pexels-photo-4225920.jpeg?auto=compress&cs=tinysrgb&w=80',
+  ];
+
   return (
-    <div className="min-h-screen bg-white">
-      <nav className="fixed left-0 right-0 top-0 z-50 border-b border-cyan-100 bg-white/95 shadow-sm shadow-cyan-500/5 backdrop-blur-md">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
+    <div className="min-h-screen bg-white overflow-x-hidden">
+      {/*
+        Page-local animations, copied verbatim from the Bolt LandingPage.tsx
+        (embedded <style> block) so timing and easing remain byte-identical.
+        Global animation utilities (animate-fadeIn / animate-shimmer / ...)
+        live in src/index.css; these are unique to the landing layout.
+      */}
+      <style>{`
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInLocal { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideLeft { from { opacity: 0; transform: translateX(60px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideRight { from { opacity: 0; transform: translateX(-60px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes floatY { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-16px); } }
+        @keyframes floatSlow { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-10px) rotate(3deg); } }
+        @keyframes blob { 0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; } 50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; } }
+        @keyframes shimmerMove { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        .animate-fade-up { animation: fadeUp 0.7s ease-out forwards; }
+        .animate-fade-in-local { animation: fadeInLocal 0.6s ease-out forwards; }
+        .animate-slide-left { animation: slideLeft 0.7s ease-out forwards; }
+        .animate-slide-right { animation: slideRight 0.7s ease-out forwards; }
+        .landing-float { animation: floatY 4s ease-in-out infinite; }
+        .landing-float-slow { animation: floatSlow 6s ease-in-out infinite; }
+        .animate-blob { animation: blob 8s ease-in-out infinite; }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .delay-500 { animation-delay: 0.5s; }
+        .delay-600 { animation-delay: 0.6s; }
+        .opacity-0-init { opacity: 0; }
+        .portal-btn { transition: all 0.25s cubic-bezier(.34,1.56,.64,1); }
+        .portal-btn:hover { transform: translateY(-4px) scale(1.04); }
+        .shimmer-text { background: linear-gradient(90deg, #0891b2, #3b82f6, #06b6d4, #0891b2); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: shimmerMove 3s linear infinite; }
+      `}</style>
+
+      {/* Navigation */}
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          scrolled
+            ? 'bg-white/95 backdrop-blur-xl shadow-lg shadow-cyan-500/10 border-b border-cyan-100'
+            : 'bg-transparent'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-18 py-4">
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="flex items-center gap-3 text-start"
+              className="flex items-center gap-3"
             >
               <img
                 src="/ChatGPT_Image_Feb_27,_2026,_11_29_01_AM.png"
-                alt="CeenAiX Logo"
-                className="h-12 w-12 object-contain transition-transform duration-300 hover:scale-110"
+                alt="CeenAiX"
+                className="w-11 h-11 object-contain"
               />
-              <div>
-                <span className="bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-2xl font-bold text-transparent">
-                  CeenAiX
-                </span>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">
-                  {copy.brandTagline}
-                </p>
-              </div>
+              <span
+                className={`text-2xl font-black tracking-tight transition-all duration-300 ${
+                  scrolled
+                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent'
+                    : 'text-white'
+                }`}
+              >
+                {t('home.landing.nav.brand')}
+              </span>
             </button>
-
-            <div className="hidden items-center gap-8 md:flex">
-              <a href="#features" className="font-medium text-slate-600 transition-all duration-300 hover:text-cyan-600">
-                {copy.navFeatures}
-              </a>
-              <a href="#how-it-works" className="font-medium text-slate-600 transition-all duration-300 hover:text-cyan-600">
-                {copy.navHowItWorks}
-              </a>
-              <a href="#pricing" className="font-medium text-slate-600 transition-all duration-300 hover:text-cyan-600">
-                {copy.navPricing}
-              </a>
-              <a href="#contact" className="font-medium text-slate-600 transition-all duration-300 hover:text-cyan-600">
-                {copy.navContact}
-              </a>
+            <div className="hidden md:flex items-center gap-8">
+              {navItems.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className={`text-sm font-semibold transition-all duration-300 hover:text-cyan-400 ${
+                    scrolled ? 'text-slate-700' : 'text-white/90'
+                  }`}
+                >
+                  {item.label}
+                </a>
+              ))}
               <LanguageSwitcher dense />
               <button
                 type="button"
-                onClick={() => navigate('/auth/portal-access?intent=login')}
-                className="rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 px-6 py-2 text-white transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/30"
+                onClick={goSignIn}
+                className="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl text-sm font-bold hover:shadow-lg hover:shadow-cyan-500/40 hover:scale-105 transition-all duration-300"
               >
-                {copy.signIn}
+                {t('home.landing.nav.signIn')}
               </button>
             </div>
-
             <button
               type="button"
-              onClick={() => setMobileMenuOpen((open) => !open)}
-              className="p-2 text-gray-600 hover:text-gray-900 md:hidden"
-              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={
+                mobileMenuOpen ? t('home.landing.nav.closeMenu') : t('home.landing.nav.openMenu')
+              }
+              className={`md:hidden p-2 ${scrolled ? 'text-slate-700' : 'text-white'}`}
             >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
-
         {mobileMenuOpen ? (
-          <div className="border-t border-gray-200 bg-white md:hidden">
-            <div className="space-y-3 px-4 py-4">
-              <a href="#features" className="block text-slate-600 hover:text-gray-900">
-                {copy.navFeatures}
-              </a>
-              <a href="#how-it-works" className="block text-slate-600 hover:text-gray-900">
-                {copy.navHowItWorks}
-              </a>
-              <a href="#pricing" className="block text-slate-600 hover:text-gray-900">
-                {copy.navPricing}
-              </a>
-              <a href="#contact" className="block text-slate-600 hover:text-gray-900">
-                {copy.navContact}
-              </a>
-              <div className="pt-2">
-                <LanguageSwitcher />
-              </div>
-              <button
-                type="button"
-                onClick={() => navigate('/auth/portal-access?intent=login')}
-                className="w-full rounded-lg bg-teal-600 px-6 py-2 text-white transition-colors hover:bg-teal-700"
+          <div className="md:hidden bg-white/95 backdrop-blur-xl border-t border-cyan-100 px-4 py-4 space-y-3">
+            {navItems.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className="block text-slate-700 font-medium py-2"
               >
-                {copy.signIn}
-              </button>
-            </div>
+                {item.label}
+              </a>
+            ))}
+            <LanguageSwitcher />
+            <button
+              type="button"
+              onClick={goSignIn}
+              className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl font-bold"
+            >
+              {t('home.landing.nav.signIn')}
+            </button>
           </div>
         ) : null}
       </nav>
 
-      <section className="relative overflow-hidden bg-gradient-to-br from-cyan-50 via-blue-50 to-white px-4 pb-20 pt-32 sm:px-6 lg:px-8">
-        <div className="absolute inset-0 opacity-50">
-          <div className="h-full w-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzA2YjZkNCIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')]" />
+      {/* Hero */}
+      <section className="relative min-h-screen flex items-center overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src="https://images.pexels.com/photos/3845810/pexels-photo-3845810.jpeg?auto=compress&cs=tinysrgb&w=1920"
+            alt={t('home.landing.hero.altHeroBg')}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-cyan-900/75 to-blue-900/85" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
         </div>
-        <div className="relative mx-auto max-w-7xl">
-          <div className="mx-auto max-w-3xl text-center">
-            <h1 className="animate-slideUp mb-6 text-5xl font-bold leading-tight text-slate-900 md:text-6xl">
-              {copy.heroTitleLine1}
+
+        <div className="absolute top-20 right-20 w-96 h-96 bg-cyan-400/10 rounded-full animate-blob blur-3xl" />
+        <div
+          className="absolute bottom-20 left-20 w-80 h-80 bg-blue-400/10 rounded-full animate-blob blur-3xl"
+          style={{ animationDelay: '4s' }}
+        />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 grid lg:grid-cols-2 gap-12 items-center">
+          <div
+            ref={heroRef.ref}
+            className={`opacity-0-init ${heroRef.inView ? 'animate-fade-up' : ''}`}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-400/20 border border-cyan-400/30 backdrop-blur-sm mb-6">
+              <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+              <span className="text-cyan-300 text-sm font-semibold tracking-wide uppercase">
+                {t('home.landing.hero.badge')}
+              </span>
+            </div>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.05] mb-6">
+              {t('home.landing.hero.titleLine1')}
               <br />
-              <span className="bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
-                {copy.heroTitleLine2}
+              <span className="shimmer-text">
+                {t('home.landing.hero.titleLine2Part1')}
+                <br />
+                {t('home.landing.hero.titleLine2Part2')}
               </span>
             </h1>
-            <p className="mb-8 text-xl leading-relaxed text-gray-600">{copy.heroLead}</p>
+            <p className="text-lg text-cyan-100/80 mb-8 leading-relaxed max-w-lg">
+              {t('home.landing.hero.lead')}
+            </p>
+            <div className="flex flex-wrap gap-4 mb-10">
+              <button
+                type="button"
+                onClick={goRegister}
+                className="group px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-2xl font-bold text-base hover:shadow-2xl hover:shadow-cyan-500/40 hover:scale-105 transition-all duration-300 flex items-center gap-2"
+              >
+                {t('home.landing.hero.ctaPrimary')}
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/patient/dashboard')}
+                className="group px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-2xl font-bold text-base hover:bg-white/20 transition-all duration-300 flex items-center gap-2"
+              >
+                <Play className="w-4 h-4" /> {t('home.landing.hero.ctaSecondary')}
+              </button>
+            </div>
+            <div className="flex items-center gap-6">
+              <div className="flex -space-x-3">
+                {heroAvatars.map((src) => (
+                  <img
+                    key={src}
+                    src={src}
+                    alt={t('home.landing.hero.altAvatars')}
+                    className="w-10 h-10 rounded-full border-2 border-white object-cover"
+                  />
+                ))}
+              </div>
+              <div>
+                <div className="flex items-center gap-1 mb-0.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <p className="text-white/70 text-sm">
+                  {t('home.landing.hero.trustBefore')}
+                  <span className="text-white font-semibold">
+                    {t('home.landing.hero.trustCount')}
+                  </span>
+                  {t('home.landing.hero.trustAfter')}
+                </p>
+              </div>
+            </div>
+          </div>
 
-            <div className="mb-12">
-              <h3 className="mb-4 text-lg font-semibold text-gray-700">{copy.portalTitle}</h3>
-              <div className="mx-auto grid max-w-2xl grid-cols-2 gap-3 md:grid-cols-3">
-                {copy.portals.map((portal) => (
-                  <button
-                    key={portal.label}
-                    type="button"
-                    onClick={portal.action}
-                    className={`rounded-lg border-2 border-teal-600 bg-white px-4 py-3 font-medium text-gray-900 transition-colors hover:bg-teal-50 ${portal.borderClass ?? ''}`}
+          {/* Portal cards floating panel */}
+          <div
+            className={`opacity-0-init ${heroRef.inView ? 'animate-slide-left delay-300' : ''}`}
+          >
+            <div className="relative">
+              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 shadow-2xl">
+                <div className="flex items-center justify-between mb-5">
+                  <div>
+                    <p className="text-white font-bold text-lg">
+                      {t('home.landing.hero.panelTitle')}
+                    </p>
+                    <p className="text-cyan-200/70 text-sm">
+                      {t('home.landing.hero.panelSubtitle')}
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-cyan-400/20 flex items-center justify-center">
+                    <Globe2 className="w-5 h-5 text-cyan-300" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {portals.map((p, i) => {
+                    const Icon = p.icon;
+                    return (
+                      <button
+                        type="button"
+                        key={p.label}
+                        onClick={() => navigate(p.path)}
+                        className={`portal-btn flex items-center gap-3 p-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 hover:border-white/30 group ${
+                          activePortal === i ? 'ring-2 ring-cyan-400/60 bg-white/20' : ''
+                        }`}
+                      >
+                        <div
+                          className={`w-9 h-9 rounded-xl bg-gradient-to-br ${p.color} flex items-center justify-center flex-shrink-0 shadow-lg`}
+                        >
+                          <Icon className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="text-white text-xs font-semibold leading-tight">
+                          {p.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-4 flex items-center justify-between px-2">
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                    </span>
+                    <span className="text-white/60 text-xs">
+                      {t('home.landing.hero.statusOperational')}
+                    </span>
+                  </div>
+                  <span className="text-white/40 text-xs">
+                    {t('home.landing.hero.statusUptime')}
+                  </span>
+                </div>
+              </div>
+
+              <div
+                className="absolute -top-8 -right-8 bg-white rounded-2xl shadow-2xl p-3.5 w-56 landing-float"
+                style={{ animationDelay: '1s' }}
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center flex-shrink-0">
+                    <Bell className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-800">
+                      {t('home.landing.hero.notifyLabResultsTitle')}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {t('home.landing.hero.notifyLabResultsBody')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="absolute -bottom-6 -left-8 bg-white rounded-2xl shadow-2xl p-3.5 w-52 landing-float"
+                style={{ animationDelay: '2.5s' }}
+              >
+                <div className="flex items-center gap-2.5 mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                    <Brain className="w-4 h-4 text-white" />
+                  </div>
+                  <p className="text-xs font-bold text-slate-800">
+                    {t('home.landing.hero.notifyAiInsightTitle')}
+                  </p>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  {t('home.landing.hero.notifyAiInsightBody')}
+                </p>
+                <div className="mt-2 h-1 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-1 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full w-3/4" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
+          <span className="text-white/50 text-xs tracking-widest uppercase">
+            {t('home.landing.hero.scroll')}
+          </span>
+          <ChevronDown className="w-5 h-5 text-white/50" />
+        </div>
+      </section>
+
+      {/* Stats Banner */}
+      <section
+        ref={statsRef.ref}
+        className="bg-gradient-to-r from-slate-900 via-cyan-900 to-blue-900 py-16 px-4 relative overflow-hidden"
+      >
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400 to-transparent" />
+        </div>
+        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+          <StatCounter
+            value={50000}
+            suffix="+"
+            label={t('home.landing.stats.patientsLabel')}
+            active={statsRef.inView}
+          />
+          <StatCounter
+            value={200}
+            suffix="+"
+            label={t('home.landing.stats.facilitiesLabel')}
+            active={statsRef.inView}
+          />
+          <StatCounter
+            value={1000000}
+            suffix="+"
+            label={t('home.landing.stats.consultationsLabel')}
+            active={statsRef.inView}
+          />
+          <StatCounter
+            value={99}
+            suffix=".9%"
+            label={t('home.landing.stats.uptimeLabel')}
+            active={statsRef.inView}
+          />
+        </div>
+      </section>
+
+      {/* Features */}
+      <section id="features" className="py-28 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-slate-50">
+        <div className="max-w-7xl mx-auto">
+          <div
+            ref={featuresRef.ref}
+            className={`text-center mb-20 opacity-0-init ${
+              featuresRef.inView ? 'animate-fade-up' : ''
+            }`}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-50 border border-cyan-200 mb-6">
+              <Zap className="w-4 h-4 text-cyan-600" />
+              <span className="text-cyan-700 text-sm font-semibold">
+                {t('home.landing.features.eyebrow')}
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-5">
+              {t('home.landing.features.titleLine1')}
+              <br />
+              <span className="bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
+                {t('home.landing.features.titleLine2')}
+              </span>
+            </h2>
+            <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
+              {t('home.landing.features.lead')}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-7">
+            {features.map((f, i) => {
+              const Icon = f.icon;
+              const title = t(`home.landing.features.items.${f.key}.title`);
+              const description = t(`home.landing.features.items.${f.key}.description`);
+              const tag = t(`home.landing.features.items.${f.key}.tag`);
+              return (
+                <div
+                  key={f.key}
+                  className={`card-hover group bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm opacity-0-init ${
+                    featuresRef.inView ? 'animate-fade-up' : ''
+                  }`}
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                >
+                  <div className="relative h-44 overflow-hidden">
+                    <img
+                      src={f.photo}
+                      alt={title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className={`absolute inset-0 bg-gradient-to-br ${f.color} opacity-60`} />
+                    <div className="absolute top-4 left-4">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white text-xs font-semibold">
+                        {tag}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-4 right-4 w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center">
+                      <Icon className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-lg font-bold text-slate-900 mb-2">{title}</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed">{description}</p>
+                    <div className="mt-4 flex items-center gap-1 text-cyan-600 text-sm font-semibold group-hover:gap-2 transition-all">
+                      {t('home.landing.features.learnMore')} <ArrowRight className="w-4 h-4" />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section
+        id="how-it-works"
+        className="py-28 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-900 to-cyan-900 relative overflow-hidden"
+      >
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-1/4 w-96 h-96 bg-cyan-400/5 rounded-full blur-3xl animate-blob" />
+          <div
+            className="absolute bottom-20 right-1/4 w-80 h-80 bg-blue-400/5 rounded-full blur-3xl animate-blob"
+            style={{ animationDelay: '4s' }}
+          />
+        </div>
+        <div className="max-w-7xl mx-auto relative">
+          <div
+            ref={howRef.ref}
+            className={`text-center mb-20 opacity-0-init ${howRef.inView ? 'animate-fade-up' : ''}`}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-400/10 border border-cyan-400/20 mb-6">
+              <TrendingUp className="w-4 h-4 text-cyan-400" />
+              <span className="text-cyan-300 text-sm font-semibold">
+                {t('home.landing.how.eyebrow')}
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-5">
+              {t('home.landing.how.title')}
+            </h2>
+            <p className="text-xl text-cyan-100/60 max-w-2xl mx-auto">{t('home.landing.how.lead')}</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {steps.map((step, i) => {
+              const Icon = step.icon;
+              const num = t(`home.landing.how.steps.${step.key}.num`);
+              const title = t(`home.landing.how.steps.${step.key}.title`);
+              const desc = t(`home.landing.how.steps.${step.key}.desc`);
+              return (
+                <div
+                  key={step.key}
+                  className={`group relative opacity-0-init ${howRef.inView ? 'animate-fade-up' : ''}`}
+                  style={{ animationDelay: `${i * 0.15}s` }}
+                >
+                  {i < steps.length - 1 ? (
+                    <div className="hidden md:block absolute top-24 left-full w-8 z-10 -translate-x-4">
+                      <ArrowRight className="w-6 h-6 text-cyan-400/40" />
+                    </div>
+                  ) : null}
+                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl overflow-hidden hover:bg-white/10 transition-all duration-500 hover:border-cyan-400/30">
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={step.photo}
+                        alt={title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-60"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-900/80" />
+                      <div className="absolute top-4 left-4 w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-xl">
+                        <span className="text-white text-xl font-black">{num}</span>
+                      </div>
+                    </div>
+                    <div className="p-6">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-8 h-8 rounded-lg bg-cyan-400/10 flex items-center justify-center">
+                          <Icon className="w-4 h-4 text-cyan-400" />
+                        </div>
+                        <h3 className="text-lg font-bold text-white">{title}</h3>
+                      </div>
+                      <p className="text-cyan-100/60 text-sm leading-relaxed">{desc}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-28 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div
+            ref={testimonialsRef.ref}
+            className={`text-center mb-16 opacity-0-init ${
+              testimonialsRef.inView ? 'animate-fade-up' : ''
+            }`}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 border border-amber-200 mb-6">
+              <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+              <span className="text-amber-700 text-sm font-semibold">
+                {t('home.landing.testimonials.eyebrow')}
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-5">
+              {t('home.landing.testimonials.titleLine1')}
+              <br />
+              <span className="bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
+                {t('home.landing.testimonials.titleLine2')}
+              </span>
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((tItem, i) => {
+              const name = t(`home.landing.testimonials.items.${tItem.key}.name`);
+              const role = t(`home.landing.testimonials.items.${tItem.key}.role`);
+              const quote = t(`home.landing.testimonials.items.${tItem.key}.quote`);
+              return (
+                <div
+                  key={tItem.key}
+                  className={`card-hover bg-gradient-to-br from-slate-50 to-cyan-50/30 rounded-3xl p-8 border border-slate-100 opacity-0-init ${
+                    testimonialsRef.inView ? 'animate-fade-up' : ''
+                  }`}
+                  style={{ animationDelay: `${i * 0.15}s` }}
+                >
+                  <div className="flex items-center gap-1 mb-6">
+                    {Array.from({ length: tItem.stars }).map((_, si) => (
+                      <Star key={si} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
+                  <p className="text-slate-600 leading-relaxed mb-6 text-sm">&ldquo;{quote}&rdquo;</p>
+                  <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
+                    <img
+                      src={tItem.avatar}
+                      alt={name}
+                      className="w-11 h-11 rounded-full object-cover border-2 border-cyan-200"
+                    />
+                    <div>
+                      <p className="font-bold text-slate-900 text-sm">{name}</p>
+                      <p className="text-slate-500 text-xs">{role}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Security */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-cyan-50 to-blue-50">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-100 border border-cyan-200 mb-6">
+              <Lock className="w-4 h-4 text-cyan-700" />
+              <span className="text-cyan-700 text-sm font-semibold">
+                {t('home.landing.security.eyebrow')}
+              </span>
+            </div>
+            <h2 className="text-4xl font-black text-slate-900 mb-6">
+              {t('home.landing.security.title')}
+            </h2>
+            <p className="text-slate-600 leading-relaxed mb-8">
+              {t('home.landing.security.lead')}
+            </p>
+            <div className="space-y-4">
+              {securityItems.map((item) => {
+                const Icon = item.icon;
+                const label = t(`home.landing.security.items.${item.key}.label`);
+                const desc = t(`home.landing.security.items.${item.key}.desc`);
+                return (
+                  <div
+                    key={item.key}
+                    className="flex items-start gap-4 p-4 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow"
                   >
-                    {portal.label}
-                  </button>
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-900 text-sm">{label}</p>
+                      <p className="text-slate-500 text-xs mt-0.5">{desc}</p>
+                    </div>
+                    <Check className="w-5 h-5 text-emerald-500 ml-auto flex-shrink-0 mt-0.5" />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="relative">
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+              <img
+                src="https://images.pexels.com/photos/8376277/pexels-photo-8376277.jpeg?auto=compress&cs=tinysrgb&w=800"
+                alt={t('home.landing.security.altImage')}
+                className="w-full h-[480px] object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
+            </div>
+            <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl p-5 landing-float">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-xs font-black text-slate-900">
+                    {t('home.landing.security.nabidhTitle')}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {t('home.landing.security.nabidhSub')}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="w-4 h-1 rounded-full bg-emerald-400" />
                 ))}
               </div>
             </div>
-          </div>
-
-          <div className="mx-auto mt-20 grid max-w-4xl grid-cols-2 gap-8 md:grid-cols-4">
-            {copy.stats.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="mb-2 text-4xl font-bold text-teal-600">{stat.value}</div>
-                <div className="text-gray-600">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="features" className="px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-16 text-center">
-            <h2 className="mb-4 text-4xl font-bold text-gray-900">{copy.featuresTitle}</h2>
-            <p className="mx-auto max-w-2xl text-xl text-gray-600">{copy.featuresLead}</p>
-          </div>
-
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {copy.features.map((feature) => (
-              <button
-                key={feature.title}
-                type="button"
-                onClick={feature.action}
-                className="group rounded-xl border-2 border-gray-200 bg-white p-8 text-start transition-all hover:border-teal-500 hover:shadow-lg"
-              >
-                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-teal-100">
-                  <feature.icon className="h-7 w-7 text-teal-600" />
-                </div>
-                <h3 className="mb-3 text-xl font-bold text-gray-900">{feature.title}</h3>
-                <p className="leading-relaxed text-gray-600">{feature.description}</p>
-              </button>
-            ))}
+            <div
+              className="absolute -top-6 -right-6 bg-white rounded-2xl shadow-xl p-4 landing-float"
+              style={{ animationDelay: '2s' }}
+            >
+              <p className="text-xs text-slate-500 mb-1">
+                {t('home.landing.security.breachesLabel')}
+              </p>
+              <p className="text-2xl font-black text-emerald-600">
+                {t('home.landing.security.breachesValue')}
+              </p>
+              <p className="text-xs text-slate-400">
+                {t('home.landing.security.breachesSub')}
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section id="how-it-works" className="bg-gray-50 px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-16 text-center">
-            <h2 className="mb-4 text-4xl font-bold text-gray-900">{copy.howTitle}</h2>
-            <p className="mx-auto max-w-2xl text-xl text-gray-600">{copy.howLead}</p>
-          </div>
-
-          <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-3">
-            {copy.steps.map((step) => (
-              <div key={step.num} className="text-center">
-                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-teal-600 text-2xl font-bold text-white">
-                  {step.num}
-                </div>
-                <h3 className="mb-3 text-xl font-bold text-gray-900">{step.title}</h3>
-                <p className="text-gray-600">{step.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="pricing" className="px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-16 text-center">
-            <h2 className="mb-4 text-4xl font-bold text-gray-900">{copy.pricingTitle}</h2>
-            <p className="mx-auto max-w-2xl text-xl text-gray-600">{copy.pricingLead}</p>
-          </div>
-
-          <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3">
-            {copy.plans.map((plan) => (
-              <div
-                key={plan.name}
-                className={`rounded-xl bg-white p-8 ${
-                  plan.highlighted ? 'scale-105 border-2 border-teal-600 shadow-xl' : 'border-2 border-gray-200'
-                }`}
-              >
-                {plan.highlighted ? (
-                  <div className="mb-4 inline-block rounded-full bg-teal-600 px-3 py-1 text-sm font-medium text-white">
-                    {copy.popular}
-                  </div>
-                ) : null}
-                <h3 className="mb-2 text-2xl font-bold text-gray-900">{plan.name}</h3>
-                <div className="mb-2 text-4xl font-bold text-gray-900">{plan.price}</div>
-                <p className="mb-6 text-gray-600">{plan.description}</p>
-                <button
-                  type="button"
-                  onClick={() => navigate('/auth/portal-access?intent=login')}
-                  className={`mb-6 w-full rounded-lg py-3 font-medium transition-colors ${
-                    plan.highlighted
-                      ? 'bg-teal-600 text-white hover:bg-teal-700'
-                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                  }`}
-                >
-                  {copy.pricingCta}
-                </button>
-                <ul className="space-y-3">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-3">
-                      <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-teal-600" />
-                      <span className="text-gray-600">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-gradient-to-br from-teal-600 to-teal-700 px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl text-center">
-          <h2 className="mb-6 text-4xl font-bold text-white">{copy.ctaTitle}</h2>
-          <p className="mb-8 text-xl text-teal-100">{copy.ctaLead}</p>
-          <button
-            type="button"
-            onClick={() => navigate('/auth/portal-access?intent=login')}
-            className="inline-flex items-center gap-2 rounded-lg bg-white px-8 py-4 text-lg font-medium text-teal-600 transition-colors hover:bg-gray-100"
+      {/* Pricing */}
+      <section id="pricing" className="py-28 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div
+            ref={pricingRef.ref}
+            className={`text-center mb-16 opacity-0-init ${pricingRef.inView ? 'animate-fade-up' : ''}`}
           >
-            {copy.ctaButton}
-            <ChevronRight className="h-5 w-5" />
-          </button>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 mb-6">
+              <TrendingUp className="w-4 h-4 text-blue-600" />
+              <span className="text-blue-700 text-sm font-semibold">
+                {t('home.landing.pricing.eyebrow')}
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-5">
+              {t('home.landing.pricing.title')}
+            </h2>
+            <p className="text-xl text-slate-500 max-w-2xl mx-auto">
+              {t('home.landing.pricing.lead')}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto items-start">
+            {plans.map((plan, i) => {
+              const name = t(`home.landing.pricing.plans.${plan.key}.name`);
+              const price = t(`home.landing.pricing.plans.${plan.key}.price`);
+              const period = t(`home.landing.pricing.plans.${plan.key}.period`);
+              const description = t(`home.landing.pricing.plans.${plan.key}.description`);
+              const cta = t(`home.landing.pricing.plans.${plan.key}.cta`);
+              const featureList = t(`home.landing.pricing.plans.${plan.key}.features`, {
+                returnObjects: true,
+              }) as string[];
+              return (
+                <div
+                  key={plan.key}
+                  className={`opacity-0-init ${pricingRef.inView ? 'animate-fade-up' : ''} ${
+                    plan.highlighted ? 'relative' : ''
+                  }`}
+                  style={{ animationDelay: `${i * 0.12}s` }}
+                >
+                  {plan.highlighted ? (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full text-white text-xs font-bold shadow-lg whitespace-nowrap z-10">
+                      {t('home.landing.pricing.mostPopular')}
+                    </div>
+                  ) : null}
+                  <div
+                    className={`rounded-3xl p-8 ${
+                      plan.highlighted
+                        ? 'bg-gradient-to-br from-slate-900 to-cyan-900 border-2 border-cyan-400/30 shadow-2xl shadow-cyan-500/20'
+                        : 'bg-slate-50 border border-slate-200 hover:border-slate-300'
+                    } transition-all duration-300 hover:shadow-xl`}
+                  >
+                    <h3
+                      className={`text-xl font-bold mb-2 ${
+                        plan.highlighted ? 'text-white' : 'text-slate-900'
+                      }`}
+                    >
+                      {name}
+                    </h3>
+                    <div
+                      className={`text-4xl font-black mb-1 ${
+                        plan.highlighted ? 'text-white' : 'text-slate-900'
+                      }`}
+                    >
+                      {price}
+                    </div>
+                    {period ? (
+                      <p
+                        className={`text-sm mb-2 ${
+                          plan.highlighted ? 'text-cyan-300' : 'text-slate-500'
+                        }`}
+                      >
+                        {period}
+                      </p>
+                    ) : null}
+                    <p
+                      className={`text-sm mb-7 ${
+                        plan.highlighted ? 'text-cyan-100/60' : 'text-slate-500'
+                      }`}
+                    >
+                      {description}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={goSignIn}
+                      className={`w-full py-3.5 rounded-2xl font-bold text-sm transition-all duration-300 mb-7 ${
+                        plan.highlighted
+                          ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105'
+                          : 'bg-white border border-slate-200 text-slate-900 hover:border-slate-300 hover:shadow-md'
+                      }`}
+                    >
+                      {cta}
+                    </button>
+                    <ul className="space-y-3">
+                      {featureList.map((feature) => (
+                        <li key={feature} className="flex items-start gap-3">
+                          <div
+                            className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                              plan.highlighted ? 'bg-cyan-400/20' : 'bg-emerald-100'
+                            }`}
+                          >
+                            <Check
+                              className={`w-3 h-3 ${
+                                plan.highlighted ? 'text-cyan-400' : 'text-emerald-600'
+                              }`}
+                            />
+                          </div>
+                          <span
+                            className={`text-sm ${
+                              plan.highlighted ? 'text-cyan-100/80' : 'text-slate-600'
+                            }`}
+                          >
+                            {feature}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
-      <footer id="contact" className="bg-gray-900 px-4 py-12 text-white sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-8 grid gap-8 md:grid-cols-4">
-            <div>
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-600">
-                  <Activity className="h-6 w-6 text-white" />
-                </div>
-                <span className="text-2xl font-bold">CeenAiX</span>
+      {/* Final CTA */}
+      <section className="relative py-28 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src="https://images.pexels.com/photos/3938022/pexels-photo-3938022.jpeg?auto=compress&cs=tinysrgb&w=1920"
+            alt={t('home.landing.finalCta.altBg')}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/95 via-blue-900/90 to-slate-900/95" />
+        </div>
+        <div
+          ref={ctaRef.ref}
+          className={`relative max-w-4xl mx-auto text-center opacity-0-init ${
+            ctaRef.inView ? 'animate-fade-up' : ''
+          }`}
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-400/10 border border-cyan-400/20 mb-8">
+            <Heart className="w-4 h-4 text-cyan-400" />
+            <span className="text-cyan-300 text-sm font-semibold">
+              {t('home.landing.finalCta.eyebrow')}
+            </span>
+          </div>
+          <h2 className="text-5xl md:text-6xl font-black text-white mb-6 leading-tight">
+            {t('home.landing.finalCta.titleLine1')}
+            <br />
+            <span className="shimmer-text">{t('home.landing.finalCta.titleLine2')}</span>
+          </h2>
+          <p className="text-xl text-cyan-100/70 mb-10 max-w-2xl mx-auto leading-relaxed">
+            {t('home.landing.finalCta.lead')}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              type="button"
+              onClick={goRegister}
+              className="group px-10 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-2xl font-bold text-lg hover:shadow-2xl hover:shadow-cyan-500/40 hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              {t('home.landing.finalCta.ctaPrimary')}
+              <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button
+              type="button"
+              onClick={goSignIn}
+              className="px-10 py-4 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-2xl font-bold text-lg hover:bg-white/20 transition-all duration-300"
+            >
+              {t('home.landing.finalCta.ctaSecondary')}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer id="contact" className="bg-slate-950 text-white py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-5 gap-10 mb-12">
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-3 mb-5">
+                <img
+                  src="/ChatGPT_Image_Feb_27,_2026,_11_29_01_AM.png"
+                  alt="CeenAiX"
+                  className="w-10 h-10 object-contain"
+                />
+                <span className="text-2xl font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                  {t('home.landing.nav.brand')}
+                </span>
               </div>
-              <p className="text-gray-400">{copy.brandTagline}</p>
+              <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-xs">
+                {t('home.landing.footer.blurb')}
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-slate-500 text-xs">
+                  {t('home.landing.footer.statusOperational')}
+                </span>
+              </div>
             </div>
             <div>
-              <h4 className="mb-4 font-bold">{copy.footerProduct}</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <a href="#features" className="hover:text-white">
-                    {copy.footerFeatureLink}
-                  </a>
-                </li>
-                <li>
-                  <a href="#pricing" className="hover:text-white">
-                    {copy.footerPricingLink}
-                  </a>
-                </li>
-                <li>
-                  <a href="#contact" className="hover:text-white">
-                    {copy.footerSecurityLink}
-                  </a>
-                </li>
+              <h4 className="font-bold mb-5 text-sm uppercase tracking-widest text-slate-400">
+                {t('home.landing.footer.productHeading')}
+              </h4>
+              <ul className="space-y-3 text-slate-500 text-sm">
+                {(['features', 'pricing', 'security', 'integrations'] as const).map((key) => (
+                  <li key={key}>
+                    <a href="#" className="hover:text-cyan-400 transition-colors">
+                      {t(`home.landing.footer.links.${key}`)}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
             <div>
-              <h4 className="mb-4 font-bold">{copy.footerCompany}</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#contact" className="hover:text-white">{copy.footerAbout}</a></li>
-                <li><a href="#contact" className="hover:text-white">{copy.footerCareers}</a></li>
-                <li><a href="#contact" className="hover:text-white">{copy.footerContactLink}</a></li>
+              <h4 className="font-bold mb-5 text-sm uppercase tracking-widest text-slate-400">
+                {t('home.landing.footer.companyHeading')}
+              </h4>
+              <ul className="space-y-3 text-slate-500 text-sm">
+                {(['about', 'careers', 'contact', 'blog'] as const).map((key) => (
+                  <li key={key}>
+                    <a href="#" className="hover:text-cyan-400 transition-colors">
+                      {t(`home.landing.footer.links.${key}`)}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
             <div>
-              <h4 className="mb-4 font-bold">{copy.footerLegal}</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#contact" className="hover:text-white">{copy.footerPrivacy}</a></li>
-                <li><a href="#contact" className="hover:text-white">{copy.footerTerms}</a></li>
-                <li><a href="#contact" className="hover:text-white">{copy.footerCompliance}</a></li>
+              <h4 className="font-bold mb-5 text-sm uppercase tracking-widest text-slate-400">
+                {t('home.landing.footer.legalHeading')}
+              </h4>
+              <ul className="space-y-3 text-slate-500 text-sm">
+                {(['privacy', 'terms', 'compliance', 'nabidh'] as const).map((key) => (
+                  <li key={key}>
+                    <a href="#" className="hover:text-cyan-400 transition-colors">
+                      {t(`home.landing.footer.links.${key}`)}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>{copy.footerCopyright}</p>
+          <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-slate-600 text-sm">
+              {t('home.landing.footer.copyright')}
+            </p>
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700">
+                <Shield className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-slate-400 text-xs">
+                  {t('home.landing.footer.dhaCertified')}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700">
+                <Lock className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="text-slate-400 text-xs">
+                  {t('home.landing.footer.nabidhCompliant')}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </footer>

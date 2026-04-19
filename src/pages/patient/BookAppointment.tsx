@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Calendar,
-  CalendarDays,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -11,8 +10,6 @@ import {
   Search,
   Stethoscope,
 } from 'lucide-react';
-import { Navigation } from '../../components/Navigation';
-import { PageHeader } from '../../components/PageHeader';
 import { Skeleton } from '../../components/Skeleton';
 import { SpecializationMultiSelect } from '../../components/SpecializationMultiSelect';
 import { useBookableDoctors, useDoctorBookingAvailability, useQuery, useSpecializations } from '../../hooks';
@@ -410,22 +407,23 @@ export const BookAppointment: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
-      <Navigation role="patient" />
-      <PageHeader
-        title={isRescheduling ? t('patient.book.titleReschedule') : t('patient.book.title')}
-        subtitle={isRescheduling ? t('patient.book.subReschedule') : t('patient.book.sub')}
-        icon={<CalendarDays className="h-6 w-6 text-white" />}
-        backTo="/patient/appointments"
-      />
+    <>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">
+          {isRescheduling ? t('patient.book.titleReschedule') : t('patient.book.title')}
+        </h1>
+        <p className="mt-1 text-sm text-slate-500">
+          {isRescheduling ? t('patient.book.subReschedule') : t('patient.book.sub')}
+        </p>
+      </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div>
         {feedback ? (
           <div
-            className={`mb-6 rounded-2xl border px-4 py-3 text-sm ${
+            className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
               feedback.type === 'success'
-                ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-                : 'border-red-200 bg-red-50 text-red-700'
+                ? 'border-emerald-100 bg-emerald-50 text-emerald-700'
+                : 'border-red-100 bg-red-50 text-red-600'
             }`}
           >
             {feedback.message}
@@ -433,25 +431,25 @@ export const BookAppointment: React.FC = () => {
         ) : null}
 
         {doctorsError ? (
-          <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <div className="mb-4 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-700">
             {t('patient.book.doctorsError')}
           </div>
         ) : null}
 
         {specializationsError ? (
-          <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <div className="mb-4 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-700">
             {t('patient.book.specError')}
           </div>
         ) : null}
 
         {rescheduleError ? (
-          <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <div className="mb-4 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-700">
             {t('patient.book.rescheduleLoadError')}
           </div>
         ) : null}
 
         {availabilityError ? (
-          <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <div className="mb-4 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-700">
             {t('patient.book.availabilityError')}
           </div>
         ) : null}
@@ -878,6 +876,6 @@ export const BookAppointment: React.FC = () => {
           </section>
         </div>
       </div>
-    </div>
+    </>
   );
 };

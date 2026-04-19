@@ -4,16 +4,18 @@ import { useTranslation } from 'react-i18next';
 import {
   Activity,
   AlertTriangle,
+  ArrowLeft,
   Banknote,
+  Bell,
   Bot,
   Calendar,
-  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   ClipboardList,
   FlaskConical,
   FolderOpen,
   Heart,
+  Home,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -116,7 +118,7 @@ export const PortalShell = ({ role, children }: PortalShellProps) => {
       { id: 'appointments', label: t('nav.appointments'), icon: Calendar, href: '/patient/appointments' },
       { id: 'my-health', label: t('nav.myHealth'), icon: Heart, disabled: true },
       { id: 'medications', label: t('nav.medications'), icon: Pill, href: '/patient/prescriptions' },
-      { id: 'lab-results', label: t('nav.labResults'), icon: Activity, disabled: true },
+      { id: 'lab-results', label: t('nav.labResults'), icon: Activity, href: '/patient/lab-results' },
       { id: 'imaging', label: t('nav.imagingScans'), icon: Scan, disabled: true },
       { id: 'documents', label: t('nav.documents'), icon: FolderOpen, badge: 3, disabled: true },
       { id: 'messages', label: t('nav.messages'), icon: MessageSquare, href: '/patient/messages', badge: 2 },
@@ -144,6 +146,7 @@ export const PortalShell = ({ role, children }: PortalShellProps) => {
       const active = isActivePath(location.pathname, item.href);
       const sharedClass = compact ? 'px-3.5 py-2.5 text-[13px]' : 'px-4 py-3 text-sm';
       const alignmentClass = isArabic ? 'flex-row-reverse' : '';
+      const isSignOut = item.id === 'signout';
 
       return (
         <button
@@ -166,9 +169,11 @@ export const PortalShell = ({ role, children }: PortalShellProps) => {
               ? 'cursor-not-allowed text-slate-400'
               : active
                 ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-500/20'
-                : compact
-                  ? 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
-                  : 'text-gray-700 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 hover:text-cyan-700'
+                : isSignOut
+                  ? 'text-slate-500 hover:bg-red-50 hover:text-red-600'
+                  : compact
+                    ? 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
+                    : 'text-gray-700 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 hover:text-cyan-700'
           }`}
         >
           <Icon className={`${compact ? 'h-[18px] w-[18px]' : 'h-5 w-5'} shrink-0`} />
@@ -184,24 +189,48 @@ export const PortalShell = ({ role, children }: PortalShellProps) => {
       );
     };
 
+    const patientRoleLabel = t('header.patient');
+
     return (
       <div className="h-screen bg-slate-50 flex flex-col overflow-hidden">
         <div className="z-50 flex-shrink-0 border-b border-cyan-100 bg-white px-6 py-4 shadow-sm shadow-cyan-500/5">
           <div className={`flex items-center justify-between gap-4 ${isArabic ? 'flex-row-reverse' : ''}`}>
-            <button
-              type="button"
-              onClick={() => navigate('/patient/dashboard')}
-              className={`flex min-w-0 items-center gap-3 ${isArabic ? 'flex-row-reverse' : ''}`}
-            >
-              <img
-                src="/ChatGPT_Image_Feb_27,_2026,_11_29_01_AM.png"
-                alt="CeenAiX"
-                className="h-10 w-10 object-contain"
-              />
-              <h1 className="bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-xl font-bold text-transparent">
-                CeenAiX
-              </h1>
-            </button>
+            <div className={`flex min-w-0 items-center gap-2 ${isArabic ? 'flex-row-reverse' : ''}`}>
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="group rounded-lg p-2 transition-all duration-300 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50"
+                aria-label={t('nav.goBack')}
+                title={t('nav.goBack')}
+              >
+                <ArrowLeft
+                  className={`h-5 w-5 text-slate-600 transition-colors duration-300 group-hover:text-cyan-600 ${isArabic ? 'rotate-180' : ''}`}
+                />
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                className="group rounded-lg p-2 transition-all duration-300 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50"
+                aria-label={t('nav.goHome')}
+                title={t('nav.goHome')}
+              >
+                <Home className="h-5 w-5 text-slate-600 transition-colors duration-300 group-hover:text-cyan-600" />
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/patient/dashboard')}
+                className={`flex min-w-0 items-center gap-3 ${isArabic ? 'flex-row-reverse' : ''}`}
+              >
+                <img
+                  src="/ChatGPT_Image_Feb_27,_2026,_11_29_01_AM.png"
+                  alt="CeenAiX"
+                  className="h-10 w-10 object-contain transition-transform duration-300 hover:scale-110"
+                />
+                <h1 className="bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-xl font-bold text-transparent">
+                  CeenAiX
+                </h1>
+              </button>
+            </div>
 
             <div className={`flex items-center gap-4 ${isArabic ? 'flex-row-reverse' : ''}`}>
               <div className="relative">
@@ -256,10 +285,28 @@ export const PortalShell = ({ role, children }: PortalShellProps) => {
 
               <button
                 type="button"
-                onClick={() => navigate('/patient/profile')}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-cyan-600 to-blue-600 text-sm font-bold text-white"
+                onClick={() => navigate('/patient/notifications')}
+                aria-label={t('nav.notifications')}
+                title={t('nav.notifications')}
+                className="group relative rounded-lg p-2 transition-all duration-300 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50"
               >
-                {getInitials(accountDisplayName)}
+                <Bell className="h-5 w-5 text-slate-600 transition-colors duration-300 group-hover:text-cyan-600" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate('/patient/profile')}
+                className={`flex items-center gap-2 transition-opacity hover:opacity-80 ${
+                  isArabic ? 'flex-row-reverse border-r pr-4' : 'border-l pl-4'
+                } border-slate-200`}
+              >
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-cyan-600 to-blue-600 text-sm font-bold text-white">
+                  {getInitials(accountDisplayName)}
+                </div>
+                <div className={`hidden md:block ${isArabic ? 'text-right' : 'text-left'}`}>
+                  <p className="text-sm font-semibold leading-none text-slate-800">{accountDisplayName}</p>
+                  <p className="mt-0.5 text-xs text-slate-500">{patientRoleLabel}</p>
+                </div>
               </button>
             </div>
           </div>
@@ -342,17 +389,27 @@ export const PortalShell = ({ role, children }: PortalShellProps) => {
     );
   }
 
+  type DoctorNavItem = {
+    href?: string;
+    label: string;
+    icon: LucideIcon;
+    badge?: number;
+    badgeTone?: 'red' | 'amber' | 'blue' | 'teal';
+    disabled?: boolean;
+    action?: () => void;
+  };
+
   const doctorTopNavGroups: Array<{
     id: string;
     title?: string;
-    items: Array<{ href?: string; label: string; icon: LucideIcon; badge?: number; disabled?: boolean; action?: () => void }>;
+    items: Array<DoctorNavItem>;
   }> = [
     {
       id: 'clinic',
       title: 'CLINIC',
       items: [
-        { href: '/doctor/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, badge: doctorChromeData?.todayAppointmentsCount ?? undefined },
-        { href: '/doctor/appointments', label: "Today's Appointments", icon: Calendar, badge: doctorChromeData?.todayAppointmentsCount ?? undefined },
+        { href: '/doctor/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, badge: doctorChromeData?.todayAppointmentsCount ?? undefined, badgeTone: 'red' },
+        { href: '/doctor/appointments', label: "Today's Appointments", icon: Calendar, badge: doctorChromeData?.todayAppointmentsCount ?? undefined, badgeTone: 'amber' },
         { href: '/doctor/appointments', label: t('nav.appointments'), icon: Calendar },
         { href: '/doctor/patients', label: 'Patient Records', icon: Users },
       ],
@@ -360,10 +417,10 @@ export const PortalShell = ({ role, children }: PortalShellProps) => {
     {
       id: 'workflow',
       items: [
-        { href: '/doctor/prescriptions/new', label: 'Write Prescription', icon: ClipboardList, badge: 1 },
-        { href: '/doctor/lab-orders/new', label: 'Lab Referrals', icon: FlaskConical, badge: doctorChromeData?.criticalResultsCount ?? undefined },
-        { label: 'Imaging Center', icon: Scan, badge: 1, disabled: true },
-        { href: '/doctor/messages', label: t('nav.messages'), icon: MessageSquare, badge: doctorChromeData?.unreadMessagesCount ?? undefined },
+        { href: '/doctor/prescriptions/new', label: 'Write Prescription', icon: ClipboardList, badge: 1, badgeTone: 'amber' },
+        { href: '/doctor/lab-orders/new', label: 'Lab Referrals', icon: FlaskConical, badge: doctorChromeData?.criticalResultsCount ?? undefined, badgeTone: 'red' },
+        { label: 'Imaging Center', icon: Scan, badge: 1, badgeTone: 'amber', disabled: true },
+        { href: '/doctor/messages', label: t('nav.messages'), icon: MessageSquare, badge: doctorChromeData?.unreadMessagesCount ?? undefined, badgeTone: 'blue' },
       ],
     },
     {
@@ -414,10 +471,22 @@ export const PortalShell = ({ role, children }: PortalShellProps) => {
       ? doctorProfile.consultation_fee * todayAppointmentsCount
       : null;
 
-  const renderDoctorNavItem = (
-    item: { href?: string; label: string; icon: LucideIcon; badge?: number; disabled?: boolean; action?: () => void },
-    key: string
-  ) => {
+  const doctorBadgeToneClass = (tone: DoctorNavItem['badgeTone']) => {
+    switch (tone) {
+      case 'red':
+        return 'bg-red-500 text-white';
+      case 'amber':
+        return 'bg-amber-500 text-white';
+      case 'blue':
+        return 'bg-blue-500 text-white';
+      case 'teal':
+        return 'bg-teal-500 text-white';
+      default:
+        return 'bg-white/10 text-slate-200';
+    }
+  };
+
+  const renderDoctorNavItem = (item: DoctorNavItem, key: string) => {
     const active = item.href ? isActivePath(location.pathname, item.href) : false;
     const Icon = item.icon;
     return (
@@ -434,22 +503,26 @@ export const PortalShell = ({ role, children }: PortalShellProps) => {
             navigate(item.href);
           }
         }}
-        className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-[12.5px] leading-5 font-medium transition ${
+        className={`flex w-full items-center justify-between rounded-lg px-4 py-2.5 text-left text-[13px] leading-5 font-medium transition-all duration-300 ${
           item.disabled
             ? 'cursor-not-allowed text-slate-500'
             : active
-              ? 'bg-white/10 text-white'
-              : 'text-slate-300 hover:bg-white/[0.04] hover:text-white'
+              ? 'bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-lg shadow-teal-500/20'
+              : 'text-slate-300 hover:bg-white/[0.05] hover:text-white'
         }`}
       >
-        <span className="flex min-w-0 items-center gap-2.5">
-          <Icon className={`h-[15px] w-[15px] shrink-0 ${active ? 'text-white' : item.disabled ? 'text-slate-600' : 'text-slate-400'}`} />
+        <span className="flex min-w-0 items-center gap-3">
+          <Icon
+            className={`h-5 w-5 shrink-0 ${
+              active ? 'text-white' : item.disabled ? 'text-slate-600' : 'text-slate-400'
+            }`}
+          />
           <span className="truncate">{item.label}</span>
         </span>
         {item.badge ? (
           <span
-            className={`min-w-5 rounded-full px-1.5 py-0.5 text-center text-[10px] font-semibold ${
-              active ? 'bg-teal-500 text-white' : 'bg-white/10 text-slate-200'
+            className={`min-w-[18px] rounded-full px-1.5 py-0.5 text-center text-[10px] font-bold ${
+              active ? 'bg-white/20 text-white' : doctorBadgeToneClass(item.badgeTone)
             }`}
           >
             {item.badge}
@@ -462,33 +535,42 @@ export const PortalShell = ({ role, children }: PortalShellProps) => {
   return (
     <div className="flex h-screen overflow-hidden bg-[#F8FAFC]">
       <aside className="w-[260px] bg-[#0A1628] flex flex-col transition-all duration-300 shadow-2xl">
-        <div className="h-[72px] flex items-center justify-between px-6 border-b border-white/[0.06]">
+        <div className="flex h-[72px] items-center justify-between border-b border-white/[0.06] px-6">
           <button
             type="button"
             onClick={() => navigate('/doctor/dashboard')}
             className="flex items-center gap-3 text-left"
           >
             <div>
-              <p className="text-lg font-bold text-white">CeenAiX</p>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">{portalLabel}</p>
+              <h1 className="text-lg font-bold text-white">CeenAiX</h1>
+              <p className="text-[10px] uppercase tracking-wide text-teal-400">{portalLabel}</p>
             </div>
           </button>
         </div>
 
         <div className="px-4 py-4">
-          <div className="bg-teal-500/10 border border-teal-500/20 rounded-xl p-3">
+          <div className="rounded-xl border border-teal-500/20 bg-teal-500/10 p-3">
             <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-sm font-bold text-white">
-                {getInitials(accountDisplayName)}
+              <div className="relative">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#0A1628] to-teal-600 text-sm font-bold text-white shadow-lg">
+                  {getInitials(accountDisplayName)}
+                </div>
+                <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#0A1628] bg-emerald-500" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-white">{accountDisplayName}</p>
-                <p className="truncate text-xs text-slate-200">{doctorSpecialty}</p>
-                <p className="mt-1 truncate text-xs text-slate-300">{doctorFacility}</p>
-                <p className="mt-1 text-[11px] font-medium text-teal-300">
+                <p className="truncate text-[13px] font-bold text-white">{accountDisplayName}</p>
+                <p className="truncate text-[11px] text-teal-300">{doctorSpecialty}</p>
+                <p className="mt-0.5 truncate text-[11px] text-slate-400">{doctorFacility}</p>
+                <div
+                  className={`mt-1.5 inline-flex items-center rounded px-2 py-0.5 text-[9px] font-medium ${
+                    doctorProfile?.dha_license_verified
+                      ? 'bg-emerald-900/50 text-emerald-300'
+                      : 'bg-amber-900/50 text-amber-300'
+                  }`}
+                >
                   {doctorProfile?.dha_license_verified ? 'DHA Licensed ✓' : 'DHA verification pending'}
-                </p>
-                <p className="mt-1 text-[11px] text-slate-300">{doctorLicense}</p>
+                </div>
+                <p className="mt-0.5 font-mono text-[9px] text-slate-500">{doctorLicense}</p>
               </div>
             </div>
           </div>
@@ -512,41 +594,45 @@ export const PortalShell = ({ role, children }: PortalShellProps) => {
         </div>
 
         <div className="border-t border-white/[0.06] p-3.5 space-y-2.5">
-          <div className="space-y-1.5">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.28em] text-slate-500/90">TODAY</p>
-            <div className="space-y-1.5 text-[12.5px] text-slate-200">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-[14px] w-[14px] shrink-0 text-slate-400" />
-                <p>{todayAppointmentsCount} appointments</p>
+          <p className="px-2 text-[9px] font-semibold uppercase tracking-wider text-slate-500">TODAY</p>
+          <div className="space-y-2 text-[12px]">
+            <div className="flex items-center justify-between px-2">
+              <div className="flex items-center gap-2 text-slate-400">
+                <Calendar className="h-3.5 w-3.5" />
+                <span>{todayAppointmentsCount} appointments</span>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-[14px] w-[14px] shrink-0 text-teal-300" />
-                <p>{completedTodayAppointmentsCount}/{todayAppointmentsCount} done</p>
+              <span className="font-mono text-[12px] font-semibold text-teal-400">
+                {completedTodayAppointmentsCount}/{todayAppointmentsCount} done
+              </span>
+            </div>
+            <div className="flex items-center justify-between px-2">
+              <div className="flex items-center gap-2 text-slate-400">
+                <Banknote className="h-3.5 w-3.5" />
+                <span>Revenue today</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Banknote className="h-[14px] w-[14px] shrink-0 text-slate-400" />
-                <p>
-                  Revenue today{' '}
-                  <span className="font-semibold text-white">
-                    {estimatedRevenueToday !== null ? `AED ${estimatedRevenueToday.toLocaleString()}` : 'AED --'}
-                  </span>
-                </p>
+              <span className="font-mono text-[12px] font-semibold text-emerald-400">
+                {estimatedRevenueToday !== null ? `AED ${estimatedRevenueToday.toLocaleString()}` : 'AED --'}
+              </span>
+            </div>
+            <div className="flex items-center justify-between px-2">
+              <div className="flex items-center gap-2 text-slate-400">
+                <span
+                  className={`h-2 w-2 rounded-full ${
+                    (doctorChromeData?.criticalResultsCount ?? 0) > 0 ? 'animate-pulse bg-red-500' : 'bg-slate-500'
+                  }`}
+                />
+                <span>Critical alerts</span>
               </div>
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="h-[14px] w-[14px] shrink-0 text-rose-300" />
-                <p>
-                  Critical alerts{' '}
-                  <span className="font-semibold text-rose-300">
-                    {doctorChromeData?.criticalResultsCount ?? 0} {doctorChromeData?.criticalResultsCount ? 'URGENT' : ''}
-                  </span>
-                </p>
-              </div>
+              <span className="font-mono text-[12px] font-bold text-red-400">
+                {doctorChromeData?.criticalResultsCount ?? 0}{' '}
+                {doctorChromeData?.criticalResultsCount ? 'URGENT' : ''}
+              </span>
             </div>
           </div>
           <button
             type="button"
             onClick={() => void handleSignOut()}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[13px] font-medium text-slate-300 transition hover:bg-white/[0.04] hover:text-white"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-[13px] font-medium text-slate-400 transition-colors hover:bg-white/5 hover:text-red-400"
           >
             <LogOut className="h-4 w-4" />
             <span>Sign Out</span>

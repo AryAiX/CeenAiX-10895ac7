@@ -1,11 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertCircle, Bot, CheckCircle2, Loader2, MessageSquarePlus, PanelLeftClose, PanelLeftOpen, Paperclip, Send } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Loader2, MessageSquarePlus, PanelLeftClose, PanelLeftOpen, Paperclip, Send } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useNavigate } from 'react-router-dom';
-import { Navigation } from '../../components/Navigation';
-import { PageHeader } from '../../components/PageHeader';
 import { usePatientPreVisitAssessments } from '../../hooks';
 import { usePatientAiChat } from '../../hooks/use-patient-ai-chat';
 import { useQuery } from '../../hooks/use-query';
@@ -299,18 +297,14 @@ export const PatientAIChat: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-cyan-50">
-      <Navigation role="patient" />
-      <PageHeader
-        title={t('patient.aiChat.title')}
-        subtitle={t('patient.aiChat.subtitle')}
-        backTo="/patient/dashboard"
-        icon={<Bot className="h-6 w-6 text-white" />}
-      />
-
-      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">{t('patient.aiChat.title')}</h1>
+        <p className="mt-1 text-sm text-slate-500">{t('patient.aiChat.subtitle')}</p>
+      </div>
+      <div>
         <section
-          className={`grid h-[calc(100vh-11rem)] min-h-[720px] overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-sm transition-[grid-template-columns] duration-200 ${
+          className={`grid h-[calc(100vh-12rem)] min-h-[680px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-[grid-template-columns] duration-200 ${
             isSidebarCollapsed ? 'grid-cols-[72px_minmax(0,1fr)]' : 'grid-cols-[280px_minmax(0,1fr)]'
           }`}
         >
@@ -747,6 +741,6 @@ export const PatientAIChat: React.FC = () => {
           </div>
         </section>
       </div>
-    </div>
+    </>
   );
 };

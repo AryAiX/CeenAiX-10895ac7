@@ -2,14 +2,11 @@ import React, { useMemo, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Ban,
-  CalendarClock,
   CalendarDays,
   Clock3,
   Plus,
   Trash2,
 } from 'lucide-react';
-import { Navigation } from '../../components/Navigation';
-import { PageHeader } from '../../components/PageHeader';
 import { Skeleton } from '../../components/Skeleton';
 import { useDoctorSchedule } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
@@ -255,22 +252,19 @@ export const DoctorSchedule: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
-      <Navigation role="doctor" />
-      <PageHeader
-        title="Schedule"
-        subtitle="Manage the recurring availability and blocked time that patients can book against."
-        icon={<CalendarClock className="h-6 w-6 text-white" />}
-        backTo="/doctor/dashboard"
-      />
+    <>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">Schedule</h1>
+        <p className="mt-1 text-sm text-slate-500">Manage the recurring availability and blocked time that patients can book against.</p>
+      </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div>
         {feedback ? (
           <div
-            className={`mb-6 rounded-2xl border px-4 py-3 text-sm ${
+            className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
               feedback.type === 'success'
-                ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-                : 'border-red-200 bg-red-50 text-red-700'
+                ? 'border-emerald-100 bg-emerald-50 text-emerald-700'
+                : 'border-red-100 bg-red-50 text-red-600'
             }`}
           >
             {feedback.message}
@@ -637,6 +631,6 @@ export const DoctorSchedule: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };

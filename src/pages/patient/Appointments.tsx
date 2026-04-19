@@ -2,8 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AlertCircle, Calendar, ClipboardList, Clock, MapPin, MessageSquare, Plus, User } from 'lucide-react';
-import { Navigation } from '../../components/Navigation';
-import { PageHeader } from '../../components/PageHeader';
 import { Skeleton } from '../../components/Skeleton';
 import { useAppointments, usePatientPreVisitAssessments, useQuery } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
@@ -161,40 +159,36 @@ export const PatientAppointments: React.FC = () => {
     return (
       <div
         key={appointment.id}
-        className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm"
+        className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm"
       >
-        <div
-          className={`p-5 ${isUpcoming ? 'bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan text-white' : 'bg-gray-50'}`}
-        >
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className={`rounded-xl p-3 ${isUpcoming ? 'bg-white/15' : 'bg-white shadow-sm'}`}>
-                <User className={`h-5 w-5 ${isUpcoming ? 'text-white' : 'text-cyan-600'}`} />
-              </div>
-              <div>
-                <p className="text-lg font-semibold">{doctorProfile?.fullName ?? t('shared.doctor')}</p>
-                <p className={`text-sm ${isUpcoming ? 'text-cyan-100' : 'text-gray-600'}`}>
-                  {doctorProfile?.specialty ?? t('shared.careVisit')}
-                </p>
-              </div>
+        <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4">
+          <div className="flex items-center gap-3">
+            <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${isUpcoming ? 'bg-teal-50' : 'bg-slate-50'}`}>
+              <User className={`h-5 w-5 ${isUpcoming ? 'text-teal-600' : 'text-slate-600'}`} />
             </div>
-            <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${
-                isUpcoming ? 'bg-white/15 text-white' : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              {appointmentStatusLabel(t, appointment.status)}
-            </span>
+            <div>
+              <p className="text-base font-semibold text-slate-900">{doctorProfile?.fullName ?? t('shared.doctor')}</p>
+              <p className="text-xs font-medium text-teal-600">
+                {doctorProfile?.specialty ?? t('shared.careVisit')}
+              </p>
+            </div>
           </div>
+          <span
+            className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${
+              isUpcoming ? 'bg-teal-50 text-teal-700' : 'bg-slate-100 text-slate-600'
+            }`}
+          >
+            {appointmentStatusLabel(t, appointment.status)}
+          </span>
         </div>
 
-        <div className="grid gap-4 p-5 md:grid-cols-3">
-          <div className="rounded-xl bg-gray-50 p-4">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase text-gray-500">
-              <Calendar className="h-4 w-4" />
+        <div className="grid gap-3 p-5 md:grid-cols-3">
+          <div className="rounded-xl bg-slate-50 p-4">
+            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-400">
+              <Calendar className="h-3.5 w-3.5" />
               <span>{t('patient.appointments.date')}</span>
             </div>
-            <p className="mt-2 font-semibold text-gray-900">
+            <p className="mt-2 font-semibold text-slate-900">
               {new Date(appointment.scheduled_at).toLocaleDateString(
                 locale,
                 dtOpts({
@@ -207,12 +201,12 @@ export const PatientAppointments: React.FC = () => {
             </p>
           </div>
 
-          <div className="rounded-xl bg-gray-50 p-4">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase text-gray-500">
-              <Clock className="h-4 w-4" />
+          <div className="rounded-xl bg-slate-50 p-4">
+            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-400">
+              <Clock className="h-3.5 w-3.5" />
               <span>{t('patient.appointments.time')}</span>
             </div>
-            <p className="mt-2 font-semibold text-gray-900">
+            <p className="mt-2 font-semibold text-slate-900">
               {new Date(appointment.scheduled_at).toLocaleTimeString(
                 locale,
                 dtOpts({
@@ -221,32 +215,32 @@ export const PatientAppointments: React.FC = () => {
                 })
               )}
             </p>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-xs text-slate-500">
               {t('shared.minutesUnit', { count: appointment.duration_minutes })}
             </p>
           </div>
 
-          <div className="rounded-xl bg-gray-50 p-4">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase text-gray-500">
-              <MapPin className="h-4 w-4" />
+          <div className="rounded-xl bg-slate-50 p-4">
+            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-400">
+              <MapPin className="h-3.5 w-3.5" />
               <span>{t('patient.appointments.location')}</span>
             </div>
-            <p className="mt-2 text-sm font-medium text-gray-900">{location}</p>
+            <p className="mt-2 text-xs font-medium text-slate-900">{location}</p>
           </div>
         </div>
 
-        <div className="border-t border-gray-100 px-5 py-4">
-          <p className="text-xs font-semibold uppercase text-gray-500">{t('patient.appointments.reason')}</p>
-          <p className="mt-2 text-sm text-gray-700">
+        <div className="border-t border-slate-100 px-5 py-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-400">{t('patient.appointments.reason')}</p>
+          <p className="mt-2 text-sm text-slate-700">
             {appointment.chief_complaint ?? t('shared.scheduledConsultation')}
           </p>
 
           {preVisitAssessment ? (
-            <div className="mt-4 rounded-2xl border border-cyan-100 bg-cyan-50/70 p-4">
+            <div className="mt-4 rounded-xl border border-teal-100 bg-teal-50/70 p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <ClipboardList className="h-4 w-4 text-cyan-700" />
-                  <p className="text-sm font-semibold text-cyan-900">
+                  <ClipboardList className="h-4 w-4 text-teal-700" />
+                  <p className="text-sm font-semibold text-teal-900">
                     {t('patient.appointments.preVisitPrefix')}{' '}
                     {preVisitStatusLabel(t, preVisitAssessment.status)}
                   </p>
@@ -254,7 +248,7 @@ export const PatientAppointments: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate(`/patient/pre-visit/${preVisitAssessment.id}`)}
-                  className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-cyan-800 shadow-sm transition hover:shadow"
+                  className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-teal-700 shadow-sm transition hover:shadow"
                 >
                   {preVisitAssessment.status === 'completed' || preVisitAssessment.status === 'reviewed'
                     ? t('patient.appointments.reviewIntake')
@@ -265,27 +259,20 @@ export const PatientAppointments: React.FC = () => {
           ) : null}
 
           {isUpcoming ? (
-            <div className="mt-4 flex flex-wrap gap-3">
+            <div className="mt-4 flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => navigate(`/patient/messages?doctor=${appointment.doctor_id}`)}
-                className="inline-flex items-center gap-2 rounded-xl border border-cyan-200 px-4 py-2 text-sm font-semibold text-cyan-700 transition hover:bg-cyan-50"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-teal-200 px-3 py-1.5 text-xs font-semibold text-teal-600 transition hover:bg-teal-50"
               >
-                <MessageSquare className="h-4 w-4" />
+                <MessageSquare className="h-3.5 w-3.5" />
                 <span>{t('patient.messages.messageDoctor')}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/patient/appointments/book')}
-                className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
-              >
-                {t('patient.appointments.bookAnother')}
               </button>
               <button
                 type="button"
                 onClick={() => navigate(`/patient/appointments/book?reschedule=${appointment.id}`)}
                 disabled={busyAppointmentId === appointment.id}
-                className="rounded-xl border border-cyan-200 px-4 py-2 text-sm font-semibold text-cyan-700 transition hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {t('patient.appointments.reschedule')}
               </button>
@@ -293,7 +280,7 @@ export const PatientAppointments: React.FC = () => {
                 type="button"
                 onClick={() => handleCancelAppointment(appointment.id)}
                 disabled={busyAppointmentId === appointment.id}
-                className="rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {busyAppointmentId === appointment.id
                   ? t('patient.appointments.cancelling')
@@ -301,13 +288,13 @@ export const PatientAppointments: React.FC = () => {
               </button>
             </div>
           ) : (
-            <div className="mt-4 flex flex-wrap gap-3">
+            <div className="mt-4 flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => navigate(`/patient/messages?doctor=${appointment.doctor_id}`)}
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-800"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
               >
-                <MessageSquare className="h-4 w-4" />
+                <MessageSquare className="h-3.5 w-3.5" />
                 <span>{t('patient.messages.followUpDoctor')}</span>
               </button>
             </div>
@@ -323,50 +310,47 @@ export const PatientAppointments: React.FC = () => {
   const isLoadingPage = loading || doctorProfilesLoading;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
-      <Navigation role="patient" />
-      <PageHeader
-        title={t('patient.appointments.title')}
-        subtitle={t('patient.appointments.subtitle')}
-        icon={<Calendar className="h-6 w-6 text-white" />}
-        backTo="/patient/dashboard"
-        actions={
-          <button
-            type="button"
-            onClick={() => navigate('/patient/appointments/book')}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:shadow-lg"
-          >
-            <Plus className="h-4 w-4" />
-            <span>{t('patient.appointments.book')}</span>
-          </button>
-        }
-      />
+    <>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">{t('patient.appointments.title')}</h1>
+          <p className="mt-1 text-sm text-slate-500">{t('patient.appointments.subtitle')}</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => navigate('/patient/appointments/book')}
+          className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-700"
+        >
+          <Plus className="h-4 w-4" />
+          <span>{t('patient.appointments.book')}</span>
+        </button>
+      </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div>
         {showSuccessBanner ? (
-          <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          <div className="mb-4 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
             {t('patient.appointments.bannerBooked')}
           </div>
         ) : null}
 
         {showRescheduledBanner ? (
-          <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          <div className="mb-4 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
             {t('patient.appointments.bannerRescheduled')}
           </div>
         ) : null}
 
         {showPreVisitCompletedBanner ? (
-          <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          <div className="mb-4 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
             {t('patient.appointments.bannerPreVisit')}
           </div>
         ) : null}
 
         {feedback ? (
           <div
-            className={`mb-6 rounded-2xl border px-4 py-3 text-sm ${
+            className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
               feedback.type === 'success'
-                ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-                : 'border-red-200 bg-red-50 text-red-700'
+                ? 'border-emerald-100 bg-emerald-50 text-emerald-700'
+                : 'border-red-100 bg-red-50 text-red-600'
             }`}
           >
             {feedback.message}
@@ -385,14 +369,14 @@ export const PatientAppointments: React.FC = () => {
             <Skeleton className="h-48 w-full rounded-2xl" />
           </div>
         ) : upcomingAppointments.length === 0 && pastAppointments.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center shadow-sm">
-            <Calendar className="mx-auto mb-4 h-10 w-10 text-gray-400" />
-            <h2 className="text-xl font-bold text-gray-900">{t('patient.appointments.emptyTitle')}</h2>
-            <p className="mt-2 text-sm text-gray-600">{t('patient.appointments.emptyBody')}</p>
+          <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center shadow-sm">
+            <Calendar className="mx-auto mb-4 h-10 w-10 text-slate-300" />
+            <h2 className="text-lg font-semibold text-slate-900">{t('patient.appointments.emptyTitle')}</h2>
+            <p className="mt-2 text-sm text-slate-500">{t('patient.appointments.emptyBody')}</p>
             <button
               type="button"
               onClick={() => navigate('/patient/appointments/book')}
-              className="mt-5 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan px-5 py-3 font-semibold text-white shadow-md transition hover:shadow-lg"
+              className="mt-5 inline-flex items-center gap-2 rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-700"
             >
               <Plus className="h-4 w-4" />
               <span>{t('patient.appointments.book')}</span>
@@ -402,42 +386,42 @@ export const PatientAppointments: React.FC = () => {
           <div className="space-y-8">
             <section>
               <div className="mb-4 flex items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">{t('patient.appointments.upcomingTitle')}</h2>
-                  <p className="text-sm text-gray-600">{t('patient.appointments.upcomingSub')}</p>
+                <div className="flex items-center gap-3">
+                  <h2 className="text-base font-semibold text-slate-900">{t('patient.appointments.upcomingTitle')}</h2>
+                  <span className="rounded-full bg-teal-600 px-3 py-1 text-xs font-semibold text-white">
+                    {upcomingAppointments.length}
+                  </span>
                 </div>
-                <span className="rounded-full bg-cyan-100 px-4 py-2 text-sm font-semibold text-cyan-700">
-                  {t('patient.appointments.upcomingBadge', { count: upcomingAppointments.length })}
-                </span>
+                <p className="text-xs text-slate-500">{t('patient.appointments.upcomingSub')}</p>
               </div>
 
               {upcomingAppointments.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-8 text-center shadow-sm">
-                  <AlertCircle className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                  <p className="font-semibold text-gray-900">{t('patient.appointments.noUpcomingTitle')}</p>
-                  <p className="mt-1 text-sm text-gray-600">{t('patient.appointments.noUpcomingBody')}</p>
+                <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center shadow-sm">
+                  <AlertCircle className="mx-auto mb-3 h-8 w-8 text-slate-300" />
+                  <p className="font-semibold text-slate-900">{t('patient.appointments.noUpcomingTitle')}</p>
+                  <p className="mt-1 text-sm text-slate-500">{t('patient.appointments.noUpcomingBody')}</p>
                 </div>
               ) : (
-                <div className="space-y-5">
+                <div className="space-y-4">
                   {upcomingAppointments.map((appointment) => renderAppointmentCard(appointment.id))}
                 </div>
               )}
             </section>
 
             <section>
-              <div className="mb-4">
-                <h2 className="text-2xl font-bold text-gray-900">{t('patient.appointments.pastTitle')}</h2>
-                <p className="text-sm text-gray-600">{t('patient.appointments.pastSub')}</p>
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <h2 className="text-base font-semibold text-slate-900">{t('patient.appointments.pastTitle')}</h2>
+                <p className="text-xs text-slate-500">{t('patient.appointments.pastSub')}</p>
               </div>
 
               {pastAppointments.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-8 text-center shadow-sm">
-                  <Clock className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                  <p className="font-semibold text-gray-900">{t('patient.appointments.noPastTitle')}</p>
-                  <p className="mt-1 text-sm text-gray-600">{t('patient.appointments.noPastBody')}</p>
+                <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center shadow-sm">
+                  <Clock className="mx-auto mb-3 h-8 w-8 text-slate-300" />
+                  <p className="font-semibold text-slate-900">{t('patient.appointments.noPastTitle')}</p>
+                  <p className="mt-1 text-sm text-slate-500">{t('patient.appointments.noPastBody')}</p>
                 </div>
               ) : (
-                <div className="space-y-5">
+                <div className="space-y-4">
                   {pastAppointments.map((appointment) => renderAppointmentCard(appointment.id))}
                 </div>
               )}
@@ -445,6 +429,6 @@ export const PatientAppointments: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 };

@@ -47,7 +47,10 @@
     "logOut": "Log out",
     "patientAccount": "Patient account",
     "doctorAccount": "Doctor account",
-    "account": "Account"
+    "account": "Account",
+    "goBack": "Go back",
+    "goHome": "Home",
+    "notifications": "Notifications"
   },
   "language": {
     "enShort": "EN",
@@ -141,6 +144,255 @@
       "lead": "Join patients and doctors using CeenAiX for smarter booking, better preparation, and more connected healthcare journeys.",
       "patientPortal": "Patient portal",
       "doctorPortal": "Doctor portal"
+    },
+    "landing": {
+      "nav": {
+        "features": "Features",
+        "howItWorks": "How It Works",
+        "pricing": "Pricing",
+        "contact": "Contact",
+        "signIn": "Sign In",
+        "brand": "CeenAiX",
+        "openMenu": "Open menu",
+        "closeMenu": "Close menu"
+      },
+      "hero": {
+        "badge": "Dubai's #1 AI Healthcare Platform",
+        "titleLine1": "Your Health,",
+        "titleLine2Part1": "Intelligently",
+        "titleLine2Part2": "Guided",
+        "lead": "DHA-compliant, NABIDH-certified, and trusted by 50,000+ patients across the UAE. Experience AI-powered healthcare that truly knows you.",
+        "ctaPrimary": "Get Started Free",
+        "ctaSecondary": "Watch Demo",
+        "trustCount": "50,000+",
+        "trustBefore": "Trusted by ",
+        "trustAfter": " patients",
+        "panelTitle": "Access Any Portal",
+        "panelSubtitle": "6 integrated care platforms",
+        "statusOperational": "All systems operational",
+        "statusUptime": "99.9% uptime",
+        "notifyLabResultsTitle": "Lab Results Ready",
+        "notifyLabResultsBody": "CBC panel — Normal",
+        "notifyAiInsightTitle": "AI Insight",
+        "notifyAiInsightBody": "Blood pressure trending — schedule check-in",
+        "scroll": "Scroll",
+        "altAvatars": "Healthcare user avatar",
+        "altHeroBg": "Healthcare"
+      },
+      "portals": {
+        "patient": "Patient Portal",
+        "doctor": "Doctor Portal",
+        "pharmacy": "Pharmacy Portal",
+        "lab": "Lab & Radiology",
+        "insurance": "Insurance Portal",
+        "admin": "Admin Portal"
+      },
+      "stats": {
+        "patientsLabel": "Active Patients",
+        "facilitiesLabel": "Healthcare Facilities",
+        "consultationsLabel": "Consultations",
+        "uptimeLabel": "Platform Uptime"
+      },
+      "features": {
+        "eyebrow": "Platform Capabilities",
+        "titleLine1": "Everything Modern",
+        "titleLine2": "Healthcare Needs",
+        "lead": "Comprehensive care management powered by cutting-edge AI — built for patients, doctors, and administrators alike.",
+        "learnMore": "Learn more",
+        "items": {
+          "ai": {
+            "tag": "AI Technology",
+            "title": "AI-Powered Diagnostics",
+            "description": "Advanced machine learning analyzes your health data to surface early warnings and personalized recommendations before symptoms arise."
+          },
+          "compliance": {
+            "tag": "Compliance",
+            "title": "DHA-Compliant & NABIDH",
+            "description": "Fully certified by the Dubai Health Authority with end-to-end encryption, meeting every UAE healthcare data regulation."
+          },
+          "guardian": {
+            "tag": "Always On",
+            "title": "24/7 Health Guardian",
+            "description": "Round-the-clock AI monitoring and access to your complete health record, anywhere and anytime across the UAE."
+          },
+          "teams": {
+            "tag": "Collaboration",
+            "title": "Integrated Care Teams",
+            "description": "Seamless real-time collaboration between your doctors, pharmacists, and lab specialists on a unified platform."
+          },
+          "monitoring": {
+            "tag": "Live Data",
+            "title": "Real-time Monitoring",
+            "description": "Live vitals tracking, instant lab result alerts, and smart medication reminders keep you and your care team in sync."
+          },
+          "premium": {
+            "tag": "Award-Winning",
+            "title": "Premium Care Experience",
+            "description": "Dubai's most trusted healthcare platform — recognized by over 200 facilities and 50,000 active patients."
+          }
+        }
+      },
+      "how": {
+        "eyebrow": "Get Started in Minutes",
+        "title": "Simple, Seamless, Secure",
+        "lead": "Three steps to your intelligent healthcare journey",
+        "steps": {
+          "one": {
+            "num": "01",
+            "title": "Create Your Account",
+            "desc": "Sign up with your Emirates ID in under 5 minutes. Instant verification through DHA systems."
+          },
+          "two": {
+            "num": "02",
+            "title": "Connect Your Records",
+            "desc": "Securely import your existing health records, insurance, and prescription history automatically."
+          },
+          "three": {
+            "num": "03",
+            "title": "Start Your Journey",
+            "desc": "Your AI health guardian is activated. Get insights, book appointments, and stay ahead of your health."
+          }
+        }
+      },
+      "testimonials": {
+        "eyebrow": "Loved by Patients & Providers",
+        "titleLine1": "Trusted by Healthcare",
+        "titleLine2": "Professionals Across the UAE",
+        "items": {
+          "one": {
+            "name": "Dr. Sarah Al Maktoum",
+            "role": "Cardiologist, Cleveland Clinic Abu Dhabi",
+            "quote": "CeenAiX has completely transformed how I manage patient care. The AI insights surface critical patterns I might have missed, and the integrated workflow saves me hours every day."
+          },
+          "two": {
+            "name": "Fatima Al Rashidi",
+            "role": "Patient, Dubai",
+            "quote": "I can see all my health records, book appointments, and chat with my doctor from one place. The AI assistant caught a potential drug interaction my pharmacist hadn't flagged."
+          },
+          "three": {
+            "name": "Ahmed Hassan",
+            "role": "Head Pharmacist, Aster Pharmacy",
+            "quote": "The prescription dispensing workflow and drug interaction checker have made our pharmacy significantly safer and faster. The NABIDH integration works flawlessly."
+          }
+        }
+      },
+      "security": {
+        "eyebrow": "Enterprise-Grade Security",
+        "title": "Your Data, Fully Protected",
+        "lead": "Built from the ground up for UAE healthcare compliance. Every record is encrypted at rest and in transit, with granular access controls and full audit trails.",
+        "items": {
+          "dha": {
+            "label": "DHA-Certified Infrastructure",
+            "desc": "Meets all Dubai Health Authority requirements"
+          },
+          "encryption": {
+            "label": "End-to-End Encryption",
+            "desc": "AES-256 encryption for all patient data"
+          },
+          "nabidh": {
+            "label": "NABIDH Compliance",
+            "desc": "Full integration with national health registry"
+          },
+          "messaging": {
+            "label": "Secure Messaging",
+            "desc": "HIPAA-equivalent encrypted communications"
+          }
+        },
+        "nabidhTitle": "NABIDH Certified",
+        "nabidhSub": "Verified 2026",
+        "breachesLabel": "Data Breaches",
+        "breachesValue": "Zero",
+        "breachesSub": "Since inception",
+        "altImage": "Security"
+      },
+      "pricing": {
+        "eyebrow": "Transparent Pricing",
+        "title": "Choose Your Plan",
+        "lead": "Flexible pricing for individuals, providers, and large organizations",
+        "mostPopular": "Most Popular",
+        "plans": {
+          "patient": {
+            "name": "Patient",
+            "price": "Free",
+            "period": "forever",
+            "description": "For individuals managing their personal health",
+            "cta": "Get Started Free",
+            "features": [
+              "AI Health Assistant",
+              "Digital Health Records",
+              "Appointment Booking",
+              "Prescription Management",
+              "Lab Results Access",
+              "Telemedicine Consultations"
+            ]
+          },
+          "provider": {
+            "name": "Healthcare Provider",
+            "price": "Custom",
+            "period": "per month",
+            "description": "For clinics, hospitals, and healthcare facilities",
+            "cta": "Contact Sales",
+            "features": [
+              "Everything in Patient",
+              "Multi-user Management",
+              "Advanced Analytics",
+              "Clinical AI Workflows",
+              "NABIDH Integration",
+              "Priority Support",
+              "Compliance Dashboard"
+            ]
+          },
+          "enterprise": {
+            "name": "Enterprise",
+            "price": "Contact Us",
+            "period": "",
+            "description": "For large health systems and networks",
+            "cta": "Talk to Us",
+            "features": [
+              "Everything in Provider",
+              "Custom Integrations",
+              "Dedicated Account Manager",
+              "SLA Guarantees",
+              "White-label Options",
+              "Advanced Security",
+              "Training & Onboarding"
+            ]
+          }
+        }
+      },
+      "finalCta": {
+        "eyebrow": "Start Your Health Journey",
+        "titleLine1": "Ready to Experience",
+        "titleLine2": "Smarter Healthcare?",
+        "lead": "Join thousands of patients and healthcare providers across the UAE who trust CeenAiX to deliver intelligent, secure, and seamless care.",
+        "ctaPrimary": "Get Started Free",
+        "ctaSecondary": "Sign In",
+        "altBg": "Call to action background"
+      },
+      "footer": {
+        "blurb": "Dubai's leading AI-powered healthcare platform. DHA-compliant, NABIDH-certified, and trusted by thousands across the UAE.",
+        "statusOperational": "All systems operational",
+        "productHeading": "Product",
+        "companyHeading": "Company",
+        "legalHeading": "Legal",
+        "links": {
+          "features": "Features",
+          "pricing": "Pricing",
+          "security": "Security",
+          "integrations": "Integrations",
+          "about": "About Us",
+          "careers": "Careers",
+          "contact": "Contact",
+          "blog": "Blog",
+          "privacy": "Privacy Policy",
+          "terms": "Terms of Service",
+          "compliance": "Compliance",
+          "nabidh": "NABIDH"
+        },
+        "copyright": "© 2026 CeenAiX Healthcare Technologies, Dubai, UAE. All rights reserved.",
+        "dhaCertified": "DHA Certified",
+        "nabidhCompliant": "NABIDH Compliant"
+      }
     }
   },
   "findDoctor": {
@@ -396,7 +648,12 @@
       "mobileShort": "Mobile",
       "otpHint": "We'll send a one-time code to the phone number associated with your account.",
       "sendCode": "Send verification code",
-      "sendingCode": "Sending code..."
+      "sendingCode": "Sending code...",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "trustDha": "DHA Certified",
+      "trustNabidh": "NABIDH Compliant",
+      "trustSsl": "256-bit SSL"
     },
     "register": {
       "badge": "Secure Registration",

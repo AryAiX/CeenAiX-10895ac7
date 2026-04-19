@@ -26,6 +26,12 @@ import { PatientAIChat } from '../pages/patient/AIChat';
 import { PatientPreVisitAssessment } from '../pages/patient/PreVisitAssessment';
 import { PatientMessages } from '../pages/patient/Messages';
 import { Profile as PatientProfile } from '../pages/patient/Profile';
+import { PatientLabResults } from '../pages/patient/LabResults';
+import { PatientNotifications } from '../pages/patient/Notifications';
+import { PatientTelemedicineConsultation } from '../pages/patient/TelemedicineConsultation';
+import { PatientSettings } from '../pages/patient/Settings';
+import { PatientImaging } from '../pages/patient/Imaging';
+import { PatientInsurance } from '../pages/patient/Insurance';
 import { DoctorDashboard } from '../pages/doctor/Dashboard';
 import { DoctorAppointments } from '../pages/doctor/Appointments';
 import { DoctorAppointmentDetail } from '../pages/doctor/AppointmentDetail';
@@ -39,6 +45,26 @@ import { DoctorMessages } from '../pages/doctor/Messages';
 import { DoctorNotifications } from '../pages/doctor/Notifications';
 import { DoctorSchedule } from '../pages/doctor/Schedule';
 import { DoctorProfile } from '../pages/doctor/Profile';
+import { DoctorConsultationWorkspace } from '../pages/doctor/ConsultationWorkspace';
+import { DoctorSettings } from '../pages/doctor/Settings';
+import { DoctorImaging } from '../pages/doctor/Imaging';
+import { DoctorEarnings } from '../pages/doctor/Earnings';
+import { DoctorPortal } from '../pages/doctor/Portal';
+import { AdminDashboard } from '../pages/admin/Dashboard';
+import { AdminCompliance } from '../pages/admin/Compliance';
+import { AdminSystemHealth } from '../pages/admin/SystemHealth';
+import { AdminOrganizations } from '../pages/admin/Organizations';
+import { AdminUsers } from '../pages/admin/Users';
+import { AdminDiagnostics } from '../pages/admin/Diagnostics';
+import { AdminAiAnalytics } from '../pages/admin/AIAnalytics';
+import { LabDashboard } from '../pages/lab/Dashboard';
+import { LabReferrals } from '../pages/lab/Referrals';
+import { LabResultEntry } from '../pages/lab/ResultEntry';
+import { LabRadiology } from '../pages/lab/Radiology';
+import { PharmacyDashboard } from '../pages/pharmacy/Dashboard';
+import { PharmacyDispensing } from '../pages/pharmacy/Dispensing';
+import { PharmacyInventory } from '../pages/pharmacy/Inventory';
+import { InsurancePortal } from '../pages/insurance/Portal';
 import { AppointmentDesignShowcase } from '../pages/AppointmentDesignShowcase';
 import { AccessDenied } from '../pages/system/AccessDenied';
 
@@ -160,6 +186,30 @@ export const router = createBrowserRouter([
     element: withPortalProtection(<PatientProfile />, 'patient'),
   },
   {
+    path: '/patient/lab-results',
+    element: withPortalProtection(<PatientLabResults />, 'patient'),
+  },
+  {
+    path: '/patient/notifications',
+    element: withPortalProtection(<PatientNotifications />, 'patient'),
+  },
+  {
+    path: '/patient/telemedicine/:appointmentId',
+    element: withPortalProtection(<PatientTelemedicineConsultation />, 'patient'),
+  },
+  {
+    path: '/patient/settings',
+    element: withPortalProtection(<PatientSettings />, 'patient'),
+  },
+  {
+    path: '/patient/imaging',
+    element: withPortalProtection(<PatientImaging />, 'patient'),
+  },
+  {
+    path: '/patient/insurance',
+    element: withPortalProtection(<PatientInsurance />, 'patient'),
+  },
+  {
     path: '/doctor/dashboard',
     element: withPortalProtection(<DoctorDashboard />, 'doctor'),
   },
@@ -214,5 +264,105 @@ export const router = createBrowserRouter([
   {
     path: '/doctor/notifications',
     element: withPortalProtection(<DoctorNotifications />, 'doctor'),
+  },
+  {
+    path: '/doctor/consultations/:appointmentId',
+    element: withPortalProtection(<DoctorConsultationWorkspace />, 'doctor'),
+  },
+  {
+    path: '/doctor/settings',
+    element: withPortalProtection(<DoctorSettings />, 'doctor'),
+  },
+  {
+    path: '/doctor/imaging',
+    element: withPortalProtection(<DoctorImaging />, 'doctor'),
+  },
+  {
+    path: '/doctor/earnings',
+    element: withPortalProtection(<DoctorEarnings />, 'doctor'),
+  },
+  {
+    path: '/doctor/portal',
+    element: withPortalProtection(<DoctorPortal />, 'doctor'),
+  },
+  {
+    path: '/admin/dashboard',
+    element: (
+      <ProtectedRoute allowedRoles={['super_admin']}>{withLayout(<AdminDashboard />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/admin/compliance',
+    element: (
+      <ProtectedRoute allowedRoles={['super_admin']}>{withLayout(<AdminCompliance />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/admin/system-health',
+    element: (
+      <ProtectedRoute allowedRoles={['super_admin']}>{withLayout(<AdminSystemHealth />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/admin/organizations',
+    element: (
+      <ProtectedRoute allowedRoles={['super_admin']}>{withLayout(<AdminOrganizations />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/admin/users',
+    element: (
+      <ProtectedRoute allowedRoles={['super_admin']}>{withLayout(<AdminUsers />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/admin/diagnostics',
+    element: (
+      <ProtectedRoute allowedRoles={['super_admin']}>{withLayout(<AdminDiagnostics />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/admin/ai-analytics',
+    element: (
+      <ProtectedRoute allowedRoles={['super_admin']}>{withLayout(<AdminAiAnalytics />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/lab/dashboard',
+    element: <ProtectedRoute allowedRoles={['lab']}>{withLayout(<LabDashboard />)}</ProtectedRoute>,
+  },
+  {
+    path: '/lab/referrals',
+    element: <ProtectedRoute allowedRoles={['lab']}>{withLayout(<LabReferrals />)}</ProtectedRoute>,
+  },
+  {
+    path: '/lab/results/entry',
+    element: <ProtectedRoute allowedRoles={['lab']}>{withLayout(<LabResultEntry />)}</ProtectedRoute>,
+  },
+  {
+    path: '/lab/radiology',
+    element: <ProtectedRoute allowedRoles={['lab']}>{withLayout(<LabRadiology />)}</ProtectedRoute>,
+  },
+  {
+    path: '/pharmacy/dashboard',
+    element: (
+      <ProtectedRoute allowedRoles={['pharmacy']}>{withLayout(<PharmacyDashboard />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/pharmacy/dispensing',
+    element: (
+      <ProtectedRoute allowedRoles={['pharmacy']}>{withLayout(<PharmacyDispensing />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/pharmacy/inventory',
+    element: (
+      <ProtectedRoute allowedRoles={['pharmacy']}>{withLayout(<PharmacyInventory />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/insurance/portal',
+    element: withLayout(<InsurancePortal />),
   },
 ]);
