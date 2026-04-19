@@ -42,6 +42,21 @@
     { "id": "doctor-lab-orders-new", "canonical": "/doctor/lab-orders/new", "reference": null },
     { "id": "doctor-messages", "canonical": "/doctor/messages", "reference": "/doctor-messages" },
     { "id": "doctor-notifications", "canonical": "/doctor/notifications", "reference": "/notification-center" },
-    { "id": "doctor-profile", "canonical": "/doctor/profile", "reference": "/doctor-profile" }
+    { "id": "doctor-profile", "canonical": "/doctor/profile", "reference": "/doctor-profile" },
+    { "id": "admin-dashboard", "canonical": "/admin/dashboard", "reference": null },
+    { "id": "admin-users", "canonical": "/admin/users", "reference": null },
+    { "id": "admin-organizations", "canonical": "/admin/organizations", "reference": null },
+    { "id": "admin-compliance", "canonical": "/admin/compliance", "reference": null },
+    { "id": "admin-system-health", "canonical": "/admin/system-health", "reference": null },
+    { "id": "admin-ai-analytics", "canonical": "/admin/ai-analytics", "reference": null },
+    { "id": "admin-diagnostics", "canonical": "/admin/diagnostics", "reference": null },
+    { "id": "lab-dashboard", "canonical": "/lab/dashboard", "reference": null },
+    { "id": "lab-referrals", "canonical": "/lab/referrals", "reference": null },
+    { "id": "lab-result-entry", "canonical": "/lab/results/entry", "reference": null },
+    { "id": "lab-radiology", "canonical": "/lab/radiology", "reference": null },
+    { "id": "pharmacy-dashboard", "canonical": "/pharmacy/dashboard", "reference": null },
+    { "id": "pharmacy-dispensing", "canonical": "/pharmacy/dispensing", "reference": null },
+    { "id": "pharmacy-inventory", "canonical": "/pharmacy/inventory", "reference": null },
+    { "id": "insurance-portal", "canonical": "/insurance/portal", "reference": null }
   ]
 }

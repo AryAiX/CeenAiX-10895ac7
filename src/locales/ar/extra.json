@@ -1123,13 +1123,37 @@
     "dashboard": {
       "title": "لوحة تحكم المختبر",
       "subtitle": "مساحة عمل موحدة لأخصائيي التحاليل والفنيين عند تفعيل دور المختبر.",
+      "eyebrow": "بوابة المختبر",
       "featureQueueTitle": "قائمة الطلبات",
       "featureQueueBody": "طلبات المختبر الواردة مرتبة بين عاجل وروتيني وقيد التنفيذ.",
       "featureResultsTitle": "إدخال النتائج",
       "featureResultsBody": "إدخال منظّم مع مجالات مرجعية ووسم تلقائي للشذوذ.",
       "featureQualityTitle": "ضبط الجودة",
       "featureQualityBody": "معايرة الأجهزة وسير عمل مراجعة الجودة.",
-      "actionBack": "العودة إلى الرئيسية"
+      "actionBack": "العودة إلى الرئيسية",
+      "kpiPending": "طلبات معلّقة",
+      "kpiInProgress": "قيد التنفيذ",
+      "kpiCompletedToday": "مكتملة اليوم",
+      "kpiStat": "طابور العاجل",
+      "errorPrefix": "تعذّر تحميل اللوحة:",
+      "worklistHeading": "قائمة العمل النشطة",
+      "worklistCountLabel": "طلب مفتوح",
+      "worklistCta": "فتح إدخال النتائج",
+      "worklistEmpty": "لا توجد طلبات نشطة حالياً.",
+      "anonPatient": "مريض بدون اسم",
+      "untitledTest": "لوحة غير محددة",
+      "testsLabel": "فحص",
+      "qualityHeading": "الجودة وزمن الاستجابة",
+      "turnaroundLabel": "فحوصات نشطة في الطابور",
+      "collectedLabel": "عينات مجموعة",
+      "criticalLabel": "طلبات عاجلة مفتوحة"
+    },
+    "status": {
+      "ordered": "مطلوب",
+      "collected": "مجموع",
+      "processing": "قيد المعالجة",
+      "resulted": "صدرت النتيجة",
+      "reviewed": "معتمد"
     },
     "referrals": {
       "title": "إحالات المختبر",
@@ -1140,7 +1164,15 @@
       "featurePatientBody": "تحقق من الصيام والنتائج السابقة وملاحظات ما قبل السحب.",
       "featureSlaTitle": "تتبع SLA",
       "featureSlaBody": "تتبع التزامات زمن الاستجابة لكل لوحة فحص.",
-      "actionBack": "العودة إلى المختبر"
+      "actionBack": "العودة إلى المختبر",
+      "kpiIncoming": "إحالات واردة",
+      "kpiDoctors": "أطباء محيلون",
+      "kpiSla": "قائمة مراقبة SLA",
+      "tableHeading": "خط الإحالات",
+      "tableCountLabel": "طلب ضمن النطاق",
+      "tableCta": "فتح اللوحة",
+      "tableEmpty": "لم تصل إحالات بعد.",
+      "anonDoctor": "طبيب غير معروف"
     },
     "resultEntry": {
       "title": "إدخال النتائج",
@@ -1151,7 +1183,16 @@
       "featureFlagBody": "وسم تلقائي مع أثر تدقيق عند التجاوز مع سبب.",
       "featureSignTitle": "توقيع مزدوج",
       "featureSignBody": "مراجعة الفني وأخصائي التحاليل قبل الإصدار.",
-      "actionBack": "العودة إلى المختبر"
+      "actionBack": "العودة إلى المختبر",
+      "kpiAwaiting": "بانتظار الإدخال",
+      "kpiProcessing": "قيد الإدخال",
+      "kpiReleasedToday": "معتمدة اليوم",
+      "queueHeading": "طابور الإدخال",
+      "queueCountLabel": "طلب قيد التنفيذ",
+      "queueCta": "ابدأ الطلب التالي",
+      "queueEmpty": "لا شيء للإدخال. عمل رائع!",
+      "pendingLabel": "معلّق",
+      "resultedLabel": "صدرت"
     },
     "radiology": {
       "title": "مساحة عمل الأشعة",
@@ -1162,20 +1203,45 @@
       "featureViewerBody": "إعادة بناء متعددة المستويات مع تمييز بالذكاء الاصطناعي.",
       "featureReportsTitle": "التقارير",
       "featureReportsBody": "قوالب تقارير منظّمة مع تسليم للمراجعة المتبادلة.",
-      "actionBack": "العودة إلى المختبر"
+      "actionBack": "العودة إلى المختبر",
+      "kpiStudiesOpen": "دراسات نشطة",
+      "kpiPending": "قراءات معلّقة",
+      "kpiReported": "تقارير اليوم"
     }
   },
   "pharmacy": {
     "dashboard": {
       "title": "لوحة تحكم الصيدلية",
       "subtitle": "الصرف والمخزون ومطالبات التأمين لمشغلي الصيدلية.",
+      "eyebrow": "بوابة الصيدلية",
       "featureQueueTitle": "قائمة الصرف",
       "featureQueueBody": "وصفات معلّقة من الأطباء عبر شبكتك.",
       "featureInventoryTitle": "مراقبة المخزون",
       "featureInventoryBody": "مستويات المخزون وتنبيهات قرب انتهاء الصلاحية وإعادة الطلب التلقائية.",
       "featureClaimsTitle": "المطالبات والمدفوعات",
       "featureClaimsBody": "تقديم مطالبات التأمين ومسؤولية العضو.",
-      "actionBack": "العودة إلى الرئيسية"
+      "actionBack": "العودة إلى الرئيسية",
+      "kpiQueue": "وصفات معلّقة",
+      "kpiDispensed": "صُرف اليوم",
+      "kpiStockAlerts": "تنبيهات المخزون",
+      "kpiClaims": "مطالبات قيد المراجعة",
+      "queueHeading": "طابور الصرف",
+      "queueCountLabel": "وصفة بالانتظار",
+      "queueCta": "فتح الطابور",
+      "queueEmpty": "لا شيء في الطابور حالياً.",
+      "priority": {
+        "stat": "عاجل",
+        "routine": "روتيني",
+        "scheduled": "مجدول"
+      },
+      "stockHeading": "تنبيهات المخزون",
+      "stockAllGood": "جميع الأصناف الحرجة بمستوى جيد.",
+      "unitsLabel": "وحدة متبقية",
+      "stockLevel": {
+        "critical": "حرج",
+        "low": "منخفض",
+        "reorder": "إعادة طلب"
+      }
     },
     "dispensing": {
       "title": "صرف الوصفات",
@@ -1186,7 +1252,19 @@
       "featureCounselBody": "إرشادات منظّمة لكل صنف دوائي.",
       "featureHandoverTitle": "تسليم آمن",
       "featureHandoverBody": "تسليم موقّع برمز OTP للمريض أو مفوّض موثوق.",
-      "actionBack": "العودة إلى الصيدلية"
+      "actionBack": "العودة إلى الصيدلية",
+      "kpiVerification": "قيد التحقق",
+      "kpiCounseling": "جاهزة للإرشاد",
+      "kpiHandover": "تسليمات اليوم",
+      "queueHeading": "الصرف النشط",
+      "queueCountLabel": "وصفة قيد الصرف",
+      "queueCta": "العودة إلى اللوحة",
+      "minutesLabel": "دقيقة",
+      "status": {
+        "verifying": "قيد التحقق",
+        "counseling": "إرشاد",
+        "ready": "جاهزة"
+      }
     },
     "inventory": {
       "title": "المخزون",
@@ -1197,20 +1275,57 @@
       "featureStockBody": "توقع الطلب من اتجاهات الوصف.",
       "featurePurchaseTitle": "الشراء",
       "featurePurchaseBody": "دمج الموردين ودورة حياة أمر الشراء.",
-      "actionBack": "العودة إلى الصيدلية"
+      "actionBack": "العودة إلى الصيدلية",
+      "kpiTotal": "إجمالي الأصناف",
+      "kpiNearExpiry": "قريبة الانتهاء",
+      "kpiOutOfStock": "نفد المخزون",
+      "tableHeading": "لقطة المخزون",
+      "colItem": "الصنف",
+      "colSku": "الرمز",
+      "colStock": "المتوفر",
+      "colReorder": "نقطة الطلب",
+      "colExpiry": "أقرب انتهاء",
+      "colStatus": "الحالة",
+      "expiryNone": "—",
+      "status": {
+        "healthy": "جيّد",
+        "low": "منخفض",
+        "near_expiry": "قرب الانتهاء",
+        "out": "نافد"
+      }
     }
   },
   "insurance": {
     "portal": {
       "title": "بوابة التأمين",
       "subtitle": "مساحة عمل مشغّل التأمين للخطط والأهلية ومراقبة المطالبات.",
+      "eyebrow": "بوابة التأمين",
       "featurePlansTitle": "كتالوج الخطط",
       "featurePlansBody": "أعدّ ونشر خططاً جاهزة للمستهلك.",
       "featureEligibilityTitle": "واجهة الأهلية",
       "featureEligibilityBody": "قدّم أهلية لحظية للعيادات الشريكة.",
       "featureClaimsTitle": "مراقبة المطالبات",
       "featureClaimsBody": "تسوية تلقائية وإشارات احتيال وقائمة تصعيد.",
-      "actionBack": "العودة إلى الرئيسية"
+      "actionBack": "العودة إلى الرئيسية",
+      "kpiMembers": "أعضاء نشطون",
+      "kpiPending": "مطالبات معلّقة",
+      "kpiApproved": "معتمدة هذا الشهر",
+      "kpiEscalations": "تصعيدات",
+      "plansHeading": "محفظة الخطط",
+      "claimsHeading": "مطالبات حديثة",
+      "membersLabel": "عضو",
+      "claimsOpenLabel": "مطالبة مفتوحة",
+      "planStatus": {
+        "active": "نشطة",
+        "draft": "مسودة",
+        "closed": "مغلقة"
+      },
+      "claimStatus": {
+        "submitted": "مقدّمة",
+        "under_review": "قيد المراجعة",
+        "approved": "معتمدة",
+        "denied": "مرفوضة"
+      }
     }
   }
 }

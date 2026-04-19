@@ -82,7 +82,13 @@ export type {
   LabResultEntryStub,
   LabRadiologyStub,
   PharmacyDashboardStub,
+  PharmacyQueueItem,
+  PharmacyStockAlert,
   PharmacyDispensingStub,
+  PharmacyDispensingItem,
   PharmacyInventoryStub,
+  PharmacyInventoryItem,
   InsurancePortalStub,
+  InsurancePlanSummary,
+  InsuranceClaimSummary,
 } from './use-phase-stub';

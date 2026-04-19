@@ -1123,13 +1123,37 @@
     "dashboard": {
       "title": "Laboratory dashboard",
       "subtitle": "A unified workspace for pathologists and lab technicians once the lab role is activated.",
+      "eyebrow": "Lab portal",
       "featureQueueTitle": "Orders queue",
       "featureQueueBody": "Incoming lab orders sorted by STAT, routine, and in-progress.",
       "featureResultsTitle": "Results entry",
       "featureResultsBody": "Structured entry with reference ranges and auto-flagging.",
       "featureQualityTitle": "Quality control",
       "featureQualityBody": "Instrument calibration and QC review workflow.",
-      "actionBack": "Back to homepage"
+      "actionBack": "Back to homepage",
+      "kpiPending": "Pending orders",
+      "kpiInProgress": "In progress",
+      "kpiCompletedToday": "Completed today",
+      "kpiStat": "STAT queue",
+      "errorPrefix": "Failed to load dashboard:",
+      "worklistHeading": "Active worklist",
+      "worklistCountLabel": "open orders",
+      "worklistCta": "Open result entry",
+      "worklistEmpty": "No active orders right now.",
+      "anonPatient": "Unnamed patient",
+      "untitledTest": "Unspecified panel",
+      "testsLabel": "tests",
+      "qualityHeading": "Quality & turnaround",
+      "turnaroundLabel": "Active tests in queue",
+      "collectedLabel": "Samples collected",
+      "criticalLabel": "STAT orders open"
+    },
+    "status": {
+      "ordered": "Ordered",
+      "collected": "Collected",
+      "processing": "Processing",
+      "resulted": "Resulted",
+      "reviewed": "Reviewed"
     },
     "referrals": {
       "title": "Lab referrals",
@@ -1140,7 +1164,15 @@
       "featurePatientBody": "Check fasting, prior results, and pre-collection notes.",
       "featureSlaTitle": "SLA tracking",
       "featureSlaBody": "Track turn-around time commitments per test panel.",
-      "actionBack": "Back to lab"
+      "actionBack": "Back to lab",
+      "kpiIncoming": "Incoming referrals",
+      "kpiDoctors": "Referring clinicians",
+      "kpiSla": "SLA watch list",
+      "tableHeading": "Referral pipeline",
+      "tableCountLabel": "orders in scope",
+      "tableCta": "Open dashboard",
+      "tableEmpty": "No referrals received yet.",
+      "anonDoctor": "Unknown clinician"
     },
     "resultEntry": {
       "title": "Result entry",
@@ -1151,7 +1183,16 @@
       "featureFlagBody": "Automatic flagging with override-with-reason audit trail.",
       "featureSignTitle": "Dual signature",
       "featureSignBody": "Technician and pathologist review before release.",
-      "actionBack": "Back to lab"
+      "actionBack": "Back to lab",
+      "kpiAwaiting": "Awaiting entry",
+      "kpiProcessing": "In progress",
+      "kpiReleasedToday": "Released today",
+      "queueHeading": "Entry queue",
+      "queueCountLabel": "orders in progress",
+      "queueCta": "Start next order",
+      "queueEmpty": "Nothing to enter. Great work!",
+      "pendingLabel": "pending",
+      "resultedLabel": "resulted"
     },
     "radiology": {
       "title": "Radiology workspace",
@@ -1162,20 +1203,45 @@
       "featureViewerBody": "Multi-planar reconstruction with AI overlays.",
       "featureReportsTitle": "Reporting",
       "featureReportsBody": "Structured report templates with peer-review handoff.",
-      "actionBack": "Back to lab"
+      "actionBack": "Back to lab",
+      "kpiStudiesOpen": "Active studies",
+      "kpiPending": "Pending reads",
+      "kpiReported": "Reported today"
     }
   },
   "pharmacy": {
     "dashboard": {
       "title": "Pharmacy dashboard",
       "subtitle": "Dispensing, inventory, and insurance claims for pharmacy operators.",
+      "eyebrow": "Pharmacy portal",
       "featureQueueTitle": "Dispensing queue",
       "featureQueueBody": "Pending prescriptions from clinicians across your network.",
       "featureInventoryTitle": "Inventory radar",
       "featureInventoryBody": "Stock levels, near-expiry alerts, and auto-reorder.",
       "featureClaimsTitle": "Claims & payments",
       "featureClaimsBody": "Insurance claim submission and member liability.",
-      "actionBack": "Back to homepage"
+      "actionBack": "Back to homepage",
+      "kpiQueue": "Pending prescriptions",
+      "kpiDispensed": "Dispensed today",
+      "kpiStockAlerts": "Stock alerts",
+      "kpiClaims": "Claims in review",
+      "queueHeading": "Dispensing queue",
+      "queueCountLabel": "prescriptions waiting",
+      "queueCta": "Open queue",
+      "queueEmpty": "Nothing in the queue right now.",
+      "priority": {
+        "stat": "STAT",
+        "routine": "Routine",
+        "scheduled": "Scheduled"
+      },
+      "stockHeading": "Stock alerts",
+      "stockAllGood": "All critical SKUs are well stocked.",
+      "unitsLabel": "units remaining",
+      "stockLevel": {
+        "critical": "Critical",
+        "low": "Low",
+        "reorder": "Reorder"
+      }
     },
     "dispensing": {
       "title": "Prescription dispensing",
@@ -1186,7 +1252,19 @@
       "featureCounselBody": "Structured counseling prompts per drug class.",
       "featureHandoverTitle": "Secure handover",
       "featureHandoverBody": "OTP-signed handover to the patient or a trusted delegate.",
-      "actionBack": "Back to pharmacy"
+      "actionBack": "Back to pharmacy",
+      "kpiVerification": "In verification",
+      "kpiCounseling": "Ready for counseling",
+      "kpiHandover": "Handovers today",
+      "queueHeading": "Active dispensing",
+      "queueCountLabel": "prescriptions in flight",
+      "queueCta": "Back to dashboard",
+      "minutesLabel": "min",
+      "status": {
+        "verifying": "Verifying",
+        "counseling": "Counseling",
+        "ready": "Ready"
+      }
     },
     "inventory": {
       "title": "Inventory",
@@ -1197,20 +1275,57 @@
       "featureStockBody": "Demand forecasting informed by prescribing trends.",
       "featurePurchaseTitle": "Procurement",
       "featurePurchaseBody": "Supplier onboarding and PO lifecycle.",
-      "actionBack": "Back to pharmacy"
+      "actionBack": "Back to pharmacy",
+      "kpiTotal": "Total SKUs",
+      "kpiNearExpiry": "Near expiry",
+      "kpiOutOfStock": "Out of stock",
+      "tableHeading": "Inventory snapshot",
+      "colItem": "Item",
+      "colSku": "SKU",
+      "colStock": "On hand",
+      "colReorder": "Reorder point",
+      "colExpiry": "Next expiry",
+      "colStatus": "Status",
+      "expiryNone": "—",
+      "status": {
+        "healthy": "Healthy",
+        "low": "Low",
+        "near_expiry": "Near expiry",
+        "out": "Out"
+      }
     }
   },
   "insurance": {
     "portal": {
       "title": "Insurance portal",
       "subtitle": "Insurance operator workspace for plans, eligibility, and claims oversight.",
+      "eyebrow": "Insurance portal",
       "featurePlansTitle": "Plan catalog",
       "featurePlansBody": "Author and publish consumer-ready plans.",
       "featureEligibilityTitle": "Eligibility API",
       "featureEligibilityBody": "Expose realtime eligibility to partner clinics.",
       "featureClaimsTitle": "Claims oversight",
       "featureClaimsBody": "Auto-adjudication, fraud flags, and escalation queue.",
-      "actionBack": "Back to homepage"
+      "actionBack": "Back to homepage",
+      "kpiMembers": "Active members",
+      "kpiPending": "Pending claims",
+      "kpiApproved": "Approved this month",
+      "kpiEscalations": "Escalations",
+      "plansHeading": "Plan portfolio",
+      "claimsHeading": "Recent claims",
+      "membersLabel": "members",
+      "claimsOpenLabel": "open claims",
+      "planStatus": {
+        "active": "Active",
+        "draft": "Draft",
+        "closed": "Closed"
+      },
+      "claimStatus": {
+        "submitted": "Submitted",
+        "under_review": "In review",
+        "approved": "Approved",
+        "denied": "Denied"
+      }
     }
   }
 }
