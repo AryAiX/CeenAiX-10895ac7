@@ -1,9 +1,15 @@
+import type { ReactElement } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import { usePatientPrescriptions } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
 import { PatientPrescriptions } from './Prescriptions';
+
+function renderWithRouter(ui: ReactElement) {
+  return render(<MemoryRouter>{ui}</MemoryRouter>);
+}
 
 vi.mock('../../components/Navigation', () => ({
   Navigation: () => <div data-testid="patient-navigation" />,
@@ -28,7 +34,7 @@ describe('PatientPrescriptions', () => {
     } as never);
   });
 
-  it('renders active and historical prescriptions from normalized data', () => {
+  it('renders active and historical prescriptions from normalized data', async () => {
     usePatientPrescriptionsMock.mockReturnValue({
       data: [
         {
@@ -111,16 +117,35 @@ describe('PatientPrescriptions', () => {
       refetch: vi.fn(),
     });
 
-    render(<PatientPrescriptions />);
+    renderWithRouter(<PatientPrescriptions />);
 
-    expect(screen.getByText('My Prescriptions')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /My Prescriptions/ })).toBeInTheDocument();
     expect(screen.getByText('Active Plans')).toBeInTheDocument();
-    expect(screen.getByText('Active Medications')).toBeInTheDocument();
+    expect(screen.getAllByText('Active Medications').length).toBeGreaterThan(0);
     expect(screen.getByText('Pending Pickup')).toBeInTheDocument();
-    expect(screen.getByText('Losartan + 1 more')).toBeInTheDocument();
-    expect(screen.getByText('Metformin')).toBeInTheDocument();
+    expect(
+      screen.getByText((_, element) =>
+        element?.tagName === 'H3' && /Losartan/.test(element?.textContent ?? '') && /1 more/.test(element?.textContent ?? '')
+      )
+    ).toBeInTheDocument();
+    expect(screen.getAllByText('Metformin').length).toBeGreaterThan(0);
+
+    const user = userEvent.setup();
+    expect(screen.queryByText('Prescription History')).not.toBeInTheDocument();
+    expect(screen.queryByText('Vitamin D3')).not.toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole('button', {
+        name: /Past Medications/i,
+      })
+    );
+
+    expect(
+      screen.getByText((_, element) =>
+        element?.tagName === 'SPAN' && /Prescription History/.test(element?.textContent ?? '')
+      )
+    ).toBeInTheDocument();
     expect(screen.getAllByText('Vitamin D3').length).toBeGreaterThan(0);
-    expect(screen.getByText('Prescription History')).toBeInTheDocument();
   });
 
   it('supports refill follow-up selection and text filtering', async () => {
@@ -176,7 +201,7 @@ describe('PatientPrescriptions', () => {
       refetch: vi.fn(),
     });
 
-    render(<PatientPrescriptions />);
+    renderWithRouter(<PatientPrescriptions />);
 
     const user = userEvent.setup();
     await user.click(screen.getAllByRole('button', { name: 'Mark for refill follow-up' })[1]);

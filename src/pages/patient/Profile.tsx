@@ -96,9 +96,11 @@ export const Profile: React.FC = () => {
 
   return (
     <>
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">{t('patient.profile.title')}</h1>
-        <p className="mt-1 text-sm text-slate-500">{t('patient.profile.subtitle')}</p>
+      <div className="animate-fadeIn">
+        <h1 className="font-playfair text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
+          {t('patient.profile.title')}
+        </h1>
+        <p className="mt-2 text-[15px] text-slate-400">{t('patient.profile.subtitle')}</p>
       </div>
 
       <div>

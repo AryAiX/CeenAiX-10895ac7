@@ -223,27 +223,79 @@ export interface LabTestCatalogSuggestion extends BaseRecord {
   reviewed_at: string | null;
 }
 
+export type LabOrderUrgency = 'routine' | 'stat' | 'urgent';
+
 export interface LabOrder extends BaseRecord, SoftDeletable {
   patient_id: string;
   doctor_id: string;
   appointment_id: string | null;
   status: LabOrderStatus;
   ordered_at: string;
+  assigned_lab_id: string | null;
+  lab_order_code: string | null;
+  nabidh_reference: string | null;
+  ordered_by_specialty: string | null;
+  sample_collection_at: string | null;
+  results_released_at: string | null;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+  overall_comment: string | null;
+  due_by: string | null;
+  urgency: LabOrderUrgency;
+  fasting_required: boolean;
+  total_cost_aed: number | null;
+  insurance_coverage_aed: number | null;
+  patient_cost_aed: number | null;
+  report_pdf_url: string | null;
 }
+
+export type LabItemStatusCategory = 'normal' | 'borderline' | 'high' | 'low' | 'critical' | 'pending';
+export type LabItemFlag = 'N' | 'H' | 'HH' | 'L' | 'LL';
 
 export interface LabOrderItem extends BaseRecord {
   lab_order_id: string;
   lab_test_catalog_id?: string | null;
   lab_test_catalog_suggestion_id?: string | null;
+  parent_item_id: string | null;
+  sort_order: number;
   test_name: string;
   test_name_ar?: string | null;
   test_code: string | null;
+  loinc_code: string | null;
+  display_name_long: string | null;
+  description: string | null;
   status: LabOrderStatus;
+  status_category: LabItemStatusCategory;
+  flag: LabItemFlag | null;
   result_value: string | null;
   result_unit: string | null;
+  numeric_value: number | null;
   reference_range: string | null;
+  reference_text: string | null;
+  reference_min: number | null;
+  reference_max: number | null;
   is_abnormal: boolean | null;
+  doctor_comment: string | null;
+  patient_explanation: string | null;
+  retest_due_date: string | null;
+  fasting_required: boolean;
+  unit_cost_aed: number | null;
+  insurance_coverage_aed: number | null;
+  patient_cost_aed: number | null;
   resulted_at: string | null;
+  status_label: string | null;
+  category_color: string | null;
+  trend_direction: LabTrendDirection | null;
+  reference_zones: LabReferenceZone[] | null;
+}
+
+export type LabTrendDirection = 'improving' | 'worsening' | 'stable';
+
+export interface LabReferenceZone {
+  label: string;
+  min?: number;
+  max?: number;
+  color: string;
 }
 
 export interface PatientVital extends BaseRecord, SoftDeletable {
@@ -569,6 +621,10 @@ export interface LabProfile extends BaseRecord {
   phone: string | null;
   email: string | null;
   is_active: boolean;
+  short_code: string | null;
+  dha_accreditation_code: string | null;
+  gradient_from: string | null;
+  gradient_to: string | null;
 }
 
 export interface LabStaffMember extends BaseRecord {

@@ -32,6 +32,7 @@ import { PatientTelemedicineConsultation } from '../pages/patient/TelemedicineCo
 import { PatientSettings } from '../pages/patient/Settings';
 import { PatientImaging } from '../pages/patient/Imaging';
 import { PatientInsurance } from '../pages/patient/Insurance';
+import { PatientDocuments } from '../pages/patient/Documents';
 import { DoctorDashboard } from '../pages/doctor/Dashboard';
 import { DoctorAppointments } from '../pages/doctor/Appointments';
 import { DoctorAppointmentDetail } from '../pages/doctor/AppointmentDetail';
@@ -70,9 +71,17 @@ import { AccessDenied } from '../pages/system/AccessDenied';
 
 const withLayout = (page: ReactNode) => <Layout>{page}</Layout>;
 
-const withPortalProtection = (page: ReactNode, role: 'patient' | 'doctor') => (
+const withPortalProtection = (
+  page: ReactNode,
+  role: 'patient' | 'doctor',
+  options: { contentBleed?: boolean } = {}
+) => (
   <ProtectedRoute allowedRoles={[role]}>
-    {withLayout(<PortalShell role={role}>{page}</PortalShell>)}
+    {withLayout(
+      <PortalShell role={role} contentBleed={options.contentBleed}>
+        {page}
+      </PortalShell>
+    )}
   </ProtectedRoute>
 );
 
@@ -167,7 +176,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/patient/ai-chat',
-    element: withPortalProtection(<PatientAIChat />, 'patient'),
+    element: withPortalProtection(<PatientAIChat />, 'patient', { contentBleed: true }),
   },
   {
     path: '/patient/pre-visit/:assessmentId',
@@ -208,6 +217,10 @@ export const router = createBrowserRouter([
   {
     path: '/patient/insurance',
     element: withPortalProtection(<PatientInsurance />, 'patient'),
+  },
+  {
+    path: '/patient/documents',
+    element: withPortalProtection(<PatientDocuments />, 'patient'),
   },
   {
     path: '/doctor/dashboard',

@@ -40,6 +40,11 @@ type PortalRole = 'patient' | 'doctor';
 interface PortalShellProps {
   role: PortalRole;
   children: ReactNode;
+  /**
+   * When true, the patient portal skips the 1320px centered content wrapper so the
+   * page can render full-bleed (e.g. the dark AI Assistant canvas).
+   */
+  contentBleed?: boolean;
 }
 
 interface PortalNavItem {
@@ -77,7 +82,7 @@ const getInitials = (value: string) =>
     .join('')
     .slice(0, 2) || 'CX';
 
-export const PortalShell = ({ role, children }: PortalShellProps) => {
+export const PortalShell = ({ role, children, contentBleed = false }: PortalShellProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t, i18n } = useTranslation('common');
@@ -116,19 +121,19 @@ export const PortalShell = ({ role, children }: PortalShellProps) => {
     const patientNavItems: PortalNavItem[] = [
       { id: 'dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, href: '/patient/dashboard' },
       { id: 'appointments', label: t('nav.appointments'), icon: Calendar, href: '/patient/appointments' },
-      { id: 'my-health', label: t('nav.myHealth'), icon: Heart, disabled: true },
+      { id: 'my-health', label: t('nav.myHealth'), icon: Heart, href: '/patient/records' },
       { id: 'medications', label: t('nav.medications'), icon: Pill, href: '/patient/prescriptions' },
       { id: 'lab-results', label: t('nav.labResults'), icon: Activity, href: '/patient/lab-results' },
-      { id: 'imaging', label: t('nav.imagingScans'), icon: Scan, disabled: true },
-      { id: 'documents', label: t('nav.documents'), icon: FolderOpen, badge: 3, disabled: true },
-      { id: 'messages', label: t('nav.messages'), icon: MessageSquare, href: '/patient/messages', badge: 2 },
+      { id: 'imaging', label: t('nav.imagingScans'), icon: Scan, href: '/patient/imaging' },
+      { id: 'documents', label: t('nav.documents'), icon: FolderOpen, href: '/patient/documents' },
+      { id: 'messages', label: t('nav.messages'), icon: MessageSquare, href: '/patient/messages' },
       { id: 'ai-assistant', label: t('nav.aiAssistant'), icon: Bot, href: '/patient/ai-chat' },
-      { id: 'insurance', label: t('nav.insurance'), icon: ShieldCheck, disabled: true },
+      { id: 'insurance', label: t('nav.insurance'), icon: ShieldCheck, href: '/patient/insurance' },
     ];
 
     const patientBottomItems: PortalNavItem[] = [
       { id: 'profile', label: t('nav.profile'), icon: UserCircle2, href: '/patient/profile' },
-      { id: 'settings', label: t('nav.settings'), icon: Settings, disabled: true },
+      { id: 'settings', label: t('nav.settings'), icon: Settings, href: '/patient/settings' },
       { id: 'signout', label: t('nav.logOut'), icon: LogOut, action: () => void handleSignOut() },
     ];
 
@@ -382,7 +387,11 @@ export const PortalShell = ({ role, children }: PortalShellProps) => {
                 </button>
               </div>
             ) : null}
-            <div className="max-w-[1320px] mx-auto px-6 py-6 space-y-6">{children}</div>
+            {contentBleed ? (
+              <div className="h-full">{children}</div>
+            ) : (
+              <div className="max-w-[1320px] mx-auto px-6 py-6 space-y-6">{children}</div>
+            )}
           </main>
         </div>
       </div>

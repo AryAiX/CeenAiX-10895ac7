@@ -140,12 +140,12 @@ export const PatientDashboard: React.FC = () => {
         : {
             greeting: 'Good afternoon',
             dateLocation: 'Dubai, UAE',
-            healthScore: 'HEALTH SCORE',
-            adherence: 'ADHERENCE',
+            healthScore: 'Health Score',
+            adherence: 'Adherence',
             adherenceSub: 'This month',
             scoreState: 'Good',
-            hba1c: 'HbA1c',
-            bloodPressure: 'Blood Pressure',
+            hba1c: 'HbA1c Trend',
+            bloodPressure: 'Blood Pressure Log',
             lastLabs: 'Last Labs',
             medicationsLabel: 'Medications',
             prediabetic: 'Pre-diabetic',
@@ -385,7 +385,7 @@ export const PatientDashboard: React.FC = () => {
         </div>
         <div className="flex items-center gap-3">
           <div className="rounded-xl border border-slate-100 bg-white px-5 py-3 text-center shadow-sm">
-            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">{localCopy.healthScore}</p>
+            <p className="text-xs font-medium tracking-wide text-slate-400">{localCopy.healthScore}</p>
             <div className="mt-1 flex items-baseline justify-center gap-1">
               <span className="text-3xl font-bold text-teal-600">{formatLocaleDigits(healthScoreValue, i18n.language)}</span>
               <span className="text-sm text-slate-400">/100</span>
@@ -393,7 +393,7 @@ export const PatientDashboard: React.FC = () => {
             <p className="mt-0.5 text-xs font-semibold text-emerald-600">{localCopy.scoreState}</p>
           </div>
           <div className="rounded-xl border border-slate-100 bg-white px-5 py-3 text-center shadow-sm">
-            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">{localCopy.adherence}</p>
+            <p className="text-xs font-medium tracking-wide text-slate-400">{localCopy.adherence}</p>
             <div className="mt-1 flex items-baseline justify-center gap-1">
               <span className="text-3xl font-bold text-slate-800">{formatLocaleDigits(adherenceValue, i18n.language)}</span>
               <span className="text-sm text-slate-400">%</span>
