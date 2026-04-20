@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState, type CSSProperties, type FormEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, LogOut, UserCheck } from 'lucide-react';
-import { AuthShell } from '../../components/AuthShell';
+import { Activity, ArrowRight, LogOut, UserCheck } from 'lucide-react';
+import { LanguageSwitcher } from '../../components/LanguageSwitcher';
 import { SpecializationMultiSelect } from '../../components/SpecializationMultiSelect';
 import { useDoctorSpecializationIds, useSpecializations } from '../../hooks';
 import {
@@ -27,23 +27,19 @@ interface OnboardingFormState {
   termsAccepted: boolean;
 }
 
+const JAKARTA: CSSProperties = { fontFamily: 'Plus Jakarta Sans, sans-serif' };
+
 const safeString = (value: unknown) => (typeof value === 'string' ? value : '');
 
 const splitFullName = (fullName: string) => {
   const parts = fullName.trim().split(/\s+/).filter(Boolean);
 
   if (parts.length === 0) {
-    return {
-      firstName: null,
-      lastName: null,
-    };
+    return { firstName: null, lastName: null };
   }
 
   if (parts.length === 1) {
-    return {
-      firstName: parts[0],
-      lastName: null,
-    };
+    return { firstName: parts[0], lastName: null };
   }
 
   return {
@@ -283,216 +279,310 @@ export const Onboarding = () => {
     navigate(getDefaultRouteForRole(activeRole), { replace: true });
   };
 
+  const sidebarFeatures = [
+    t('auth.roleAccess.sidebarFeature1'),
+    t('auth.roleAccess.sidebarFeature2'),
+    t('auth.roleAccess.sidebarFeature3'),
+    t('auth.roleAccess.sidebarFeature4'),
+  ];
+
+  const inputClass =
+    'w-full rounded-lg border border-slate-200 py-2.5 px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500';
+
   return (
-    <AuthShell
-      badge={t('auth.onboarding.badge')}
-      title={t('auth.onboarding.title')}
-      description={t('auth.onboarding.description')}
-      contentWidthClass="max-w-2xl"
-    >
-      {errorMessage ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {errorMessage}
-        </div>
-      ) : null}
+    <div className="relative min-h-screen bg-slate-50 lg:flex">
+      <div className="absolute end-4 top-4 z-20 sm:end-6 sm:top-6 lg:end-8 lg:top-8">
+        <LanguageSwitcher />
+      </div>
 
-      {successMessage ? (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-          {successMessage}
-        </div>
-      ) : null}
+      <div className="relative hidden w-80 shrink-0 flex-col justify-between overflow-hidden bg-slate-900 p-8 lg:flex">
+        <div className="pointer-events-none absolute -right-20 top-16 h-64 w-64 rounded-full bg-teal-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute -left-16 bottom-24 h-56 w-56 rounded-full bg-blue-500/10 blur-3xl" />
 
-      <form className="space-y-5" onSubmit={handleSubmit}>
-        <label className="block space-y-2">
-          <span className="text-sm font-semibold text-gray-700">{t('auth.onboarding.fields.fullName')}</span>
-          <input
-            type="text"
-            value={form.fullName}
-            onChange={(event) => updateField('fullName', event.target.value)}
-            className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
-            placeholder={t('auth.onboarding.fields.fullNamePlaceholder')}
-            autoComplete="name"
-            required
-          />
-        </label>
+        <div className="relative">
+          <Link to="/" className="mb-10 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-600">
+              <Activity className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <div className="text-lg font-bold text-white" style={JAKARTA}>
+                CeenAiX
+              </div>
+              <div className="text-xs text-teal-400">{t('auth.roleAccess.sidebarEyebrow')}</div>
+            </div>
+          </Link>
 
-        <div className="grid gap-5 sm:grid-cols-2">
-          <label className="block space-y-2">
-            <span className="text-sm font-semibold text-gray-700">
-              {t('auth.onboarding.fields.email')}
-              {!user?.email ? t('auth.onboarding.fields.emailRequired') : ''}
-            </span>
-            <input
-              type="email"
-              value={form.email}
-              onChange={(event) => updateField('email', event.target.value)}
-              className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
-              placeholder={t('auth.onboarding.fields.emailPlaceholder')}
-              autoComplete="email"
-              required={!user?.email}
-              disabled={Boolean(user?.email)}
-            />
-          </label>
-
-          {!isPhoneManagedByOtp ? (
-            <label className="block space-y-2">
-              <span className="text-sm font-semibold text-gray-700">{t('auth.onboarding.fields.phone')}</span>
-              <input
-                type="tel"
-                value={form.phone}
-                onChange={(event) => updateField('phone', event.target.value)}
-                className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
-                placeholder={t('auth.register.mobilePlaceholder')}
-                autoComplete="tel"
-              />
-            </label>
-          ) : null}
-        </div>
-
-        <label className="block space-y-2">
-          <span className="text-sm font-semibold text-gray-700">{t('auth.onboarding.fields.city')}</span>
-          <input
-            type="text"
-            value={form.city}
-            onChange={(event) => updateField('city', event.target.value)}
-            className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
-            placeholder={t('auth.onboarding.fields.cityPlaceholder')}
-          />
-        </label>
-
-        <label className="block space-y-2">
-          <span className="text-sm font-semibold text-gray-700">{t('auth.onboarding.fields.address')}</span>
-          <textarea
-            value={form.address}
-            onChange={(event) => updateField('address', event.target.value)}
-            rows={3}
-            className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
-            placeholder={t('auth.onboarding.fields.addressPlaceholder')}
-          />
-        </label>
-
-        {activeRole === 'patient' ? (
-          <div className="grid gap-5 sm:grid-cols-2">
-            <label className="block space-y-2">
-              <span className="text-sm font-semibold text-gray-700">
-                {t('auth.onboarding.fields.emergencyName')}
-              </span>
-              <input
-                type="text"
-                value={form.emergencyContactName}
-                onChange={(event) => updateField('emergencyContactName', event.target.value)}
-                className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
-                placeholder={t('auth.onboarding.fields.emergencyNamePlaceholder')}
-              />
-            </label>
-
-            <label className="block space-y-2">
-              <span className="text-sm font-semibold text-gray-700">
-                {t('auth.onboarding.fields.emergencyPhone')}
-              </span>
-              <input
-                type="tel"
-                value={form.emergencyContactPhone}
-                onChange={(event) => updateField('emergencyContactPhone', event.target.value)}
-                className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
-                placeholder={t('auth.onboarding.fields.emergencyPhonePlaceholder')}
-              />
-            </label>
-          </div>
-        ) : null}
-
-        {activeRole === 'doctor' ? (
-          <>
-            <SpecializationMultiSelect
-              label={t('auth.onboarding.doctor.specialization')}
-              options={specializationOptions}
-              selectedIds={form.selectedSpecializationIds}
-              onChange={(value) => updateField('selectedSpecializationIds', value)}
-              loading={specializationsLoading || doctorSpecializationIdsLoading}
-              placeholder={t('auth.onboarding.doctor.specSearchPlaceholder')}
-              helperText={
-                specializationsError
-                  ? t('auth.onboarding.doctor.specHelperError')
-                  : t('auth.onboarding.doctor.specHelperOk')
-              }
-            />
-
-            <div className="grid gap-5 sm:grid-cols-2">
-              <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">
-                  {t('auth.onboarding.fields.licenseNumber')}
-                </span>
-                <input
-                  type="text"
-                  value={form.licenseNumber}
-                  onChange={(event) => updateField('licenseNumber', event.target.value)}
-                  className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
-                  placeholder={t('auth.onboarding.fields.licensePlaceholder')}
-                />
-              </label>
+          <div className="space-y-6">
+            <div>
+              <div className="text-2xl font-bold leading-tight text-white" style={JAKARTA}>
+                {t('auth.roleAccess.sidebarTitle')}
+              </div>
+              <div className="mt-3 text-sm text-slate-400">
+                {t('auth.roleAccess.sidebarDescription')}
+              </div>
             </div>
 
-            <label className="block space-y-2">
-              <span className="text-sm font-semibold text-gray-700">{t('auth.onboarding.fields.bio')}</span>
-              <textarea
-                value={form.bio}
-                onChange={(event) => updateField('bio', event.target.value)}
-                rows={4}
-                className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
-                placeholder={t('auth.onboarding.fields.bioPlaceholder')}
-              />
-            </label>
-          </>
-        ) : null}
+            <div className="space-y-3">
+              {sidebarFeatures.map((feature) => (
+                <div key={feature} className="flex items-center gap-3">
+                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-600">
+                    <svg
+                      className="h-3 w-3 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span className="text-sm text-slate-300">{feature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
 
-        <label className="flex items-start gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4">
-          <input
-            type="checkbox"
-            checked={form.termsAccepted}
-            onChange={(event) => updateField('termsAccepted', event.target.checked)}
-            className="mt-1 h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
-          />
-          <span className="text-sm leading-relaxed text-gray-600">
-            {t('auth.onboarding.fields.termsConfirm')}
-          </span>
-        </label>
+        <div className="relative text-xs text-slate-500">{t('auth.roleAccess.copyright')}</div>
+      </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
-          <button
-            type="button"
-            onClick={() => navigate(getDefaultRouteForRole(activeRole), { replace: true })}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 px-5 py-3 font-semibold text-gray-700 transition hover:border-cyan-500 hover:text-cyan-700"
-          >
-            {t('auth.onboarding.buttons.skip')}
-          </button>
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-3 font-semibold text-white shadow-lg shadow-cyan-500/20 transition hover:shadow-xl hover:shadow-cyan-500/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
-          >
-            <UserCheck className="h-4 w-4" />
-            <span>
-              {isSubmitting ? t('auth.onboarding.buttons.saving') : t('auth.onboarding.buttons.save')}
+      <div className="flex flex-1 items-center justify-center p-6 sm:p-8">
+        <div className="w-full max-w-2xl">
+          <div className="mb-6 flex items-center gap-3 lg:hidden">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600">
+              <Activity className="h-4 w-4 text-white" />
+            </div>
+            <span className="font-bold text-slate-800" style={JAKARTA}>
+              CeenAiX
             </span>
-            <ArrowRight className="h-4 w-4" />
-          </button>
-        </div>
+          </div>
 
-        <div className="flex items-center justify-center border-t border-slate-200 pt-4">
-          <button
-            type="button"
-            onClick={async () => {
-              await signOut();
-              navigate('/auth/login', { replace: true });
-            }}
-            className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition-colors hover:text-cyan-600"
-          >
-            <LogOut className="h-4 w-4" />
-            <span>{t('auth.onboarding.buttons.useAnotherAccount')}</span>
-          </button>
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700">
+            {t('auth.onboarding.badge')}
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg sm:p-8">
+            <h2 className="mb-1 text-2xl font-bold text-slate-900" style={JAKARTA}>
+              {t('auth.onboarding.title')}
+            </h2>
+            <p className="mb-6 text-sm text-slate-500">{t('auth.onboarding.description')}</p>
+
+            {errorMessage ? (
+              <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                {errorMessage}
+              </div>
+            ) : null}
+
+            {successMessage ? (
+              <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+                {successMessage}
+              </div>
+            ) : null}
+
+            <form className="space-y-5" onSubmit={handleSubmit}>
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                  {t('auth.onboarding.fields.fullName')}
+                </label>
+                <input
+                  type="text"
+                  value={form.fullName}
+                  onChange={(event) => updateField('fullName', event.target.value)}
+                  className={inputClass}
+                  placeholder={t('auth.onboarding.fields.fullNamePlaceholder')}
+                  autoComplete="name"
+                  required
+                />
+              </div>
+
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                    {t('auth.onboarding.fields.email')}
+                    {!user?.email ? t('auth.onboarding.fields.emailRequired') : ''}
+                  </label>
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={(event) => updateField('email', event.target.value)}
+                    className={`${inputClass} ${user?.email ? 'bg-slate-50 text-slate-500' : ''}`}
+                    placeholder={t('auth.onboarding.fields.emailPlaceholder')}
+                    autoComplete="email"
+                    required={!user?.email}
+                    disabled={Boolean(user?.email)}
+                  />
+                </div>
+
+                {!isPhoneManagedByOtp ? (
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                      {t('auth.onboarding.fields.phone')}
+                    </label>
+                    <input
+                      type="tel"
+                      value={form.phone}
+                      onChange={(event) => updateField('phone', event.target.value)}
+                      className={inputClass}
+                      placeholder={t('auth.register.mobilePlaceholder')}
+                      autoComplete="tel"
+                    />
+                  </div>
+                ) : null}
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                  {t('auth.onboarding.fields.city')}
+                </label>
+                <input
+                  type="text"
+                  value={form.city}
+                  onChange={(event) => updateField('city', event.target.value)}
+                  className={inputClass}
+                  placeholder={t('auth.onboarding.fields.cityPlaceholder')}
+                />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                  {t('auth.onboarding.fields.address')}
+                </label>
+                <textarea
+                  value={form.address}
+                  onChange={(event) => updateField('address', event.target.value)}
+                  rows={3}
+                  className={inputClass}
+                  placeholder={t('auth.onboarding.fields.addressPlaceholder')}
+                />
+              </div>
+
+              {activeRole === 'patient' ? (
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                      {t('auth.onboarding.fields.emergencyName')}
+                    </label>
+                    <input
+                      type="text"
+                      value={form.emergencyContactName}
+                      onChange={(event) => updateField('emergencyContactName', event.target.value)}
+                      className={inputClass}
+                      placeholder={t('auth.onboarding.fields.emergencyNamePlaceholder')}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                      {t('auth.onboarding.fields.emergencyPhone')}
+                    </label>
+                    <input
+                      type="tel"
+                      value={form.emergencyContactPhone}
+                      onChange={(event) => updateField('emergencyContactPhone', event.target.value)}
+                      className={inputClass}
+                      placeholder={t('auth.onboarding.fields.emergencyPhonePlaceholder')}
+                    />
+                  </div>
+                </div>
+              ) : null}
+
+              {activeRole === 'doctor' ? (
+                <>
+                  <SpecializationMultiSelect
+                    label={t('auth.onboarding.doctor.specialization')}
+                    options={specializationOptions}
+                    selectedIds={form.selectedSpecializationIds}
+                    onChange={(value) => updateField('selectedSpecializationIds', value)}
+                    loading={specializationsLoading || doctorSpecializationIdsLoading}
+                    placeholder={t('auth.onboarding.doctor.specSearchPlaceholder')}
+                    helperText={
+                      specializationsError
+                        ? t('auth.onboarding.doctor.specHelperError')
+                        : t('auth.onboarding.doctor.specHelperOk')
+                    }
+                  />
+
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                      {t('auth.onboarding.fields.licenseNumber')}
+                    </label>
+                    <input
+                      type="text"
+                      value={form.licenseNumber}
+                      onChange={(event) => updateField('licenseNumber', event.target.value)}
+                      className={inputClass}
+                      placeholder={t('auth.onboarding.fields.licensePlaceholder')}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                      {t('auth.onboarding.fields.bio')}
+                    </label>
+                    <textarea
+                      value={form.bio}
+                      onChange={(event) => updateField('bio', event.target.value)}
+                      rows={4}
+                      className={inputClass}
+                      placeholder={t('auth.onboarding.fields.bioPlaceholder')}
+                    />
+                  </div>
+                </>
+              ) : null}
+
+              <label className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                <input
+                  type="checkbox"
+                  checked={form.termsAccepted}
+                  onChange={(event) => updateField('termsAccepted', event.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+                />
+                <span className="text-sm leading-relaxed text-slate-600">
+                  {t('auth.onboarding.fields.termsConfirm')}
+                </span>
+              </label>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
+                <button
+                  type="button"
+                  onClick={() => navigate(getDefaultRouteForRole(activeRole), { replace: true })}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-600 transition-colors hover:border-slate-300 hover:text-slate-800"
+                >
+                  {t('auth.onboarding.buttons.skip')}
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  <UserCheck className="h-4 w-4" />
+                  <span>
+                    {isSubmitting ? t('auth.onboarding.buttons.saving') : t('auth.onboarding.buttons.save')}
+                  </span>
+                  <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-center border-t border-slate-100 pt-4">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await signOut();
+                    navigate('/auth/login', { replace: true });
+                  }}
+                  className="inline-flex items-center gap-2 text-xs font-medium text-slate-500 transition-colors hover:text-teal-700"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                  <span>{t('auth.onboarding.buttons.useAnotherAccount')}</span>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </form>
-    </AuthShell>
+      </div>
+    </div>
   );
 };
