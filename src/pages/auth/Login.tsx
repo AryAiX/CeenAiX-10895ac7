@@ -31,8 +31,6 @@ interface RolePreset {
   colorClass: string;
   bgClass: string;
   borderClass: string;
-  demoEmail: string;
-  demoPassword: string;
 }
 
 const JAKARTA: React.CSSProperties = { fontFamily: 'Plus Jakarta Sans, sans-serif' };
@@ -44,8 +42,6 @@ const getRolePresets = (t: (key: string) => string): Record<LoginRole, RolePrese
     colorClass: 'text-teal-700',
     bgClass: 'bg-teal-50',
     borderClass: 'border-teal-200',
-    demoEmail: 'patient1@aryaix.com',
-    demoPassword: 'P@ssw0rd!',
   },
   doctor: {
     title: t('auth.login.roleDoctorTitle'),
@@ -53,8 +49,6 @@ const getRolePresets = (t: (key: string) => string): Record<LoginRole, RolePrese
     colorClass: 'text-blue-700',
     bgClass: 'bg-blue-50',
     borderClass: 'border-blue-200',
-    demoEmail: 'doctor1@aryaix.com',
-    demoPassword: 'P@ssw0rd!',
   },
   pharmacy: {
     title: t('auth.login.rolePharmacyTitle'),
@@ -62,8 +56,6 @@ const getRolePresets = (t: (key: string) => string): Record<LoginRole, RolePrese
     colorClass: 'text-emerald-700',
     bgClass: 'bg-emerald-50',
     borderClass: 'border-emerald-200',
-    demoEmail: 'pharmacy1@aryaix.com',
-    demoPassword: 'P@ssw0rd!',
   },
   lab: {
     title: t('auth.login.roleLabTitle'),
@@ -71,8 +63,6 @@ const getRolePresets = (t: (key: string) => string): Record<LoginRole, RolePrese
     colorClass: 'text-slate-700',
     bgClass: 'bg-slate-50',
     borderClass: 'border-slate-200',
-    demoEmail: 'lab1@aryaix.com',
-    demoPassword: 'P@ssw0rd!',
   },
   insurance: {
     title: t('auth.login.roleInsuranceTitle'),
@@ -80,8 +70,6 @@ const getRolePresets = (t: (key: string) => string): Record<LoginRole, RolePrese
     colorClass: 'text-amber-700',
     bgClass: 'bg-amber-50',
     borderClass: 'border-amber-200',
-    demoEmail: 'insurance1@aryaix.com',
-    demoPassword: 'P@ssw0rd!',
   },
   admin: {
     title: t('auth.login.roleAdminTitle'),
@@ -89,8 +77,6 @@ const getRolePresets = (t: (key: string) => string): Record<LoginRole, RolePrese
     colorClass: 'text-rose-700',
     bgClass: 'bg-rose-50',
     borderClass: 'border-rose-200',
-    demoEmail: 'admin1@aryaix.com',
-    demoPassword: 'P@ssw0rd!',
   },
 });
 
@@ -121,8 +107,8 @@ export const Login = () => {
   const rolePreset = selectedRole ? rolePresets[selectedRole] : null;
 
   const [mode, setMode] = useState<LoginMode>('password');
-  const [email, setEmail] = useState(rolePreset?.demoEmail ?? '');
-  const [password, setPassword] = useState(rolePreset?.demoPassword ?? '');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [phone, setPhone] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -130,13 +116,6 @@ export const Login = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (rolePreset) {
-      setEmail((current) => (current ? current : rolePreset.demoEmail));
-      setPassword((current) => (current ? current : rolePreset.demoPassword));
-    }
-  }, [rolePreset]);
 
   const isRecoveryMode = useMemo(() => {
     if (searchParams.get('mode') === 'recovery') {
@@ -403,7 +382,7 @@ export const Login = () => {
                       {rolePreset.title}
                     </div>
                     <div className="text-xs text-slate-500">
-                      {t('auth.login.roleAccessBadge')}
+                      {t('auth.login.rolePortalBadge')}
                     </div>
                   </div>
                 </div>
@@ -415,7 +394,7 @@ export const Login = () => {
                 </h2>
                 <p className="mb-6 text-sm text-slate-500">
                   {rolePreset
-                    ? t('auth.login.demoCredsLead')
+                    ? t('auth.login.descriptionRole')
                     : t('auth.login.description')}
                 </p>
 
@@ -573,18 +552,7 @@ export const Login = () => {
                   </form>
                 )}
 
-                {rolePreset ? (
-                  <div className="mt-4 border-t border-slate-100 pt-4">
-                    <div className="rounded-lg bg-slate-50 px-3 py-3 text-xs text-slate-500">
-                      <span className="font-medium text-slate-700">
-                        {t('auth.login.demoMode')}:
-                      </span>{' '}
-                      {t('auth.login.demoModeBody').replace('{role}', rolePreset.title)}
-                    </div>
-                  </div>
-                ) : null}
-
-                <div className="mt-5 text-center text-sm text-slate-500">
+                <div className="mt-5 border-t border-slate-100 pt-5 text-center text-sm text-slate-500">
                   <span>{t('auth.login.needAccount')}</span>{' '}
                   <Link
                     to={
