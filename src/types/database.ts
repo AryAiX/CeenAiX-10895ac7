@@ -223,27 +223,79 @@ export interface LabTestCatalogSuggestion extends BaseRecord {
   reviewed_at: string | null;
 }
 
+export type LabOrderUrgency = 'routine' | 'stat' | 'urgent';
+
 export interface LabOrder extends BaseRecord, SoftDeletable {
   patient_id: string;
   doctor_id: string;
   appointment_id: string | null;
   status: LabOrderStatus;
   ordered_at: string;
+  assigned_lab_id: string | null;
+  lab_order_code: string | null;
+  nabidh_reference: string | null;
+  ordered_by_specialty: string | null;
+  sample_collection_at: string | null;
+  results_released_at: string | null;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+  overall_comment: string | null;
+  due_by: string | null;
+  urgency: LabOrderUrgency;
+  fasting_required: boolean;
+  total_cost_aed: number | null;
+  insurance_coverage_aed: number | null;
+  patient_cost_aed: number | null;
+  report_pdf_url: string | null;
 }
+
+export type LabItemStatusCategory = 'normal' | 'borderline' | 'high' | 'low' | 'critical' | 'pending';
+export type LabItemFlag = 'N' | 'H' | 'HH' | 'L' | 'LL';
 
 export interface LabOrderItem extends BaseRecord {
   lab_order_id: string;
   lab_test_catalog_id?: string | null;
   lab_test_catalog_suggestion_id?: string | null;
+  parent_item_id: string | null;
+  sort_order: number;
   test_name: string;
   test_name_ar?: string | null;
   test_code: string | null;
+  loinc_code: string | null;
+  display_name_long: string | null;
+  description: string | null;
   status: LabOrderStatus;
+  status_category: LabItemStatusCategory;
+  flag: LabItemFlag | null;
   result_value: string | null;
   result_unit: string | null;
+  numeric_value: number | null;
   reference_range: string | null;
+  reference_text: string | null;
+  reference_min: number | null;
+  reference_max: number | null;
   is_abnormal: boolean | null;
+  doctor_comment: string | null;
+  patient_explanation: string | null;
+  retest_due_date: string | null;
+  fasting_required: boolean;
+  unit_cost_aed: number | null;
+  insurance_coverage_aed: number | null;
+  patient_cost_aed: number | null;
   resulted_at: string | null;
+  status_label: string | null;
+  category_color: string | null;
+  trend_direction: LabTrendDirection | null;
+  reference_zones: LabReferenceZone[] | null;
+}
+
+export type LabTrendDirection = 'improving' | 'worsening' | 'stable';
+
+export interface LabReferenceZone {
+  label: string;
+  min?: number;
+  max?: number;
+  color: string;
 }
 
 export interface PatientVital extends BaseRecord, SoftDeletable {
@@ -555,4 +607,166 @@ export interface PlatformSetting {
   value: Record<string, unknown>;
   updated_by: string | null;
   updated_at: string;
+}
+
+// ---------------------------------------------------------------------------
+// Lab (backend: Phase 3 / MVP lab portal)
+// ---------------------------------------------------------------------------
+
+export interface LabProfile extends BaseRecord {
+  slug: string;
+  name: string;
+  city: string | null;
+  address: string | null;
+  phone: string | null;
+  email: string | null;
+  is_active: boolean;
+  short_code: string | null;
+  dha_accreditation_code: string | null;
+  gradient_from: string | null;
+  gradient_to: string | null;
+}
+
+export interface LabStaffMember extends BaseRecord {
+  user_id: string;
+  lab_id: string;
+  role_label: string;
+  is_active: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Admin (organizations, incidents, feature flags, service health snapshots)
+// ---------------------------------------------------------------------------
+
+export type OrganizationKind = 'hospital' | 'clinic' | 'lab' | 'pharmacy' | 'insurance';
+export type OrganizationStatus = 'active' | 'suspended' | 'pending' | 'archived';
+
+export interface Organization extends BaseRecord {
+  slug: string;
+  name: string;
+  kind: OrganizationKind;
+  city: string | null;
+  country: string;
+  primary_contact_name: string | null;
+  primary_contact_email: string | null;
+  baa_signed_at: string | null;
+  contract_started_at: string | null;
+  contract_ends_at: string | null;
+  seats_allocated: number;
+  seats_used: number;
+  status: OrganizationStatus;
+  notes: string | null;
+}
+
+export type AdminIncidentSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type AdminIncidentStatus = 'open' | 'investigating' | 'mitigated' | 'closed';
+
+export interface AdminIncident extends BaseRecord {
+  title: string;
+  summary: string;
+  severity: AdminIncidentSeverity;
+  status: AdminIncidentStatus;
+  detected_at: string;
+  resolved_at: string | null;
+  owner_user_id: string | null;
+  affected_records: number;
+  regulator_reported: boolean;
+  metadata: Record<string, unknown>;
+}
+
+export type FeatureFlagEnvironment = 'development' | 'staging' | 'production';
+
+export interface FeatureFlag extends BaseRecord {
+  key: string;
+  name: string;
+  description: string | null;
+  environment: FeatureFlagEnvironment;
+  is_enabled: boolean;
+  rollout_percent: number;
+  updated_by: string | null;
+}
+
+export type ServiceHealthStatus = 'healthy' | 'degraded' | 'down' | 'unknown';
+export type ServiceHealthCategory = 'core' | 'integration' | 'ai';
+
+export interface ServiceHealthSnapshot {
+  id: string;
+  service_key: string;
+  service_name: string;
+  category: ServiceHealthCategory;
+  status: ServiceHealthStatus;
+  latency_ms: number | null;
+  region: string | null;
+  message: string | null;
+  observed_at: string;
+  created_at: string;
+}
+
+// ---------------------------------------------------------------------------
+// Admin RPC return shapes
+// ---------------------------------------------------------------------------
+
+export interface AdminMetricsPayload {
+  generatedAt: string;
+  totals: {
+    users: number;
+    appointmentsToday: number;
+    completedConsultsThisMonth: number;
+    pendingApprovals: number;
+    activeIncidents: number;
+  };
+  usersByRole: Partial<Record<UserRole, number>>;
+  ai: {
+    sessions30d: number;
+    flaggedOutputs30d: number;
+  };
+  compliance: {
+    auditEvents30d: number;
+    activeIncidents: number;
+  };
+}
+
+export interface AdminSystemHealthPayload {
+  generatedAt: string;
+  services: ServiceHealthSnapshot[];
+  integrations: ServiceHealthSnapshot[];
+  aiServices: ServiceHealthSnapshot[];
+}
+
+export interface AdminAiAnalyticsPayload {
+  generatedAt: string;
+  sessions: {
+    last7Days: number;
+    last30Days: number;
+    guestLast30Days: number;
+  };
+  messages: {
+    last30Days: number;
+  };
+  safety: {
+    flaggedLast30Days: number;
+  };
+}
+
+export interface AdminUserRow {
+  user_id: string;
+  role: UserRole;
+  full_name: string;
+  email: string | null;
+  phone: string | null;
+  city: string | null;
+  profile_completed: boolean;
+  created_at: string;
+  last_sign_in_at: string | null;
+  is_dha_verified: boolean;
+}
+
+export interface AdminAuditEventRow {
+  id: string;
+  user_id: string | null;
+  actor_name: string | null;
+  action: AuditAction;
+  table_name: string;
+  record_id: string | null;
+  created_at: string;
 }

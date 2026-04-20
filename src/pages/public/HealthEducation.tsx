@@ -156,7 +156,7 @@ export const HealthEducation: React.FC = () => {
             {filteredArticles.map((article) => (
               <div
                 key={article.id}
-                className="group cursor-pointer overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                className="group card-hover cursor-pointer overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm"
               >
                 <div className="relative h-52 overflow-hidden">
                   <img

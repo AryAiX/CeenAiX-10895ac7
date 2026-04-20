@@ -139,14 +139,14 @@ export const Pharmacy: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
       <Header />
 
-      <section className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 py-20 text-white">
+      <section className="relative overflow-hidden bg-gradient-to-r from-cyan-600 via-blue-600 to-blue-700 py-20 text-white">
         <div className="absolute inset-0">
           <img
             src="https://images.pexels.com/photos/3683053/pexels-photo-3683053.jpeg?auto=compress&cs=tinysrgb&w=1920"
             alt={t('pharmacyPage.heroAlt')}
             className="h-full w-full object-cover opacity-20"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/90 via-cyan-600/90 to-teal-600/90" />
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-600/90 via-blue-600/90 to-blue-700/90" />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -232,7 +232,7 @@ export const Pharmacy: React.FC = () => {
             return (
               <div
                 key={row.id}
-                className="overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+                className="card-hover overflow-hidden rounded-2xl bg-white shadow-lg"
               >
                 <div className="relative h-48 overflow-hidden">
                   <img src={row.image} alt={name} className="h-full w-full object-cover" />

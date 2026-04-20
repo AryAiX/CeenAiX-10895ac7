@@ -9,10 +9,7 @@ import {
   MessageSquare,
   Pill,
   TestTube2,
-  User,
 } from 'lucide-react';
-import { Navigation } from '../../components/Navigation';
-import { PageHeader } from '../../components/PageHeader';
 import { Skeleton } from '../../components/Skeleton';
 import { LabTestNameDisplay } from '../../components/LabTestNameDisplay';
 import { MedicationNameDisplay } from '../../components/MedicationNameDisplay';
@@ -64,35 +61,29 @@ export const DoctorPatientDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
-        <Navigation role="doctor" />
-        <div className="mx-auto max-w-7xl px-4 py-8">
-          <Skeleton className="h-40 w-full rounded-3xl" />
-          <div className="mt-6 grid gap-6 lg:grid-cols-2">
-            <Skeleton className="h-80 w-full rounded-3xl" />
-            <Skeleton className="h-80 w-full rounded-3xl" />
-          </div>
+      <>
+        <Skeleton className="h-40 w-full rounded-3xl" />
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <Skeleton className="h-80 w-full rounded-3xl" />
+          <Skeleton className="h-80 w-full rounded-3xl" />
         </div>
-      </div>
+      </>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
-        <Navigation role="doctor" />
-        <PageHeader
-          title={t('doctor.patientDetail.titleFallback')}
-          subtitle={t('doctor.patientDetail.loadError')}
-          icon={<User className="w-6 h-6 text-white" />}
-          backTo="/doctor/patients"
-        />
-        <div className="mx-auto max-w-7xl px-4 py-8">
-          <div className="rounded-3xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
+      <>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">{t('doctor.patientDetail.titleFallback')}</h1>
+          <p className="mt-1 text-sm text-slate-500">{t('doctor.patientDetail.loadError')}</p>
+        </div>
+        <div>
+          <div className="rounded-xl border border-amber-100 bg-amber-50 px-5 py-4 text-sm text-amber-700">
             {error ?? t('doctor.patientDetail.notFound')}
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -113,16 +104,13 @@ export const DoctorPatientDetail: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
-      <Navigation role="doctor" />
-      <PageHeader
-        title={patientName}
-        subtitle={t('doctor.patientDetail.subtitle')}
-        icon={<User className="w-6 h-6 text-white" />}
-        backTo="/doctor/patients"
-      />
+    <>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">{patientName}</h1>
+        <p className="mt-1 text-sm text-slate-500">{t('doctor.patientDetail.subtitle')}</p>
+      </div>
 
-      <div className="mx-auto max-w-7xl space-y-6 px-4 py-8">
+      <div className="space-y-6">
         <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
           <div className="bg-gradient-to-r from-slate-900 to-emerald-800 p-6 text-white">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -543,6 +531,6 @@ export const DoctorPatientDetail: React.FC = () => {
           </section>
         </div>
       </div>
-    </div>
+    </>
   );
 };

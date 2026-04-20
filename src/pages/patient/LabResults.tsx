@@ -1,0 +1,1658 @@
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import {
+  AlertCircle,
+  AlertTriangle,
+  Building2,
+  Calendar,
+  CheckCircle,
+  ChevronDown,
+  ChevronUp,
+  CreditCard,
+  Download,
+  Eye,
+  FileText,
+  FlaskConical,
+  LineChart,
+  MessageCircle,
+  Share2,
+  Sparkles,
+  TrendingDown,
+  TrendingUp,
+} from 'lucide-react';
+import { Skeleton } from '../../components/Skeleton';
+import { usePatientLabResults } from '../../hooks';
+import type { PatientLabOrderRecord } from '../../hooks/use-patient-lab-results';
+import { useAuth } from '../../lib/auth-context';
+import { dateTimeFormatWithNumerals, resolveLocale } from '../../lib/i18n-ui';
+import type { LabItemStatusCategory, LabOrderItem } from '../../types';
+
+type LabTab = 'recent' | 'trends' | 'history' | 'upcoming' | 'reports';
+
+const STATUS_COLOR: Record<LabItemStatusCategory, string> = {
+  normal: '#059669',
+  borderline: '#F59E0B',
+  low: '#F59E0B',
+  high: '#F59E0B',
+  critical: '#EF4444',
+  pending: '#64748B',
+};
+
+function withAlpha(hex: string, alpha: number): string {
+  const clampedAlpha = Math.max(0, Math.min(1, alpha));
+  const clean = hex.replace('#', '');
+  if (clean.length !== 6) return hex;
+  const r = parseInt(clean.slice(0, 2), 16);
+  const g = parseInt(clean.slice(2, 4), 16);
+  const b = parseInt(clean.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${clampedAlpha})`;
+}
+
+function formatDate(language: string, iso: string, long = false): string {
+  try {
+    return new Intl.DateTimeFormat(
+      resolveLocale(language),
+      dateTimeFormatWithNumerals(
+        language,
+        long
+          ? { year: 'numeric', month: 'long', day: 'numeric' }
+          : { month: 'short', day: 'numeric' }
+      )
+    ).format(new Date(iso));
+  } catch {
+    return iso;
+  }
+}
+
+function formatDateOnly(language: string, isoDate: string, long = false): string {
+  try {
+    const [year, month, day] = isoDate.slice(0, 10).split('-').map(Number);
+    const date = new Date(Date.UTC(year, (month ?? 1) - 1, day ?? 1, 12));
+    return new Intl.DateTimeFormat(
+      resolveLocale(language),
+      dateTimeFormatWithNumerals(
+        language,
+        long
+          ? { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }
+          : { month: 'short', day: 'numeric', timeZone: 'UTC' }
+      )
+    ).format(date);
+  } catch {
+    return isoDate;
+  }
+}
+
+function formatTime(language: string, iso: string): string {
+  try {
+    return new Intl.DateTimeFormat(
+      resolveLocale(language),
+      dateTimeFormatWithNumerals(language, { hour: 'numeric', minute: '2-digit' })
+    ).format(new Date(iso));
+  } catch {
+    return iso;
+  }
+}
+
+function renderValue(item: LabOrderItem): string {
+  if (item.numeric_value != null) {
+    return item.result_unit ? `${item.numeric_value} ${item.result_unit}` : String(item.numeric_value);
+  }
+  if (item.result_value != null && item.result_value.trim() !== '') {
+    return item.result_unit ? `${item.result_value} ${item.result_unit}` : item.result_value;
+  }
+  return '';
+}
+
+function statusBadgeKey(category: LabItemStatusCategory): string {
+  switch (category) {
+    case 'normal':
+      return 'statusNormal';
+    case 'borderline':
+      return 'statusBorderline';
+    case 'high':
+      return 'statusHigh';
+    case 'low':
+      return 'statusLow';
+    case 'critical':
+      return 'statusCritical';
+    default:
+      return 'statusPending';
+  }
+}
+
+function getZonePosition(item: LabOrderItem): number | null {
+  if (item.numeric_value == null) return null;
+  const referenceMax = item.reference_max ?? null;
+  const referenceMin = item.reference_min ?? null;
+  if (referenceMax != null && referenceMax > 0) {
+    const upper = Math.max(referenceMax * 1.6, item.numeric_value);
+    return Math.min(100, Math.max(2, (item.numeric_value / upper) * 100));
+  }
+  if (referenceMin != null && referenceMin > 0) {
+    const upper = Math.max(referenceMin * 2, item.numeric_value);
+    return Math.min(100, Math.max(2, (item.numeric_value / upper) * 100));
+  }
+  return null;
+}
+
+function getItemColor(item: LabOrderItem): string {
+  return item.category_color ?? STATUS_COLOR[item.status_category];
+}
+
+function zoneAxisMax(zones: LabOrderItem['reference_zones']): number | null {
+  if (!zones || zones.length === 0) return null;
+  const maxes = zones
+    .map((z) => (typeof z.max === 'number' ? z.max : null))
+    .filter((v): v is number => v != null);
+  if (maxes.length === 0) return null;
+  return Math.max(...maxes) * 1.15;
+}
+
+function zoneMarkerPercent(item: LabOrderItem): number | null {
+  if (item.numeric_value == null) return null;
+  const axisMax = zoneAxisMax(item.reference_zones);
+  if (axisMax && axisMax > 0) {
+    return Math.min(98, Math.max(2, (item.numeric_value / axisMax) * 100));
+  }
+  return getZonePosition(item);
+}
+
+export const PatientLabResults: React.FC = () => {
+  const { t, i18n } = useTranslation('common');
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { data, loading, error } = usePatientLabResults(user?.id);
+
+  const [activeTab, setActiveTab] = useState<LabTab>('recent');
+  const [expandedTests, setExpandedTests] = useState<string[]>([]);
+  const [expandedVisits, setExpandedVisits] = useState<string[]>([]);
+  const [showBookingForm, setShowBookingForm] = useState(false);
+  const [bookingDate, setBookingDate] = useState('');
+  const [bookingTime, setBookingTime] = useState('08:00');
+  const [bookingConfirmed, setBookingConfirmed] = useState(false);
+
+  const labOrders = useMemo<PatientLabOrderRecord[]>(() => data ?? [], [data]);
+
+  const {
+    resultedOrders,
+    upcomingOrders,
+    totalTests,
+    latestVisit,
+    abnormalTotal,
+    trendsByCode,
+    primaryLabName,
+    secondaryLabName,
+  } = useMemo(() => {
+    const resulted: PatientLabOrderRecord[] = [];
+    const upcoming: PatientLabOrderRecord[] = [];
+    let total = 0;
+    let abnormal = 0;
+    const labNamesSeen = new Set<string>();
+    let primaryLab: string | null = null;
+    let secondaryLab: string | null = null;
+
+    for (const order of labOrders) {
+      const topLevel = order.parentItems;
+      if (order.isUpcoming) {
+        upcoming.push(order);
+      } else {
+        resulted.push(order);
+        total += topLevel.length;
+        abnormal += topLevel.filter((item) => item.is_abnormal === true).length;
+      }
+      if (order.labName && !labNamesSeen.has(order.labName)) {
+        labNamesSeen.add(order.labName);
+        if (!primaryLab) primaryLab = order.labName;
+        else if (!secondaryLab) secondaryLab = order.labName;
+      }
+    }
+
+    return {
+      resultedOrders: resulted,
+      upcomingOrders: upcoming,
+      totalTests: total,
+      latestVisit: resulted[0] ?? null,
+      abnormalTotal: abnormal,
+      trendsByCode: resulted[0]?.trends ?? {},
+      primaryLabName: primaryLab,
+      secondaryLabName: secondaryLab,
+    };
+  }, [labOrders]);
+
+  if (loading) {
+    return (
+      <>
+        <div className="animate-fadeIn">
+          <h1 className="font-playfair text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
+            {t('patient.labResults.title')}
+          </h1>
+          <p className="mt-2 text-[15px] text-slate-400">{t('patient.labResults.subtitleFallback')}</p>
+        </div>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+          <Skeleton className="h-32 w-full rounded-2xl" />
+          <Skeleton className="h-32 w-full rounded-2xl" />
+          <Skeleton className="h-32 w-full rounded-2xl" />
+          <Skeleton className="h-32 w-full rounded-2xl" />
+          <Skeleton className="h-32 w-full rounded-2xl" />
+        </div>
+        <Skeleton className="h-96 w-full rounded-2xl" />
+      </>
+    );
+  }
+
+  const totalUpcomingTests = upcomingOrders.reduce(
+    (sum, order) => sum + order.parentItems.length,
+    0
+  );
+  const upcomingPrimary = upcomingOrders[0] ?? null;
+
+  const toggleTest = (id: string) =>
+    setExpandedTests((prev) =>
+      prev.includes(id) ? prev.filter((test) => test !== id) : [...prev, id]
+    );
+  const toggleVisit = (id: string) =>
+    setExpandedVisits((prev) =>
+      prev.includes(id) ? prev.filter((visit) => visit !== id) : [...prev, id]
+    );
+
+  const getVisitSubtitle = () => {
+    if (primaryLabName && secondaryLabName) {
+      return t('patient.labResults.subtitle', {
+        primaryLab: primaryLabName,
+        partnerLab: secondaryLabName,
+      });
+    }
+    if (primaryLabName) {
+      return t('patient.labResults.subtitleOne', {
+        primaryLab: primaryLabName,
+      });
+    }
+    return t('patient.labResults.subtitleFallback');
+  };
+
+  const renderEmpty = (title: string, body: string, icon: React.ReactNode) => (
+    <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-white p-12 text-center shadow-sm">
+      <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-50">
+        {icon}
+      </div>
+      <h2 className="font-playfair text-xl font-bold text-slate-900">{title}</h2>
+      <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">{body}</p>
+    </div>
+  );
+
+  // ----- Recent Results ------------------------------------------------------
+  const renderRecentTab = () => {
+    if (!latestVisit) {
+      return renderEmpty(
+        t('patient.labResults.emptyTitle'),
+        t('patient.labResults.emptyBody'),
+        <FlaskConical className="h-8 w-8 text-teal-600" />
+      );
+    }
+
+    const labBadge = latestVisit.labShortCode ?? latestVisit.labName?.slice(0, 3).toUpperCase() ?? 'LAB';
+    const gradientFrom = latestVisit.labGradientFrom ?? '#0D9488';
+    const gradientTo = latestVisit.labGradientTo ?? '#06B6D4';
+
+    return (
+      <div className="space-y-6">
+        <section
+          className="rounded-2xl border p-6"
+          style={{
+            background: `linear-gradient(90deg, ${withAlpha(gradientFrom, 0.08)}, ${withAlpha(
+              gradientTo,
+              0.08
+            )})`,
+            borderColor: withAlpha(gradientFrom, 0.25),
+          }}
+        >
+          <div className="mb-4 flex items-start justify-between">
+            <div className="flex items-center gap-4">
+              <div
+                className="flex h-14 w-14 items-center justify-center rounded-full text-lg font-bold text-white"
+                style={{ background: `linear-gradient(135deg, ${gradientFrom}, ${gradientTo})` }}
+              >
+                {labBadge}
+              </div>
+              <div>
+                <h3 className="font-playfair text-xl font-bold text-slate-900">
+                  {latestVisit.labName ?? t('patient.labResults.orderedByFallback')}
+                </h3>
+                <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
+                  {latestVisit.labCity ? <span>📍 {latestVisit.labCity}</span> : null}
+                  {latestVisit.labDhaAccreditationCode ? (
+                    <span className="rounded bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-700">
+                      {t('patient.labResults.dhaAccredited')}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="font-mono text-base font-bold text-slate-700">
+                {formatDate(i18n.language, latestVisit.results_released_at ?? latestVisit.ordered_at, true)}
+              </div>
+              {latestVisit.sample_collection_at ? (
+                <div className="text-sm text-slate-500">
+                  {t('patient.labResults.sampleCollected', {
+                    time: formatTime(i18n.language, latestVisit.sample_collection_at),
+                  })}
+                </div>
+              ) : null}
+              {latestVisit.results_released_at ? (
+                <div className="text-sm text-slate-500">
+                  {t('patient.labResults.resultsReleased', {
+                    time: formatTime(i18n.language, latestVisit.results_released_at),
+                  })}
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          {latestVisit.reviewStatus === 'reviewed' && latestVisit.overall_comment ? (
+            <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
+              <div className="mb-2 flex items-center gap-2">
+                <span className="rounded-full bg-emerald-500 px-3 py-1 text-xs font-bold text-white">
+                  {t('patient.labResults.doctorReviewedBadge')}
+                </span>
+                {latestVisit.doctorName && latestVisit.reviewed_at ? (
+                  <span className="text-xs text-slate-500">
+                    {t('patient.labResults.doctorReviewedBy', {
+                      name: latestVisit.doctorName,
+                      date: formatDate(i18n.language, latestVisit.reviewed_at, true),
+                    })}
+                  </span>
+                ) : null}
+              </div>
+              <p className="text-sm italic text-blue-800">"{latestVisit.overall_comment}"</p>
+              {latestVisit.doctorName ? (
+                <button
+                  type="button"
+                  onClick={() => navigate('/patient/messages')}
+                  className="mt-2 inline-flex items-center gap-2 rounded-lg border-2 border-teal-600 px-4 py-2 text-sm font-medium text-teal-600 transition-all hover:bg-teal-600 hover:text-white"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  {t('patient.labResults.doctorMessageCta', { name: latestVisit.doctorName })}
+                </button>
+              ) : null}
+            </div>
+          ) : null}
+
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            {latestVisit.parentItems.map((item) => (
+              <div
+                key={item.id}
+                title={item.test_name}
+                className="h-3 w-3 rounded-full"
+                style={{ backgroundColor: getItemColor(item) }}
+              />
+            ))}
+            <span className="ms-2 text-xs text-slate-500">
+              {t('patient.labResults.normalCountBadge', { count: latestVisit.normalCount })} ·{' '}
+              {t('patient.labResults.monitorCountBadge', { count: latestVisit.monitorCount })}
+            </span>
+          </div>
+        </section>
+
+        <div className="space-y-4">
+          {latestVisit.parentItems.map((item, index) => {
+            const isExpanded = expandedTests.includes(item.id);
+            const color = getItemColor(item);
+            const subTests = latestVisit.subItemsByParent[item.id] ?? [];
+            const trend = item.test_code ? latestVisit.trends[item.test_code.toUpperCase()] : null;
+            const zones = item.reference_zones ?? null;
+            const axisMax = zoneAxisMax(zones);
+            const markerPercent = zoneMarkerPercent(item);
+            const pillLabel =
+              item.status_label ??
+              t(`patient.labResults.${statusBadgeKey(item.status_category)}`);
+            return (
+              <div
+                key={item.id}
+                style={{
+                  animationDelay: `${index * 60}ms`,
+                  borderLeftColor: color,
+                }}
+                className="animate-slideUp cursor-pointer rounded-2xl border-l-[5px] bg-white shadow-sm transition-all duration-300 hover:shadow-lg"
+                onClick={() => toggleTest(item.id)}
+              >
+                <div className="p-6">
+                  <div className="flex items-start gap-6">
+                    <div className="w-60 flex-shrink-0">
+                      <div className="flex items-start gap-3">
+                        <div
+                          className="flex h-11 w-11 items-center justify-center rounded-full"
+                          style={{ backgroundColor: withAlpha(color, 0.18) }}
+                        >
+                          {item.status_category === 'normal' ? (
+                            <CheckCircle className="h-6 w-6" style={{ color }} />
+                          ) : (
+                            <AlertTriangle className="h-6 w-6" style={{ color }} />
+                          )}
+                        </div>
+                        <div>
+                          <h4 className="font-playfair text-base font-bold text-slate-900">
+                            {item.test_name}
+                          </h4>
+                          {item.display_name_long ? (
+                            <div className="text-xs text-slate-400">{item.display_name_long}</div>
+                          ) : null}
+                          {item.loinc_code ? (
+                            <div className="font-mono text-[10px] text-slate-300">
+                              {t('patient.labResults.loincLabel', { code: item.loinc_code })}
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex-1">
+                      {subTests.length === 0 ? (
+                        <>
+                          <div className="mb-3 flex items-baseline gap-2">
+                            {item.numeric_value != null ? (
+                              <>
+                                <div className="font-mono text-4xl font-bold" style={{ color }}>
+                                  {item.numeric_value}
+                                </div>
+                                {item.result_unit ? (
+                                  <div className="font-mono text-xl text-slate-400">
+                                    {item.result_unit}
+                                  </div>
+                                ) : null}
+                              </>
+                            ) : (
+                              <div className="text-base text-slate-400">
+                                {t('patient.labResults.noResultYet')}
+                              </div>
+                            )}
+                            <div
+                              className="rounded-full px-3 py-1 text-xs font-bold"
+                              style={{
+                                backgroundColor: withAlpha(color, 0.18),
+                                color,
+                              }}
+                            >
+                              {pillLabel}
+                            </div>
+                          </div>
+
+                          {zones && zones.length > 0 && axisMax ? (
+                            <div className="mb-3">
+                              <div className="relative h-3 overflow-hidden rounded-full bg-slate-100">
+                                {zones.map((zone, zIdx) => {
+                                  const zoneMin = zone.min ?? 0;
+                                  const zoneMax = zone.max ?? axisMax;
+                                  const left = Math.max(0, (zoneMin / axisMax) * 100);
+                                  const widthPercent = Math.min(
+                                    100 - left,
+                                    Math.max(0, ((zoneMax - zoneMin) / axisMax) * 100)
+                                  );
+                                  return (
+                                    <div
+                                      key={`${item.id}-zone-${zIdx}`}
+                                      className="absolute h-full"
+                                      style={{
+                                        left: `${left}%`,
+                                        width: `${widthPercent}%`,
+                                        backgroundColor: withAlpha(zone.color, 0.28),
+                                      }}
+                                    />
+                                  );
+                                })}
+                                {markerPercent != null ? (
+                                  <div
+                                    className="absolute top-0 h-full w-0.5 animate-slideInRight"
+                                    style={{
+                                      left: `${markerPercent}%`,
+                                      backgroundColor: color,
+                                    }}
+                                  >
+                                    <div
+                                      className="absolute -top-1 left-1/2 -translate-x-1/2 text-lg"
+                                      style={{ color }}
+                                    >
+                                      ▼
+                                    </div>
+                                  </div>
+                                ) : null}
+                              </div>
+                              <div className="mt-1 flex justify-between">
+                                {zones.map((zone, zIdx) => (
+                                  <div
+                                    key={`${item.id}-zonelabel-${zIdx}`}
+                                    className="font-mono text-[10px]"
+                                    style={{ color: zone.color }}
+                                  >
+                                    {zone.label}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ) : item.numeric_value != null && getZonePosition(item) != null ? (
+                            <div className="mb-3">
+                              <div className="relative h-3 overflow-hidden rounded-full bg-slate-100">
+                                <div
+                                  className="absolute h-full"
+                                  style={{
+                                    left: 0,
+                                    width: `${item.reference_max && item.reference_max > 0 ? Math.min(100, (item.reference_max / Math.max(item.reference_max * 1.6, item.numeric_value ?? 0)) * 100) : 40}%`,
+                                    backgroundColor: withAlpha('#059669', 0.3),
+                                  }}
+                                />
+                                <div
+                                  className="absolute top-0 h-full w-0.5 animate-slideInRight"
+                                  style={{ left: `${getZonePosition(item)}%`, backgroundColor: color }}
+                                >
+                                  <div
+                                    className="absolute -top-1 left-1/2 -translate-x-1/2 text-lg"
+                                    style={{ color }}
+                                  >
+                                    ▼
+                                  </div>
+                                </div>
+                              </div>
+                              {item.reference_text ? (
+                                <div className="mt-1 font-mono text-[11px] text-slate-400">
+                                  {item.reference_text}
+                                </div>
+                              ) : null}
+                            </div>
+                          ) : null}
+
+                          {item.patient_explanation ? (
+                            <p className="text-sm italic text-slate-600">
+                              {item.patient_explanation}
+                            </p>
+                          ) : null}
+                        </>
+                      ) : (
+                        <div className="space-y-2">
+                          {subTests.map((sub) => {
+                            const subColor = getItemColor(sub);
+                            return (
+                              <div
+                                key={sub.id}
+                                className="flex items-center gap-4 rounded-lg bg-slate-50 p-2"
+                              >
+                                <div className="flex-1">
+                                  <div className="text-sm font-medium text-slate-700">
+                                    {sub.test_name}
+                                  </div>
+                                </div>
+                                <div className="font-mono text-sm font-bold text-slate-900">
+                                  {sub.numeric_value ?? sub.result_value ?? '—'}{' '}
+                                  {sub.result_unit ?? ''}
+                                </div>
+                                <div className="h-2 w-32 overflow-hidden rounded-full bg-slate-200">
+                                  <div
+                                    className="h-full"
+                                    style={{
+                                      width: '70%',
+                                      backgroundColor: subColor,
+                                    }}
+                                  />
+                                </div>
+                                <div
+                                  className="text-xs font-bold"
+                                  style={{ color: subColor }}
+                                >
+                                  {sub.status_label ??
+                                    t(`patient.labResults.${statusBadgeKey(sub.status_category)}`)}
+                                </div>
+                              </div>
+                            );
+                          })}
+                          {item.patient_explanation ? (
+                            <p className="pt-2 text-sm italic text-slate-600">
+                              {item.patient_explanation}
+                            </p>
+                          ) : null}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="w-44 flex-shrink-0">
+                      {trend && trend.points.length > 1 ? (
+                        <div className="mb-3">
+                          <div className="mb-2 text-xs uppercase text-slate-400">
+                            {t('patient.labResults.trendLabel')}
+                          </div>
+                          <div className="flex h-16 items-end gap-1">
+                            {trend.points.map((point, pointIdx) => (
+                              <div
+                                key={pointIdx}
+                                className="flex-1 rounded-t bg-gradient-to-t from-teal-500 to-teal-400 transition-all duration-700"
+                                style={{
+                                  height: `${
+                                    (point.value / Math.max(...trend.points.map((p) => p.value))) *
+                                    100
+                                  }%`,
+                                }}
+                              />
+                            ))}
+                          </div>
+                          <div className="mt-2 flex items-center gap-1">
+                            {(item.trend_direction ?? trend.direction) === 'improving' ? (
+                              <>
+                                <TrendingDown className="h-4 w-4 text-emerald-600" />
+                                <span className="text-xs font-bold text-emerald-600">
+                                  {t('patient.labResults.trendImproving')}
+                                </span>
+                              </>
+                            ) : (item.trend_direction ?? trend.direction) === 'worsening' ? (
+                              <>
+                                <TrendingUp className="h-4 w-4 text-red-600" />
+                                <span className="text-xs font-bold text-red-600">
+                                  {t('patient.labResults.trendWorsening')}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-xs text-slate-400">
+                                {t('patient.labResults.trendStable')}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ) : null}
+
+                      <button
+                        type="button"
+                        className="text-xs font-medium text-teal-600 hover:text-teal-700"
+                      >
+                        {isExpanded
+                          ? t('patient.labResults.lessDetails')
+                          : t('patient.labResults.moreDetails')}
+                      </button>
+                    </div>
+                  </div>
+
+                  {isExpanded && item.doctor_comment ? (
+                    <div className="mt-6 border-t border-slate-100 pt-6">
+                      <div className="rounded-lg border-l-4 border-blue-500 bg-blue-50 p-4">
+                        <div className="mb-1 text-xs font-bold text-blue-900">
+                          {t('patient.labResults.doctorNoteTitle')}
+                        </div>
+                        <p className="text-sm text-blue-800">"{item.doctor_comment}"</p>
+                        {latestVisit.doctorName ? (
+                          <p className="mt-2 text-xs text-blue-600">
+                            — {latestVisit.doctorName}
+                            {latestVisit.doctorSpecialty ? `, ${latestVisit.doctorSpecialty}` : ''}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="flex items-center justify-end">
+          <button
+            type="button"
+            onClick={() => navigate('/patient/ai-chat')}
+            className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:shadow-md"
+          >
+            <Sparkles className="h-4 w-4" />
+            <span>{t('patient.labResults.explainWithAi')}</span>
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // ----- Trends --------------------------------------------------------------
+  const renderTrendsTab = () => {
+    const hba1c = trendsByCode['HBA1C'];
+    if (!hba1c || hba1c.points.length < 2) {
+      return renderEmpty(
+        t('patient.labResults.trendsEmptyTitle'),
+        t('patient.labResults.trendsEmptyBody'),
+        <LineChart className="h-8 w-8 text-indigo-600" />
+      );
+    }
+    const first = hba1c.points[0];
+    const last = hba1c.points[hba1c.points.length - 1];
+    const maxVal = Math.max(...hba1c.points.map((p) => p.value));
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-lg font-bold text-slate-900">
+            {t('patient.labResults.trendsHeading')}
+          </h3>
+          <p className="text-sm text-slate-500">{t('patient.labResults.trendsSubtitle')}</p>
+        </div>
+
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          <div className="mb-4 flex items-start justify-between">
+            <div>
+              <h4 className="font-playfair text-lg font-bold text-slate-900">
+                {t('patient.labResults.trendsCardHbA1cTitle')}
+              </h4>
+              <p className="text-sm text-slate-500">
+                {t('patient.labResults.trendsCardHbA1cSubtitle')}
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="mb-1 rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700">
+                {last.value}% ·{' '}
+                {t(`patient.labResults.${statusBadgeKey(last.status)}`)}
+              </div>
+              {hba1c.delta != null ? (
+                <div className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
+                  {t('patient.labResults.trendsDelta', {
+                    delta: hba1c.delta,
+                    direction: hba1c.direction ?? 'stable',
+                  })}
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="relative h-56">
+            <div className="absolute inset-0 flex items-end justify-between gap-2">
+              {hba1c.points.map((point, idx) => (
+                <div key={idx} className="flex flex-1 flex-col items-center gap-2">
+                  <div
+                    className="w-full rounded-t bg-gradient-to-t from-teal-600 to-teal-400 transition-all duration-1000"
+                    style={{ height: `${(point.value / maxVal) * 100}%` }}
+                  />
+                  <div className="font-mono text-xs text-slate-400">{point.label}</div>
+                  <div className="font-mono text-xs font-bold text-slate-700">
+                    {point.value}%
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div
+              className="absolute left-0 right-0 h-px bg-emerald-500"
+              style={{ top: '30%' }}
+            >
+              <div className="absolute right-0 -top-3 text-xs font-bold text-emerald-600">
+                Target: 6.5%
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 rounded-lg bg-emerald-50 p-4">
+            <p className="text-sm font-medium text-emerald-800">
+              {t('patient.labResults.trendsSummary', {
+                first: first.label,
+                firstValue: first.value,
+                last: last.label,
+                lastValue: last.value,
+                delta: hba1c.delta ?? 0,
+              })}
+            </p>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-50 to-cyan-50 p-8">
+          <h4 className="mb-4 text-lg font-bold text-slate-900">
+            {t('patient.labResults.trendsKeyInsightsTitle')}
+          </h4>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-xl bg-white p-4 shadow-sm">
+              <div className="mb-2 font-bold text-emerald-600">
+                {t('patient.labResults.trendsInsightDiabetesTitle')}
+              </div>
+              <p className="text-sm text-slate-600">
+                {t('patient.labResults.trendsInsightDiabetesBody')}
+              </p>
+            </div>
+            <div className="rounded-xl bg-white p-4 shadow-sm">
+              <div className="mb-2 font-bold text-amber-600">
+                {t('patient.labResults.trendsInsightVitDTitle')}
+              </div>
+              <p className="text-sm text-slate-600">
+                {t('patient.labResults.trendsInsightVitDBody')}
+              </p>
+            </div>
+            <div className="rounded-xl bg-white p-4 shadow-sm">
+              <div className="mb-2 font-bold text-blue-600">
+                {t('patient.labResults.trendsInsightCholTitle')}
+              </div>
+              <p className="text-sm text-slate-600">
+                {t('patient.labResults.trendsInsightCholBody')}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ----- History -------------------------------------------------------------
+  const renderHistoryTab = () => {
+    if (resultedOrders.length === 0) {
+      return renderEmpty(
+        t('patient.labResults.emptyTitle'),
+        t('patient.labResults.emptyBody'),
+        <FlaskConical className="h-8 w-8 text-teal-600" />
+      );
+    }
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 className="text-lg font-bold text-slate-900">
+              {t('patient.labResults.historyHeading')}
+            </h3>
+            <p className="text-sm text-slate-500">
+              {t('patient.labResults.historySubtitle')}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <select className="rounded-lg border border-slate-200 px-3 py-2 text-sm">
+              <option>{t('patient.labResults.historyFilterAll')}</option>
+              <option>{t('patient.labResults.historyFilterAbnormal')}</option>
+              <option>{t('patient.labResults.historyFilterNormal')}</option>
+            </select>
+            <select className="rounded-lg border border-slate-200 px-3 py-2 text-sm">
+              <option>{t('patient.labResults.historyFilterNewest')}</option>
+              <option>{t('patient.labResults.historyFilterOldest')}</option>
+            </select>
+          </div>
+        </div>
+
+        {resultedOrders.map((order, idx) => {
+          const isExpanded = expandedVisits.includes(order.id);
+          return (
+            <div
+              key={order.id}
+              style={{ animationDelay: `${idx * 60}ms` }}
+              className="animate-slideUp rounded-xl border-l-4 border-teal-500 bg-white shadow-sm transition-all duration-300 hover:shadow-md"
+            >
+              <div
+                className="flex cursor-pointer items-center justify-between p-5"
+                onClick={() => toggleVisit(order.id)}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-100 text-sm font-bold text-teal-600">
+                    {order.labShortCode ?? order.labName?.slice(0, 3).toUpperCase() ?? 'LAB'}
+                  </div>
+                  <div>
+                    <h4 className="text-base font-bold text-slate-900">
+                      {order.labName ?? t('patient.labResults.orderedByFallback')}
+                    </h4>
+                    <div className="text-sm text-slate-500">
+                      {t('patient.labResults.historyVisitSummary', {
+                        date: formatDate(
+                          i18n.language,
+                          order.results_released_at ?? order.ordered_at,
+                          true
+                        ),
+                        count: order.parentItems.length,
+                        doctor: order.doctorName ?? t('patient.labResults.orderedByFallback'),
+                      })}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  {order.normalCount > 0 ? (
+                    <span className="rounded bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-700">
+                      {t('patient.labResults.normalCountBadge', { count: order.normalCount })}
+                    </span>
+                  ) : null}
+                  {order.monitorCount > 0 ? (
+                    <span className="rounded bg-amber-50 px-2 py-1 text-xs font-bold text-amber-700">
+                      {t('patient.labResults.monitorCountBadge', {
+                        count: order.monitorCount,
+                      })}
+                    </span>
+                  ) : null}
+                  {order.reviewStatus === 'reviewed' ? (
+                    <span className="rounded bg-blue-50 px-2 py-1 text-xs font-bold text-blue-700">
+                      {t('patient.labResults.historyReviewedBadge')}
+                    </span>
+                  ) : null}
+                  {isExpanded ? (
+                    <ChevronUp className="h-5 w-5 text-slate-400" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5 text-slate-400" />
+                  )}
+                </div>
+              </div>
+
+              {isExpanded ? (
+                <div className="space-y-2 border-t border-slate-100 px-5 pb-5 pt-4">
+                  {order.parentItems.map((item) => {
+                    const color = STATUS_COLOR[item.status_category];
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between rounded-lg bg-slate-50 p-3"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold"
+                            style={{ backgroundColor: withAlpha(color, 0.2), color }}
+                          >
+                            {item.numeric_value ?? '—'}
+                          </div>
+                          <div>
+                            <div className="text-sm font-bold text-slate-900">
+                              {item.test_name}
+                            </div>
+                            {item.display_name_long ? (
+                              <div className="text-xs text-slate-500">
+                                {item.display_name_long}
+                              </div>
+                            ) : null}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="text-right">
+                            <div className="font-mono text-sm font-bold text-slate-900">
+                              {renderValue(item)}
+                            </div>
+                            {item.reference_text ? (
+                              <div className="text-xs text-slate-500">{item.reference_text}</div>
+                            ) : null}
+                          </div>
+                          <div
+                            className="rounded-full px-3 py-1 text-xs font-bold"
+                            style={{ backgroundColor: withAlpha(color, 0.2), color }}
+                          >
+                            {t(`patient.labResults.${statusBadgeKey(item.status_category)}`)}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // ----- Upcoming ------------------------------------------------------------
+  const renderUpcomingTab = () => {
+    if (upcomingOrders.length === 0) {
+      return renderEmpty(
+        t('patient.labResults.upcomingEmptyTitle'),
+        t('patient.labResults.upcomingEmptyBody'),
+        <Calendar className="h-8 w-8 text-blue-600" />
+      );
+    }
+
+    if (bookingConfirmed && upcomingPrimary) {
+      return (
+        <div className="mx-auto max-w-2xl py-12 text-center">
+          <div className="animate-fadeIn mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100">
+            <CheckCircle className="h-12 w-12 text-emerald-600" />
+          </div>
+          <h3 className="font-playfair text-2xl font-bold text-emerald-700">
+            {t('patient.labResults.upcomingConfirmedTitle')}
+          </h3>
+          <div className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-left">
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm text-slate-600">
+                  {t('patient.labResults.upcomingConfirmedLab')}
+                </span>
+                <span className="text-sm font-bold text-slate-900">
+                  {upcomingPrimary.labName ?? 'Dubai Medical Laboratory'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-slate-600">
+                  {t('patient.labResults.upcomingConfirmedDate')}
+                </span>
+                <span className="text-sm font-bold text-slate-900">{bookingDate || '—'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-slate-600">
+                  {t('patient.labResults.upcomingConfirmedTime')}
+                </span>
+                <span className="text-sm font-bold text-slate-900">{bookingTime}</span>
+              </div>
+              {upcomingPrimary.labAddress ? (
+                <div className="flex justify-between">
+                  <span className="text-sm text-slate-600">
+                    {t('patient.labResults.upcomingConfirmedAddress')}
+                  </span>
+                  <span className="text-sm font-bold text-slate-900">
+                    {upcomingPrimary.labAddress}
+                  </span>
+                </div>
+              ) : null}
+              {upcomingPrimary.lab_order_code ? (
+                <div className="flex justify-between border-t border-emerald-200 pt-2">
+                  <span className="text-sm text-slate-600">
+                    {t('patient.labResults.upcomingConfirmedRef')}
+                  </span>
+                  <span className="font-mono text-sm font-bold text-slate-900">
+                    {upcomingPrimary.lab_order_code}
+                  </span>
+                </div>
+              ) : null}
+            </div>
+            {upcomingPrimary.fasting_required ? (
+              <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                <p className="text-xs font-bold text-amber-800">
+                  {t('patient.labResults.upcomingFastingReminder')}
+                </p>
+              </div>
+            ) : null}
+          </div>
+          <div className="mt-6 flex justify-center gap-3">
+            <button
+              type="button"
+              className="rounded-lg bg-teal-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-teal-700"
+            >
+              {t('patient.labResults.upcomingAddToCalendar')}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setBookingConfirmed(false);
+                setActiveTab('recent');
+              }}
+              className="rounded-lg border-2 border-slate-300 px-6 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+            >
+              {t('patient.labResults.upcomingBackToResults')}
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        {upcomingOrders.map((order) => {
+          const daysRemaining = order.daysUntilDue ?? 0;
+          const totalCost = order.total_cost_aed ?? 0;
+          const totalInsurance = order.insurance_coverage_aed ?? 0;
+          const totalPatient = order.patient_cost_aed ?? 0;
+          const fastingTests = order.parentItems.filter((item) => item.fasting_required);
+          return (
+            <div key={order.id} className="space-y-6">
+              <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-6">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
+                    <Calendar className="h-6 w-6 text-amber-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-playfair text-lg font-bold text-amber-900">
+                      {t('patient.labResults.upcomingHeadingTitle', {
+                        date: order.due_by
+                          ? formatDateOnly(i18n.language, order.due_by, true)
+                          : '—',
+                      })}
+                    </h3>
+                    {order.doctorName ? (
+                      <div className="text-sm text-amber-700">
+                        {t('patient.labResults.upcomingHeadingOrderedBy', {
+                          name: order.doctorName,
+                          specialty:
+                            order.doctorSpecialty ?? t('patient.labResults.orderedByFallback'),
+                        })}
+                      </div>
+                    ) : null}
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {order.parentItems.map((item) => (
+                        <div
+                          key={item.id}
+                          className="rounded-full border border-amber-300 bg-white px-3 py-1 text-xs font-bold text-amber-700"
+                        >
+                          {item.test_name}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-4">
+                      <div className="mb-2 text-xs text-amber-700">
+                        {daysRemaining > 0
+                          ? t('patient.labResults.upcomingHeadingDaysLine', {
+                              count: daysRemaining,
+                            })
+                          : daysRemaining === 0
+                          ? t('patient.labResults.alertDueToday')
+                          : t('patient.labResults.upcomingHeadingOverdueLine', {
+                              count: Math.abs(daysRemaining),
+                            })}
+                      </div>
+                      <div className="h-2 overflow-hidden rounded-full bg-white">
+                        <div
+                          className="h-full bg-gradient-to-r from-amber-500 to-amber-600 transition-all duration-700"
+                          style={{
+                            width: `${Math.min(100, Math.max(0, ((30 - Math.max(0, daysRemaining)) / 30) * 100))}%`,
+                          }}
+                        />
+                      </div>
+                      <div className="mt-1 text-xs text-amber-600">
+                        {t('patient.labResults.upcomingOrderedDueLine', {
+                          doctor: order.doctorName?.replace(/^Dr\.\s*/, '') ?? '',
+                          orderDate: formatDate(i18n.language, order.ordered_at, true),
+                          dueDate: order.due_by
+                            ? formatDateOnly(i18n.language, order.due_by, true)
+                            : '—',
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-2xl bg-white p-6 shadow-sm">
+                <h4 className="mb-4 text-lg font-bold text-slate-900">
+                  {t('patient.labResults.upcomingOrderedTests')}
+                </h4>
+                <div className="space-y-3">
+                  {order.parentItems.map((item, idx) => (
+                    <div
+                      key={item.id}
+                      style={{ animationDelay: `${idx * 60}ms` }}
+                      className="animate-slideUp rounded-lg bg-slate-50 p-4"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-3">
+                          <FlaskConical className="mt-0.5 h-5 w-5 text-teal-600" />
+                          <div>
+                            <div className="text-sm font-bold text-slate-900">
+                              {item.test_name}
+                            </div>
+                            {item.description ? (
+                              <div className="text-xs text-slate-500">{item.description}</div>
+                            ) : null}
+                            {item.loinc_code ? (
+                              <div className="mt-1 font-mono text-[10px] text-slate-400">
+                                {t('patient.labResults.loincLabel', {
+                                  code: item.loinc_code,
+                                })}
+                              </div>
+                            ) : null}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm text-slate-600">
+                            {t('patient.labResults.upcomingPerTestCost', {
+                              cost: item.unit_cost_aed ?? 0,
+                              insurance: item.insurance_coverage_aed ?? 0,
+                            })}
+                          </div>
+                          <div className="text-sm font-bold text-teal-600">
+                            {t('patient.labResults.upcomingPerTestPays', {
+                              amount: item.patient_cost_aed ?? 0,
+                            })}
+                          </div>
+                          {item.fasting_required ? (
+                            <div className="mt-1 rounded bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700">
+                              {t('patient.labResults.upcomingFastingFlag')}
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6 rounded-lg border border-teal-200 bg-teal-50 p-4">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-sm text-slate-600">
+                      {t('patient.labResults.upcomingSummarySelfPay')}
+                    </span>
+                    <span className="text-sm text-slate-400 line-through">
+                      AED {totalCost}
+                    </span>
+                  </div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-sm text-slate-600">
+                      {t('patient.labResults.upcomingSummaryInsurance')}
+                    </span>
+                    <span className="text-sm font-bold text-emerald-600">
+                      AED {totalInsurance}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-teal-200 pt-2">
+                    <span className="text-base font-bold text-slate-900">
+                      {t('patient.labResults.upcomingSummaryYourCost')}
+                    </span>
+                    <span className="font-mono text-2xl font-bold text-teal-600">
+                      AED {totalPatient}
+                    </span>
+                  </div>
+                  <div className="mt-2 text-xs text-teal-700">
+                    <CreditCard className="me-1 inline h-3.5 w-3.5" />
+                    {t('patient.labResults.upcomingSummaryBillNote')}
+                  </div>
+                </div>
+
+                {fastingTests.length > 0 ? (
+                  <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                    <h5 className="mb-2 text-sm font-bold text-amber-900">
+                      {t('patient.labResults.upcomingFastingTitle')}
+                    </h5>
+                    <p className="mb-3 text-sm text-amber-800">
+                      {t('patient.labResults.upcomingFastingBody', {
+                        count: fastingTests.length,
+                      })}
+                    </p>
+                    <ul className="space-y-1 text-sm text-amber-700">
+                      <li>{t('patient.labResults.upcomingFastingStopEating')}</li>
+                      <li>{t('patient.labResults.upcomingFastingDrink')}</li>
+                      <li>{t('patient.labResults.upcomingFastingArrive')}</li>
+                      <li>{t('patient.labResults.upcomingFastingBring')}</li>
+                    </ul>
+                  </div>
+                ) : null}
+
+                <div className="mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setShowBookingForm(true)}
+                    className="w-full rounded-lg bg-amber-600 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-amber-700"
+                  >
+                    {t('patient.labResults.upcomingBookCta', {
+                      labName: order.labName ?? 'Dubai Medical Laboratory',
+                    })}
+                  </button>
+                </div>
+
+                {showBookingForm ? (
+                  <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-6">
+                    <h5 className="mb-4 text-sm font-bold text-slate-900">
+                      {t('patient.labResults.upcomingBookingFormTitle')}
+                    </h5>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="mb-2 block text-xs font-bold text-slate-600">
+                          {t('patient.labResults.upcomingPreferredDate')}
+                        </label>
+                        <input
+                          type="date"
+                          value={bookingDate}
+                          onChange={(event) => setBookingDate(event.target.value)}
+                          className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-2 block text-xs font-bold text-slate-600">
+                          {t('patient.labResults.upcomingPreferredTime')}
+                        </label>
+                        <select
+                          value={bookingTime}
+                          onChange={(event) => setBookingTime(event.target.value)}
+                          className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                        >
+                          <option value="08:00">08:00</option>
+                          <option value="08:30">08:30</option>
+                          <option value="09:00">09:00</option>
+                          <option value="09:30">09:30</option>
+                          <option value="10:00">10:00</option>
+                        </select>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setBookingConfirmed(true)}
+                        className="w-full rounded-lg bg-teal-600 px-6 py-3 font-bold text-white transition-colors hover:bg-teal-700"
+                      >
+                        {t('patient.labResults.upcomingConfirmBtn')}
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // ----- Reports -------------------------------------------------------------
+  const renderReportsTab = () => {
+    if (resultedOrders.length === 0) {
+      return renderEmpty(
+        t('patient.labResults.reportsEmptyTitle'),
+        t('patient.labResults.reportsEmptyBody'),
+        <FileText className="h-8 w-8 text-purple-600" />
+      );
+    }
+    return (
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-lg font-bold text-slate-900">
+            {t('patient.labResults.reportsHeading')}
+          </h3>
+          <p className="text-sm text-slate-500">
+            {t('patient.labResults.reportsSubtitle')}
+          </p>
+        </div>
+
+        {resultedOrders.map((order, idx) => (
+          <div
+            key={order.id}
+            style={{ animationDelay: `${idx * 60}ms` }}
+            className="animate-slideUp rounded-xl bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md"
+          >
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-100">
+                <FileText className="h-6 w-6 text-red-600" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-base font-bold text-slate-900">
+                  {t('patient.labResults.reportsRowTitle', {
+                    labName: order.labName ?? t('patient.labResults.orderedByFallback'),
+                  })}
+                </h4>
+                <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-500">
+                  <span>
+                    {formatDate(
+                      i18n.language,
+                      order.results_released_at ?? order.ordered_at,
+                      true
+                    )}
+                  </span>
+                  <span>·</span>
+                  <span>
+                    {t('patient.labResults.historyVisitSummary', {
+                      date: '',
+                      count: order.parentItems.length,
+                      doctor: order.doctorName ?? t('patient.labResults.orderedByFallback'),
+                    }).replace('·', '')}
+                  </span>
+                </div>
+                <div className="mt-1 text-xs text-slate-400">
+                  {t('patient.labResults.reportsRowMeta')}
+                </div>
+                {order.nabidh_reference ? (
+                  <div className="mt-1 font-mono text-[10px] text-slate-300">
+                    {t('patient.labResults.reportsRef', { nabidh: order.nabidh_reference })}
+                  </div>
+                ) : null}
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-teal-700"
+                >
+                  <Download className="h-4 w-4" />
+                  {t('patient.labResults.reportsDownloadBtn')}
+                </button>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-lg border-2 border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                >
+                  <Eye className="h-4 w-4" />
+                  {t('patient.labResults.reportsPreviewBtn')}
+                </button>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-lg border-2 border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                >
+                  <Share2 className="h-4 w-4" />
+                  {t('patient.labResults.reportsShareBtn')}
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <p className="text-sm text-amber-800">
+            {t('patient.labResults.reportsWarning')}
+          </p>
+        </div>
+      </div>
+    );
+  };
+
+  // --- Tabs shell -----------------------------------------------------------
+
+  const tabs: Array<{ id: LabTab; label: string; badge?: number }> = [
+    { id: 'recent', label: t('patient.labResults.tabRecent') },
+    { id: 'trends', label: t('patient.labResults.tabTrends') },
+    { id: 'history', label: t('patient.labResults.tabHistory') },
+    {
+      id: 'upcoming',
+      label: t('patient.labResults.tabUpcoming'),
+      badge: upcomingOrders.length || undefined,
+    },
+    { id: 'reports', label: t('patient.labResults.tabReports') },
+  ];
+
+  const upcomingAlertDue = upcomingPrimary?.due_by
+    ? formatDateOnly(i18n.language, upcomingPrimary.due_by, true)
+    : null;
+
+  return (
+    <>
+      <div className="flex flex-wrap items-start justify-between gap-4 animate-fadeIn">
+        <div>
+          <h1 className="font-playfair text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
+            {t('patient.labResults.title')} 🔬
+          </h1>
+          <p className="mt-2 text-[15px] text-slate-400">{getVisitSubtitle()}</p>
+        </div>
+        {upcomingOrders.length > 0 && upcomingPrimary ? (
+          <div className="animate-glow max-w-xs rounded-xl border-2 border-amber-200 bg-amber-50 p-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" />
+              <div>
+                {upcomingAlertDue ? (
+                  <div className="mb-1 text-xs font-bold text-amber-700">
+                    {t('patient.labResults.alertDueBeforeTitle', { date: upcomingAlertDue })}
+                  </div>
+                ) : null}
+                <div className="text-xs text-amber-600">
+                  {t('patient.labResults.alertDueBeforeTests', {
+                    count: totalUpcomingTests,
+                    doctor: upcomingPrimary.doctorName ?? t('patient.labResults.orderedByFallback'),
+                  })}
+                </div>
+                {upcomingPrimary.daysUntilDue != null ? (
+                  <div className="mt-1 text-xs font-bold text-amber-700">
+                    {upcomingPrimary.daysUntilDue > 0
+                      ? t('patient.labResults.alertDueBeforeDays', {
+                          count: upcomingPrimary.daysUntilDue,
+                        })
+                      : upcomingPrimary.daysUntilDue === 0
+                      ? t('patient.labResults.alertDueToday')
+                      : t('patient.labResults.alertOverdueDays', {
+                          count: Math.abs(upcomingPrimary.daysUntilDue),
+                        })}
+                  </div>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('upcoming')}
+                  className="mt-2 w-full rounded-lg bg-amber-600 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-amber-700"
+                >
+                  {t('patient.labResults.alertDueBeforeCta')}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </div>
+
+      {error ? (
+        <div className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+          {t('patient.labResults.loadError')}
+        </div>
+      ) : null}
+
+      <div
+        className="grid grid-cols-2 gap-4 animate-slideUp md:grid-cols-5"
+        style={{ animationDelay: '80ms' }}
+      >
+        <div className="rounded-2xl bg-white p-6 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md">
+          <div className="mb-3 flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-teal-100">
+              <FlaskConical className="h-7 w-7 text-teal-600" />
+            </div>
+            <div>
+              <div className="font-mono text-3xl font-bold text-slate-900">{totalTests}</div>
+              <div className="text-xs text-slate-400">
+                {t('patient.labResults.statCompleted')}
+              </div>
+            </div>
+          </div>
+          <div className="text-xs font-medium text-teal-600">
+            {t('patient.labResults.statAcrossVisits', { count: resultedOrders.length })}
+          </div>
+        </div>
+
+        <div className="rounded-2xl bg-white p-6 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md">
+          <div className="mb-3 flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
+              <CheckCircle className="h-7 w-7 text-emerald-600" />
+            </div>
+            <div>
+              <div className="font-mono text-3xl font-bold text-slate-900">
+                {latestVisit?.parentItems.length ?? 0}
+              </div>
+              <div className="text-xs text-slate-400">
+                {t('patient.labResults.statLatest')}
+              </div>
+            </div>
+          </div>
+          {latestVisit ? (
+            <>
+              <div className="text-xs font-medium text-emerald-600">
+                {formatDate(i18n.language, latestVisit.results_released_at ?? latestVisit.ordered_at, true)}{' '}
+                ✓
+              </div>
+              {latestVisit.doctorName ? (
+                <div className="mt-1 text-[11px] text-slate-400">
+                  {t('patient.labResults.statLatestReviewedBy', { name: latestVisit.doctorName })}
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <div className="text-xs text-slate-400">
+              {t('patient.labResults.statLastVisitNever')}
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-2xl bg-white p-6 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md">
+          <div className="mb-3 flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
+              <AlertTriangle className="h-7 w-7 text-amber-600" />
+            </div>
+            <div>
+              <div className="font-mono text-3xl font-bold text-amber-600">{abnormalTotal}</div>
+              <div className="text-xs text-slate-400">
+                {t('patient.labResults.statToMonitor')}
+              </div>
+            </div>
+          </div>
+          <div className="text-xs font-medium text-amber-600">
+            {t('patient.labResults.statFlaggedAbnormal')}
+          </div>
+        </div>
+
+        <div
+          className={`rounded-2xl bg-white p-6 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md ${
+            upcomingOrders.length > 0 ? 'animate-glow' : ''
+          }`}
+        >
+          <div className="mb-3 flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
+              <Calendar className="h-7 w-7 text-blue-600" />
+            </div>
+            <div>
+              <div className="font-mono text-3xl font-bold text-blue-600">{totalUpcomingTests}</div>
+              <div className="text-xs text-slate-400">
+                {t('patient.labResults.statOrdered')}
+              </div>
+            </div>
+          </div>
+          {upcomingAlertDue ? (
+            <div className="text-xs font-medium text-amber-500">
+              {t('patient.labResults.statOrderedDueByShort', { date: upcomingAlertDue })}
+            </div>
+          ) : (
+            <div className="text-xs font-medium text-amber-500">
+              {t('patient.labResults.statOrderedPending')}
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-2xl bg-white p-6 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md">
+          <div className="mb-3 flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-purple-100">
+              <Building2 className="h-7 w-7 text-purple-600" />
+            </div>
+            <div>
+              <div className="font-mono text-2xl font-bold text-slate-900">
+                {latestVisit
+                  ? formatDate(
+                      i18n.language,
+                      latestVisit.results_released_at ?? latestVisit.ordered_at
+                    )
+                  : '—'}
+              </div>
+              <div className="text-xs text-slate-400">
+                {t('patient.labResults.statLastVisit')}
+              </div>
+            </div>
+          </div>
+          {latestVisit?.labName ? (
+            <div className="text-xs font-medium text-purple-600">{latestVisit.labName}</div>
+          ) : (
+            <div className="text-xs text-slate-400">
+              {t('patient.labResults.statLastVisitNever')}
+            </div>
+          )}
+          {latestVisit?.daysSinceOrdered != null ? (
+            <div className="mt-1 text-[11px] text-slate-400">
+              {t('patient.labResults.statLastVisitDaysAgo', {
+                count: latestVisit.daysSinceOrdered,
+              })}
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      <div
+        className="rounded-2xl bg-white shadow-sm animate-slideUp"
+        style={{ animationDelay: '160ms' }}
+      >
+        <div className="border-b border-slate-100 px-6">
+          <div className="flex flex-wrap gap-6">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`relative px-2 py-4 text-[15px] font-medium transition-all duration-300 ${
+                  activeTab === tab.id ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  {tab.label}
+                  {tab.badge ? (
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-white">
+                      {tab.badge}
+                    </span>
+                  ) : null}
+                </span>
+                {activeTab === tab.id ? (
+                  <span className="absolute inset-x-0 bottom-0 h-0.5 bg-teal-600" />
+                ) : null}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="p-6">
+          {activeTab === 'recent' ? renderRecentTab() : null}
+          {activeTab === 'trends' ? renderTrendsTab() : null}
+          {activeTab === 'history' ? renderHistoryTab() : null}
+          {activeTab === 'upcoming' ? renderUpcomingTab() : null}
+          {activeTab === 'reports' ? renderReportsTab() : null}
+        </div>
+      </div>
+    </>
+  );
+};

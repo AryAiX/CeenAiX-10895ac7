@@ -30,6 +30,35 @@ interface MessagesWorkspaceProps {
   role: 'patient' | 'doctor';
 }
 
+const AVATAR_GRADIENTS: readonly string[] = [
+  'from-slate-800 to-teal-700',
+  'from-emerald-700 to-teal-600',
+  'from-blue-700 to-indigo-600',
+  'from-rose-600 to-pink-600',
+  'from-amber-600 to-orange-500',
+  'from-violet-700 to-fuchsia-600',
+  'from-cyan-700 to-sky-600',
+  'from-slate-700 to-slate-500',
+];
+
+function avatarInitials(name: string): string {
+  const trimmed = name.trim();
+  if (!trimmed) return '•';
+  const parts = trimmed.split(/\s+/);
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function avatarGradient(key: string): string {
+  let hash = 0;
+  for (let i = 0; i < key.length; i += 1) {
+    hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+  }
+  return AVATAR_GRADIENTS[hash % AVATAR_GRADIENTS.length];
+}
+
 export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
   const navigate = useNavigate();
   const { conversationId } = useParams<{ conversationId?: string }>();
@@ -586,29 +615,40 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
                       isActive ? theme.selected : 'border-gray-100'
                     }`}
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="truncate font-semibold text-gray-900">{conversation.counterpart.name}</p>
-                        <p className="truncate text-xs text-gray-500">
-                          {conversation.counterpart.email ?? t(`${namespace}.noEmail`)}
-                        </p>
+                    <div className="flex items-start gap-3">
+                      <div
+                        className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-sm font-bold text-white shadow-sm ${avatarGradient(
+                          conversation.counterpart.id ?? conversation.counterpart.name
+                        )}`}
+                      >
+                        {avatarInitials(conversation.counterpart.name)}
                       </div>
-                      {conversation.unreadCount > 0 ? (
-                        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${theme.badge}`}>
-                          {t(`${namespace}.unreadCount`, { count: conversation.unreadCount })}
-                        </span>
-                      ) : null}
-                    </div>
-                    <p className="mt-3 line-clamp-2 text-sm text-gray-600">
-                      {conversation.lastMessagePreview ?? t(`${namespace}.emptyPreview`)}
-                    </p>
-                    <div className="mt-3 flex items-center justify-between gap-3 text-xs text-gray-500">
-                      <span className="truncate">{conversation.subject ?? t(`${namespace}.defaultSubject`)}</span>
-                      <span className="shrink-0">
-                        {conversation.lastMessageAt
-                          ? formatRelativeTime(t, conversation.lastMessageAt)
-                          : t(`${namespace}.newConversation`)}
-                      </span>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="truncate font-semibold text-gray-900">{conversation.counterpart.name}</p>
+                            <p className="truncate text-xs text-gray-500">
+                              {conversation.counterpart.email ?? t(`${namespace}.noEmail`)}
+                            </p>
+                          </div>
+                          {conversation.unreadCount > 0 ? (
+                            <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${theme.badge}`}>
+                              {t(`${namespace}.unreadCount`, { count: conversation.unreadCount })}
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="mt-2 line-clamp-2 text-sm text-gray-600">
+                          {conversation.lastMessagePreview ?? t(`${namespace}.emptyPreview`)}
+                        </p>
+                        <div className="mt-2 flex items-center justify-between gap-3 text-xs text-gray-500">
+                          <span className="truncate">{conversation.subject ?? t(`${namespace}.defaultSubject`)}</span>
+                          <span className="shrink-0">
+                            {conversation.lastMessageAt
+                              ? formatRelativeTime(t, conversation.lastMessageAt)
+                              : t(`${namespace}.newConversation`)}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </button>
                 );
@@ -638,8 +678,15 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
         {activeConversation ? (
           <>
             <div className="border-b border-gray-100 px-5 py-4">
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
+              <div className="flex items-start gap-4">
+                <div
+                  className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-base font-bold text-white shadow-sm ${avatarGradient(
+                    activeConversation.counterpart.id ?? activeConversation.counterpart.name
+                  )}`}
+                >
+                  {avatarInitials(activeConversation.counterpart.name)}
+                </div>
+                <div className="min-w-0 flex-1">
                   <p className="text-lg font-bold text-gray-900">{activeConversation.counterpart.name}</p>
                   <p className="truncate text-sm text-gray-500">
                     {activeConversation.counterpart.email ?? t(`${namespace}.noEmail`)}

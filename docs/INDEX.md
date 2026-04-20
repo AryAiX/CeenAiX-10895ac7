@@ -13,6 +13,7 @@ Start here when developing. These are condensed, action-oriented summaries.
 | [tech-stack.md](agent/tech-stack.md) | Technology choices, file structure, coding conventions |
 | [ai-reference.md](agent/ai-reference.md) | AI features, Edge Function patterns, model usage |
 | [bolt-code-audit.md](agent/bolt-code-audit.md) | Bolt prototype conflicts, table mapping, migration guide |
+| [ui-parity-plan.md](agent/ui-parity-plan.md) | UI parity pass (UX-4-6-3): ground rules, tiers, execution order, screenshot workflow |
 
 ## Detailed Specifications (`docs/specs/`)
 

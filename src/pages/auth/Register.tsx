@@ -233,7 +233,7 @@ export const Register = () => {
           <span>{t('auth.register.haveAccount')}</span>
           <Link
             to={`/auth/login?role=${selectedRole}`}
-            className="font-semibold text-teal-600 transition-colors hover:text-teal-700"
+            className="font-semibold text-cyan-600 transition-colors hover:text-cyan-700"
           >
             {t('auth.register.signInInstead')}
           </Link>
@@ -250,7 +250,7 @@ export const Register = () => {
               key={stepTitle}
               className={`rounded-3xl border px-4 py-4 transition ${
                 completed || active
-                  ? 'border-teal-200 bg-teal-50 shadow-sm'
+                  ? 'border-cyan-500 bg-cyan-50 shadow-sm shadow-cyan-500/20'
                   : 'border-slate-200 bg-white'
               }`}
             >
@@ -258,7 +258,7 @@ export const Register = () => {
                 <div
                   className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
                     completed || active
-                      ? 'bg-teal-600 text-white'
+                      ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-sm shadow-cyan-500/30'
                       : 'bg-slate-100 text-slate-500'
                   }`}
                 >
@@ -284,13 +284,13 @@ export const Register = () => {
       ) : null}
 
       {(successMessage || duplicateEmailConflict) && mode === 'email-password' ? (
-        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-700">
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm text-cyan-700">
           <span>{t('auth.register.resendPrompt')}</span>
           <button
             type="button"
             onClick={() => void handleResendConfirmation()}
             disabled={isSubmitting || isResendingConfirmation || !normalizedEmail}
-            className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-teal-600 shadow-sm transition hover:shadow disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-cyan-600 shadow-sm transition hover:shadow disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isResendingConfirmation ? t('auth.register.resending') : t('auth.register.resendButton')}
           </button>
@@ -304,7 +304,7 @@ export const Register = () => {
       ) : null}
 
       {isResettingSession ? (
-        <div className="rounded-2xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-700">
+        <div className="rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm text-cyan-700">
           {t('auth.register.resettingSession')}
         </div>
       ) : null}
@@ -320,12 +320,12 @@ export const Register = () => {
               }}
               className={`rounded-[1.75rem] border p-5 text-left transition ${
                 mode === 'email-password'
-                  ? 'border-teal-200 bg-teal-50 shadow-sm'
-                  : 'border-gray-200 bg-white hover:border-teal-200 hover:bg-slate-50'
+                  ? 'border-cyan-500 bg-cyan-50 shadow-sm shadow-cyan-500/20'
+                  : 'border-gray-200 bg-white hover:border-slate-300 hover:bg-slate-50'
               }`}
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
-                <ShieldCheck className="h-6 w-6 text-teal-600" />
+                <ShieldCheck className="h-6 w-6 text-cyan-600" />
               </div>
               <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.modeEmailTitle')}</h3>
               <p className="mt-2 text-sm leading-relaxed text-gray-600">
@@ -341,12 +341,12 @@ export const Register = () => {
               }}
               className={`rounded-[1.75rem] border p-5 text-left transition ${
                 mode === 'phone-otp'
-                  ? 'border-teal-200 bg-teal-50 shadow-sm'
-                  : 'border-gray-200 bg-white hover:border-teal-200 hover:bg-slate-50'
+                  ? 'border-cyan-500 bg-cyan-50 shadow-sm shadow-cyan-500/20'
+                  : 'border-gray-200 bg-white hover:border-slate-300 hover:bg-slate-50'
               }`}
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
-                <UserRound className="h-6 w-6 text-teal-600" />
+                <UserRound className="h-6 w-6 text-cyan-600" />
               </div>
               <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.modePhoneTitle')}</h3>
               <p className="mt-2 text-sm leading-relaxed text-gray-600">
@@ -365,19 +365,19 @@ export const Register = () => {
               </div>
               <Link
                 to="/auth/portal-access?intent=register"
-                className="text-sm font-semibold text-teal-600 transition-colors hover:text-teal-700"
+                className="text-sm font-semibold text-cyan-600 transition-colors hover:text-cyan-700"
               >
                 {t('auth.register.changeRole')}
               </Link>
             </div>
 
             {safeRequestedRole ? (
-              <div className="flex items-center gap-3 rounded-xl border border-teal-200 bg-teal-50 p-4">
+              <div className="flex items-center gap-3 rounded-xl border border-cyan-200 bg-cyan-50 p-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white">
                   {selectedRole === 'doctor' ? (
-                    <Stethoscope className="h-5 w-5 text-teal-600" />
+                    <Stethoscope className="h-5 w-5 text-cyan-600" />
                   ) : (
-                    <UserRound className="h-5 w-5 text-teal-600" />
+                    <UserRound className="h-5 w-5 text-cyan-600" />
                   )}
                 </div>
                 <div className="min-w-0">
@@ -392,12 +392,12 @@ export const Register = () => {
                   onClick={() => setSelectedRole('patient')}
                   className={`rounded-[1.75rem] border p-5 text-left transition ${
                     selectedRole === 'patient'
-                      ? 'border-teal-200 bg-teal-50 shadow-sm'
-                      : 'border-gray-200 bg-white hover:border-teal-200 hover:bg-white'
+                      ? 'border-cyan-500 bg-cyan-50 shadow-sm shadow-cyan-500/20'
+                      : 'border-gray-200 bg-white hover:border-slate-300 hover:bg-white'
                   }`}
                 >
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
-                    <UserRound className="h-6 w-6 text-teal-600" />
+                    <UserRound className="h-6 w-6 text-cyan-600" />
                   </div>
                   <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.rolePatientTitle')}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-gray-600">
@@ -410,12 +410,12 @@ export const Register = () => {
                   onClick={() => setSelectedRole('doctor')}
                   className={`rounded-[1.75rem] border p-5 text-left transition ${
                     selectedRole === 'doctor'
-                      ? 'border-teal-200 bg-teal-50 shadow-sm'
-                      : 'border-gray-200 bg-white hover:border-teal-200 hover:bg-white'
+                      ? 'border-cyan-500 bg-cyan-50 shadow-sm shadow-cyan-500/20'
+                      : 'border-gray-200 bg-white hover:border-slate-300 hover:bg-white'
                   }`}
                 >
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
-                    <Stethoscope className="h-6 w-6 text-teal-600" />
+                    <Stethoscope className="h-6 w-6 text-cyan-600" />
                   </div>
                   <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.roleDoctorTitle')}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-gray-600">
@@ -433,7 +433,7 @@ export const Register = () => {
                   type="text"
                   value={fullName}
                   onChange={(event) => setFullName(event.target.value)}
-                  className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
+                  className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
                   placeholder={t('auth.register.fullNamePlaceholder')}
                   autoComplete="name"
                   required
@@ -455,7 +455,7 @@ export const Register = () => {
                       type="email"
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
-                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
+                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
                       placeholder={t('auth.register.emailPlaceholder')}
                       autoComplete="email"
                       required
@@ -471,7 +471,7 @@ export const Register = () => {
                       type="tel"
                       value={phone}
                       onChange={(event) => setPhone(event.target.value)}
-                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
+                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
                       placeholder={t('auth.register.mobilePlaceholder')}
                       autoComplete="tel"
                     />
@@ -486,7 +486,7 @@ export const Register = () => {
                       type="password"
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
-                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
+                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
                       placeholder={t('auth.register.passwordPlaceholder')}
                       autoComplete="new-password"
                       required
@@ -502,7 +502,7 @@ export const Register = () => {
                       type="password"
                       value={confirmPassword}
                       onChange={(event) => setConfirmPassword(event.target.value)}
-                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
+                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
                       placeholder={t('auth.register.confirmPasswordPlaceholder')}
                       autoComplete="new-password"
                       required
@@ -520,7 +520,7 @@ export const Register = () => {
                       type="tel"
                       value={phone}
                       onChange={(event) => setPhone(event.target.value)}
-                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
+                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
                       placeholder={t('auth.register.mobilePlaceholder')}
                       autoComplete="tel"
                       required
@@ -539,7 +539,7 @@ export const Register = () => {
                 type="checkbox"
                 checked={termsAccepted}
                 onChange={(event) => setTermsAccepted(event.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm leading-relaxed text-gray-600">
                 {t('auth.register.termsLabel')}
@@ -553,7 +553,7 @@ export const Register = () => {
             type="button"
             onClick={previousStep}
             disabled={step === 0 || isSubmitting || isResettingSession}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 px-5 py-3 font-semibold text-gray-700 transition hover:border-teal-500 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 px-5 py-3 font-semibold text-gray-700 transition hover:border-cyan-500 hover:text-cyan-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>{t('auth.register.btnBack')}</span>
@@ -562,7 +562,7 @@ export const Register = () => {
           <button
             type="submit"
             disabled={isSubmitting || isResettingSession}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-teal-600 px-5 py-3 font-semibold text-white shadow-lg transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-3 font-semibold text-white shadow-lg shadow-cyan-500/20 transition hover:shadow-xl hover:shadow-cyan-500/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
           >
             <span>
               {step < 2

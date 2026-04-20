@@ -2,8 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, CalendarDays, ChevronLeft, ChevronRight, ClipboardList, Clock, List, MapPin, User, Video } from 'lucide-react';
-import { Navigation } from '../../components/Navigation';
-import { PageHeader } from '../../components/PageHeader';
 import { Skeleton } from '../../components/Skeleton';
 import { useAppointments, useQuery } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
@@ -205,27 +203,24 @@ export const DoctorAppointments: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
-      <Navigation role="doctor" />
-      <PageHeader
-        title={t('doctor.appointments.title')}
-        subtitle={t('doctor.appointments.subtitle')}
-        icon={<Calendar className="w-6 h-6 text-white" />}
-        backTo="/doctor/dashboard"
-      />
+    <>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">{t('doctor.appointments.title')}</h1>
+        <p className="mt-1 text-sm text-slate-500">{t('doctor.appointments.subtitle')}</p>
+      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">{t('doctor.appointments.sectionTitle')}</h2>
-          <p className="text-gray-600">{t('doctor.appointments.sectionSub')}</p>
+      <div>
+        <div className="mb-4">
+          <h2 className="text-base font-semibold text-slate-900">{t('doctor.appointments.sectionTitle')}</h2>
+          <p className="text-xs text-slate-500">{t('doctor.appointments.sectionSub')}</p>
         </div>
 
         {feedback ? (
           <div
-            className={`mb-6 rounded-2xl border px-4 py-3 text-sm ${
+            className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
               feedback.type === 'success'
-                ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-                : 'border-red-200 bg-red-50 text-red-700'
+                ? 'border-emerald-100 bg-emerald-50 text-emerald-700'
+                : 'border-red-100 bg-red-50 text-red-600'
             }`}
           >
             {feedback.message}
@@ -238,14 +233,14 @@ export const DoctorAppointments: React.FC = () => {
             <Skeleton className="h-44 w-full rounded-2xl" />
           </div>
         ) : error ? (
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <div className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-700">
             {t('doctor.appointments.loadError')}
           </div>
         ) : appointments.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center shadow-sm">
-            <Calendar className="mx-auto mb-4 h-10 w-10 text-gray-400" />
-            <h3 className="text-xl font-bold text-gray-900">{t('doctor.appointments.emptyTitle')}</h3>
-            <p className="mt-2 text-sm text-gray-600">{t('doctor.appointments.emptyBody')}</p>
+          <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center shadow-sm">
+            <Calendar className="mx-auto mb-4 h-10 w-10 text-slate-300" />
+            <h3 className="text-lg font-semibold text-slate-900">{t('doctor.appointments.emptyTitle')}</h3>
+            <p className="mt-2 text-sm text-slate-500">{t('doctor.appointments.emptyBody')}</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -666,6 +661,6 @@ export const DoctorAppointments: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 };

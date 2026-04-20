@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Marketing / portal chrome fonts — sourced from Bolt reference index.html + index.css.
+ * Plus Jakarta Sans is the body default; Playfair Display is the serif accent used in
+ * headlines; DM Sans / DM Mono are used in numeric KPI blocks in the portals.
+ * The stylesheets themselves are loaded from index.html.
+ */
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
+}
+
+.font-playfair {
+  font-family: 'Playfair Display', serif;
+}
+
 html[lang='ar'] body {
   font-family:
     system-ui,
@@ -121,6 +135,143 @@ html[lang='ar'] body {
 
 .animate-bounce-slow {
   animation: bounce-slow 2s ease-in-out infinite;
+}
+
+/* =========================================================================
+ * Bolt reference animations (from .reference/CeenAiX-final-main-today/
+ * CeenAiX-final-main/src/index.css).
+ *
+ * Copied verbatim so the public landing page + portal chrome animate with
+ * byte-identical timing/easing/shadows. The one edit vs Bolt:
+ *   `@keyframes float` / `.animate-float` are already defined above for
+ *   GeometricBackground's orbs (6s multi-axis drift), so Bolt's simpler
+ *   3s vertical version is re-exported under the `-bolt` suffix.
+ * ========================================================================= */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes criticalPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(220, 38, 38, 0);
+  }
+}
+
+@keyframes workspacePulse {
+  0%, 100% {
+    box-shadow: 0 8px 32px rgba(10, 22, 40, 0.3);
+  }
+  50% {
+    box-shadow: 0 8px 32px rgba(13, 148, 136, 0.4);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes float-bolt {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(20, 184, 166, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(20, 184, 166, 0.6);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-criticalPulse {
+  animation: criticalPulse 2s ease-in-out infinite;
+}
+
+.animate-workspacePulse {
+  animation: workspacePulse 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+}
+
+.animate-float-bolt {
+  animation: float-bolt 3s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Shared card-hover utility — lifted from the Bolt reference so any page
+ * (Home landing + other public pages) can pair a card with the same easing
+ * and shadow treatment without redeclaring it locally. Bezier + shadow
+ * values are byte-identical with .reference/.../index.css + LandingPage.tsx. */
+.card-hover {
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.35s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 30px 60px -12px rgba(6, 182, 212, 0.2);
 }
 
 @layer utilities {

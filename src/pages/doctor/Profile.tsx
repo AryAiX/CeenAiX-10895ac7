@@ -19,9 +19,7 @@ import {
   Trash2,
   Upload,
 } from 'lucide-react';
-import { Navigation } from '../../components/Navigation';
 import { AccountSecurityPanel } from '../../components/AccountSecurityPanel';
-import { PageHeader } from '../../components/PageHeader';
 import { SpecializationMultiSelect } from '../../components/SpecializationMultiSelect';
 import { useDoctorPreVisitTemplates, useDoctorSpecializationIds, useSpecializations } from '../../hooks';
 import { dateTimeFormatWithNumerals, resolveLocale } from '../../lib/i18n-ui';
@@ -584,38 +582,32 @@ export const DoctorProfile: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
-        <Navigation role="doctor" />
-        <div className="flex items-center justify-center py-20">
-          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-teal-600" />
-        </div>
+      <div className="flex items-center justify-center py-20">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-teal-600" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100/90">
-      <Navigation role="doctor" />
-      <PageHeader
-        title="Doctor Profile"
-        subtitle="Review and update the profile information patients will rely on."
-        icon={<User className="w-6 h-6 text-white" />}
-        backTo="/doctor/dashboard"
-        actions={
-          !isEditing ? (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2 rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-teal-700"
-            >
-              <Edit2 className="w-4 h-4" />
-              Edit profile
-            </button>
-          ) : null
-        }
-      />
+    <>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Doctor Profile</h1>
+          <p className="mt-1 text-sm text-slate-500">Review and update the profile information patients will rely on.</p>
+        </div>
+        {!isEditing ? (
+          <button
+            onClick={() => setIsEditing(true)}
+            className="flex items-center gap-2 rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-700"
+          >
+            <Edit2 className="w-4 h-4" />
+            Edit profile
+          </button>
+        ) : null}
+      </div>
 
-      <div className="py-8">
-        <div className="mx-auto max-w-4xl space-y-8 px-4">
+      <div>
+        <div className="mx-auto w-full max-w-4xl space-y-6">
           <div className="overflow-hidden rounded-3xl bg-white shadow-md">
             <div className="bg-gradient-to-r from-slate-900 to-emerald-800 px-8 py-12">
               <div className="flex items-center space-x-6">
@@ -1258,6 +1250,6 @@ export const DoctorProfile: React.FC = () => {
           <AccountSecurityPanel tone="doctor" />
         </div>
       </div>
-    </div>
+    </>
   );
 };

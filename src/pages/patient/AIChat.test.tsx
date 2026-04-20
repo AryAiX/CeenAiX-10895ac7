@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { usePatientPreVisitAssessments } from '../../hooks';
+import { usePatientDashboard, usePatientPreVisitAssessments } from '../../hooks';
 import { usePatientAiChat } from '../../hooks/use-patient-ai-chat';
 import { useQuery } from '../../hooks/use-query';
 import { invokeAiChat, uploadAiChatAttachment } from '../../lib/ai';
@@ -31,6 +31,7 @@ vi.mock('../../hooks/use-query', () => ({
 
 vi.mock('../../hooks', () => ({
   usePatientPreVisitAssessments: vi.fn(),
+  usePatientDashboard: vi.fn(),
 }));
 
 vi.mock('react-router-dom', () => ({
@@ -62,6 +63,7 @@ vi.mock('../../lib/canonical-record-updates', () => ({
 describe('PatientAIChat', () => {
   const usePatientAiChatMock = vi.mocked(usePatientAiChat);
   const usePatientPreVisitAssessmentsMock = vi.mocked(usePatientPreVisitAssessments);
+  const usePatientDashboardMock = vi.mocked(usePatientDashboard);
   const invokeAiChatMock = vi.mocked(invokeAiChat);
   const uploadAiChatAttachmentMock = vi.mocked(uploadAiChatAttachment);
   const useAuthMock = vi.mocked(useAuth);
@@ -70,10 +72,17 @@ describe('PatientAIChat', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useAuthMock.mockReturnValue({
-      user: { id: 'patient-1' },
+      user: { id: 'patient-1', email: 'parnia@example.com' },
+      profile: { first_name: 'Parnia', full_name: 'Parnia Karimi' },
     } as never);
     usePatientPreVisitAssessmentsMock.mockReturnValue({
       data: [],
+      loading: false,
+      error: null,
+      refetch: vi.fn(),
+    } as never);
+    usePatientDashboardMock.mockReturnValue({
+      data: null,
       loading: false,
       error: null,
       refetch: vi.fn(),
@@ -128,12 +137,13 @@ describe('PatientAIChat', () => {
 
     render(<PatientAIChat />);
 
-    expect(screen.getByText('AI Health Chat')).toBeInTheDocument();
-    expect(screen.getByText('Chats')).toBeInTheDocument();
-    expect(screen.getByText('New conversation')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Attach' })).toBeInTheDocument();
-    expect(screen.getByText('How can I help today?')).toBeInTheDocument();
-    expect(screen.getByText('Your blood pressure history shows repeated follow-up visits.')).toBeInTheDocument();
+    expect(screen.getAllByText('CeenAiX AI').length).toBeGreaterThan(0);
+    expect(screen.getByText('Your Personal Health Assistant')).toBeInTheDocument();
+    expect(screen.getByText(/Hi Parnia!/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Attach file' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Explain my medications/i })
+    ).toBeInTheDocument();
   });
 
   it('sends a new question and appends the assistant reply', async () => {
@@ -211,7 +221,7 @@ describe('PatientAIChat', () => {
     render(<PatientAIChat />);
 
     const user = userEvent.setup();
-    expect(screen.getByRole('button', { name: 'I have pain' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Review my health history/i })).toBeInTheDocument();
     await user.type(screen.getByPlaceholderText(/Ask a question or add context/i), 'Summarize my history');
     await user.click(screen.getByRole('button', { name: 'Send' }));
 
@@ -226,7 +236,6 @@ describe('PatientAIChat', () => {
     });
 
     expect(screen.getByText('Summarize my history')).toBeInTheDocument();
-    expect(screen.getByText('YOU')).toBeInTheDocument();
 
     await waitFor(() => {
       expect(
@@ -306,8 +315,6 @@ describe('PatientAIChat', () => {
     } as never);
 
     render(<PatientAIChat />);
-
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Open chat from Mar 21' }));
 
     expect(screen.getByText('Review updates from this chat')).toBeInTheDocument();
     expect(screen.getByText('Address')).toBeInTheDocument();
