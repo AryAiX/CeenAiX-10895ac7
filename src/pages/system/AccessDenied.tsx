@@ -16,7 +16,7 @@ export const AccessDenied = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-ceenai-cyan/5 relative overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-ceenai-cyan/5">
       <GeometricBackground />
 
       <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
@@ -29,8 +29,8 @@ export const AccessDenied = () => {
             <p className="inline-flex items-center rounded-full bg-ceenai-cyan/10 px-4 py-2 text-sm font-semibold text-ceenai-blue">
               {t('system.accessDenied.badge')}
             </p>
-            <h1 className="text-3xl font-bold text-gray-900">{t('system.accessDenied.title')}</h1>
-            <p className="mx-auto max-w-xl text-base leading-relaxed text-gray-600">
+            <h1 className="text-3xl font-bold text-slate-900">{t('system.accessDenied.title')}</h1>
+            <p className="mx-auto max-w-xl text-base leading-relaxed text-slate-600">
               {t('system.accessDenied.body')}
             </p>
           </div>
@@ -38,7 +38,7 @@ export const AccessDenied = () => {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Link
               to="/"
-              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 px-5 py-3 font-semibold text-gray-700 transition hover:border-ceenai-cyan hover:text-ceenai-blue"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 px-5 py-3 font-semibold text-slate-700 transition hover:border-ceenai-cyan hover:text-ceenai-blue"
             >
               <span>{t('system.accessDenied.home')}</span>
             </Link>

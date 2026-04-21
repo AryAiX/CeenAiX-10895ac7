@@ -321,14 +321,14 @@ export const Register = () => {
               className={`rounded-[1.75rem] border p-5 text-left transition ${
                 mode === 'email-password'
                   ? 'border-cyan-500 bg-cyan-50 shadow-sm shadow-cyan-500/20'
-                  : 'border-gray-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                  : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
               }`}
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
                 <ShieldCheck className="h-6 w-6 text-cyan-600" />
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.modeEmailTitle')}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-gray-600">
+              <h3 className="mt-4 text-lg font-semibold text-slate-900">{t('auth.register.modeEmailTitle')}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">
                 {t('auth.register.modeEmailDesc')}
               </p>
             </button>
@@ -342,14 +342,14 @@ export const Register = () => {
               className={`rounded-[1.75rem] border p-5 text-left transition ${
                 mode === 'phone-otp'
                   ? 'border-cyan-500 bg-cyan-50 shadow-sm shadow-cyan-500/20'
-                  : 'border-gray-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                  : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
               }`}
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
                 <UserRound className="h-6 w-6 text-cyan-600" />
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.modePhoneTitle')}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-gray-600">
+              <h3 className="mt-4 text-lg font-semibold text-slate-900">{t('auth.register.modePhoneTitle')}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">
                 {t('auth.register.modePhoneDesc')}
               </p>
             </button>
@@ -393,14 +393,14 @@ export const Register = () => {
                   className={`rounded-[1.75rem] border p-5 text-left transition ${
                     selectedRole === 'patient'
                       ? 'border-cyan-500 bg-cyan-50 shadow-sm shadow-cyan-500/20'
-                      : 'border-gray-200 bg-white hover:border-slate-300 hover:bg-white'
+                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-white'
                   }`}
                 >
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
                     <UserRound className="h-6 w-6 text-cyan-600" />
                   </div>
-                  <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.rolePatientTitle')}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                  <h3 className="mt-4 text-lg font-semibold text-slate-900">{t('auth.register.rolePatientTitle')}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
                     {t('auth.register.rolePatientDesc')}
                   </p>
                 </button>
@@ -411,14 +411,14 @@ export const Register = () => {
                   className={`rounded-[1.75rem] border p-5 text-left transition ${
                     selectedRole === 'doctor'
                       ? 'border-cyan-500 bg-cyan-50 shadow-sm shadow-cyan-500/20'
-                      : 'border-gray-200 bg-white hover:border-slate-300 hover:bg-white'
+                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-white'
                   }`}
                 >
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
                     <Stethoscope className="h-6 w-6 text-cyan-600" />
                   </div>
-                  <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.roleDoctorTitle')}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                  <h3 className="mt-4 text-lg font-semibold text-slate-900">{t('auth.register.roleDoctorTitle')}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
                     {t('auth.register.roleDoctorDesc')}
                   </p>
                 </button>
@@ -433,7 +433,7 @@ export const Register = () => {
                   type="text"
                   value={fullName}
                   onChange={(event) => setFullName(event.target.value)}
-                  className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
+                  className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
                   placeholder={t('auth.register.fullNamePlaceholder')}
                   autoComplete="name"
                   required
@@ -455,7 +455,7 @@ export const Register = () => {
                       type="email"
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
-                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
+                      className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
                       placeholder={t('auth.register.emailPlaceholder')}
                       autoComplete="email"
                       required
@@ -471,7 +471,7 @@ export const Register = () => {
                       type="tel"
                       value={phone}
                       onChange={(event) => setPhone(event.target.value)}
-                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
+                      className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
                       placeholder={t('auth.register.mobilePlaceholder')}
                       autoComplete="tel"
                     />
@@ -486,7 +486,7 @@ export const Register = () => {
                       type="password"
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
-                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
+                      className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
                       placeholder={t('auth.register.passwordPlaceholder')}
                       autoComplete="new-password"
                       required
@@ -502,7 +502,7 @@ export const Register = () => {
                       type="password"
                       value={confirmPassword}
                       onChange={(event) => setConfirmPassword(event.target.value)}
-                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
+                      className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
                       placeholder={t('auth.register.confirmPasswordPlaceholder')}
                       autoComplete="new-password"
                       required
@@ -520,7 +520,7 @@ export const Register = () => {
                       type="tel"
                       value={phone}
                       onChange={(event) => setPhone(event.target.value)}
-                      className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
+                      className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
                       placeholder={t('auth.register.mobilePlaceholder')}
                       autoComplete="tel"
                       required
@@ -528,20 +528,20 @@ export const Register = () => {
                   </div>
                 </div>
 
-                <div className="rounded-2xl bg-gray-50 px-4 py-3 text-sm text-gray-600">
+                <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
                   {t('auth.register.otpNextHint')}
                 </div>
               </>
             )}
 
-            <label className="flex items-start gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4">
+            <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
               <input
                 type="checkbox"
                 checked={termsAccepted}
                 onChange={(event) => setTermsAccepted(event.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                className="mt-1 h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500"
               />
-              <span className="text-sm leading-relaxed text-gray-600">
+              <span className="text-sm leading-relaxed text-slate-600">
                 {t('auth.register.termsLabel')}
               </span>
             </label>
@@ -553,7 +553,7 @@ export const Register = () => {
             type="button"
             onClick={previousStep}
             disabled={step === 0 || isSubmitting || isResettingSession}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 px-5 py-3 font-semibold text-gray-700 transition hover:border-cyan-500 hover:text-cyan-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 px-5 py-3 font-semibold text-slate-700 transition hover:border-cyan-500 hover:text-cyan-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>{t('auth.register.btnBack')}</span>

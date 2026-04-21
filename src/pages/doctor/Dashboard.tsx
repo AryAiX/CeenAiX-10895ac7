@@ -295,8 +295,8 @@ export const DoctorDashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-[#0A1628] to-teal-600 rounded-[20px] p-7 mb-6 shadow-2xl relative overflow-hidden text-white">
-        <div className="absolute inset-0 bg-teal-500/10 animate-pulse-slow" />
+      <div className="bg-gradient-to-br from-[#0A1628] to-ceenai-blue rounded-[20px] p-7 mb-6 shadow-2xl relative overflow-hidden text-white">
+        <div className="absolute inset-0 bg-ceenai-cyan/10 animate-pulse-slow" />
         <div className="relative z-10">
         {loading ? (
           <Skeleton className="h-40 w-full rounded-2xl bg-white/10" />
@@ -400,7 +400,7 @@ export const DoctorDashboard: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigate('/doctor/appointments')}
-                className="text-sm font-semibold text-teal-700 transition hover:text-teal-800"
+                className="text-sm font-semibold text-ceenai-blue transition hover:text-ceenai-navy"
               >
                 {localCopy.viewFullSchedule}
               </button>
@@ -453,10 +453,10 @@ export const DoctorDashboard: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-                <Users className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                <p className="font-semibold text-gray-900">{localCopy.todaySchedule}</p>
-                <p className="mt-2 text-sm text-gray-600">{localCopy.noTodaySchedule}</p>
+              <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+                <Users className="mx-auto mb-3 h-8 w-8 text-slate-400" />
+                <p className="font-semibold text-slate-900">{localCopy.todaySchedule}</p>
+                <p className="mt-2 text-sm text-slate-600">{localCopy.noTodaySchedule}</p>
               </div>
             )}
           </div>
@@ -474,7 +474,7 @@ export const DoctorDashboard: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigate('/doctor/lab-orders')}
-                className="text-xs font-semibold text-teal-700 transition hover:text-teal-800"
+                className="text-xs font-semibold text-ceenai-blue transition hover:text-ceenai-navy"
               >
                 {localCopy.viewAllLabs}
               </button>
@@ -526,7 +526,7 @@ export const DoctorDashboard: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigate('/doctor/messages')}
-                className="text-xs font-semibold text-teal-700 transition hover:text-teal-800"
+                className="text-xs font-semibold text-ceenai-blue transition hover:text-ceenai-navy"
               >
                 {localCopy.viewAllMessages}
               </button>
