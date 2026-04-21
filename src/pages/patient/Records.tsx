@@ -513,26 +513,26 @@ export const PatientRecords: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-8">
+        <div className="mb-8 rounded-2xl border border-slate-200 bg-white/95 p-6 shadow-sm backdrop-blur-sm">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 placeholder={t('patient.records.searchPh')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                className="w-full rounded-xl border-2 border-slate-200 bg-slate-50/70 py-3 pl-12 pr-4 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:bg-white focus:ring-2 focus:ring-ceenai-cyan/20"
               />
             </div>
 
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
               <div className="relative">
-                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Filter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
                 <select
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value as RecordCategoryFilter)}
-                  className="pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent font-medium appearance-none bg-white cursor-pointer"
+                  className="cursor-pointer appearance-none rounded-xl border-2 border-slate-200 bg-slate-50/70 py-3 pl-10 pr-4 font-medium text-slate-700 outline-none transition focus:border-ceenai-cyan focus:bg-white focus:ring-2 focus:ring-ceenai-cyan/20"
                 >
                   <option value="all">{t('patient.records.filterAllRecords')}</option>
                   <option value="condition">{t('patient.records.filterCondition')}</option>
@@ -544,7 +544,7 @@ export const PatientRecords: React.FC = () => {
               <select
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest' | 'alphabetical')}
-                className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent font-medium appearance-none bg-white cursor-pointer"
+                className="cursor-pointer appearance-none rounded-xl border-2 border-slate-200 bg-slate-50/70 px-4 py-3 font-medium text-slate-700 outline-none transition focus:border-ceenai-cyan focus:bg-white focus:ring-2 focus:ring-ceenai-cyan/20"
               >
                 <option value="newest">{t('patient.records.sortNewest')}</option>
                 <option value="oldest">{t('patient.records.sortOldest')}</option>
@@ -554,7 +554,7 @@ export const PatientRecords: React.FC = () => {
           </div>
 
           <div className="mt-4 flex items-center justify-between">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-slate-600">
               {t('patient.records.showing', { shown: sortedRecords.length, total: totalRecords })}
             </p>
             <div className="flex flex-wrap gap-2">
@@ -605,16 +605,16 @@ export const PatientRecords: React.FC = () => {
         ) : null}
 
         {activeForm === 'condition' ? (
-          <form onSubmit={handleCreateCondition} className="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <form onSubmit={handleCreateCondition} className="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">{t('patient.records.addCondition')}</h2>
-                <p className="mt-1 text-sm text-gray-600">{t('patient.records.addConditionSub')}</p>
+                <h2 className="text-xl font-bold text-slate-900">{t('patient.records.addCondition')}</h2>
+                <p className="mt-1 text-sm text-slate-600">{t('patient.records.addConditionSub')}</p>
               </div>
               <button
                 type="button"
                 onClick={resetForms}
-                className="rounded-xl border border-gray-200 p-2 text-gray-500 transition hover:bg-gray-50 hover:text-gray-700"
+                className="rounded-xl border border-slate-200 p-2 text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
                 aria-label={t('patient.records.closeForm')}
               >
                 <X className="h-4 w-4" />
@@ -622,7 +622,7 @@ export const PatientRecords: React.FC = () => {
             </div>
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">{t('patient.records.conditionName')}</span>
+                <span className="text-sm font-semibold text-slate-700">{t('patient.records.conditionName')}</span>
                 <input
                   required
                   type="text"
@@ -630,33 +630,33 @@ export const PatientRecords: React.FC = () => {
                   onChange={(event) =>
                     setConditionForm((current) => ({ ...current, conditionName: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
                 />
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">{t('patient.records.icdCode')}</span>
+                <span className="text-sm font-semibold text-slate-700">{t('patient.records.icdCode')}</span>
                 <input
                   type="text"
                   value={conditionForm.icdCode}
                   onChange={(event) =>
                     setConditionForm((current) => ({ ...current, icdCode: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
                 />
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">{t('patient.records.diagnosedDate')}</span>
+                <span className="text-sm font-semibold text-slate-700">{t('patient.records.diagnosedDate')}</span>
                 <input
                   type="date"
                   value={conditionForm.diagnosedDate}
                   onChange={(event) =>
                     setConditionForm((current) => ({ ...current, diagnosedDate: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
                 />
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">{t('patient.records.status')}</span>
+                <span className="text-sm font-semibold text-slate-700">{t('patient.records.status')}</span>
                 <select
                   value={conditionForm.status}
                   onChange={(event) =>
@@ -665,7 +665,7 @@ export const PatientRecords: React.FC = () => {
                       status: event.target.value as ConditionStatus,
                     }))
                   }
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
                 >
                   <option value="active">{t('patient.records.statusActive')}</option>
                   <option value="chronic">{t('patient.records.statusChronic')}</option>
@@ -673,14 +673,14 @@ export const PatientRecords: React.FC = () => {
                 </select>
               </label>
               <label className="block space-y-2 md:col-span-2">
-                <span className="text-sm font-semibold text-gray-700">{t('patient.records.notes')}</span>
+                <span className="text-sm font-semibold text-slate-700">{t('patient.records.notes')}</span>
                 <textarea
                   rows={4}
                   value={conditionForm.notes}
                   onChange={(event) =>
                     setConditionForm((current) => ({ ...current, notes: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
                 />
               </label>
             </div>
@@ -696,7 +696,7 @@ export const PatientRecords: React.FC = () => {
               <button
                 type="button"
                 onClick={resetForms}
-                className="rounded-xl border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
               >
                 {t('patient.records.cancel')}
               </button>
@@ -705,16 +705,16 @@ export const PatientRecords: React.FC = () => {
         ) : null}
 
         {activeForm === 'allergy' ? (
-          <form onSubmit={handleCreateAllergy} className="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <form onSubmit={handleCreateAllergy} className="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">{t('patient.records.addAllergy')}</h2>
-                <p className="mt-1 text-sm text-gray-600">{t('patient.records.addAllergySub')}</p>
+                <h2 className="text-xl font-bold text-slate-900">{t('patient.records.addAllergy')}</h2>
+                <p className="mt-1 text-sm text-slate-600">{t('patient.records.addAllergySub')}</p>
               </div>
               <button
                 type="button"
                 onClick={resetForms}
-                className="rounded-xl border border-gray-200 p-2 text-gray-500 transition hover:bg-gray-50 hover:text-gray-700"
+                className="rounded-xl border border-slate-200 p-2 text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
                 aria-label={t('patient.records.closeForm')}
               >
                 <X className="h-4 w-4" />
@@ -722,7 +722,7 @@ export const PatientRecords: React.FC = () => {
             </div>
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">{t('patient.records.allergen')}</span>
+                <span className="text-sm font-semibold text-slate-700">{t('patient.records.allergen')}</span>
                 <input
                   required
                   type="text"
@@ -730,11 +730,11 @@ export const PatientRecords: React.FC = () => {
                   onChange={(event) =>
                     setAllergyForm((current) => ({ ...current, allergen: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10"
                 />
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">{t('patient.records.severity')}</span>
+                <span className="text-sm font-semibold text-slate-700">{t('patient.records.severity')}</span>
                 <select
                   value={allergyForm.severity}
                   onChange={(event) =>
@@ -743,7 +743,7 @@ export const PatientRecords: React.FC = () => {
                       severity: event.target.value as AllergySeverity,
                     }))
                   }
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10"
                 >
                   <option value="mild">{t('patient.records.severityMild')}</option>
                   <option value="moderate">{t('patient.records.severityModerate')}</option>
@@ -751,17 +751,17 @@ export const PatientRecords: React.FC = () => {
                 </select>
               </label>
               <label className="block space-y-2 md:col-span-2">
-                <span className="text-sm font-semibold text-gray-700">{t('patient.records.reaction')}</span>
+                <span className="text-sm font-semibold text-slate-700">{t('patient.records.reaction')}</span>
                 <textarea
                   rows={4}
                   value={allergyForm.reaction}
                   onChange={(event) =>
                     setAllergyForm((current) => ({ ...current, reaction: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10"
                 />
               </label>
-              <label className="inline-flex items-center gap-3 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 md:col-span-2">
+              <label className="inline-flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 md:col-span-2">
                 <input
                   type="checkbox"
                   checked={allergyForm.confirmedByDoctor}
@@ -771,7 +771,7 @@ export const PatientRecords: React.FC = () => {
                       confirmedByDoctor: event.target.checked,
                     }))
                   }
-                  className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                  className="h-4 w-4 rounded border-slate-300 text-amber-600 focus:ring-amber-500"
                 />
                 {t('patient.records.confirmAllergyDoctor')}
               </label>
@@ -788,7 +788,7 @@ export const PatientRecords: React.FC = () => {
               <button
                 type="button"
                 onClick={resetForms}
-                className="rounded-xl border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
               >
                 {t('patient.records.cancel')}
               </button>
@@ -797,16 +797,16 @@ export const PatientRecords: React.FC = () => {
         ) : null}
 
         {activeForm === 'vaccination' ? (
-          <form onSubmit={handleCreateVaccination} className="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <form onSubmit={handleCreateVaccination} className="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">{t('patient.records.addVax')}</h2>
-                <p className="mt-1 text-sm text-gray-600">{t('patient.records.addVaxSub')}</p>
+                <h2 className="text-xl font-bold text-slate-900">{t('patient.records.addVax')}</h2>
+                <p className="mt-1 text-sm text-slate-600">{t('patient.records.addVaxSub')}</p>
               </div>
               <button
                 type="button"
                 onClick={resetForms}
-                className="rounded-xl border border-gray-200 p-2 text-gray-500 transition hover:bg-gray-50 hover:text-gray-700"
+                className="rounded-xl border border-slate-200 p-2 text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
                 aria-label={t('patient.records.closeForm')}
               >
                 <X className="h-4 w-4" />
@@ -814,7 +814,7 @@ export const PatientRecords: React.FC = () => {
             </div>
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">{t('patient.records.vaccineName')}</span>
+                <span className="text-sm font-semibold text-slate-700">{t('patient.records.vaccineName')}</span>
                 <input
                   required
                   type="text"
@@ -822,11 +822,11 @@ export const PatientRecords: React.FC = () => {
                   onChange={(event) =>
                     setVaccinationForm((current) => ({ ...current, vaccineName: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
                 />
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">{t('patient.records.doseNumber')}</span>
+                <span className="text-sm font-semibold text-slate-700">{t('patient.records.doseNumber')}</span>
                 <input
                   type="number"
                   min="1"
@@ -834,11 +834,11 @@ export const PatientRecords: React.FC = () => {
                   onChange={(event) =>
                     setVaccinationForm((current) => ({ ...current, doseNumber: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
                 />
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">{t('patient.records.administeredDate')}</span>
+                <span className="text-sm font-semibold text-slate-700">{t('patient.records.administeredDate')}</span>
                 <input
                   type="date"
                   value={vaccinationForm.administeredDate}
@@ -848,11 +848,11 @@ export const PatientRecords: React.FC = () => {
                       administeredDate: event.target.value,
                     }))
                   }
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
                 />
               </label>
               <label className="block space-y-2">
-                <span className="text-sm font-semibold text-gray-700">{t('patient.records.administeredBy')}</span>
+                <span className="text-sm font-semibold text-slate-700">{t('patient.records.administeredBy')}</span>
                 <input
                   type="text"
                   value={vaccinationForm.administeredBy}
@@ -862,18 +862,18 @@ export const PatientRecords: React.FC = () => {
                       administeredBy: event.target.value,
                     }))
                   }
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
                 />
               </label>
               <label className="block space-y-2 md:col-span-2">
-                <span className="text-sm font-semibold text-gray-700">{t('patient.records.nextDose')}</span>
+                <span className="text-sm font-semibold text-slate-700">{t('patient.records.nextDose')}</span>
                 <input
                   type="date"
                   value={vaccinationForm.nextDoseDue}
                   onChange={(event) =>
                     setVaccinationForm((current) => ({ ...current, nextDoseDue: event.target.value }))
                   }
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
                 />
               </label>
             </div>
@@ -889,7 +889,7 @@ export const PatientRecords: React.FC = () => {
               <button
                 type="button"
                 onClick={resetForms}
-                className="rounded-xl border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
               >
                 {t('patient.records.cancel')}
               </button>
@@ -904,7 +904,7 @@ export const PatientRecords: React.FC = () => {
             <Skeleton className="h-36 w-full rounded-2xl" />
           </div>
         ) : sortedRecords.length === 0 ? (
-          <div className="relative bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+          <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div className="absolute top-0 right-0 w-64 h-64 opacity-5">
               <img
                 src="https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg?auto=compress&cs=tinysrgb&w=400"
@@ -916,8 +916,8 @@ export const PatientRecords: React.FC = () => {
               <div className="w-20 h-20 bg-gradient-to-br from-ceenai-cyan to-ceenai-blue rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <FileText className="w-10 h-10 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('patient.records.noMatchTitle')}</h3>
-              <p className="text-gray-600">{t('patient.records.emptyStateBody')}</p>
+              <h3 className="mb-2 text-2xl font-bold text-slate-900">{t('patient.records.noMatchTitle')}</h3>
+              <p className="text-slate-600">{t('patient.records.emptyStateBody')}</p>
               <button
                 type="button"
                 onClick={() => setActiveForm('condition')}
@@ -931,19 +931,19 @@ export const PatientRecords: React.FC = () => {
         ) : (
           <div className="space-y-6">
             {sortedRecords.map((record) => (
-              <div key={record.id} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+              <div key={record.id} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div className="flex items-start gap-4">
-                    <div className="rounded-xl bg-gray-50 p-3">{getCategoryIcon(record.category)}</div>
+                    <div className="rounded-xl bg-slate-50 p-3">{getCategoryIcon(record.category)}</div>
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-xl font-bold text-gray-900">{record.title}</h3>
-                        <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold uppercase text-gray-600">
+                        <h3 className="text-xl font-bold text-slate-900">{record.title}</h3>
+                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase text-slate-600">
                           {recordCategoryLabel(record.category)}
                         </span>
                       </div>
                       {record.subtitle ? (
-                        <p className="mt-1 text-sm font-medium text-gray-600">{record.subtitle}</p>
+                        <p className="mt-1 text-sm font-medium text-slate-600">{record.subtitle}</p>
                       ) : null}
                     </div>
                   </div>
@@ -961,20 +961,20 @@ export const PatientRecords: React.FC = () => {
                   {record.metadata.map((item) => (
                     <span
                       key={`${record.id}-${item}`}
-                      className="rounded-full border border-gray-200 px-3 py-1 text-xs font-medium text-gray-600"
+                      className="rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600"
                     >
                       {item}
                     </span>
                   ))}
                   {record.dateLabel ? (
-                    <span className="rounded-full border border-gray-200 px-3 py-1 text-xs font-medium text-gray-600">
+                    <span className="rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600">
                       {t('patient.records.recordedOn', { date: record.dateLabel })}
                     </span>
                   ) : null}
                 </div>
 
                 {record.description ? (
-                  <div className="mt-4 rounded-xl bg-gray-50 p-4 text-sm text-gray-700">
+                  <div className="mt-4 rounded-xl bg-slate-50 p-4 text-sm text-slate-700">
                     {record.description}
                   </div>
                 ) : null}

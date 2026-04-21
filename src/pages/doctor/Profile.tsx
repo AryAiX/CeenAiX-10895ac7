@@ -636,39 +636,39 @@ export const DoctorProfile: React.FC = () => {
                 </div>
               ) : null}
 
-              <h3 className="mb-4 text-lg font-semibold text-gray-900">Professional Information</h3>
+              <h3 className="mb-4 text-lg font-semibold text-slate-900">Professional Information</h3>
 
               {isEditing ? (
                 <div className="space-y-4">
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">Full Name</label>
+                    <label className="mb-1 block text-sm font-medium text-slate-700">Full Name</label>
                     <input
                       type="text"
                       value={formData.fullName}
                       onChange={(event) => setFormData({ ...formData, fullName: event.target.value })}
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                       placeholder="Enter your full name"
                     />
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">Email</label>
+                    <label className="mb-1 block text-sm font-medium text-slate-700">Email</label>
                     <input
                       type="email"
                       value={formData.email}
                       disabled
-                      className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-gray-500"
+                      className="w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-2 text-slate-500"
                     />
                   </div>
 
                   {!isPhoneManagedByOtp ? (
                     <div>
-                      <label className="mb-1 block text-sm font-medium text-gray-700">Phone</label>
+                      <label className="mb-1 block text-sm font-medium text-slate-700">Phone</label>
                       <input
                         type="tel"
                         value={formData.phone}
                         onChange={(event) => setFormData({ ...formData, phone: event.target.value })}
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                        className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                         placeholder="Enter your phone number"
                       />
                     </div>
@@ -688,36 +688,36 @@ export const DoctorProfile: React.FC = () => {
                   />
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">License Number</label>
+                    <label className="mb-1 block text-sm font-medium text-slate-700">License Number</label>
                     <input
                       type="text"
                       value={formData.licenseNumber}
                       onChange={(event) =>
                         setFormData({ ...formData, licenseNumber: event.target.value })
                       }
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                       placeholder="Enter your medical license number"
                     />
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">Date of Birth</label>
+                    <label className="mb-1 block text-sm font-medium text-slate-700">Date of Birth</label>
                     <input
                       type="date"
                       value={formData.dateOfBirth}
                       onChange={(event) =>
                         setFormData({ ...formData, dateOfBirth: event.target.value })
                       }
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                     />
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">Gender</label>
+                    <label className="mb-1 block text-sm font-medium text-slate-700">Gender</label>
                     <select
                       value={formData.gender}
                       onChange={(event) => setFormData({ ...formData, gender: event.target.value })}
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                     >
                       <option value="">Select gender</option>
                       <option value="male">Male</option>
@@ -727,22 +727,22 @@ export const DoctorProfile: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">Address</label>
+                    <label className="mb-1 block text-sm font-medium text-slate-700">Address</label>
                     <textarea
                       value={formData.address}
                       onChange={(event) => setFormData({ ...formData, address: event.target.value })}
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                       rows={3}
                       placeholder="Enter your address"
                     />
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">Professional Bio</label>
+                    <label className="mb-1 block text-sm font-medium text-slate-700">Professional Bio</label>
                     <textarea
                       value={formData.bio}
                       onChange={(event) => setFormData({ ...formData, bio: event.target.value })}
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                       rows={4}
                       placeholder="Summarize your expertise and care approach"
                     />
@@ -760,7 +760,7 @@ export const DoctorProfile: React.FC = () => {
                     <button
                       onClick={handleCancel}
                       disabled={saving}
-                      className="flex items-center gap-2 rounded-lg border border-gray-300 px-6 py-2 text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
+                      className="flex items-center gap-2 rounded-lg border border-slate-300 px-6 py-2 text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50"
                     >
                       <X className="w-4 h-4" />
                       Cancel
@@ -771,32 +771,32 @@ export const DoctorProfile: React.FC = () => {
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <div className="flex items-start space-x-3">
                     <div className="mt-1">
-                      <Mail className="w-5 h-5 text-gray-400" />
+                      <Mail className="w-5 h-5 text-slate-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Email</p>
-                      <p className="mt-1 text-base text-gray-900">{formData.email || 'Not provided'}</p>
+                      <p className="text-sm font-medium text-slate-500">Email</p>
+                      <p className="mt-1 text-base text-slate-900">{formData.email || 'Not provided'}</p>
                     </div>
                   </div>
 
                   {!isPhoneManagedByOtp ? (
                     <div className="flex items-start space-x-3">
                       <div className="mt-1">
-                        <Phone className="w-5 h-5 text-gray-400" />
+                        <Phone className="w-5 h-5 text-slate-400" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-500">Phone</p>
-                        <p className="mt-1 text-base text-gray-900">{formData.phone || 'Not provided'}</p>
+                        <p className="text-sm font-medium text-slate-500">Phone</p>
+                        <p className="mt-1 text-base text-slate-900">{formData.phone || 'Not provided'}</p>
                       </div>
                     </div>
                   ) : null}
 
                   <div className="flex items-start space-x-3">
                     <div className="mt-1">
-                      <Stethoscope className="w-5 h-5 text-gray-400" />
+                      <Stethoscope className="w-5 h-5 text-slate-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Specialization</p>
+                      <p className="text-sm font-medium text-slate-500">Specialization</p>
                       {selectedSpecializations.length > 0 ? (
                         <div className="mt-2 flex flex-wrap gap-2">
                           {selectedSpecializations.map((specialization) => (
@@ -809,7 +809,7 @@ export const DoctorProfile: React.FC = () => {
                           ))}
                         </div>
                       ) : (
-                        <p className="mt-1 text-base text-gray-900">
+                        <p className="mt-1 text-base text-slate-900">
                           Not provided
                         </p>
                       )}
@@ -818,11 +818,11 @@ export const DoctorProfile: React.FC = () => {
 
                   <div className="flex items-start space-x-3">
                     <div className="mt-1">
-                      <FileText className="w-5 h-5 text-gray-400" />
+                      <FileText className="w-5 h-5 text-slate-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">License Number</p>
-                      <p className="mt-1 text-base text-gray-900">
+                      <p className="text-sm font-medium text-slate-500">License Number</p>
+                      <p className="mt-1 text-base text-slate-900">
                         {formData.licenseNumber || 'Not provided'}
                       </p>
                     </div>
@@ -830,11 +830,11 @@ export const DoctorProfile: React.FC = () => {
 
                   <div className="flex items-start space-x-3">
                     <div className="mt-1">
-                      <Calendar className="w-5 h-5 text-gray-400" />
+                        <Calendar className="w-5 h-5 text-slate-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Date of Birth</p>
-                      <p className="mt-1 text-base text-gray-900">
+                      <p className="text-sm font-medium text-slate-500">Date of Birth</p>
+                      <p className="mt-1 text-base text-slate-900">
                         {formData.dateOfBirth
                           ? new Date(formData.dateOfBirth).toLocaleDateString(
                               locale,
@@ -847,11 +847,11 @@ export const DoctorProfile: React.FC = () => {
 
                   <div className="flex items-start space-x-3">
                     <div className="mt-1">
-                      <UserCircle className="w-5 h-5 text-gray-400" />
+                        <UserCircle className="w-5 h-5 text-slate-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Gender</p>
-                      <p className="mt-1 text-base capitalize text-gray-900">
+                      <p className="text-sm font-medium text-slate-500">Gender</p>
+                      <p className="mt-1 text-base capitalize text-slate-900">
                         {formData.gender || 'Not provided'}
                       </p>
                     </div>
@@ -859,21 +859,21 @@ export const DoctorProfile: React.FC = () => {
 
                   <div className="flex items-start space-x-3 md:col-span-2">
                     <div className="mt-1">
-                      <MapPin className="w-5 h-5 text-gray-400" />
+                      <MapPin className="w-5 h-5 text-slate-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Address</p>
-                      <p className="mt-1 text-base text-gray-900">{formData.address || 'Not provided'}</p>
+                      <p className="text-sm font-medium text-slate-500">Address</p>
+                      <p className="mt-1 text-base text-slate-900">{formData.address || 'Not provided'}</p>
                     </div>
                   </div>
 
                   <div className="flex items-start space-x-3 md:col-span-2">
                     <div className="mt-1">
-                      <FileText className="w-5 h-5 text-gray-400" />
+                      <FileText className="w-5 h-5 text-slate-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Bio</p>
-                      <p className="mt-1 text-base text-gray-900">{formData.bio || 'Not provided'}</p>
+                      <p className="text-sm font-medium text-slate-500">Bio</p>
+                      <p className="mt-1 text-base text-slate-900">{formData.bio || 'Not provided'}</p>
                     </div>
                   </div>
                 </div>
@@ -882,11 +882,11 @@ export const DoctorProfile: React.FC = () => {
           </div>
 
           <div className="overflow-hidden rounded-3xl bg-white shadow-md">
-            <div className="border-b border-gray-100 px-8 py-6">
+            <div className="border-b border-slate-100 px-8 py-6">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Pre-Visit Intake Template</h3>
-                  <p className="mt-1 text-sm text-gray-600">
+                  <h3 className="text-xl font-semibold text-slate-900">Pre-Visit Intake Template</h3>
+                  <p className="mt-1 text-sm text-slate-600">
                     Upload a doctor questionnaire PDF, let AI convert it into structured questions, then review and publish the intake patients complete after booking.
                   </p>
                 </div>
@@ -897,7 +897,7 @@ export const DoctorProfile: React.FC = () => {
                     <span className="font-semibold">{activePreVisitTemplate.title}</span>
                   </div>
                 ) : (
-                  <div className="rounded-2xl border border-dashed border-gray-300 px-4 py-3 text-sm text-gray-600">
+                  <div className="rounded-2xl border border-dashed border-slate-300 px-4 py-3 text-sm text-slate-600">
                     No published template yet
                   </div>
                 )}
@@ -932,13 +932,13 @@ export const DoctorProfile: React.FC = () => {
               />
 
               <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-                <div className="rounded-2xl border border-gray-200 p-5">
+                <div className="rounded-2xl border border-slate-200 p-5">
                   <div className="flex flex-wrap items-center gap-3">
                     <button
                       type="button"
                       onClick={() => templateFileInputRef.current?.click()}
                       disabled={templateExtracting || templateSaving}
-                      className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {templateExtracting ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -951,7 +951,7 @@ export const DoctorProfile: React.FC = () => {
                       type="button"
                       onClick={handleAddTemplateQuestion}
                       disabled={templateExtracting || templateSaving}
-                      className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       <Plus className="h-4 w-4" />
                       Add question
@@ -960,7 +960,7 @@ export const DoctorProfile: React.FC = () => {
                       type="button"
                       onClick={resetTemplateDraft}
                       disabled={templateExtracting || templateSaving}
-                      className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       <X className="h-4 w-4" />
                       Reset
@@ -969,24 +969,24 @@ export const DoctorProfile: React.FC = () => {
 
                   <div className="mt-5 grid gap-4 md:grid-cols-2">
                     <label className="block">
-                      <span className="mb-1 block text-sm font-medium text-gray-700">Template title</span>
+                      <span className="mb-1 block text-sm font-medium text-slate-700">Template title</span>
                       <input
                         type="text"
                         value={templateDraft.title}
                         onChange={(event) => updateTemplateDraft({ title: event.target.value })}
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                        className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                         placeholder="Cardiology pre-visit intake"
                       />
                     </label>
 
                     <label className="block">
-                      <span className="mb-1 block text-sm font-medium text-gray-700">Specialization</span>
+                      <span className="mb-1 block text-sm font-medium text-slate-700">Specialization</span>
                       <select
                         value={templateDraft.specializationId ?? ''}
                         onChange={(event) =>
                           updateTemplateDraft({ specializationId: event.target.value || null })
                         }
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                        className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                       >
                         <option value="">Use doctor primary specialty</option>
                         {specializationOptions.map((specialization) => (
@@ -999,21 +999,21 @@ export const DoctorProfile: React.FC = () => {
                   </div>
 
                   <label className="mt-4 block">
-                    <span className="mb-1 block text-sm font-medium text-gray-700">Description</span>
+                    <span className="mb-1 block text-sm font-medium text-slate-700">Description</span>
                     <textarea
                       value={templateDraft.description}
                       onChange={(event) => updateTemplateDraft({ description: event.target.value })}
                       rows={3}
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                       placeholder="Short note shown in the patient pre-visit flow."
                     />
                   </label>
 
                   <div className="mt-6 space-y-4">
                     {templateDraft.questions.map((question, index) => (
-                      <div key={`${question.key}-${index}`} className="rounded-2xl border border-gray-200 p-4">
+                      <div key={`${question.key}-${index}`} className="rounded-2xl border border-slate-200 p-4">
                         <div className="flex items-center justify-between gap-3">
-                          <p className="text-sm font-semibold text-gray-900">Question {index + 1}</p>
+                          <p className="text-sm font-semibold text-slate-900">Question {index + 1}</p>
                           <button
                             type="button"
                             onClick={() => handleRemoveTemplateQuestion(index)}
@@ -1026,20 +1026,20 @@ export const DoctorProfile: React.FC = () => {
 
                         <div className="mt-4 grid gap-4 md:grid-cols-2">
                           <label className="block md:col-span-2">
-                            <span className="mb-1 block text-sm font-medium text-gray-700">Prompt</span>
+                            <span className="mb-1 block text-sm font-medium text-slate-700">Prompt</span>
                             <input
                               type="text"
                               value={question.label}
                               onChange={(event) =>
                                 handleTemplateQuestionChange(index, { label: event.target.value })
                               }
-                              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                              className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                               placeholder="Describe your current symptoms"
                             />
                           </label>
 
                           <label className="block">
-                            <span className="mb-1 block text-sm font-medium text-gray-700">Question type</span>
+                            <span className="mb-1 block text-sm font-medium text-slate-700">Question type</span>
                             <select
                               value={question.type}
                               onChange={(event) =>
@@ -1047,7 +1047,7 @@ export const DoctorProfile: React.FC = () => {
                                   type: event.target.value as PreVisitTemplateQuestionDraft['type'],
                                 })
                               }
-                              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                              className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                             >
                               <option value="short_text">Short text</option>
                               <option value="long_text">Long text</option>
@@ -1060,7 +1060,7 @@ export const DoctorProfile: React.FC = () => {
                           </label>
 
                           <label className="block">
-                            <span className="mb-1 block text-sm font-medium text-gray-700">Autofill source</span>
+                            <span className="mb-1 block text-sm font-medium text-slate-700">Autofill source</span>
                             <select
                               value={question.autofillSource ?? ''}
                               onChange={(event) =>
@@ -1068,7 +1068,7 @@ export const DoctorProfile: React.FC = () => {
                                   autofillSource: event.target.value || null,
                                 })
                               }
-                              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                              className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                             >
                               <option value="">No autofill</option>
                               {PRE_VISIT_AUTOFILL_SOURCE_OPTIONS.map((option) => (
@@ -1080,7 +1080,7 @@ export const DoctorProfile: React.FC = () => {
                           </label>
 
                           <label className="block">
-                            <span className="mb-1 block text-sm font-medium text-gray-700">Memory key</span>
+                            <span className="mb-1 block text-sm font-medium text-slate-700">Memory key</span>
                             <input
                               type="text"
                               value={question.memoryKey ?? ''}
@@ -1089,30 +1089,30 @@ export const DoctorProfile: React.FC = () => {
                                   memoryKey: event.target.value || null,
                                 })
                               }
-                              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                              className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                               placeholder="symptom_duration"
                             />
-                            <p className="mt-1 text-xs text-gray-500">
+                            <p className="mt-1 text-xs text-slate-500">
                               Use the same key for semantically equivalent questions across templates.
                             </p>
                           </label>
 
                           <label className="block md:col-span-2">
-                            <span className="mb-1 block text-sm font-medium text-gray-700">Help text</span>
+                            <span className="mb-1 block text-sm font-medium text-slate-700">Help text</span>
                             <textarea
                               value={question.helpText ?? ''}
                               onChange={(event) =>
                                 handleTemplateQuestionChange(index, { helpText: event.target.value })
                               }
                               rows={2}
-                              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                              className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                               placeholder="Explain what the patient should include."
                             />
                           </label>
 
                           {question.type === 'single_select' || question.type === 'multi_select' ? (
                             <label className="block md:col-span-2">
-                              <span className="mb-1 block text-sm font-medium text-gray-700">
+                              <span className="mb-1 block text-sm font-medium text-slate-700">
                                 Options
                               </span>
                               <textarea
@@ -1127,20 +1127,20 @@ export const DoctorProfile: React.FC = () => {
                                   })
                                 }
                                 rows={3}
-                                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
+                                className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                                 placeholder={'Chest pain\nShortness of breath\nPalpitations'}
                               />
                             </label>
                           ) : null}
 
-                          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                          <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
                             <input
                               type="checkbox"
                               checked={question.required}
                               onChange={(event) =>
                                 handleTemplateQuestionChange(index, { required: event.target.checked })
                               }
-                              className="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                              className="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
                             />
                             Required question
                           </label>
@@ -1151,14 +1151,14 @@ export const DoctorProfile: React.FC = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="rounded-2xl border border-gray-200 p-5">
+                  <div className="rounded-2xl border border-slate-200 p-5">
                     <div className="flex items-center gap-3">
                       <div className="rounded-2xl bg-cyan-50 p-3 text-cyan-700">
                         <ClipboardList className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900">Template summary</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="font-semibold text-slate-900">Template summary</p>
+                        <p className="text-sm text-slate-600">
                           Patients will be asked to complete this right after booking.
                         </p>
                       </div>
@@ -1166,26 +1166,26 @@ export const DoctorProfile: React.FC = () => {
 
                     <dl className="mt-5 space-y-3 text-sm">
                       <div className="flex items-start justify-between gap-3">
-                        <dt className="text-gray-500">Questions</dt>
-                        <dd className="font-medium text-gray-900">{templateDraft.questions.length}</dd>
+                        <dt className="text-slate-500">Questions</dt>
+                        <dd className="font-medium text-slate-900">{templateDraft.questions.length}</dd>
                       </div>
                       <div className="flex items-start justify-between gap-3">
-                        <dt className="text-gray-500">Required</dt>
-                        <dd className="font-medium text-gray-900">
+                        <dt className="text-slate-500">Required</dt>
+                        <dd className="font-medium text-slate-900">
                           {templateDraft.questions.filter((question) => question.required).length}
                         </dd>
                       </div>
                       <div className="flex items-start justify-between gap-3">
-                        <dt className="text-gray-500">Specialization</dt>
-                        <dd className="text-right font-medium text-gray-900">
+                        <dt className="text-slate-500">Specialization</dt>
+                        <dd className="text-right font-medium text-slate-900">
                           {templateDraft.specializationId
                             ? specializationNameById.get(templateDraft.specializationId) ?? 'Selected'
                             : 'Doctor primary specialty'}
                         </dd>
                       </div>
                       <div className="flex items-start justify-between gap-3">
-                        <dt className="text-gray-500">Source PDF</dt>
-                        <dd className="text-right font-medium text-gray-900">
+                        <dt className="text-slate-500">Source PDF</dt>
+                        <dd className="text-right font-medium text-slate-900">
                           {templateDraft.sourceFileName ?? 'Structured draft only'}
                         </dd>
                       </div>
@@ -1196,7 +1196,7 @@ export const DoctorProfile: React.FC = () => {
                         type="button"
                         onClick={() => void handleSavePreVisitTemplate(false)}
                         disabled={templateSaving || templateExtracting}
-                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {templateSaving ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -1221,23 +1221,23 @@ export const DoctorProfile: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-gray-200 p-5">
-                    <h4 className="font-semibold text-gray-900">Extraction notes</h4>
+                  <div className="rounded-2xl border border-slate-200 p-5">
+                    <h4 className="font-semibold text-slate-900">Extraction notes</h4>
                     {templateExtracting || preVisitTemplatesLoading ? (
-                      <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
+                      <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">
                         <Loader2 className="h-4 w-4 animate-spin" />
                         Preparing pre-visit template data...
                       </div>
                     ) : templateDraft.extractionNotes.length > 0 ? (
-                      <ul className="mt-3 space-y-2 text-sm text-gray-700">
+                      <ul className="mt-3 space-y-2 text-sm text-slate-700">
                         {templateDraft.extractionNotes.map((note) => (
-                          <li key={note} className="rounded-xl bg-gray-50 px-3 py-2">
+                          <li key={note} className="rounded-xl bg-slate-50 px-3 py-2">
                             {note}
                           </li>
                         ))}
                       </ul>
                     ) : (
-                      <p className="mt-3 text-sm text-gray-600">
+                      <p className="mt-3 text-sm text-slate-600">
                         Upload a PDF to receive AI extraction notes and a structured draft questionnaire.
                       </p>
                     )}
