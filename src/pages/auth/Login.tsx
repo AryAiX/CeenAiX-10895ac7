@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Activity,
   ArrowLeft,
   Building2,
   ChevronRight,
@@ -227,65 +226,68 @@ export const Login = () => {
         <LanguageSwitcher />
       </div>
 
-      <div className="relative hidden w-80 shrink-0 flex-col justify-between overflow-hidden bg-slate-900 p-8 lg:flex">
+      <div className="relative hidden w-80 shrink-0 overflow-hidden lg:flex lg:w-[45%]">
+        <img
+          src="https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg?auto=compress&cs=tinysrgb&w=1400"
+          alt="Healthcare"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-cyan-900/75 to-blue-900/85" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent" />
         <div className="pointer-events-none absolute -right-20 top-16 h-64 w-64 rounded-full bg-teal-500/10 blur-3xl" />
         <div className="pointer-events-none absolute -left-16 bottom-24 h-56 w-56 rounded-full bg-blue-500/10 blur-3xl" />
 
-        <div className="relative">
-          <Link to="/" className="mb-10 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-600">
-              <Activity className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <div className="text-lg font-bold text-white" style={JAKARTA}>
-                CeenAiX
-              </div>
-              <div className="text-xs text-teal-400">{t('auth.roleAccess.sidebarEyebrow')}</div>
-            </div>
-          </Link>
-
-          <div className="space-y-6">
-            <div>
-              <div className="text-2xl font-bold leading-tight text-white" style={JAKARTA}>
-                {t('auth.roleAccess.sidebarTitle')}
-              </div>
-              <div className="mt-3 text-sm text-slate-400">
-                {t('auth.roleAccess.sidebarDescription')}
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              {sidebarFeatures.map((feature) => (
-                <div key={feature} className="flex items-center gap-3">
-                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-600">
-                    <svg
-                      className="h-3 w-3 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <span className="text-sm text-slate-300">{feature}</span>
+        <div className="relative z-10 flex h-full w-full flex-col justify-between p-8">
+          <div className="relative">
+            <Link to="/" className="mb-10 flex items-center gap-3">
+              <img src="/favicon.svg" alt="CeenAiX" className="h-10 w-10 object-contain" />
+              <div>
+                <div className="text-lg font-bold text-white" style={JAKARTA}>
+                  CeenAiX
                 </div>
-              ))}
+                <div className="text-xs text-teal-300">{t('auth.roleAccess.sidebarEyebrow')}</div>
+              </div>
+            </Link>
+
+            <div className="space-y-6">
+              <div>
+                <div className="text-3xl font-bold leading-tight text-white" style={JAKARTA}>
+                  {t('auth.roleAccess.sidebarTitle')}
+                </div>
+                <div className="mt-3 text-sm text-slate-300">{t('auth.roleAccess.sidebarDescription')}</div>
+              </div>
+
+              <div className="space-y-3">
+                {sidebarFeatures.map((feature) => (
+                  <div key={feature} className="flex items-center gap-3">
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-500/90">
+                      <svg
+                        className="h-3 w-3 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-sm text-slate-200">{feature}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="relative text-xs text-slate-500">{t('auth.roleAccess.copyright')}</div>
+          <div className="relative text-xs text-slate-400">{t('auth.roleAccess.copyright')}</div>
+        </div>
       </div>
 
       <div className="flex flex-1 items-center justify-center p-8">
         <div className="w-full max-w-md">
           <div className="mb-6 flex items-center gap-3 lg:hidden">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600">
-              <Activity className="h-4 w-4 text-white" />
-            </div>
+            <img src="/favicon.svg" alt="CeenAiX" className="h-8 w-8 object-contain" />
             <span className="font-bold text-slate-800" style={JAKARTA}>
               CeenAiX
             </span>

@@ -12,7 +12,7 @@ export const Footer: React.FC = () => {
       <div className="mx-auto max-w-7xl">
         <div className="mb-10 flex flex-col gap-6 rounded-[2rem] border border-white/10 bg-white/[0.04] px-6 py-6 backdrop-blur-sm lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.26em] text-cyan-200">{t('brand.tagline')}</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-200">{t('brand.tagline')}</p>
             <p className="mt-3 max-w-2xl text-base leading-7 text-slate-300">{t('footer.blurb')}</p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -35,7 +35,7 @@ export const Footer: React.FC = () => {
               </div>
               <div>
                 <span className="block text-xl font-bold text-white">CeenAiX</span>
-                <span className="block text-[11px] font-medium uppercase tracking-[0.24em] text-slate-500">
+                <span className="block text-[11px] font-medium uppercase tracking-[0.2em] text-slate-500">
                   {t('brand.tagline')}
                 </span>
               </div>

@@ -165,13 +165,13 @@ export const Pharmacy: React.FC = () => {
         <div className="mb-8">
           <div className="mb-6 flex flex-col gap-4 md:flex-row">
             <div className="relative flex-1">
-              <Search className="pointer-events-none absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+              <Search className="pointer-events-none absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 placeholder={t('pharmacyPage.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-2xl border-2 border-gray-200 bg-white py-4 pe-4 ps-12 text-lg transition-colors focus:border-cyan-500 focus:outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 py-4 pe-4 ps-12 text-lg text-slate-900 outline-none transition focus:border-ceenai-cyan focus:bg-white focus:ring-2 focus:ring-ceenai-cyan/20"
               />
             </div>
           </div>
@@ -183,7 +183,7 @@ export const Pharmacy: React.FC = () => {
               className={`rounded-xl px-6 py-2.5 font-medium transition-all ${
                 selectedFilter === 'all'
                   ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg'
-                  : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                  : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
               }`}
             >
               {t('pharmacyPage.filterAll')}
@@ -194,7 +194,7 @@ export const Pharmacy: React.FC = () => {
               className={`flex items-center gap-2 rounded-xl px-6 py-2.5 font-medium transition-all ${
                 selectedFilter === '24h'
                   ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg'
-                  : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                  : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
               }`}
             >
               <Clock className="h-4 w-4" />
@@ -206,7 +206,7 @@ export const Pharmacy: React.FC = () => {
               className={`flex items-center gap-2 rounded-xl px-6 py-2.5 font-medium transition-all ${
                 selectedFilter === 'delivery'
                   ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg'
-                  : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                  : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
               }`}
             >
               <Package className="h-4 w-4" />
@@ -232,7 +232,7 @@ export const Pharmacy: React.FC = () => {
             return (
               <div
                 key={row.id}
-                className="card-hover overflow-hidden rounded-2xl bg-white shadow-lg"
+                className="card-hover overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm"
               >
                 <div className="relative h-48 overflow-hidden">
                   <img src={row.image} alt={name} className="h-full w-full object-cover" />
@@ -253,14 +253,14 @@ export const Pharmacy: React.FC = () => {
                 </div>
 
                 <div className="p-6">
-                  <h3 className="mb-2 text-xl font-bold text-gray-900">{name}</h3>
+                  <h3 className="mb-2 text-xl font-bold text-slate-900">{name}</h3>
 
                   <div className="mb-3 flex items-center text-yellow-500">
                     <Star className="h-4 w-4 fill-current" />
-                    <span className="ms-1 font-semibold text-gray-900">
+                    <span className="ms-1 font-semibold text-slate-900">
                       {formatLocaleDecimal(row.rating, i18n.language, 1)}
                     </span>
-                    <span className="ms-1 text-sm text-gray-500">
+                    <span className="ms-1 text-sm text-slate-500">
                       {t('pharmacyPage.reviews', {
                         count: formatLocaleDigits(row.reviews, i18n.language),
                       })}
@@ -268,17 +268,17 @@ export const Pharmacy: React.FC = () => {
                   </div>
 
                   <div className="mb-4 space-y-2">
-                    <div className="flex items-start text-gray-600">
+                    <div className="flex items-start text-slate-600">
                       <MapPin className="me-2 mt-0.5 h-4 w-4 flex-shrink-0 text-cyan-600" />
                       <span className="text-sm">{locationLine}</span>
                     </div>
 
-                    <div className="flex items-center text-gray-600">
+                    <div className="flex items-center text-slate-600">
                       <Clock className="me-2 h-4 w-4 flex-shrink-0 text-cyan-600" />
                       <span className="text-sm">{hours}</span>
                     </div>
 
-                    <div className="flex items-center text-gray-600">
+                    <div className="flex items-center text-slate-600">
                       <Phone className="me-2 h-4 w-4 flex-shrink-0 text-cyan-600" />
                       <span className="text-sm" dir="ltr">
                         {formatLocalePhoneDisplay(row.phone, i18n.language)}
@@ -311,9 +311,9 @@ export const Pharmacy: React.FC = () => {
 
         {filteredPharmacies.length === 0 && (
           <div className="py-16 text-center">
-            <Package className="mx-auto mb-4 h-16 w-16 text-gray-300" />
-            <h3 className="mb-2 text-xl font-semibold text-gray-900">{t('pharmacyPage.noResultsTitle')}</h3>
-            <p className="text-gray-600">{t('pharmacyPage.noResultsLead')}</p>
+            <Package className="mx-auto mb-4 h-16 w-16 text-slate-300" />
+            <h3 className="mb-2 text-xl font-semibold text-slate-900">{t('pharmacyPage.noResultsTitle')}</h3>
+            <p className="text-slate-600">{t('pharmacyPage.noResultsLead')}</p>
           </div>
         )}
       </main>

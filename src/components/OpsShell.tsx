@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, LogOut, type LucideIcon } from 'lucide-react';
 import { useAuth } from '../lib/auth-context';
@@ -54,7 +54,11 @@ export const OpsShell = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="relative min-h-screen bg-slate-50">
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute -top-24 right-10 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
+        <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-blue-400/10 blur-3xl" />
+      </div>
       <header className={`bg-gradient-to-r ${ACCENT_BAR[accent]} text-white`}>
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6 lg:px-8">
           <div className={`flex items-center justify-between gap-4 ${isArabic ? 'flex-row-reverse' : ''}`}>
@@ -67,6 +71,16 @@ export const OpsShell = ({
               >
                 <ArrowLeft className={`h-4 w-4 ${isArabic ? 'rotate-180' : ''}`} />
               </button>
+              <Link
+                to="/"
+                className={`inline-flex items-center gap-2 rounded-lg bg-white/10 px-2.5 py-2 text-white/90 transition hover:bg-white/20 ${
+                  isArabic ? 'flex-row-reverse' : ''
+                }`}
+                aria-label="Home"
+              >
+                <img src="/favicon.svg" alt="CeenAiX" className="h-6 w-6 object-contain" />
+                <span className="hidden text-xs font-semibold sm:inline">CeenAiX</span>
+              </Link>
               <div>
                 {eyebrow ? (
                   <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/70">
@@ -88,7 +102,7 @@ export const OpsShell = ({
                 className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/20"
               >
                 <LogOut className="h-3.5 w-3.5" />
-                <span>Sign out</span>
+                <span>{isArabic ? 'تسجيل الخروج' : 'Sign out'}</span>
               </button>
               {actions}
             </div>

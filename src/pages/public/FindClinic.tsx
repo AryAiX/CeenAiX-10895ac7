@@ -10,6 +10,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
+import { Skeleton } from '../../components/Skeleton';
 
 interface Hospital {
   id: string;
@@ -243,11 +244,11 @@ export const FindClinic: React.FC = () => {
             <div className="mt-6 space-y-4 border-t border-slate-200 pt-6 animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Type</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Type</label>
                   <select
                     value={selectedType}
                     onChange={(e) => setSelectedType(e.target.value)}
-                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:bg-white focus:ring-2 focus:ring-ceenai-cyan/20"
                   >
                     <option value="all">All Types</option>
                     <option value="hospital">Hospitals</option>
@@ -256,11 +257,11 @@ export const FindClinic: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">City</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">City</label>
                   <select
                     value={selectedCity}
                     onChange={(e) => setSelectedCity(e.target.value)}
-                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:bg-white focus:ring-2 focus:ring-ceenai-cyan/20"
                   >
                     <option value="all">All Cities</option>
                     {allCities.map(city => (
@@ -270,11 +271,11 @@ export const FindClinic: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Specialty</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Specialty</label>
                   <select
                     value={selectedSpecialty}
                     onChange={(e) => setSelectedSpecialty(e.target.value)}
-                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:bg-white focus:ring-2 focus:ring-ceenai-cyan/20"
                   >
                     <option value="all">All Specialties</option>
                     {allSpecialties.map(specialty => (
@@ -284,11 +285,11 @@ export const FindClinic: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Sort By</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Sort By</label>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as 'rating' | 'name')}
-                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:bg-white focus:ring-2 focus:ring-ceenai-cyan/20"
                   >
                     <option value="rating">Highest Rated</option>
                     <option value="name">Name (A-Z)</option>
@@ -298,7 +299,7 @@ export const FindClinic: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Minimum Rating: {minRating === 0 ? 'All' : `${minRating}+ Stars`}
                   </label>
                   <div className="flex items-center gap-3">
@@ -309,7 +310,7 @@ export const FindClinic: React.FC = () => {
                       step="0.5"
                       value={minRating}
                       onChange={(e) => setMinRating(parseFloat(e.target.value))}
-                      className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                      className="flex-1 h-2 appearance-none rounded-lg bg-slate-200 accent-ceenai-blue cursor-pointer"
                     />
                     <div className="flex items-center gap-1 min-w-[120px]">
                       {[1, 2, 3, 4, 5].map((star) => (
@@ -318,7 +319,7 @@ export const FindClinic: React.FC = () => {
                           className={`w-4 h-4 transition-all ${
                             star <= minRating
                               ? 'text-yellow-500 fill-current scale-110'
-                              : 'text-gray-300'
+                              : 'text-slate-300'
                           }`}
                         />
                       ))}
@@ -332,9 +333,9 @@ export const FindClinic: React.FC = () => {
                       type="checkbox"
                       checked={showEmergencyOnly}
                       onChange={(e) => setShowEmergencyOnly(e.target.checked)}
-                      className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      className="h-5 w-5 rounded border-slate-300 text-ceenai-blue focus:ring-ceenai-blue"
                     />
-                    <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">
+                    <span className="ml-2 text-sm font-medium text-slate-700 transition-colors group-hover:text-ceenai-blue">
                       24/7 Emergency Only
                     </span>
                   </label>
@@ -344,22 +345,43 @@ export const FindClinic: React.FC = () => {
           )}
         </div>
 
-        <div className="mb-4 text-sm text-gray-600 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-blue-600" />
-          Found <span className="font-bold text-blue-600">{filteredHospitals.length}</span> {filteredHospitals.length === 1 ? 'facility' : 'facilities'}
+        <div className="mb-4 flex items-center gap-2 text-sm text-slate-600">
+          <TrendingUp className="w-4 h-4 text-ceenai-blue" />
+          Found <span className="font-bold text-ceenai-blue">{filteredHospitals.length}</span> {filteredHospitals.length === 1 ? 'facility' : 'facilities'}
         </div>
 
         {loading ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="mt-4 text-gray-600">Loading facilities...</p>
+          <div className="space-y-4 py-4">
+            {[...Array(3)].map((_, index) => (
+              <div key={index} className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="grid gap-6 lg:grid-cols-[24rem_1fr]">
+                  <Skeleton className="h-72 w-full rounded-2xl" />
+                  <div className="space-y-3">
+                    <Skeleton className="h-8 w-2/3" />
+                    <Skeleton className="h-4 w-1/3" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-5/6" />
+                    <div className="grid grid-cols-2 gap-3">
+                      <Skeleton className="h-9 w-full rounded-lg" />
+                      <Skeleton className="h-9 w-full rounded-lg" />
+                    </div>
+                    <div className="flex gap-3 pt-2">
+                      <Skeleton className="h-10 w-40 rounded-lg" />
+                      <Skeleton className="h-10 w-44 rounded-lg" />
+                      <Skeleton className="h-10 w-40 rounded-lg" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            <p className="text-center text-sm text-slate-500">Loading facilities...</p>
           </div>
         ) : (
           <div className="space-y-6">
             {filteredHospitals.map((hospital, index) => (
               <div
                 key={hospital.id}
-                className="card-hover bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden border border-gray-100 animate-fade-in-up"
+                className="card-hover animate-fade-in-up overflow-hidden rounded-[2rem] border border-slate-200 bg-white/95 shadow-sm backdrop-blur-sm"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="lg:flex">
@@ -382,17 +404,17 @@ export const FindClinic: React.FC = () => {
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
+                          <h3 className="text-2xl font-bold text-slate-900 transition-colors hover:text-ceenai-blue">
                             {hospital.name}
                           </h3>
                           {hospital.type === 'hospital' ? (
-                            <Building2 className="w-5 h-5 text-blue-600" />
+                            <Building2 className="w-5 h-5 text-ceenai-blue" />
                           ) : (
-                            <Heart className="w-5 h-5 text-cyan-600" />
+                            <Heart className="w-5 h-5 text-ceenai-cyan" />
                           )}
                         </div>
-                        <p className="text-blue-600 font-medium capitalize flex items-center gap-2">
-                          <span className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></span>
+                        <p className="flex items-center gap-2 font-medium capitalize text-ceenai-blue">
+                          <span className="h-2 w-2 rounded-full bg-ceenai-blue animate-pulse"></span>
                           {hospital.type}
                         </p>
                       </div>
@@ -412,51 +434,51 @@ export const FindClinic: React.FC = () => {
                       </div>
                     </div>
 
-                    <p className="text-gray-600 mb-4 line-clamp-2 leading-relaxed">{hospital.description}</p>
+                    <p className="mb-4 line-clamp-2 leading-relaxed text-slate-600">{hospital.description}</p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                      <div className="flex items-center gap-2 text-gray-700 group hover:text-blue-600 transition-colors">
-                        <MapPin className="w-4 h-4 text-blue-600 flex-shrink-0 group-hover:animate-bounce-subtle" />
+                      <div className="group flex items-center gap-2 text-slate-700 transition-colors hover:text-ceenai-blue">
+                        <MapPin className="h-4 w-4 flex-shrink-0 text-ceenai-blue group-hover:animate-bounce-subtle" />
                         <span className="text-sm">{hospital.address}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-gray-700 group hover:text-blue-600 transition-colors">
-                        <Phone className="w-4 h-4 text-blue-600 flex-shrink-0 group-hover:animate-bounce-subtle" />
-                        <a href={`tel:${hospital.phone}`} className="text-sm hover:text-blue-600">
+                      <div className="group flex items-center gap-2 text-slate-700 transition-colors hover:text-ceenai-blue">
+                        <Phone className="h-4 w-4 flex-shrink-0 text-ceenai-blue group-hover:animate-bounce-subtle" />
+                        <a href={`tel:${hospital.phone}`} className="text-sm hover:text-ceenai-blue">
                           {hospital.phone}
                         </a>
                       </div>
                       {hospital.email && (
-                        <div className="flex items-center gap-2 text-gray-700 group hover:text-blue-600 transition-colors">
-                          <Mail className="w-4 h-4 text-blue-600 flex-shrink-0 group-hover:animate-bounce-subtle" />
-                          <a href={`mailto:${hospital.email}`} className="text-sm hover:text-blue-600">
+                        <div className="group flex items-center gap-2 text-slate-700 transition-colors hover:text-ceenai-blue">
+                          <Mail className="h-4 w-4 flex-shrink-0 text-ceenai-blue group-hover:animate-bounce-subtle" />
+                          <a href={`mailto:${hospital.email}`} className="text-sm hover:text-ceenai-blue">
                             {hospital.email}
                           </a>
                         </div>
                       )}
                       <div className="flex items-center gap-2 bg-yellow-50 px-3 py-2 rounded-lg">
-                        <Star className="w-5 h-5 text-yellow-500 fill-current flex-shrink-0 animate-pulse-subtle" />
-                        <span className="font-bold text-gray-900">{hospital.rating.toFixed(1)}</span>
-                        <span className="text-gray-500 text-sm">({hospital.total_reviews} reviews)</span>
+                        <Star className="h-5 w-5 flex-shrink-0 fill-current text-yellow-500 animate-pulse-subtle" />
+                        <span className="font-bold text-slate-900">{hospital.rating.toFixed(1)}</span>
+                        <span className="text-sm text-slate-500">({hospital.total_reviews} reviews)</span>
                       </div>
                     </div>
 
                     {hospital.specialties && hospital.specialties.length > 0 && (
                       <div className="mb-4">
-                        <p className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide flex items-center gap-2">
-                          <Stethoscope className="w-3.5 h-3.5 text-blue-600" />
+                        <p className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-700">
+                          <Stethoscope className="h-3.5 w-3.5 text-ceenai-blue" />
                           Specialties
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {hospital.specialties.slice(0, 6).map((specialty, index) => (
                             <span
                               key={index}
-                              className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold hover:scale-105 transition-transform cursor-default"
+                              className="cursor-default rounded-full border border-cyan-200 bg-gradient-to-r from-cyan-50 to-blue-50 px-3 py-1 text-xs font-semibold text-cyan-700 transition-transform hover:scale-105"
                             >
                               {specialty}
                             </span>
                           ))}
                           {hospital.specialties.length > 6 && (
-                            <span className="text-xs text-gray-500 px-2 py-1">
+                            <span className="px-2 py-1 text-xs text-slate-500">
                               +{hospital.specialties.length - 6} more
                             </span>
                           )}
@@ -483,10 +505,10 @@ export const FindClinic: React.FC = () => {
                       </div>
                     )}
 
-                    <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
+                    <div className="flex flex-wrap gap-3 border-t border-slate-200 pt-4">
                       <button
                         onClick={() => toggleHospitalExpansion(hospital.id)}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-xl transform hover:scale-105"
+                        className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-ceenai-blue to-ceenai-cyan px-5 py-2.5 font-semibold text-white shadow-md transition-all hover:scale-105 hover:shadow-xl"
                       >
                         <Users className="w-4 h-4" />
                         {expandedHospital === hospital.id ? 'Hide' : 'View'} Doctors
@@ -497,7 +519,7 @@ export const FindClinic: React.FC = () => {
                       </button>
                       <button
                         onClick={() => navigate('/auth/register?role=patient&reset=1')}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold rounded-lg transition-all transform hover:scale-105 hover:shadow-md"
+                        className="flex items-center gap-2 rounded-lg border-2 border-ceenai-blue bg-white px-5 py-2.5 font-semibold text-ceenai-blue transition-all hover:scale-105 hover:bg-cyan-50 hover:shadow-md"
                       >
                         <Calendar className="w-4 h-4" />
                         Book Appointment
@@ -505,26 +527,26 @@ export const FindClinic: React.FC = () => {
                       <div className="relative">
                         <button
                           onClick={() => setShowNavMenu(showNavMenu === hospital.id ? null : hospital.id)}
-                          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-2.5 font-semibold text-white shadow-md transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/30"
+                          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-2.5 font-semibold text-white shadow-md transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/30"
                         >
                           <Navigation className="w-4 h-4" />
                           Get Directions
                           <ChevronDown className={`w-4 h-4 transition-transform ${showNavMenu === hospital.id ? 'rotate-180' : ''}`} />
                         </button>
                         {showNavMenu === hospital.id && (
-                          <div className="absolute top-full mt-2 left-0 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-10 animate-fade-in min-w-[200px]">
+                          <div className="absolute left-0 top-full z-10 mt-2 min-w-[200px] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl animate-fade-in">
                             <button
                               onClick={() => openGoogleMaps(hospital)}
-                              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors text-left text-gray-700 hover:text-blue-600 font-medium"
+                              className="w-full text-left text-slate-700 flex items-center gap-3 px-4 py-3 font-medium transition-colors hover:bg-cyan-50 hover:text-ceenai-blue"
                             >
-                              <MapPin className="w-4 h-4 text-blue-600" />
+                              <MapPin className="h-4 w-4 text-ceenai-blue" />
                               Google Maps
                             </button>
                             <button
                               onClick={() => openWaze(hospital)}
-                              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-cyan-50 transition-colors text-left text-gray-700 hover:text-cyan-600 font-medium border-t border-gray-100"
+                              className="w-full text-left text-slate-700 flex items-center gap-3 border-t border-slate-100 px-4 py-3 font-medium transition-colors hover:bg-cyan-50 hover:text-ceenai-cyan"
                             >
-                              <Navigation className="w-4 h-4 text-cyan-600" />
+                              <Navigation className="h-4 w-4 text-ceenai-cyan" />
                               Waze
                             </button>
                           </div>
@@ -535,9 +557,9 @@ export const FindClinic: React.FC = () => {
                 </div>
 
                 {expandedHospital === hospital.id && (
-                  <div className="bg-gradient-to-br from-slate-50 to-blue-50 border-t-2 border-blue-100 p-6 animate-fade-in">
-                    <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                      <Stethoscope className="w-5 h-5 text-blue-600" />
+                  <div className="animate-fade-in border-t-2 border-cyan-100 bg-gradient-to-br from-slate-50 to-cyan-50 p-6">
+                    <h4 className="mb-4 flex items-center gap-2 text-xl font-bold text-slate-900">
+                      <Stethoscope className="h-5 w-5 text-ceenai-blue" />
                       Available Doctors at {hospital.name}
                     </h4>
 
@@ -546,7 +568,7 @@ export const FindClinic: React.FC = () => {
                         {hospitalDoctors[hospital.id].map((doctor, idx) => (
                           <div
                             key={doctor.id}
-                            className="card-hover bg-white rounded-xl p-4 shadow-md border border-gray-100 animate-fade-in-up"
+                            className="card-hover animate-fade-in-up rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
                             style={{ animationDelay: `${idx * 50}ms` }}
                           >
                             <div className="flex items-start gap-3 mb-3">
@@ -561,35 +583,35 @@ export const FindClinic: React.FC = () => {
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h5 className="font-bold text-gray-900 mb-1">{doctor.name}</h5>
-                                <p className="text-sm text-blue-600 font-medium">{doctor.specialty}</p>
+                                <h5 className="mb-1 font-bold text-slate-900">{doctor.name}</h5>
+                                <p className="text-sm font-medium text-ceenai-blue">{doctor.specialty}</p>
                                 <div className="flex items-center gap-1 mt-1">
                                   <Star className="w-3.5 h-3.5 text-yellow-500 fill-current" />
-                                  <span className="text-xs font-bold text-gray-900">
+                                  <span className="text-xs font-bold text-slate-900">
                                     {doctor.average_rating > 0 ? doctor.average_rating.toFixed(1) : 'New'}
                                   </span>
                                   {doctor.total_ratings > 0 && (
-                                    <span className="text-xs text-gray-500">({doctor.total_ratings})</span>
+                                    <span className="text-xs text-slate-500">({doctor.total_ratings})</span>
                                   )}
                                 </div>
                               </div>
                             </div>
 
-                            <div className="space-y-2 text-xs text-gray-600 bg-gray-50 rounded-lg p-3 mb-3">
+                            <div className="mb-3 space-y-2 rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
                               <div className="flex items-center gap-2">
-                                <MapPin className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                                <MapPin className="h-3.5 w-3.5 flex-shrink-0 text-slate-400" />
                                 <span>Room {doctor.room_number}</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <Clock className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                                <Clock className="h-3.5 w-3.5 flex-shrink-0 text-slate-400" />
                                 <span>{doctor.consultation_hours}</span>
                               </div>
                               {doctor.consultation_days?.length > 0 && (
                                 <div className="flex items-start gap-2">
-                                  <Calendar className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mt-0.5" />
+                                  <Calendar className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-slate-400" />
                                   <div className="flex flex-wrap gap-1">
                                     {doctor.consultation_days.map((day, idx) => (
-                                      <span key={idx} className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-medium">
+                                      <span key={idx} className="rounded bg-cyan-100 px-2 py-0.5 text-xs font-medium text-cyan-700">
                                         {day}
                                       </span>
                                     ))}
@@ -600,7 +622,7 @@ export const FindClinic: React.FC = () => {
 
                             <button
                               onClick={() => navigate('/patient/appointments/book')}
-                              className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-medium rounded-lg transition-all text-sm shadow-md hover:shadow-lg transform hover:scale-105"
+                              className="w-full rounded-lg bg-gradient-to-r from-ceenai-blue to-ceenai-cyan px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:scale-105 hover:shadow-lg"
                             >
                               Book with Dr. {doctor.name.split(' ')[doctor.name.split(' ').length - 1]}
                             </button>
@@ -608,9 +630,12 @@ export const FindClinic: React.FC = () => {
                         ))}
                       </div>
                     ) : (
-                      <div className="text-center py-8 text-gray-500">
-                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-3"></div>
-                        <p>Loading doctors...</p>
+                      <div className="py-8 text-center text-slate-500">
+                        <div className="space-y-2">
+                          <Skeleton className="mx-auto h-4 w-48" />
+                          <Skeleton className="mx-auto h-4 w-36" />
+                        </div>
+                        <p className="mt-3">Loading doctors...</p>
                       </div>
                     )}
                   </div>
@@ -619,10 +644,10 @@ export const FindClinic: React.FC = () => {
             ))}
 
             {filteredHospitals.length === 0 && (
-              <div className="text-center py-16 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100">
-                <Building2 className="w-16 h-16 mx-auto mb-4 text-gray-300 animate-pulse" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No facilities found</h3>
-                <p className="text-gray-600">Try adjusting your search or filters</p>
+              <div className="rounded-[2rem] border border-slate-200 bg-white/90 py-16 text-center shadow-sm backdrop-blur-sm">
+                <Building2 className="mx-auto mb-4 h-16 w-16 animate-pulse text-slate-300" />
+                <h3 className="mb-2 text-xl font-semibold text-slate-900">No facilities found</h3>
+                <p className="text-slate-600">Try adjusting your search or filters</p>
               </div>
             )}
           </div>
