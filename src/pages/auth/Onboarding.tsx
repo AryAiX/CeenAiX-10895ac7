@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type CSSProperties, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Activity, ArrowRight, LogOut, UserCheck } from 'lucide-react';
+import { ArrowRight, LogOut, UserCheck } from 'lucide-react';
 import { LanguageSwitcher } from '../../components/LanguageSwitcher';
 import { SpecializationMultiSelect } from '../../components/SpecializationMultiSelect';
 import { useDoctorSpecializationIds, useSpecializations } from '../../hooks';
@@ -301,9 +301,7 @@ export const Onboarding = () => {
 
         <div className="relative">
           <Link to="/" className="mb-10 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-600">
-              <Activity className="h-5 w-5 text-white" />
-            </div>
+            <img src="/favicon.svg" alt="CeenAiX" className="h-10 w-10 object-contain" />
             <div>
               <div className="text-lg font-bold text-white" style={JAKARTA}>
                 CeenAiX
@@ -351,9 +349,7 @@ export const Onboarding = () => {
       <div className="flex flex-1 items-center justify-center p-6 sm:p-8">
         <div className="w-full max-w-2xl">
           <div className="mb-6 flex items-center gap-3 lg:hidden">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600">
-              <Activity className="h-4 w-4 text-white" />
-            </div>
+            <img src="/favicon.svg" alt="CeenAiX" className="h-8 w-8 object-contain" />
             <span className="font-bold text-slate-800" style={JAKARTA}>
               CeenAiX
             </span>
