@@ -456,12 +456,12 @@ export const BookAppointment: React.FC = () => {
 
         <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           <section className="rounded-2xl bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-gray-900">
+            <h2 className="text-xl font-bold text-slate-900">
               {isRescheduling || isDoctorSelectionLocked
                 ? t('patient.book.currentDoctor')
                 : t('patient.book.chooseDoctor')}
             </h2>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-slate-600">
               {isRescheduling
                 ? t('patient.book.rescheduleDoctorSub')
                 : isDoctorSelectionLocked
@@ -492,16 +492,16 @@ export const BookAppointment: React.FC = () => {
                   <div className="w-full rounded-2xl border border-cyan-400 bg-cyan-50 p-4 text-left shadow-sm">
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <p className="text-lg font-semibold text-gray-900">{selectedDoctor.fullName}</p>
+                        <p className="text-lg font-semibold text-slate-900">{selectedDoctor.fullName}</p>
                         <p className="mt-1 text-sm text-cyan-700">
                           {selectedDoctor.specialty ?? t('shared.generalPractice')}
                         </p>
-                        <p className="mt-2 text-sm text-gray-600">
+                        <p className="mt-2 text-sm text-slate-600">
                           {[selectedDoctor.city, selectedDoctor.address].filter(Boolean).join(' • ') ||
                             t('shared.clinicTbd')}
                         </p>
                       </div>
-                      <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm">
+                      <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm">
                         {selectedDoctor.activeAvailabilityCount === 1
                           ? t('shared.windowOne', { count: selectedDoctor.activeAvailabilityCount })
                           : t('shared.windowMany', { count: selectedDoctor.activeAvailabilityCount })}
@@ -509,10 +509,10 @@ export const BookAppointment: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-                    <Stethoscope className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                    <p className="font-semibold text-gray-900">{t('patient.book.noDoctors')}</p>
-                    <p className="mt-1 text-sm text-gray-600">{t('patient.book.noDoctorsSub')}</p>
+                  <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+                    <Stethoscope className="mx-auto mb-3 h-8 w-8 text-slate-400" />
+                    <p className="font-semibold text-slate-900">{t('patient.book.noDoctors')}</p>
+                    <p className="mt-1 text-sm text-slate-600">{t('patient.book.noDoctorsSub')}</p>
                   </div>
                 )}
               </div>
@@ -520,15 +520,15 @@ export const BookAppointment: React.FC = () => {
               <div className="mt-5 grid gap-6 md:grid-cols-[320px_minmax(0,1fr)] md:items-start">
                 <div className="space-y-4">
                   <label className="block space-y-2">
-                    <span className="text-sm font-semibold text-gray-700">{t('patient.book.search')}</span>
+                    <span className="text-sm font-semibold text-slate-700">{t('patient.book.search')}</span>
                     <div className="relative">
-                      <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                      <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                       <input
                         type="text"
                         value={searchTerm}
                         onChange={(event) => setSearchTerm(event.target.value)}
                         placeholder={t('patient.book.searchPh')}
-                        className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-11 pr-4 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
+                        className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
                       />
                     </div>
                   </label>
@@ -546,7 +546,7 @@ export const BookAppointment: React.FC = () => {
                 </div>
 
                 <div className="min-w-0 space-y-3">
-                  <div className="rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+                  <div className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-600">
                     {t('patient.book.matching')}
                   </div>
                   <div className="space-y-3">
@@ -557,10 +557,10 @@ export const BookAppointment: React.FC = () => {
                         <Skeleton className="h-28 w-full rounded-2xl" />
                       </>
                     ) : filteredDoctors.length === 0 ? (
-                      <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-                        <Stethoscope className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                        <p className="font-semibold text-gray-900">{t('patient.book.noDoctors')}</p>
-                        <p className="mt-1 text-sm text-gray-600">{t('patient.book.noDoctorsSub')}</p>
+                      <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+                        <Stethoscope className="mx-auto mb-3 h-8 w-8 text-slate-400" />
+                        <p className="font-semibold text-slate-900">{t('patient.book.noDoctors')}</p>
+                        <p className="mt-1 text-sm text-slate-600">{t('patient.book.noDoctorsSub')}</p>
                       </div>
                     ) : (
                       filteredDoctors.map((doctor) => {
@@ -573,20 +573,20 @@ export const BookAppointment: React.FC = () => {
                             className={`w-full rounded-2xl border p-4 text-left transition ${
                               isSelected
                                 ? 'border-cyan-400 bg-cyan-50 shadow-sm'
-                                : 'border-gray-200 bg-white hover:border-cyan-200 hover:bg-cyan-50/50'
+                                : 'border-slate-200 bg-white hover:border-cyan-200 hover:bg-cyan-50/50'
                             }`}
                           >
                             <div className="flex items-start justify-between gap-4">
                               <div>
-                                <p className="text-lg font-semibold text-gray-900">{doctor.fullName}</p>
+                                <p className="text-lg font-semibold text-slate-900">{doctor.fullName}</p>
                                 <p className="mt-1 text-sm text-cyan-700">
                                   {doctor.specialty ?? t('shared.generalPractice')}
                                 </p>
-                                <p className="mt-2 text-sm text-gray-600">
+                                <p className="mt-2 text-sm text-slate-600">
                                   {[doctor.city, doctor.address].filter(Boolean).join(' • ') || t('shared.clinicTbd')}
                                 </p>
                               </div>
-                              <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm">
+                              <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm">
                                 {doctor.activeAvailabilityCount === 1
                                   ? t('shared.windowOne', { count: doctor.activeAvailabilityCount })
                                   : t('shared.windowMany', { count: doctor.activeAvailabilityCount })}
@@ -610,10 +610,10 @@ export const BookAppointment: React.FC = () => {
                     <Skeleton className="h-28 w-full rounded-2xl" />
                   </>
                 ) : filteredDoctors.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-                    <Stethoscope className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                    <p className="font-semibold text-gray-900">{t('patient.book.noDoctors')}</p>
-                    <p className="mt-1 text-sm text-gray-600">{t('patient.book.noDoctorsSub')}</p>
+                  <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+                    <Stethoscope className="mx-auto mb-3 h-8 w-8 text-slate-400" />
+                    <p className="font-semibold text-slate-900">{t('patient.book.noDoctors')}</p>
+                    <p className="mt-1 text-sm text-slate-600">{t('patient.book.noDoctorsSub')}</p>
                   </div>
                 ) : (
                   filteredDoctors.map((doctor) => {
@@ -626,20 +626,20 @@ export const BookAppointment: React.FC = () => {
                         className={`w-full rounded-2xl border p-4 text-left transition ${
                           isSelected
                             ? 'border-cyan-400 bg-cyan-50 shadow-sm'
-                            : 'border-gray-200 bg-white hover:border-cyan-200 hover:bg-cyan-50/50'
+                            : 'border-slate-200 bg-white hover:border-cyan-200 hover:bg-cyan-50/50'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-4">
                           <div>
-                            <p className="text-lg font-semibold text-gray-900">{doctor.fullName}</p>
+                            <p className="text-lg font-semibold text-slate-900">{doctor.fullName}</p>
                             <p className="mt-1 text-sm text-cyan-700">
                               {doctor.specialty ?? t('shared.generalPractice')}
                             </p>
-                            <p className="mt-2 text-sm text-gray-600">
+                            <p className="mt-2 text-sm text-slate-600">
                               {[doctor.city, doctor.address].filter(Boolean).join(' • ') || t('shared.clinicTbd')}
                             </p>
                           </div>
-                          <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm">
+                          <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm">
                             {doctor.activeAvailabilityCount === 1
                               ? t('shared.windowOne', { count: doctor.activeAvailabilityCount })
                               : t('shared.windowMany', { count: doctor.activeAvailabilityCount })}
@@ -654,23 +654,23 @@ export const BookAppointment: React.FC = () => {
           </section>
 
           <section className="rounded-2xl bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-gray-900">{t('patient.book.pickSlot')}</h2>
-            <p className="mt-1 text-sm text-gray-600">{t('patient.book.pickSlotSub')}</p>
+            <h2 className="text-xl font-bold text-slate-900">{t('patient.book.pickSlot')}</h2>
+            <p className="mt-1 text-sm text-slate-600">{t('patient.book.pickSlotSub')}</p>
 
             {!selectedDoctor ? (
-              <div className="mt-6 rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-                <Calendar className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                <p className="font-semibold text-gray-900">{t('patient.book.chooseDoctorFirst')}</p>
-                <p className="mt-1 text-sm text-gray-600">{t('patient.book.chooseDoctorFirstSub')}</p>
+              <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+                <Calendar className="mx-auto mb-3 h-8 w-8 text-slate-400" />
+                <p className="font-semibold text-slate-900">{t('patient.book.chooseDoctorFirst')}</p>
+                <p className="mt-1 text-sm text-slate-600">{t('patient.book.chooseDoctorFirstSub')}</p>
               </div>
             ) : (
               <>
                 <div className="mt-6 rounded-2xl bg-cyan-50 p-4">
-                  <p className="text-lg font-semibold text-gray-900">{selectedDoctor.fullName}</p>
+                  <p className="text-lg font-semibold text-slate-900">{selectedDoctor.fullName}</p>
                   <p className="mt-1 text-sm text-cyan-700">
                     {selectedDoctor.specialty ?? t('shared.generalPractice')}
                   </p>
-                  <p className="mt-2 text-sm text-gray-600 flex items-center gap-2">
+                  <p className="mt-2 flex items-center gap-2 text-sm text-slate-600">
                     <MapPin className="h-4 w-4" />
                     <span>
                       {[selectedDoctor.city, selectedDoctor.address].filter(Boolean).join(' • ') ||
@@ -694,11 +694,11 @@ export const BookAppointment: React.FC = () => {
                             new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
                           )
                         }
-                        className="rounded-lg p-2 transition hover:bg-gray-100"
+                        className="rounded-lg p-2 transition hover:bg-slate-100"
                       >
-                        <ChevronLeft className="h-5 w-5 text-gray-700" />
+                        <ChevronLeft className="h-5 w-5 text-slate-700" />
                       </button>
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-slate-900">
                         {currentMonth.toLocaleDateString(locale, dtOpts({ month: 'long', year: 'numeric' }))}
                       </h3>
                       <button
@@ -708,14 +708,14 @@ export const BookAppointment: React.FC = () => {
                             new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)
                           )
                         }
-                        className="rounded-lg p-2 transition hover:bg-gray-100"
+                        className="rounded-lg p-2 transition hover:bg-slate-100"
                       >
-                        <ChevronRight className="h-5 w-5 text-gray-700" />
+                        <ChevronRight className="h-5 w-5 text-slate-700" />
                       </button>
                     </div>
 
-                    <div className="mt-4 rounded-2xl border border-gray-200 p-4">
-                      <div className="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-gray-500">
+                    <div className="mt-4 rounded-2xl border border-slate-200 p-4">
+                      <div className="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-slate-500">
                         {weekdayLabels.map((label) => (
                           <div key={label} className="py-2">
                             {label}
@@ -743,8 +743,8 @@ export const BookAppointment: React.FC = () => {
                                 isSelected
                                   ? 'border-cyan-500 bg-cyan-500 text-white'
                                   : isAvailable
-                                    ? 'border-gray-200 bg-white text-gray-900 hover:border-cyan-300 hover:bg-cyan-50'
-                                    : 'border-gray-100 bg-gray-50 text-gray-300'
+                                    ? 'border-slate-200 bg-white text-slate-900 hover:border-cyan-300 hover:bg-cyan-50'
+                                    : 'border-slate-100 bg-slate-50 text-slate-300'
                               }`}
                             >
                               {formatLocaleDigits(date.getDate(), i18n.language)}
@@ -755,9 +755,9 @@ export const BookAppointment: React.FC = () => {
                     </div>
 
                     <div className="mt-6">
-                      <h3 className="font-semibold text-gray-900">{t('patient.book.slotsTitle')}</h3>
+                      <h3 className="font-semibold text-slate-900">{t('patient.book.slotsTitle')}</h3>
                       {selectedDate ? (
-                        <p className="mt-1 text-sm text-gray-600">
+                        <p className="mt-1 text-sm text-slate-600">
                           {selectedDate.toLocaleDateString(
                             locale,
                             dtOpts({
@@ -769,7 +769,7 @@ export const BookAppointment: React.FC = () => {
                           )}
                         </p>
                       ) : (
-                        <p className="mt-1 text-sm text-gray-600">{t('patient.book.selectDateHint')}</p>
+                        <p className="mt-1 text-sm text-slate-600">{t('patient.book.selectDateHint')}</p>
                       )}
 
                       <div className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -782,17 +782,17 @@ export const BookAppointment: React.FC = () => {
                               className={`rounded-xl border px-4 py-3 text-sm font-semibold transition ${
                                 selectedSlotIso === slot.iso
                                   ? 'border-cyan-500 bg-cyan-500 text-white'
-                                  : 'border-gray-200 bg-white text-gray-800 hover:border-cyan-300 hover:bg-cyan-50'
+                                  : 'border-slate-200 bg-white text-slate-800 hover:border-cyan-300 hover:bg-cyan-50'
                               }`}
                             >
                               {slot.label}
                             </button>
                           ))
                         ) : (
-                          <div className="sm:col-span-3 lg:col-span-4 rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
-                            <Clock className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                            <p className="font-semibold text-gray-900">{t('patient.book.noSlots')}</p>
-                            <p className="mt-1 text-sm text-gray-600">{t('patient.book.noSlotsSub')}</p>
+                          <div className="sm:col-span-3 lg:col-span-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+                            <Clock className="mx-auto mb-3 h-8 w-8 text-slate-400" />
+                            <p className="font-semibold text-slate-900">{t('patient.book.noSlots')}</p>
+                            <p className="mt-1 text-sm text-slate-600">{t('patient.book.noSlotsSub')}</p>
                           </div>
                         )}
                       </div>
@@ -800,33 +800,33 @@ export const BookAppointment: React.FC = () => {
 
                     <div className="mt-6 space-y-4">
                       <label className="block space-y-2">
-                        <span className="text-sm font-semibold text-gray-700">{t('patient.book.reasonLabel')}</span>
+                        <span className="text-sm font-semibold text-slate-700">{t('patient.book.reasonLabel')}</span>
                         <textarea
                           value={chiefComplaint}
                           onChange={(event) => setChiefComplaint(event.target.value)}
                           rows={4}
-                          className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
+                          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
                           placeholder={t('patient.book.reasonPh')}
                         />
                       </label>
 
                       <label className="block space-y-2">
-                        <span className="text-sm font-semibold text-gray-700">{t('patient.book.notesLabel')}</span>
+                        <span className="text-sm font-semibold text-slate-700">{t('patient.book.notesLabel')}</span>
                         <textarea
                           value={notes}
                           onChange={(event) => setNotes(event.target.value)}
                           rows={3}
-                          className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
+                          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
                           placeholder={t('patient.book.notesPh')}
                         />
                       </label>
                     </div>
 
-                    <div className="mt-6 rounded-2xl bg-gray-50 p-4">
-                      <p className="text-sm font-semibold text-gray-900">
+                    <div className="mt-6 rounded-2xl bg-slate-50 p-4">
+                      <p className="text-sm font-semibold text-slate-900">
                         {isRescheduling ? t('patient.book.summaryReschedule') : t('patient.book.summaryBook')}
                       </p>
-                      <p className="mt-2 text-sm text-gray-600">
+                      <p className="mt-2 text-sm text-slate-600">
                         {selectedDoctor.fullName}
                         {selectedSlot
                           ? ` • ${new Date(selectedSlot.iso).toLocaleString(
@@ -847,7 +847,7 @@ export const BookAppointment: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => navigate('/patient/appointments')}
-                        className="rounded-xl border border-gray-200 px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
+                        className="rounded-xl border border-slate-200 px-5 py-3 font-semibold text-slate-700 transition hover:bg-slate-50"
                       >
                         {t('patient.book.cancel')}
                       </button>

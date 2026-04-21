@@ -279,25 +279,25 @@ export const DoctorSchedule: React.FC = () => {
 
         <div className="mb-8 grid gap-4 md:grid-cols-3">
           <div className="rounded-2xl bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-500">Active weekly windows</p>
-            {loading ? <Skeleton className="mt-3 h-8 w-12" /> : <p className="mt-3 text-3xl font-bold text-gray-900">{activeAvailabilityCount}</p>}
-            <p className="mt-2 text-sm text-gray-600">Patients can book only against active recurring hours.</p>
+            <p className="text-sm font-medium text-slate-500">Active weekly windows</p>
+            {loading ? <Skeleton className="mt-3 h-8 w-12" /> : <p className="mt-3 text-3xl font-bold text-slate-900">{activeAvailabilityCount}</p>}
+            <p className="mt-2 text-sm text-slate-600">Patients can book only against active recurring hours.</p>
           </div>
 
           <div className="rounded-2xl bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-500">Upcoming blocked slots</p>
-            {loading ? <Skeleton className="mt-3 h-8 w-12" /> : <p className="mt-3 text-3xl font-bold text-gray-900">{blockedSlots.length}</p>}
-            <p className="mt-2 text-sm text-gray-600">Use blocked slots for leave, meetings, and time away from clinic.</p>
+            <p className="text-sm font-medium text-slate-500">Upcoming blocked slots</p>
+            {loading ? <Skeleton className="mt-3 h-8 w-12" /> : <p className="mt-3 text-3xl font-bold text-slate-900">{blockedSlots.length}</p>}
+            <p className="mt-2 text-sm text-slate-600">Use blocked slots for leave, meetings, and time away from clinic.</p>
           </div>
 
           <div className="rounded-2xl bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-500">Booking readiness</p>
+            <p className="text-sm font-medium text-slate-500">Booking readiness</p>
             {loading ? (
               <Skeleton className="mt-3 h-8 w-24" />
             ) : (
-              <p className="mt-3 text-3xl font-bold text-gray-900">{activeAvailabilityCount > 0 ? 'Ready' : 'Not yet'}</p>
+              <p className="mt-3 text-3xl font-bold text-slate-900">{activeAvailabilityCount > 0 ? 'Ready' : 'Not yet'}</p>
             )}
-            <p className="mt-2 text-sm text-gray-600">Add at least one active recurring window before patient booking is enabled.</p>
+            <p className="mt-2 text-sm text-slate-600">Add at least one active recurring window before patient booking is enabled.</p>
           </div>
         </div>
 
@@ -305,24 +305,24 @@ export const DoctorSchedule: React.FC = () => {
           <div className="space-y-6">
             <section className="rounded-2xl bg-white p-6 shadow-sm">
               <div className="mb-6 flex items-center gap-3">
-                <div className="rounded-xl bg-teal-100 p-3">
-                  <CalendarDays className="h-5 w-5 text-teal-700" />
+                <div className="rounded-xl bg-cyan-100 p-3">
+                  <CalendarDays className="h-5 w-5 text-ceenai-blue" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">Weekly Availability</h2>
-                  <p className="text-sm text-gray-600">Create the recurring hours patients should see when choosing a slot.</p>
+                  <h2 className="text-xl font-bold text-slate-900">Weekly Availability</h2>
+                  <p className="text-sm text-slate-600">Create the recurring hours patients should see when choosing a slot.</p>
                 </div>
               </div>
 
               <form className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" onSubmit={handleAvailabilitySubmit}>
                 <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-gray-700">Day</span>
+                  <span className="text-sm font-semibold text-slate-700">Day</span>
                   <select
                     value={availabilityForm.dayOfWeek}
                     onChange={(event) =>
                       setAvailabilityForm((current) => ({ ...current, dayOfWeek: event.target.value }))
                     }
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
                   >
                     {DAY_OPTIONS.map((day) => (
                       <option key={day.value} value={day.value}>
@@ -333,33 +333,33 @@ export const DoctorSchedule: React.FC = () => {
                 </label>
 
                 <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-gray-700">Start</span>
+                  <span className="text-sm font-semibold text-slate-700">Start</span>
                   <input
                     type="time"
                     value={availabilityForm.startTime}
                     onChange={(event) =>
                       setAvailabilityForm((current) => ({ ...current, startTime: event.target.value }))
                     }
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
                     required
                   />
                 </label>
 
                 <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-gray-700">End</span>
+                  <span className="text-sm font-semibold text-slate-700">End</span>
                   <input
                     type="time"
                     value={availabilityForm.endTime}
                     onChange={(event) =>
                       setAvailabilityForm((current) => ({ ...current, endTime: event.target.value }))
                     }
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
                     required
                   />
                 </label>
 
                 <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-gray-700">Slot length</span>
+                  <span className="text-sm font-semibold text-slate-700">Slot length</span>
                   <select
                     value={availabilityForm.slotDurationMinutes}
                     onChange={(event) =>
@@ -368,7 +368,7 @@ export const DoctorSchedule: React.FC = () => {
                         slotDurationMinutes: event.target.value,
                       }))
                     }
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
                   >
                     <option value="15">15 min</option>
                     <option value="20">20 min</option>
@@ -382,7 +382,7 @@ export const DoctorSchedule: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isSavingAvailability}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-slate-900 to-emerald-800 px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <Plus className="h-4 w-4" />
                     <span>{isSavingAvailability ? 'Saving...' : 'Add recurring availability'}</span>
@@ -392,8 +392,8 @@ export const DoctorSchedule: React.FC = () => {
             </section>
 
             <section className="rounded-2xl bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-bold text-gray-900">Current Weekly Schedule</h2>
-              <p className="mt-1 text-sm text-gray-600">Pause or remove recurring windows as your practice hours change.</p>
+              <h2 className="text-xl font-bold text-slate-900">Current Weekly Schedule</h2>
+              <p className="mt-1 text-sm text-slate-600">Pause or remove recurring windows as your practice hours change.</p>
 
               <div className="mt-6 space-y-4">
                 {loading ? (
@@ -403,25 +403,25 @@ export const DoctorSchedule: React.FC = () => {
                     <Skeleton className="h-24 w-full rounded-2xl" />
                   </>
                 ) : availabilities.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-                    <CalendarDays className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                    <p className="font-semibold text-gray-900">No recurring availability yet</p>
-                    <p className="mt-1 text-sm text-gray-600">
+                  <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+                    <CalendarDays className="mx-auto mb-3 h-8 w-8 text-slate-400" />
+                    <p className="font-semibold text-slate-900">No recurring availability yet</p>
+                    <p className="mt-1 text-sm text-slate-600">
                       Add your weekly working hours here before patient booking goes live.
                     </p>
                   </div>
                 ) : (
                   groupedAvailability.map((day) => (
-                    <div key={day.value} className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+                    <div key={day.value} className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
                       <div className="mb-3 flex items-center justify-between">
-                        <h3 className="font-semibold text-gray-900">{day.label}</h3>
-                        <span className="text-xs font-medium text-gray-500">
+                        <h3 className="font-semibold text-slate-900">{day.label}</h3>
+                        <span className="text-xs font-medium text-slate-500">
                           {day.entries.length === 0 ? 'Unavailable' : `${day.entries.length} window${day.entries.length === 1 ? '' : 's'}`}
                         </span>
                       </div>
 
                       {day.entries.length === 0 ? (
-                        <p className="text-sm text-gray-500">No active or paused recurring windows for this day.</p>
+                        <p className="text-sm text-slate-500">No active or paused recurring windows for this day.</p>
                       ) : (
                         <div className="space-y-3">
                           {day.entries.map((entry) => {
@@ -434,16 +434,16 @@ export const DoctorSchedule: React.FC = () => {
                                 <div className="flex items-start gap-3">
                                   <div
                                     className={`rounded-lg p-2 ${
-                                      entry.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
+                                      entry.is_active ? 'bg-cyan-100 text-ceenai-blue' : 'bg-slate-100 text-slate-500'
                                     }`}
                                   >
                                     <Clock3 className="h-4 w-4" />
                                   </div>
                                   <div>
-                                    <p className="font-semibold text-gray-900">
+                                    <p className="font-semibold text-slate-900">
                                       {formatTimeLabel(entry.start_time, i18n.language)} to {formatTimeLabel(entry.end_time, i18n.language)}
                                     </p>
-                                    <p className="mt-1 text-sm text-gray-600">
+                                    <p className="mt-1 text-sm text-slate-600">
                                       {entry.slot_duration_minutes} minute slots
                                     </p>
                                   </div>
@@ -453,8 +453,8 @@ export const DoctorSchedule: React.FC = () => {
                                   <span
                                     className={`rounded-full px-3 py-1 text-xs font-semibold ${
                                       entry.is_active
-                                        ? 'bg-emerald-100 text-emerald-800'
-                                        : 'bg-gray-200 text-gray-700'
+                                        ? 'bg-cyan-100 text-ceenai-blue'
+                                        : 'bg-slate-200 text-slate-700'
                                     }`}
                                   >
                                     {entry.is_active ? 'Active' : 'Paused'}
@@ -463,7 +463,7 @@ export const DoctorSchedule: React.FC = () => {
                                     type="button"
                                     disabled={isBusy}
                                     onClick={() => handleAvailabilityToggle(entry.id, !entry.is_active)}
-                                    className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-teal-300 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
+                                    className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-cyan-300 hover:text-ceenai-blue disabled:cursor-not-allowed disabled:opacity-60"
                                   >
                                     {entry.is_active ? 'Pause' : 'Activate'}
                                   </button>
@@ -492,18 +492,18 @@ export const DoctorSchedule: React.FC = () => {
           <div className="space-y-6">
             <section className="rounded-2xl bg-white p-6 shadow-sm">
               <div className="mb-6 flex items-center gap-3">
-                <div className="rounded-xl bg-orange-100 p-3">
-                  <Ban className="h-5 w-5 text-orange-700" />
+                <div className="rounded-xl bg-cyan-100 p-3">
+                  <Ban className="h-5 w-5 text-ceenai-blue" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">Block Time</h2>
-                  <p className="text-sm text-gray-600">Temporarily hide slots for leave, meetings, or time off.</p>
+                  <h2 className="text-xl font-bold text-slate-900">Block Time</h2>
+                  <p className="text-sm text-slate-600">Temporarily hide slots for leave, meetings, or time off.</p>
                 </div>
               </div>
 
               <form className="space-y-4" onSubmit={handleBlockedSlotSubmit}>
                 <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-gray-700">Date</span>
+                  <span className="text-sm font-semibold text-slate-700">Date</span>
                   <input
                     type="date"
                     min={getTodayDate()}
@@ -511,48 +511,48 @@ export const DoctorSchedule: React.FC = () => {
                     onChange={(event) =>
                       setBlockedSlotForm((current) => ({ ...current, blockedDate: event.target.value }))
                     }
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
                     required
                   />
                 </label>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <label className="block space-y-2">
-                    <span className="text-sm font-semibold text-gray-700">Start</span>
+                    <span className="text-sm font-semibold text-slate-700">Start</span>
                     <input
                       type="time"
                       value={blockedSlotForm.startTime}
                       onChange={(event) =>
                         setBlockedSlotForm((current) => ({ ...current, startTime: event.target.value }))
                       }
-                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
                       required
                     />
                   </label>
 
                   <label className="block space-y-2">
-                    <span className="text-sm font-semibold text-gray-700">End</span>
+                    <span className="text-sm font-semibold text-slate-700">End</span>
                     <input
                       type="time"
                       value={blockedSlotForm.endTime}
                       onChange={(event) =>
                         setBlockedSlotForm((current) => ({ ...current, endTime: event.target.value }))
                       }
-                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
                       required
                     />
                   </label>
                 </div>
 
                 <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-gray-700">Reason</span>
+                  <span className="text-sm font-semibold text-slate-700">Reason</span>
                   <textarea
                     value={blockedSlotForm.reason}
                     onChange={(event) =>
                       setBlockedSlotForm((current) => ({ ...current, reason: event.target.value }))
                     }
                     rows={3}
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10"
                     placeholder="Optional note for your own reference"
                   />
                 </label>
@@ -560,7 +560,7 @@ export const DoctorSchedule: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSavingBlockedSlot}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <Plus className="h-4 w-4" />
                   <span>{isSavingBlockedSlot ? 'Saving...' : 'Add blocked time'}</span>
@@ -569,8 +569,8 @@ export const DoctorSchedule: React.FC = () => {
             </section>
 
             <section className="rounded-2xl bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-bold text-gray-900">Upcoming Blocked Slots</h2>
-              <p className="mt-1 text-sm text-gray-600">These one-off blocks override your recurring weekly availability.</p>
+              <h2 className="text-xl font-bold text-slate-900">Upcoming Blocked Slots</h2>
+              <p className="mt-1 text-sm text-slate-600">These one-off blocks override your recurring weekly availability.</p>
 
               <div className="mt-6 space-y-3">
                 {loading ? (
@@ -579,10 +579,10 @@ export const DoctorSchedule: React.FC = () => {
                     <Skeleton className="h-24 w-full rounded-2xl" />
                   </>
                 ) : blockedSlots.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-                    <Ban className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-                    <p className="font-semibold text-gray-900">No blocked time yet</p>
-                    <p className="mt-1 text-sm text-gray-600">
+                  <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+                    <Ban className="mx-auto mb-3 h-8 w-8 text-slate-400" />
+                    <p className="font-semibold text-slate-900">No blocked time yet</p>
+                    <p className="mt-1 text-sm text-slate-600">
                       Add one-off blocks here when you need to close parts of your schedule.
                     </p>
                   </div>
@@ -591,10 +591,10 @@ export const DoctorSchedule: React.FC = () => {
                     const isBusy = busyBlockedSlotId === slot.id;
 
                     return (
-                      <div key={slot.id} className="rounded-xl border border-orange-100 bg-orange-50 p-4">
+                      <div key={slot.id} className="rounded-xl border border-cyan-100 bg-cyan-50 p-4">
                         <div className="flex items-start justify-between gap-3">
                           <div>
-                            <p className="font-semibold text-gray-900">
+                            <p className="font-semibold text-slate-900">
                               {new Date(`${slot.blocked_date}T00:00:00`).toLocaleDateString(
                                 locale,
                                 dtOpts({
@@ -605,11 +605,11 @@ export const DoctorSchedule: React.FC = () => {
                                 })
                               )}
                             </p>
-                            <p className="mt-1 text-sm text-gray-700">
+                            <p className="mt-1 text-sm text-slate-700">
                               {formatTimeLabel(slot.start_time, i18n.language)} to{' '}
                               {formatTimeLabel(slot.end_time, i18n.language)}
                             </p>
-                            <p className="mt-2 text-sm text-gray-600">{slot.reason ?? 'No reason added'}</p>
+                            <p className="mt-2 text-sm text-slate-600">{slot.reason ?? 'No reason added'}</p>
                           </div>
 
                           <button
