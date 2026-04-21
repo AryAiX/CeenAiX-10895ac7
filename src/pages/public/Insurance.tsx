@@ -206,7 +206,7 @@ export const Insurance: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-gray-50">
+    <div className="relative min-h-screen bg-gradient-to-b from-slate-50 via-white to-white">
       <div
         className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[22rem] overflow-hidden sm:h-[26rem]"
         aria-hidden
@@ -216,24 +216,24 @@ export const Insurance: React.FC = () => {
           alt=""
           className="h-full w-full object-cover opacity-10"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-50/80 to-gray-50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-50/80 to-white" />
       </div>
 
       <Header />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-300 bg-blue-100 px-5 py-2.5 text-blue-700">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-white/90 px-5 py-2.5 text-cyan-700 shadow-sm">
             <Shield className="h-5 w-5" />
             <span className="text-sm font-semibold">{t('insurancePage.heroBadge')}</span>
           </div>
-          <h1 className="mb-4 text-5xl font-bold text-gray-900 md:text-6xl">{t('insurancePage.heroTitle')}</h1>
-          <p className="mx-auto max-w-3xl text-xl text-gray-600">{t('insurancePage.heroLead')}</p>
+          <h1 className="mb-4 text-5xl font-bold text-slate-900 md:text-6xl">{t('insurancePage.heroTitle')}</h1>
+          <p className="mx-auto max-w-3xl text-xl text-slate-600">{t('insurancePage.heroLead')}</p>
         </div>
 
-        <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-4 text-center">
-          <Shield className="mx-auto mb-2 h-6 w-6 text-blue-600" />
-          <p className="text-sm text-blue-900">{t('insurancePage.dhaNotice')}</p>
+        <div className="mb-6 rounded-2xl border border-cyan-200 bg-cyan-50/70 p-4 text-center">
+          <Shield className="mx-auto mb-2 h-6 w-6 text-cyan-700" />
+          <p className="text-sm text-cyan-900">{t('insurancePage.dhaNotice')}</p>
         </div>
 
         <div className="mb-8 flex justify-center">
@@ -242,14 +242,14 @@ export const Insurance: React.FC = () => {
             onClick={() => setShowComparison(!showComparison)}
             className={`flex items-center gap-2 rounded-xl px-6 py-3 font-semibold transition-all ${
               showComparison
-                ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg'
-                : 'border-2 border-gray-300 bg-white text-gray-700 hover:border-blue-500'
+                ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg'
+                : 'border-2 border-slate-200 bg-white text-slate-700 hover:border-cyan-400 hover:text-cyan-700'
             }`}
           >
             <ArrowLeftRight className="h-5 w-5" />
             {showComparison ? t('insurancePage.compareHide') : t('insurancePage.compareShow')}
             {selectedPlans.length > 0 && (
-              <span className="rounded-full bg-white px-2 py-0.5 text-sm font-bold text-blue-600">
+              <span className="rounded-full bg-white px-2 py-0.5 text-sm font-bold text-cyan-700">
                 {formatLocaleDigits(selectedPlans.length, i18n.language)}
               </span>
             )}
@@ -257,26 +257,26 @@ export const Insurance: React.FC = () => {
         </div>
 
         {showComparison && (
-          <div className="mb-8 overflow-hidden rounded-2xl bg-white shadow-2xl">
-            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 p-4 text-white">
+          <div className="mb-8 overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+            <div className="bg-gradient-to-r from-slate-900 via-ceenai-blue to-ceenai-cyan p-4 text-white">
               <h2 className="text-center text-2xl font-bold">{t('insurancePage.comparisonTitle')}</h2>
               <p className="mt-1 text-center text-sm">{t('insurancePage.comparisonSubtitle')}</p>
             </div>
 
             {selectedPlans.length === 0 ? (
               <div className="p-12 text-center">
-                <ArrowLeftRight className="mx-auto mb-4 h-16 w-16 text-gray-300" />
-                <h3 className="mb-2 text-xl font-semibold text-gray-900">
+                <ArrowLeftRight className="mx-auto mb-4 h-16 w-16 text-slate-300" />
+                <h3 className="mb-2 text-xl font-semibold text-slate-900">
                   {t('insurancePage.comparisonEmptyTitle')}
                 </h3>
-                <p className="text-gray-600">{t('insurancePage.comparisonEmptyBody')}</p>
+                <p className="text-slate-600">{t('insurancePage.comparisonEmptyBody')}</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-slate-50">
                     <tr>
-                      <th className="px-6 py-4 text-start text-sm font-semibold text-gray-900">
+                      <th className="px-6 py-4 text-start text-sm font-semibold text-slate-900">
                         {t('insurancePage.tableFeatures')}
                       </th>
                       {selectedPlanObjects.map((plan) => {
@@ -284,8 +284,8 @@ export const Insurance: React.FC = () => {
                         return (
                           <th key={plan.id} className="min-w-[200px] px-6 py-4 text-center">
                             <div className="flex flex-col items-center">
-                              <span className="font-bold text-gray-900">{d.name}</span>
-                              <span className="mt-1 text-xs text-gray-600">{d.provider}</span>
+                              <span className="font-bold text-slate-900">{d.name}</span>
+                              <span className="mt-1 text-xs text-slate-600">{d.provider}</span>
                               <button
                                 type="button"
                                 onClick={() => togglePlanSelection(plan.id)}
@@ -300,14 +300,14 @@ export const Insurance: React.FC = () => {
                       })}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    <tr className="bg-blue-50">
-                      <td className="px-6 py-4 font-semibold text-gray-900">
+                  <tbody className="divide-y divide-slate-200">
+                    <tr className="bg-cyan-50/70">
+                      <td className="px-6 py-4 font-semibold text-slate-900">
                         {t('insurancePage.tableMonthlyPremium')}
                       </td>
                       {selectedPlanObjects.map((plan) => (
                         <td key={plan.id} className="px-6 py-4 text-center">
-                          <span className="text-2xl font-bold text-blue-600">
+                          <span className="text-2xl font-bold text-cyan-700">
                             {t('insurancePage.premiumWithCurrency', {
                               amount: formatLocaleDigits(plan.monthlyPremium, i18n.language),
                             })}
@@ -316,71 +316,71 @@ export const Insurance: React.FC = () => {
                       ))}
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 font-semibold text-gray-900">
+                      <td className="px-6 py-4 font-semibold text-slate-900">
                         {t('insurancePage.tableCoverageLimit')}
                       </td>
                       {selectedPlanObjects.map((plan) => (
-                        <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
+                        <td key={plan.id} className="px-6 py-4 text-center text-slate-700">
                           {planDisplay(plan).coverageLimit}
                         </td>
                       ))}
                     </tr>
-                    <tr className="bg-gray-50">
-                      <td className="px-6 py-4 font-semibold text-gray-900">
+                    <tr className="bg-slate-50">
+                      <td className="px-6 py-4 font-semibold text-slate-900">
                         {t('insurancePage.tableInpatient')}
                       </td>
                       {selectedPlanObjects.map((plan) => (
-                        <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
+                        <td key={plan.id} className="px-6 py-4 text-center text-slate-700">
                           {planDisplay(plan).inpatientCoverage}
                         </td>
                       ))}
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 font-semibold text-gray-900">
+                      <td className="px-6 py-4 font-semibold text-slate-900">
                         {t('insurancePage.tableOutpatient')}
                       </td>
                       {selectedPlanObjects.map((plan) => (
-                        <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
+                        <td key={plan.id} className="px-6 py-4 text-center text-slate-700">
                           {planDisplay(plan).outpatientCoverage}
                         </td>
                       ))}
                     </tr>
-                    <tr className="bg-gray-50">
-                      <td className="px-6 py-4 font-semibold text-gray-900">
+                    <tr className="bg-slate-50">
+                      <td className="px-6 py-4 font-semibold text-slate-900">
                         {t('insurancePage.tableEmergency')}
                       </td>
                       {selectedPlanObjects.map((plan) => (
-                        <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
+                        <td key={plan.id} className="px-6 py-4 text-center text-slate-700">
                           {planDisplay(plan).emergencyCare}
                         </td>
                       ))}
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 font-semibold text-gray-900">
+                      <td className="px-6 py-4 font-semibold text-slate-900">
                         {t('insurancePage.tableMaternity')}
                       </td>
                       {selectedPlanObjects.map((plan) => (
-                        <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
+                        <td key={plan.id} className="px-6 py-4 text-center text-slate-700">
                           {planDisplay(plan).maternityCare}
                         </td>
                       ))}
                     </tr>
-                    <tr className="bg-gray-50">
-                      <td className="px-6 py-4 font-semibold text-gray-900">
+                    <tr className="bg-slate-50">
+                      <td className="px-6 py-4 font-semibold text-slate-900">
                         {t('insurancePage.tableDental')}
                       </td>
                       {selectedPlanObjects.map((plan) => (
-                        <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
+                        <td key={plan.id} className="px-6 py-4 text-center text-slate-700">
                           {planDisplay(plan).dentalOptical}
                         </td>
                       ))}
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 font-semibold text-gray-900">
+                      <td className="px-6 py-4 font-semibold text-slate-900">
                         {t('insurancePage.tablePharmacy')}
                       </td>
                       {selectedPlanObjects.map((plan) => (
-                        <td key={plan.id} className="px-6 py-4 text-center text-gray-700">
+                        <td key={plan.id} className="px-6 py-4 text-center text-slate-700">
                           {planDisplay(plan).pharmacyCoverage}
                         </td>
                       ))}
@@ -401,12 +401,12 @@ export const Insurance: React.FC = () => {
             return (
               <div
                 key={plan.id}
-                className={`card-hover overflow-hidden rounded-2xl bg-white shadow-lg ${
-                  plan.popular ? 'ring-2 ring-blue-500' : ''
+                className={`card-hover overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm ${
+                  plan.popular ? 'ring-2 ring-cyan-500' : ''
                 } ${isSelected ? 'ring-2 ring-green-500' : ''}`}
               >
                 {plan.popular && (
-                  <div className="bg-gradient-to-r from-blue-600 to-cyan-600 py-2 text-center text-sm font-bold text-white">
+                  <div className="bg-gradient-to-r from-ceenai-cyan to-ceenai-blue py-2 text-center text-sm font-bold text-white">
                     {t('insurancePage.popular')}
                   </div>
                 )}
@@ -414,8 +414,8 @@ export const Insurance: React.FC = () => {
                 <div className="p-6">
                   <div className="mb-4 flex items-start justify-between">
                     <div>
-                      <h3 className="mb-1 text-xl font-bold text-gray-900">{d.name}</h3>
-                      <p className="text-sm text-gray-600">{d.provider}</p>
+                      <h3 className="mb-1 text-xl font-bold text-slate-900">{d.name}</h3>
+                      <p className="text-sm text-slate-600">{d.provider}</p>
                     </div>
                     <button
                       type="button"
@@ -423,42 +423,42 @@ export const Insurance: React.FC = () => {
                       className={`rounded-lg border px-3 py-1 text-xs font-semibold transition-all ${
                         isSelected
                           ? 'border-emerald-400 bg-emerald-50 text-emerald-700'
-                          : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-cyan-400 hover:text-cyan-600'
+                          : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-cyan-400 hover:text-cyan-700'
                       }`}
                     >
                       {isSelected ? t('insurancePage.selected') : t('insurancePage.compare')}
                     </button>
                   </div>
 
-                  <div className="mb-6 border-b border-gray-200 pb-6">
+                  <div className="mb-6 border-b border-slate-200 pb-6">
                     <div className="flex items-baseline">
-                      <span className="text-3xl font-bold text-gray-900">
+                      <span className="text-3xl font-bold text-slate-900">
                         {t('insurancePage.premiumWithCurrency', {
                           amount: formatLocaleDigits(plan.monthlyPremium, i18n.language),
                         })}
                       </span>
-                      <span className="ms-2 text-gray-600">{t('insurancePage.perMonth')}</span>
+                      <span className="ms-2 text-slate-600">{t('insurancePage.perMonth')}</span>
                     </div>
-                    <p className="mt-2 text-sm text-gray-600">
+                    <p className="mt-2 text-sm text-slate-600">
                       {t('insurancePage.coverageUpTo', { limit: d.coverageLimit })}
                     </p>
                   </div>
 
                   <div className="mb-6">
-                    <p className="mb-3 text-sm font-semibold text-gray-900">
+                    <p className="mb-3 text-sm font-semibold text-slate-900">
                       {t('insurancePage.whatsIncluded')}
                     </p>
                     <ul className="space-y-2">
                       {plan.features.slice(0, 5).map((feature, index) => (
                         <li key={index} className="flex items-start gap-2">
                           <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600" />
-                          <span className="text-sm text-gray-700">
+                          <span className="text-sm text-slate-700">
                             {displayInsuranceFeature(t, slug, index, feature)}
                           </span>
                         </li>
                       ))}
                       {plan.features.length > 5 && (
-                        <li className="ms-7 text-sm text-gray-500">
+                        <li className="ms-7 text-sm text-slate-500">
                           {t('insurancePage.moreBenefits', {
                             count: formatLocaleDigits(plan.features.length - 5, i18n.language),
                           })}
@@ -472,7 +472,7 @@ export const Insurance: React.FC = () => {
                     onClick={() => navigate('/auth/register?role=patient&reset=1')}
                     className={`w-full rounded-xl py-3 font-semibold transition-all duration-300 ${
                       plan.popular
-                        ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md hover:shadow-lg hover:shadow-cyan-500/30'
+                        ? 'bg-gradient-to-r from-ceenai-cyan to-ceenai-blue text-white shadow-md hover:shadow-lg hover:shadow-cyan-500/30'
                         : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                     }`}
                   >
@@ -484,36 +484,36 @@ export const Insurance: React.FC = () => {
           })}
         </div>
 
-        <div className="mt-12 rounded-2xl bg-white p-8 shadow-lg">
-          <h2 className="mb-4 text-center text-2xl font-bold text-gray-900">
+        <div className="mt-12 rounded-[2rem] border border-slate-200 bg-white/95 p-8 shadow-sm">
+          <h2 className="mb-4 text-center text-2xl font-bold text-slate-900">
             {t('insurancePage.benefitsTitle')}
           </h2>
           <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
             <div className="text-center">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-                <Shield className="h-6 w-6 text-blue-600" />
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-cyan-100">
+                <Shield className="h-6 w-6 text-cyan-700" />
               </div>
-              <h3 className="mb-2 font-semibold text-gray-900">{t('insurancePage.benefit1Title')}</h3>
-              <p className="text-sm text-gray-600">{t('insurancePage.benefit1Body')}</p>
+              <h3 className="mb-2 font-semibold text-slate-900">{t('insurancePage.benefit1Title')}</h3>
+              <p className="text-sm text-slate-600">{t('insurancePage.benefit1Body')}</p>
             </div>
             <div className="text-center">
               <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
                 <Check className="h-6 w-6 text-green-600" />
               </div>
-              <h3 className="mb-2 font-semibold text-gray-900">{t('insurancePage.benefit2Title')}</h3>
-              <p className="text-sm text-gray-600">{t('insurancePage.benefit2Body')}</p>
+              <h3 className="mb-2 font-semibold text-slate-900">{t('insurancePage.benefit2Title')}</h3>
+              <p className="text-sm text-slate-600">{t('insurancePage.benefit2Body')}</p>
             </div>
             <div className="text-center">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-cyan-100">
-                <Heart className="h-6 w-6 text-cyan-600" />
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+                <Heart className="h-6 w-6 text-blue-600" />
               </div>
-              <h3 className="mb-2 font-semibold text-gray-900">{t('insurancePage.benefit3Title')}</h3>
-              <p className="text-sm text-gray-600">{t('insurancePage.benefit3Body')}</p>
+              <h3 className="mb-2 font-semibold text-slate-900">{t('insurancePage.benefit3Title')}</h3>
+              <p className="text-sm text-slate-600">{t('insurancePage.benefit3Body')}</p>
             </div>
           </div>
         </div>
       </div>
-      <div className="relative z-10 border-t border-slate-800/20">
+      <div className="relative z-10 border-t border-slate-200">
         <Footer />
       </div>
     </div>
