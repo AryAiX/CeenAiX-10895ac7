@@ -347,10 +347,10 @@ export const PatientAppointments: React.FC = () => {
           <div className="flex-1">
             <div className="flex items-start justify-between mb-3 gap-3">
               <div>
-                <h3 className="text-xl font-bold text-gray-900">
+                <h3 className="text-xl font-bold text-slate-900">
                   {doctorProfile?.fullName ?? t('shared.doctor')}
                 </h3>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="mt-1 text-sm text-slate-600">
                   {doctorProfile?.specialty ?? t('shared.careVisit')}
                 </p>
               </div>
@@ -368,13 +368,13 @@ export const PatientAppointments: React.FC = () => {
             </div>
 
             {clinicName ? (
-              <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
-                <MapPin className="w-4 h-4 text-gray-400" />
+              <div className="mb-2 flex items-center gap-2 text-sm text-slate-700">
+                <MapPin className="h-4 w-4 text-slate-400" />
                 <span className="font-medium">{clinicName}</span>
                 {clinicAddress ? (
                   <>
-                    <span className="text-gray-400">•</span>
-                    <span className="text-gray-600">{clinicAddress}</span>
+                    <span className="text-slate-400">•</span>
+                    <span className="text-slate-600">{clinicAddress}</span>
                   </>
                 ) : null}
               </div>
@@ -383,7 +383,7 @@ export const PatientAppointments: React.FC = () => {
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mb-4">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-teal-600" />
-                <span className="text-lg font-serif font-semibold text-gray-900">
+                <span className="text-lg font-serif font-semibold text-slate-900">
                   {new Date(appointment.scheduled_at).toLocaleDateString(
                     locale,
                     dtOpts({ month: 'long', day: '2-digit', year: 'numeric' })
@@ -392,13 +392,13 @@ export const PatientAppointments: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-teal-600" />
-                <span className="text-lg font-serif font-semibold text-gray-900">
+                <span className="text-lg font-serif font-semibold text-slate-900">
                   {new Date(appointment.scheduled_at).toLocaleTimeString(
                     locale,
                     dtOpts({ hour: 'numeric', minute: '2-digit' })
                   )}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-slate-500">
                   {t('shared.minutesUnit', { count: appointment.duration_minutes })}
                 </span>
               </div>
@@ -461,7 +461,7 @@ export const PatientAppointments: React.FC = () => {
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     canJoin
                       ? 'bg-green-600 hover:bg-green-700 text-white'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'cursor-not-allowed bg-slate-200 text-slate-400'
                   }`}
                 >
                   <Video className="w-4 h-4 inline mr-2" />
@@ -477,7 +477,7 @@ export const PatientAppointments: React.FC = () => {
                     type="button"
                     onClick={() => navigate(`/patient/appointments/book?reschedule=${appointment.id}`)}
                     disabled={busyAppointmentId === appointment.id}
-                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors disabled:opacity-60"
+                    className="rounded-lg bg-slate-100 px-4 py-2 font-medium text-slate-700 transition-colors hover:bg-slate-200 disabled:opacity-60"
                   >
                     {t('patient.appointments.reschedule')}
                   </button>
@@ -485,7 +485,7 @@ export const PatientAppointments: React.FC = () => {
                     type="button"
                     onClick={() => handleCancelAppointment(appointment.id)}
                     disabled={busyAppointmentId === appointment.id}
-                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors disabled:opacity-60"
+                    className="rounded-lg bg-slate-100 px-4 py-2 font-medium text-slate-700 transition-colors hover:bg-slate-200 disabled:opacity-60"
                   >
                     {busyAppointmentId === appointment.id
                       ? t('patient.appointments.cancelling')
@@ -503,7 +503,7 @@ export const PatientAppointments: React.FC = () => {
                     [clinicName, clinicAddress].filter(Boolean).join(', ')
                   )
                 }
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
+                className="rounded-lg bg-slate-100 px-4 py-2 font-medium text-slate-700 transition-colors hover:bg-slate-200"
               >
                 {t('patient.appointments.addToCalendar')}
               </button>
@@ -512,7 +512,7 @@ export const PatientAppointments: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleGetDirections(doctorProfile)}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
+                  className="rounded-lg bg-slate-100 px-4 py-2 font-medium text-slate-700 transition-colors hover:bg-slate-200"
                 >
                   <MapPin className="w-4 h-4 inline mr-2" />
                   {t('patient.appointments.getDirections')}
@@ -522,7 +522,7 @@ export const PatientAppointments: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigate(`/patient/messages?doctor=${appointment.doctor_id}`)}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
+                className="rounded-lg bg-slate-100 px-4 py-2 font-medium text-slate-700 transition-colors hover:bg-slate-200"
               >
                 <MessageSquare className="w-4 h-4 inline mr-2" />
                 {upcoming ? t('patient.messages.messageDoctor') : t('patient.messages.followUpDoctor')}
@@ -567,7 +567,7 @@ export const PatientAppointments: React.FC = () => {
   const renderFilterPanel = () => (
     <aside className="hidden lg:block w-[280px] flex-shrink-0 bg-white border border-slate-200 rounded-xl p-6 space-y-6 h-fit sticky top-4">
       <div>
-        <h3 className="font-semibold text-gray-900 mb-3">{t('patient.appointments.filterStatus')}</h3>
+        <h3 className="mb-3 font-semibold text-slate-900">{t('patient.appointments.filterStatus')}</h3>
         <div className="space-y-2">
           {statusOptions.map((opt) => (
             <button
@@ -577,7 +577,7 @@ export const PatientAppointments: React.FC = () => {
               className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 statusFilter === opt.value
                   ? 'bg-teal-100 text-teal-700'
-                  : 'text-gray-700 hover:bg-gray-100'
+                  : 'text-slate-700 hover:bg-slate-100'
               }`}
             >
               {t(opt.labelKey)}
@@ -587,7 +587,7 @@ export const PatientAppointments: React.FC = () => {
       </div>
 
       <div>
-        <h3 className="font-semibold text-gray-900 mb-3">{t('patient.appointments.filterType')}</h3>
+        <h3 className="mb-3 font-semibold text-slate-900">{t('patient.appointments.filterType')}</h3>
         <div className="space-y-2">
           {typeOptions.map((opt) => (
             <button
@@ -597,7 +597,7 @@ export const PatientAppointments: React.FC = () => {
               className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 typeFilter === opt.value
                   ? 'bg-teal-100 text-teal-700'
-                  : 'text-gray-700 hover:bg-gray-100'
+                  : 'text-slate-700 hover:bg-slate-100'
               }`}
             >
               {t(opt.labelKey)}
@@ -607,7 +607,7 @@ export const PatientAppointments: React.FC = () => {
       </div>
 
       <div>
-        <label className="font-semibold text-gray-900 mb-3 block">
+        <label className="mb-3 block font-semibold text-slate-900">
           {t('patient.appointments.filterSpecialty')}
         </label>
         <input
@@ -615,12 +615,12 @@ export const PatientAppointments: React.FC = () => {
           value={specialtyQuery}
           onChange={(event) => setSpecialtyQuery(event.target.value)}
           placeholder={t('patient.appointments.searchSpecialtyPh')}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
         />
       </div>
 
       <div>
-        <label className="font-semibold text-gray-900 mb-3 block">
+        <label className="mb-3 block font-semibold text-slate-900">
           {t('patient.appointments.filterProvider')}
         </label>
         <input
@@ -628,16 +628,16 @@ export const PatientAppointments: React.FC = () => {
           value={providerQuery}
           onChange={(event) => setProviderQuery(event.target.value)}
           placeholder={t('patient.appointments.searchProviderPh')}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
         />
       </div>
 
       <div>
-        <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+        <h3 className="mb-3 flex items-center gap-2 font-semibold text-slate-900">
           <Calendar className="w-4 h-4" />
           {t('patient.appointments.filterCalendar')}
         </h3>
-        <div className="bg-gray-50 rounded-lg p-3">
+        <div className="rounded-lg bg-slate-50 p-3">
           <div className="flex items-center justify-between mb-3">
             <button
               type="button"
@@ -646,12 +646,12 @@ export const PatientAppointments: React.FC = () => {
                   new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1)
                 )
               }
-              className="p-1 hover:bg-gray-200 rounded"
+              className="rounded p-1 hover:bg-slate-200"
               aria-label="Previous month"
             >
-              <ChevronLeft className="w-4 h-4 text-gray-600" />
+              <ChevronLeft className="h-4 w-4 text-slate-600" />
             </button>
-            <span className="text-sm font-semibold text-gray-900">
+            <span className="text-sm font-semibold text-slate-900">
               {calendarMonth.toLocaleDateString(locale, dtOpts({ month: 'long', year: 'numeric' }))}
             </span>
             <button
@@ -661,16 +661,16 @@ export const PatientAppointments: React.FC = () => {
                   new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1)
                 )
               }
-              className="p-1 hover:bg-gray-200 rounded"
+              className="rounded p-1 hover:bg-slate-200"
               aria-label="Next month"
             >
-              <ChevronRight className="w-4 h-4 text-gray-600" />
+              <ChevronRight className="h-4 w-4 text-slate-600" />
             </button>
           </div>
 
           <div className="grid grid-cols-7 gap-1 text-center">
             {weekdays.map((day, i) => (
-              <div key={i} className="text-xs font-medium text-gray-500 mb-1">
+              <div key={i} className="mb-1 text-xs font-medium text-slate-500">
                 {day}
               </div>
             ))}
@@ -696,7 +696,7 @@ export const PatientAppointments: React.FC = () => {
                     setDateTo(iso);
                   }}
                   className={`relative w-8 h-8 rounded-full text-xs font-medium transition-colors ${
-                    isToday ? 'bg-teal-600 text-white' : 'text-gray-700 hover:bg-gray-200'
+                    isToday ? 'bg-teal-600 text-white' : 'text-slate-700 hover:bg-slate-200'
                   }`}
                 >
                   {day}
@@ -711,7 +711,7 @@ export const PatientAppointments: React.FC = () => {
       </div>
 
       <div>
-        <h3 className="font-semibold text-gray-900 mb-3">
+        <h3 className="mb-3 font-semibold text-slate-900">
           {t('patient.appointments.filterDateRange')}
         </h3>
         <div className="space-y-2">
@@ -719,13 +719,13 @@ export const PatientAppointments: React.FC = () => {
             type="date"
             value={dateFrom}
             onChange={(event) => setDateFrom(event.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
           <input
             type="date"
             value={dateTo}
             onChange={(event) => setDateTo(event.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
         </div>
       </div>
@@ -733,14 +733,14 @@ export const PatientAppointments: React.FC = () => {
   );
 
   const renderPastTable = () => (
-    <div className="bg-white rounded-lg border border-gray-200">
+    <div className="rounded-lg border border-slate-200 bg-white">
       <button
         type="button"
         onClick={() => setIsPastExpanded((prev) => !prev)}
-        className="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors"
+        className="flex w-full items-center justify-between p-6 transition-colors hover:bg-slate-50"
       >
         <div className="flex items-center gap-3">
-          <h3 className="text-xl font-bold text-gray-900">
+          <h3 className="text-xl font-bold text-slate-900">
             {t('patient.appointments.pastTitle')}
           </h3>
           <span className="rounded-full bg-slate-200 px-3 py-1 text-sm font-semibold text-slate-600">
@@ -748,14 +748,14 @@ export const PatientAppointments: React.FC = () => {
           </span>
         </div>
         {isPastExpanded ? (
-          <ChevronUp className="w-6 h-6 text-gray-600" />
+          <ChevronUp className="h-6 w-6 text-slate-600" />
         ) : (
-          <ChevronDown className="w-6 h-6 text-gray-600" />
+          <ChevronDown className="h-6 w-6 text-slate-600" />
         )}
       </button>
 
       {isPastExpanded ? (
-        <div className="border-t border-gray-200">
+        <div className="border-t border-slate-200">
           {pastAppointments.length === 0 ? (
             <div className="p-6 text-sm text-slate-500">
               {t('patient.appointments.noPastBody')}
@@ -763,37 +763,37 @@ export const PatientAppointments: React.FC = () => {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="border-b border-slate-200 bg-slate-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-700">
                       {t('patient.appointments.date')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-700">
                       {t('shared.doctor')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-700">
                       {t('patient.appointments.location')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-700">
                       {t('patient.appointments.filterType')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-700">
                       {t('patient.appointments.reason')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-700">
                       {t('patient.appointments.filterStatus')}
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-slate-200">
                   {pastAppointments.map((appointment) => {
                     const doctorProfile = doctorProfileById.get(appointment.doctor_id);
                     const typeColor =
                       appointment.type === 'virtual' ? 'text-violet-700' : 'text-teal-700';
                     return (
                       <React.Fragment key={appointment.id}>
-                        <tr className="hover:bg-gray-50">
-                          <td className="px-6 py-4 text-sm text-gray-900">
+                        <tr className="hover:bg-slate-50">
+                          <td className="px-6 py-4 text-sm text-slate-900">
                             {new Date(appointment.scheduled_at).toLocaleDateString(
                               locale,
                               dtOpts({ month: 'short', day: '2-digit', year: 'numeric' })
@@ -805,16 +805,16 @@ export const PatientAppointments: React.FC = () => {
                                 {doctorProfile ? getDoctorInitials(doctorProfile.fullName) : '?'}
                               </div>
                               <div>
-                                <div className="text-sm font-semibold text-gray-900">
+                                <div className="text-sm font-semibold text-slate-900">
                                   {doctorProfile?.fullName ?? t('shared.doctor')}
                                 </div>
-                                <div className="text-xs text-gray-600">
+                                <div className="text-xs text-slate-600">
                                   {doctorProfile?.specialty ?? t('shared.careVisit')}
                                 </div>
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-700">
+                          <td className="px-6 py-4 text-sm text-slate-700">
                             {doctorProfile?.city ?? t('shared.clinicPending')}
                           </td>
                           <td className="px-6 py-4">
@@ -846,8 +846,8 @@ export const PatientAppointments: React.FC = () => {
                         </tr>
                         {selectedPastId === appointment.id && appointment.notes ? (
                           <tr>
-                            <td colSpan={6} className="px-6 py-4 bg-gray-50">
-                              <div className="bg-white rounded-lg p-4 border border-gray-200">
+                            <td colSpan={6} className="bg-slate-50 px-6 py-4">
+                              <div className="rounded-lg border border-slate-200 bg-white p-4">
                                 <div className="flex items-start gap-2">
                                   <Sparkles className="w-4 h-4 text-violet-600 flex-shrink-0 mt-0.5" />
                                   <div>
