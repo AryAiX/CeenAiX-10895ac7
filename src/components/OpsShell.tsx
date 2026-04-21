@@ -102,7 +102,7 @@ export const OpsShell = ({
                 className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/20"
               >
                 <LogOut className="h-3.5 w-3.5" />
-                <span>Sign out</span>
+                <span>{isArabic ? 'تسجيل الخروج' : 'Sign out'}</span>
               </button>
               {actions}
             </div>

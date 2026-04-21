@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Menu } from 'lucide-react';
 import { LanguageSwitcher } from './LanguageSwitcher';
 
 export const Header: React.FC = () => {
@@ -23,11 +24,11 @@ export const Header: React.FC = () => {
   );
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur-lg">
+    <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur-xl shadow-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           <div className="flex cursor-pointer items-center gap-3" onClick={() => navigate('/')}>
-            <img src="/favicon.svg" alt="CeenAiX" className="h-10 w-10 rounded-xl" />
+            <img src="/favicon.svg" alt="CeenAiX" className="h-10 w-10 object-contain" />
             <div>
               <span className="block bg-gradient-to-r from-ceenai-cyan via-ceenai-blue to-ceenai-navy bg-clip-text text-2xl font-bold text-transparent">
                 CeenAiX
@@ -38,7 +39,7 @@ export const Header: React.FC = () => {
             </div>
           </div>
 
-          <div className="hidden items-center space-x-8 md:flex">
+          <div className="hidden items-center space-x-8 lg:flex">
             {menuItems.map((item) => {
               const isActive = location.pathname === item.path;
               return (
@@ -56,19 +57,26 @@ export const Header: React.FC = () => {
             })}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <LanguageSwitcher dense />
             <button
               onClick={() => openRegistration('patient')}
-              className="rounded-full bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition hover:shadow-xl"
+              className="rounded-full bg-gradient-to-r from-ceenai-cyan to-ceenai-blue px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-cyan-500/20 transition hover:shadow-xl sm:px-5 sm:text-sm"
             >
               {t('header.patient')}
             </button>
             <button
               onClick={() => openRegistration('doctor')}
-              className="rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 transition hover:border-ceenai-cyan hover:text-ceenai-blue"
+              className="hidden rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 transition hover:border-ceenai-cyan hover:text-ceenai-blue sm:inline-flex"
             >
               {t('header.doctor')}
+            </button>
+            <button
+              type="button"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:text-slate-900 lg:hidden"
+              aria-label="Menu"
+            >
+              <Menu className="h-5 w-5" />
             </button>
           </div>
         </div>

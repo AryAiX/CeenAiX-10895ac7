@@ -41,7 +41,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
               className="group inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white transition hover:border-slate-300 hover:bg-slate-50"
               aria-label={t('pageHeader.goBack')}
             >
-              <ArrowLeft className="h-5 w-5 text-slate-600 transition-colors group-hover:text-slate-900" />
+              <ArrowLeft className="h-5 w-5 text-slate-600 transition-colors group-hover:text-slate-900 rtl:rotate-180" />
             </button>
           ) : null}
           <div className="flex min-w-0 items-start gap-4">
