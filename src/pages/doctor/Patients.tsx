@@ -62,13 +62,13 @@ export const DoctorPatients: React.FC = () => {
         <div className="mb-6">
           <div className="flex items-center justify-between gap-4">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 rtl:left-auto rtl:right-4" />
+              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400 rtl:left-auto rtl:right-4" />
               <input
                 type="text"
                 placeholder={t('doctor.patients.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                className="w-full rounded-xl border-2 border-gray-200 py-3 pl-12 pr-4 font-medium transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 rtl:pl-4 rtl:pr-12"
+                className="w-full rounded-xl border-2 border-slate-200 py-3 pl-12 pr-4 font-medium text-slate-900 transition-all duration-200 focus:border-ceenai-blue focus:ring-4 focus:ring-ceenai-blue/20 rtl:pl-4 rtl:pr-12"
               />
             </div>
             <div className="hidden rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm md:block">
@@ -87,10 +87,10 @@ export const DoctorPatients: React.FC = () => {
             {t('doctor.patients.loadError')}
           </div>
         ) : filteredPatients.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center shadow-sm">
-            <Users className="mx-auto mb-4 h-10 w-10 text-gray-400" />
-            <h3 className="text-xl font-bold text-gray-900">{t('doctor.patients.emptyTitle')}</h3>
-            <p className="mt-2 text-sm text-gray-600">
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
+            <Users className="mx-auto mb-4 h-10 w-10 text-slate-400" />
+            <h3 className="text-xl font-bold text-slate-900">{t('doctor.patients.emptyTitle')}</h3>
+            <p className="mt-2 text-sm text-slate-600">
               {t('doctor.patients.emptyBody')}
             </p>
           </div>
@@ -99,7 +99,7 @@ export const DoctorPatients: React.FC = () => {
             {filteredPatients.map((patient) => (
               <div
                 key={patient.id}
-                className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg transition-all duration-200 hover:shadow-xl"
+                className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-lg transition-all duration-200 hover:shadow-xl"
               >
                 <div className="bg-gradient-to-r from-ceenai-blue to-ceenai-cyan p-4">
                   <div className="flex items-center space-x-3">
@@ -122,14 +122,14 @@ export const DoctorPatients: React.FC = () => {
 
                 <div className="grid gap-6 p-6 md:grid-cols-4">
                   <div>
-                    <h4 className="mb-2 text-sm font-semibold text-gray-700">{t('doctor.patients.contact')}</h4>
-                    <p className="text-sm text-gray-600">{patient.phone ?? t('doctor.patients.notProvided')}</p>
-                    <p className="mt-1 text-sm text-gray-600">{patient.email ?? t('doctor.patients.notProvided')}</p>
+                    <h4 className="mb-2 text-sm font-semibold text-slate-700">{t('doctor.patients.contact')}</h4>
+                    <p className="text-sm text-slate-600">{patient.phone ?? t('doctor.patients.notProvided')}</p>
+                    <p className="mt-1 text-sm text-slate-600">{patient.email ?? t('doctor.patients.notProvided')}</p>
                   </div>
 
                   <div>
-                    <h4 className="mb-2 text-sm font-semibold text-gray-700">{t('doctor.patients.lastAppointment')}</h4>
-                    <p className="text-sm text-gray-600">
+                    <h4 className="mb-2 text-sm font-semibold text-slate-700">{t('doctor.patients.lastAppointment')}</h4>
+                    <p className="text-sm text-slate-600">
                       {patient.lastAppointment
                         ? new Date(patient.lastAppointment).toLocaleString(
                             locale,
@@ -147,9 +147,9 @@ export const DoctorPatients: React.FC = () => {
                   </div>
 
                   <div>
-                    <h4 className="mb-2 text-sm font-semibold text-gray-700">{t('doctor.patients.nextAppointment')}</h4>
-                    <div className="flex items-start space-x-2 text-sm text-gray-600">
-                      <Calendar className="mt-0.5 h-4 w-4 text-gray-400" />
+                    <h4 className="mb-2 text-sm font-semibold text-slate-700">{t('doctor.patients.nextAppointment')}</h4>
+                    <div className="flex items-start space-x-2 text-sm text-slate-600">
+                      <Calendar className="mt-0.5 h-4 w-4 text-slate-400" />
                       <span>
                         {patient.nextAppointment
                           ? new Date(patient.nextAppointment).toLocaleString(
@@ -169,21 +169,21 @@ export const DoctorPatients: React.FC = () => {
                   </div>
 
                   <div>
-                    <h4 className="mb-2 text-sm font-semibold text-gray-700">{t('doctor.patients.bloodType')}</h4>
-                    <div className="flex items-start gap-2 text-sm text-gray-600">
+                    <h4 className="mb-2 text-sm font-semibold text-slate-700">{t('doctor.patients.bloodType')}</h4>
+                    <div className="flex items-start gap-2 text-sm text-slate-600">
                       <HeartPulse className="mt-0.5 h-4 w-4 text-rose-400" />
                       <span>{patient.bloodType ?? t('doctor.patients.notProvided')}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="border-t border-gray-100 px-6 py-4">
+                <div className="border-t border-slate-100 px-6 py-4">
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                         {t('doctor.patients.recentConcern')}
                       </p>
-                      <p className="mt-1 text-sm text-gray-600">{renderConcern(patient.latestChiefComplaint)}</p>
+                      <p className="mt-1 text-sm text-slate-600">{renderConcern(patient.latestChiefComplaint)}</p>
                     </div>
                     <div className="flex flex-wrap gap-3">
                       <button
@@ -205,14 +205,14 @@ export const DoctorPatients: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => navigate('/doctor/appointments')}
-                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-teal-200 hover:bg-teal-50 hover:text-teal-800"
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-ceenai-cyan/40 hover:bg-cyan-50 hover:text-ceenai-blue"
                       >
                         {t('doctor.patients.viewAppointments')}
                         <ArrowRight className="h-4 w-4 rtl:rotate-180" />
                       </button>
                     </div>
                   </div>
-                  <p className="mt-4 text-sm text-gray-500">{t('doctor.patients.footerHint')}</p>
+                  <p className="mt-4 text-sm text-slate-500">{t('doctor.patients.footerHint')}</p>
                 </div>
               </div>
             ))}

@@ -15,7 +15,7 @@ export const PatientMessages: React.FC = () => {
           </h1>
           <p className="mt-2 text-[15px] text-slate-400">{t('patient.messages.subtitle')}</p>
         </div>
-        <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-teal-600 to-teal-700 px-6 py-3 text-white shadow-lg shadow-teal-500/30">
+        <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-600 to-cyan-700 px-6 py-3 text-white shadow-lg shadow-cyan-500/30">
           <MessageCircle className="h-4 w-4" />
           <span className="text-[13px] font-bold">{t('patient.messages.encryptedBadge')}</span>
         </div>

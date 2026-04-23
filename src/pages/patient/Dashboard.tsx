@@ -220,7 +220,7 @@ export const PatientDashboard: React.FC = () => {
       {
         icon: Calendar,
         label: localCopy.bookApptShort,
-        colorClass: 'text-teal-600 bg-teal-50 hover:bg-teal-100',
+        colorClass: 'text-cyan-600 bg-cyan-50 hover:bg-cyan-100',
         action: () => navigate('/patient/appointments'),
       },
       {
@@ -317,12 +317,12 @@ export const PatientDashboard: React.FC = () => {
       },
       {
         icon: Pill,
-        iconBg: 'bg-teal-50',
-        iconColor: 'text-teal-600',
+        iconBg: 'bg-cyan-50',
+        iconColor: 'text-cyan-600',
         label: localCopy.medicationsLabel,
         value: `${formatLocaleDigits(takenCount, i18n.language)}/${formatLocaleDigits(Math.max(medications.length, 1), i18n.language)}`,
         badge: localCopy.todayBadge,
-        badgeColor: 'bg-teal-50 text-teal-700',
+        badgeColor: 'bg-cyan-50 text-cyan-700',
         trend: 'up' as const,
         trendLabel: isArabic ? 'تم أخذها' : 'taken',
       },
@@ -387,7 +387,7 @@ export const PatientDashboard: React.FC = () => {
           <div className="rounded-xl border border-slate-100 bg-white px-5 py-3 text-center shadow-sm">
             <p className="text-xs font-medium tracking-wide text-slate-400">{localCopy.healthScore}</p>
             <div className="mt-1 flex items-baseline justify-center gap-1">
-              <span className="text-3xl font-bold text-teal-600">{formatLocaleDigits(healthScoreValue, i18n.language)}</span>
+              <span className="text-3xl font-bold text-cyan-600">{formatLocaleDigits(healthScoreValue, i18n.language)}</span>
               <span className="text-sm text-slate-400">/100</span>
             </div>
             <p className="mt-0.5 text-xs font-semibold text-emerald-600">{localCopy.scoreState}</p>
@@ -424,8 +424,8 @@ export const PatientDashboard: React.FC = () => {
           <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-50">
-                  <Pill className="h-4 w-4 text-teal-600" />
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-50">
+                  <Pill className="h-4 w-4 text-cyan-600" />
                 </div>
                 <div>
                   <h2 className="text-sm font-semibold text-slate-900">{localCopy.mainMedicationsTitle}</h2>
@@ -440,13 +440,13 @@ export const PatientDashboard: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <div className="h-1.5 w-32 overflow-hidden rounded-full bg-slate-100">
                     <div
-                      className="h-full rounded-full bg-teal-500 transition-all duration-500"
+                      className="h-full rounded-full bg-cyan-500 transition-all duration-500"
                       style={{
                         width: `${medications.length > 0 ? (takenCount / medications.length) * 100 : 0}%`,
                       }}
                     />
                   </div>
-                  <span className="text-xs font-semibold text-teal-600">
+                  <span className="text-xs font-semibold text-cyan-600">
                     {formatLocaleDigits(
                       medications.length > 0 ? Math.round((takenCount / medications.length) * 100) : 0,
                       i18n.language
@@ -457,7 +457,7 @@ export const PatientDashboard: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/patient/prescriptions')}
-                  className="flex items-center gap-1 text-xs font-semibold text-teal-600 hover:text-teal-700"
+                  className="flex items-center gap-1 text-xs font-semibold text-cyan-600 hover:text-cyan-700"
                 >
                   {t('patient.dashboard.viewAll')} <ChevronRight className="h-3 w-3 rtl:rotate-180" />
                 </button>
@@ -508,7 +508,7 @@ export const PatientDashboard: React.FC = () => {
                         type="button"
                         disabled
                         title={localCopy.unavailable}
-                        className="flex items-center gap-1 rounded-lg bg-teal-600 px-3 py-1.5 text-xs font-semibold text-white opacity-50 transition-colors disabled:cursor-not-allowed"
+                        className="flex items-center gap-1 rounded-lg bg-cyan-600 px-3 py-1.5 text-xs font-semibold text-white opacity-50 transition-colors disabled:cursor-not-allowed"
                       >
                         <CheckCircle2 className="h-3 w-3" />
                         {isArabic ? 'تأكيد' : 'Mark Taken'}
@@ -538,7 +538,7 @@ export const PatientDashboard: React.FC = () => {
                 {latestHba1cDelta !== null && latestHba1cDelta <= 0 ? `${localCopy.improving} ↓` : localCopy.stable}
               </span>
             </div>
-            <div className="h-44 rounded-xl bg-gradient-to-b from-teal-50 to-white p-4">
+            <div className="h-44 rounded-xl bg-gradient-to-b from-cyan-50 to-white p-4">
               <svg viewBox="0 0 600 160" className="h-full w-full">
                 {hba1cAreaPath ? <path d={hba1cAreaPath} fill="url(#hba1c-fill)" /> : null}
                 {hba1cLinePath ? <path d={hba1cLinePath} fill="none" stroke="#0D9488" strokeWidth="3" /> : null}
@@ -610,7 +610,7 @@ export const PatientDashboard: React.FC = () => {
                 type="button"
                 disabled
                 title={localCopy.unavailable}
-                className="rounded-lg border border-teal-200 px-3 py-1.5 text-xs font-semibold text-teal-600 opacity-50 transition-colors disabled:cursor-not-allowed"
+                className="rounded-lg border border-cyan-200 px-3 py-1.5 text-xs font-semibold text-cyan-600 opacity-50 transition-colors disabled:cursor-not-allowed"
               >
                 {isArabic ? '+ إضافة قراءة' : '+ Add Reading'}
               </button>
@@ -641,11 +641,11 @@ export const PatientDashboard: React.FC = () => {
                 {careTeam.map((member) => (
                   <div
                     key={member.doctorId}
-                    className="rounded-xl border border-slate-100 p-4 transition-all hover:border-teal-200 hover:shadow-sm"
+                    className="rounded-xl border border-slate-100 p-4 transition-all hover:border-cyan-200 hover:shadow-sm"
                   >
                     <div className="mb-3 flex flex-col items-center text-center">
                       <div className="relative mb-2">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-slate-700 to-teal-600 text-sm font-bold text-white">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-slate-700 to-cyan-600 text-sm font-bold text-white">
                           {member.doctorName
                             .split(' ')
                             .map((part) => part[0] ?? '')
@@ -655,7 +655,7 @@ export const PatientDashboard: React.FC = () => {
                         </div>
                       </div>
                       <p className="text-sm font-semibold text-slate-900">{member.doctorName}</p>
-                      <span className="mt-0.5 text-xs font-medium text-teal-600">
+                      <span className="mt-0.5 text-xs font-medium text-cyan-600">
                         {member.specialty ?? t('shared.careVisit')}
                       </span>
                       <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-400">
@@ -668,7 +668,7 @@ export const PatientDashboard: React.FC = () => {
                         {member.nextAppointmentAt ? (
                           <>
                             {localCopy.nextLabel}:{' '}
-                            <span className="font-medium text-teal-600">
+                            <span className="font-medium text-cyan-600">
                               {formatCompactDate(member.nextAppointmentAt)}
                             </span>
                           </>
@@ -686,7 +686,7 @@ export const PatientDashboard: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => navigate(`/patient/messages?doctor=${member.doctorId}`)}
-                        className="flex items-center justify-center gap-1 rounded-lg bg-teal-600 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-teal-700"
+                        className="flex items-center justify-center gap-1 rounded-lg bg-cyan-600 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-cyan-700"
                       >
                         <MessageSquare className="h-3 w-3" />
                         {localCopy.messageShort}
@@ -713,12 +713,12 @@ export const PatientDashboard: React.FC = () => {
           <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-50">
-                  <Calendar className="h-4 w-4 text-teal-600" />
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-50">
+                  <Calendar className="h-4 w-4 text-cyan-600" />
                 </div>
                 <h2 className="text-sm font-semibold text-slate-900">{t('patient.dashboard.nextAppointment')}</h2>
               </div>
-              <span className="rounded-lg bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700">
+              <span className="rounded-lg bg-cyan-50 px-2.5 py-1 text-xs font-semibold text-cyan-700">
                 {localCopy.nextDays.replace('{{count}}', formatLocaleDigits(nextAppointmentCountdown, i18n.language))}
               </span>
             </div>
@@ -734,7 +734,7 @@ export const PatientDashboard: React.FC = () => {
                       dtOpts({ weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
                     )}
                   </p>
-                  <p className="mt-0.5 text-sm font-semibold text-teal-600">
+                  <p className="mt-0.5 text-sm font-semibold text-cyan-600">
                     <Clock className="mr-1 inline h-3.5 w-3.5 rtl:mr-0 rtl:ml-1" />
                     {new Date(nextAppointment.scheduledAt).toLocaleTimeString(
                       locale,
@@ -744,7 +744,7 @@ export const PatientDashboard: React.FC = () => {
                 </div>
 
                 <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-slate-700 to-teal-600 text-sm font-bold text-white">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-slate-700 to-cyan-600 text-sm font-bold text-white">
                     {nextAppointment.doctorName
                       .split(' ')
                       .map((part) => part[0] ?? '')
@@ -754,7 +754,7 @@ export const PatientDashboard: React.FC = () => {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-slate-900">{nextAppointment.doctorName}</p>
-                    <p className="text-xs font-medium text-teal-600">{nextAppointment.specialty ?? t('shared.careVisit')}</p>
+                    <p className="text-xs font-medium text-cyan-600">{nextAppointment.specialty ?? t('shared.careVisit')}</p>
                     <p className="text-xs text-slate-400">{nextAppointment.doctorCity || (isArabic ? 'الموقع سيظهر قريباً' : 'Location available in appointment details')}</p>
                   </div>
                 </div>
@@ -788,7 +788,7 @@ export const PatientDashboard: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => navigate('/patient/appointments')}
-                    className="rounded-lg bg-teal-600 py-2 text-xs font-semibold text-white transition-colors hover:bg-teal-700"
+                    className="rounded-lg bg-cyan-600 py-2 text-xs font-semibold text-white transition-colors hover:bg-cyan-700"
                   >
                     {localCopy.details}
                   </button>
@@ -856,7 +856,7 @@ export const PatientDashboard: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/patient/messages')}
-              className="w-full rounded-lg border border-teal-200 py-2 text-xs font-semibold text-teal-600 transition-colors hover:bg-teal-50"
+              className="w-full rounded-lg border border-cyan-200 py-2 text-xs font-semibold text-cyan-600 transition-colors hover:bg-cyan-50"
             >
               {localCopy.newMessage}
             </button>
@@ -875,9 +875,9 @@ export const PatientDashboard: React.FC = () => {
               </span>
             </div>
 
-            <div className="mb-4 rounded-xl bg-gradient-to-br from-slate-800 to-teal-700 p-4">
+            <div className="mb-4 rounded-xl bg-gradient-to-br from-slate-800 to-cyan-700 p-4">
               <p className="text-sm font-bold text-white">{insurance?.providerCompany?.toUpperCase() ?? 'DAMAN'}</p>
-              <p className="mt-0.5 text-xs text-teal-200">{insurance?.planName ?? (isArabic ? 'لا توجد خطة مرتبطة' : 'No linked plan yet')}</p>
+              <p className="mt-0.5 text-xs text-cyan-200">{insurance?.planName ?? (isArabic ? 'لا توجد خطة مرتبطة' : 'No linked plan yet')}</p>
               <p className="mt-3 text-xs text-white/70">{profile?.full_name ?? user?.email ?? displayName}</p>
               <p className="text-xs text-white/50">{insurance?.policyNumber ?? (isArabic ? 'رقم الوثيقة سيظهر هنا' : 'Policy number will appear here')}</p>
             </div>
@@ -907,7 +907,7 @@ export const PatientDashboard: React.FC = () => {
               type="button"
               disabled
               title={localCopy.unavailable}
-              className="w-full text-center text-xs font-semibold text-teal-600 opacity-50 disabled:cursor-not-allowed"
+              className="w-full text-center text-xs font-semibold text-cyan-600 opacity-50 disabled:cursor-not-allowed"
             >
               {localCopy.viewFullDetails}
             </button>
@@ -934,19 +934,19 @@ export const PatientDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-teal-100 bg-white p-5 shadow-sm">
+          <div className="rounded-2xl border border-cyan-100 bg-white p-5 shadow-sm">
             <div className="flex items-start gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal-50">
-                <Bot className="h-4 w-4 text-teal-600" />
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-50">
+                <Bot className="h-4 w-4 text-cyan-600" />
               </div>
               <div className="flex-1">
-                <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-teal-600">{localCopy.aiTipTitle}</p>
+                <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-cyan-600">{localCopy.aiTipTitle}</p>
                 <p className="text-xs leading-relaxed text-slate-600">{aiTip}</p>
                 <div className="mt-3 flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => navigate('/patient/ai-chat')}
-                    className="rounded-lg bg-teal-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-teal-700"
+                    className="rounded-lg bg-cyan-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-cyan-700"
                   >
                     {localCopy.askMore}
                   </button>
@@ -989,7 +989,7 @@ function StatCard({
 }) {
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
   const trendColor =
-    trend === 'down' ? 'text-emerald-600' : trend === 'up' ? 'text-teal-600' : 'text-slate-500';
+    trend === 'down' ? 'text-emerald-600' : trend === 'up' ? 'text-cyan-600' : 'text-slate-500';
 
   return (
     <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">

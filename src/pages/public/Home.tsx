@@ -531,7 +531,7 @@ export const Home = () => {
                 <p className="text-xs text-slate-600 leading-relaxed">
                   {t('home.landing.hero.notifyAiInsightBody')}
                 </p>
-                <div className="mt-2 h-1 bg-gray-100 rounded-full overflow-hidden">
+                <div className="mt-2 h-1 bg-slate-100 rounded-full overflow-hidden">
                   <div className="h-1 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full w-3/4" />
                 </div>
               </div>

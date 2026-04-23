@@ -465,9 +465,9 @@ export const PatientPreVisitAssessment: React.FC = () => {
         ) : error ? (
           <div className="rounded-3xl border border-red-200 bg-red-50 p-6 text-sm text-red-700">{error}</div>
         ) : !data ? (
-          <div className="rounded-3xl border border-dashed border-gray-300 bg-white p-10 text-center shadow-sm">
-            <p className="text-lg font-semibold text-gray-900">Pre-visit assessment not found</p>
-            <p className="mt-2 text-sm text-gray-600">
+          <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
+            <p className="text-lg font-semibold text-slate-900">Pre-visit assessment not found</p>
+            <p className="mt-2 text-sm text-slate-600">
               This intake may have been removed or you may no longer have access to it.
             </p>
           </div>
@@ -478,8 +478,8 @@ export const PatientPreVisitAssessment: React.FC = () => {
                 <p className="text-sm font-semibold uppercase tracking-wide text-cyan-700">
                   {formatPreVisitStatus(data.assessment.status)}
                 </p>
-                <h2 className="mt-2 text-2xl font-bold text-gray-900">{data.assessment.templateTitle}</h2>
-                <p className="mt-2 text-sm text-gray-600">
+                <h2 className="mt-2 text-2xl font-bold text-slate-900">{data.assessment.templateTitle}</h2>
+                <p className="mt-2 text-sm text-slate-600">
                   {formatAppointmentLabel(
                     data.assessment.appointment.scheduledAt,
                     data.assessment.appointment.doctorName,
@@ -525,16 +525,16 @@ export const PatientPreVisitAssessment: React.FC = () => {
                     ref={(element) => {
                       questionRefs.current[question.key] = element;
                     }}
-                    className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm"
+                    className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-lg font-semibold text-slate-900">
                           {question.label}
                           {question.required ? <span className="ml-1 text-red-500">*</span> : null}
                         </h3>
                         {question.helpText ? (
-                          <p className="mt-1 text-sm text-gray-600">{question.helpText}</p>
+                          <p className="mt-1 text-sm text-slate-600">{question.helpText}</p>
                         ) : null}
                       </div>
                       {showAutofillPrompt ? (
@@ -550,7 +550,7 @@ export const PatientPreVisitAssessment: React.FC = () => {
                           rows={5}
                           value={textValue}
                           onChange={(event) => updateAnswer(question, event.target.value)}
-                          className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-2 focus:ring-ceenai-cyan/20"
+                          className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-2 focus:ring-ceenai-cyan/20"
                           placeholder="Type your answer"
                         />
                       ) : null}
@@ -560,7 +560,7 @@ export const PatientPreVisitAssessment: React.FC = () => {
                           type={question.type === 'number' ? 'number' : question.type === 'date' ? 'date' : 'text'}
                           value={textValue}
                           onChange={(event) => updateAnswer(question, event.target.value)}
-                          className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-2 focus:ring-ceenai-cyan/20"
+                          className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-2 focus:ring-ceenai-cyan/20"
                           placeholder="Type your answer"
                         />
                       ) : null}
@@ -575,7 +575,7 @@ export const PatientPreVisitAssessment: React.FC = () => {
                               className={`rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
                                 textValue === option
                                   ? 'border-cyan-500 bg-cyan-50 text-cyan-800'
-                                  : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                                  : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                               }`}
                             >
                               {option}
@@ -594,7 +594,7 @@ export const PatientPreVisitAssessment: React.FC = () => {
                               className={`rounded-2xl border px-4 py-3 text-left text-sm font-medium transition ${
                                 textValue === option.value
                                   ? 'border-cyan-500 bg-cyan-50 text-cyan-800'
-                                  : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                                  : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                               }`}
                             >
                               {option.label}
@@ -614,7 +614,7 @@ export const PatientPreVisitAssessment: React.FC = () => {
                                 className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium transition ${
                                   checked
                                     ? 'border-cyan-500 bg-cyan-50 text-cyan-800'
-                                    : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                                    : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                                 }`}
                               >
                                 <input
@@ -626,7 +626,7 @@ export const PatientPreVisitAssessment: React.FC = () => {
                                       : multiValue.filter((value) => value !== option.value);
                                     updateAnswer(question, nextValues);
                                   }}
-                                  className="h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                                  className="h-4 w-4 rounded border-slate-300 text-ceenai-blue focus:ring-ceenai-blue"
                                 />
                                 <span>{option.label}</span>
                               </label>
@@ -668,8 +668,8 @@ export const PatientPreVisitAssessment: React.FC = () => {
                     <AlertCircle className="h-5 w-5" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h2 className="text-lg font-semibold text-gray-900">Review record updates before you finish</h2>
-                    <p className="mt-1 text-sm text-gray-700">
+                    <h2 className="text-lg font-semibold text-slate-900">Review record updates before you finish</h2>
+                    <p className="mt-1 text-sm text-slate-700">
                       Confirm which answers should update your record for future autofill. Medication changes stay
                       patient-reported so your doctor can review them first.
                     </p>
@@ -680,7 +680,7 @@ export const PatientPreVisitAssessment: React.FC = () => {
                   {data.pendingCanonicalUpdates.map((update) => (
                     <article key={update.id} className="rounded-2xl border border-amber-200 bg-white px-4 py-4">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <h3 className="text-sm font-semibold text-gray-900">{update.displayLabel}</h3>
+                        <h3 className="text-sm font-semibold text-slate-900">{update.displayLabel}</h3>
                         <span
                           className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide ${
                             update.requiresDoctorReview
@@ -692,13 +692,13 @@ export const PatientPreVisitAssessment: React.FC = () => {
                         </span>
                       </div>
                       <div className="mt-3 grid gap-3 md:grid-cols-2">
-                        <div className="rounded-2xl bg-gray-50 px-4 py-3">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Current</p>
-                          <p className="mt-1 text-sm text-gray-700">{formatCanonicalValueForReview(update.currentValue)}</p>
+                        <div className="rounded-2xl bg-slate-50 px-4 py-3">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Current</p>
+                          <p className="mt-1 text-sm text-slate-700">{formatCanonicalValueForReview(update.currentValue)}</p>
                         </div>
                         <div className="rounded-2xl bg-cyan-50/70 px-4 py-3">
                           <p className="text-xs font-semibold uppercase tracking-wide text-cyan-700">New answer</p>
-                          <p className="mt-1 text-sm text-gray-900">{formatCanonicalValueForReview(update.proposedValue)}</p>
+                          <p className="mt-1 text-sm text-slate-900">{formatCanonicalValueForReview(update.proposedValue)}</p>
                         </div>
                       </div>
                     </article>
@@ -719,7 +719,7 @@ export const PatientPreVisitAssessment: React.FC = () => {
                     type="button"
                     onClick={() => void handleFinishWithCanonicalUpdates('skip')}
                     disabled={isSaving || isCompleting}
-                    className="rounded-full border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="rounded-full border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     Finish without record updates
                   </button>
@@ -734,8 +734,8 @@ export const PatientPreVisitAssessment: React.FC = () => {
                     <Sparkles className="h-5 w-5" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900">Latest summary for your doctor</h2>
-                    <p className="text-sm text-gray-600">
+                    <h2 className="text-lg font-semibold text-slate-900">Latest summary for your doctor</h2>
+                    <p className="text-sm text-slate-600">
                       Generated{' '}
                       {new Date(data.assessment.summary.generatedAt).toLocaleString(
                         locale,
@@ -750,7 +750,7 @@ export const PatientPreVisitAssessment: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-gray-700">
+                <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-slate-700">
                   {data.assessment.summary.summaryText}
                 </p>
               </section>
@@ -758,7 +758,7 @@ export const PatientPreVisitAssessment: React.FC = () => {
 
             <section className="rounded-3xl bg-white p-6 shadow-sm">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-slate-600">
                   {requiredErrors.length > 0 ? (
                     <span>{requiredErrors.length} required item(s) still need attention.</span>
                   ) : (
@@ -769,7 +769,7 @@ export const PatientPreVisitAssessment: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => navigate('/patient/appointments')}
-                    className="rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                    className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                   >
                     Back to appointments
                   </button>
@@ -777,7 +777,7 @@ export const PatientPreVisitAssessment: React.FC = () => {
                     type="button"
                     onClick={() => void handleSaveProgress()}
                     disabled={isSaving || isCompleting}
-                    className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                     Save progress

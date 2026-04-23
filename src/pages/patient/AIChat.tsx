@@ -432,15 +432,15 @@ export const PatientAIChat: React.FC = () => {
           <div className={`flex items-center gap-6 ${isArabic ? 'flex-row-reverse' : ''}`}>
             <div className="relative">
               <div className="absolute inset-0 animate-ping">
-                <div className="h-16 w-16 rounded-full border-2 border-teal-500/40" />
+                <div className="h-16 w-16 rounded-full border-2 border-cyan-500/40" />
               </div>
               <div
                 className="absolute inset-0 animate-pulse"
                 style={{ animationDuration: '3s' }}
               >
-                <div className="h-16 w-16 rounded-full border-2 border-teal-500/15" />
+                <div className="h-16 w-16 rounded-full border-2 border-cyan-500/15" />
               </div>
-              <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-teal-600 to-emerald-600 shadow-lg shadow-teal-500/30">
+              <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-cyan-600 to-emerald-600 shadow-lg shadow-cyan-500/30">
                 <Bot className="h-8 w-8 text-white" />
               </div>
             </div>
@@ -448,8 +448,8 @@ export const PatientAIChat: React.FC = () => {
               <h1 className="text-lg font-bold text-white" style={PLAYFAIR}>
                 {t('patient.aiChat.heroBrand')}
               </h1>
-              <p className="flex items-center gap-1 text-xs text-teal-300">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-teal-400" />
+              <p className="flex items-center gap-1 text-xs text-cyan-300">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-400" />
                 {t('patient.aiChat.heroSubtitle')}
               </p>
             </div>
@@ -463,7 +463,7 @@ export const PatientAIChat: React.FC = () => {
             >
               {isHistoryOpen ? t('patient.aiChat.collapseHistory') : t('patient.aiChat.chats')}
               {sessions.length > 0 ? (
-                <span className="rounded-full bg-teal-500/20 px-2 py-0.5 text-[10px] font-mono text-teal-200">
+                <span className="rounded-full bg-cyan-500/20 px-2 py-0.5 text-[10px] font-mono text-cyan-200">
                   {sessions.length}
                 </span>
               ) : null}
@@ -504,7 +504,7 @@ export const PatientAIChat: React.FC = () => {
               <div className="mx-auto max-w-4xl px-4 py-8 sm:px-8">
                 {loading ? (
                   <div className="flex h-full items-center justify-center py-16">
-                    <Loader2 className="h-6 w-6 animate-spin text-teal-400" />
+                    <Loader2 className="h-6 w-6 animate-spin text-cyan-400" />
                   </div>
                 ) : null}
 
@@ -559,8 +559,8 @@ export const PatientAIChat: React.FC = () => {
                                 {formatCanonicalValueForReview(update.currentValue)}
                               </p>
                             </div>
-                            <div className="rounded-2xl bg-teal-500/10 px-4 py-3">
-                              <p className="text-xs font-semibold uppercase tracking-wide text-teal-200">
+                            <div className="rounded-2xl bg-cyan-500/10 px-4 py-3">
+                              <p className="text-xs font-semibold uppercase tracking-wide text-cyan-200">
                                 {t('patient.aiChat.fieldNew')}
                               </p>
                               <p className="mt-1 text-sm text-white/90">
@@ -582,7 +582,7 @@ export const PatientAIChat: React.FC = () => {
                         type="button"
                         onClick={() => void handleApplyPendingUpdates()}
                         disabled={isApplyingRecordUpdates}
-                        className="inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-teal-600 to-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-teal-500/30 transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-cyan-600 to-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-cyan-500/30 transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {isApplyingRecordUpdates ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -633,7 +633,7 @@ export const PatientAIChat: React.FC = () => {
 
                     <div className="mx-auto mb-8 max-w-xl">
                       <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
-                        <p className="mb-4 font-mono text-xs uppercase tracking-wider text-teal-400">
+                        <p className="mb-4 font-mono text-xs uppercase tracking-wider text-cyan-400">
                           {t('patient.aiChat.healthSummary')}
                         </p>
                         <div className="mb-6 grid grid-cols-2 gap-8">
@@ -685,7 +685,7 @@ export const PatientAIChat: React.FC = () => {
                             <p className="mb-1 font-mono text-xs text-white/50">
                               {t('patient.aiChat.labelMedications')}
                             </p>
-                            <p className="font-mono text-2xl font-bold text-teal-300">
+                            <p className="font-mono text-2xl font-bold text-cyan-300">
                               {activeMedicationsCount}
                             </p>
                             <p className="mt-1 text-xs text-white/50">
@@ -728,7 +728,7 @@ export const PatientAIChat: React.FC = () => {
                             key={`${pill.text}-${index}`}
                             type="button"
                             onClick={() => void handleSendMessage({ submittedMessage: pill.text })}
-                            className="flex-shrink-0 rounded-full border border-teal-500/30 bg-teal-900/20 px-5 py-2.5 text-sm text-teal-200 transition-all hover:scale-105 hover:bg-teal-900/30 hover:shadow-lg hover:shadow-teal-500/10"
+                            className="flex-shrink-0 rounded-full border border-cyan-500/30 bg-cyan-900/20 px-5 py-2.5 text-sm text-cyan-200 transition-all hover:scale-105 hover:bg-cyan-900/30 hover:shadow-lg hover:shadow-cyan-500/10"
                           >
                             {pill.icon} {pill.text}
                           </button>
@@ -764,20 +764,20 @@ export const PatientAIChat: React.FC = () => {
                       return (
                         <div key={message.id} className="mb-8 flex justify-start">
                           <div className={`flex max-w-[85%] items-start gap-4 ${isArabic ? 'flex-row-reverse' : ''}`}>
-                            <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-900">
-                              <Bot className="h-6 w-6 text-teal-400" />
+                            <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cyan-900">
+                              <Bot className="h-6 w-6 text-cyan-400" />
                             </div>
                             <div className="flex-1">
-                              <div className="rounded-3xl rounded-tl-sm border border-teal-500/20 bg-teal-900/[0.12] p-6 shadow-lg shadow-teal-500/5">
+                              <div className="rounded-3xl rounded-tl-sm border border-cyan-500/20 bg-cyan-900/[0.12] p-6 shadow-lg shadow-cyan-500/5">
                                 {index === 0 ? (
                                   <div className="mb-3">
                                     <p
-                                      className="text-sm font-bold text-teal-300"
+                                      className="text-sm font-bold text-cyan-300"
                                       style={PLAYFAIR}
                                     >
                                       {t('patient.aiChat.heroBrand')}
                                     </p>
-                                    <p className="font-mono text-xs text-teal-400/60">
+                                    <p className="font-mono text-xs text-cyan-400/60">
                                       {t('patient.aiChat.personalizedFor', { name: firstName })}
                                     </p>
                                   </div>
@@ -801,7 +801,7 @@ export const PatientAIChat: React.FC = () => {
                                           href={href}
                                           target="_blank"
                                           rel="noreferrer"
-                                          className="font-medium text-teal-300 underline"
+                                          className="font-medium text-cyan-300 underline"
                                         >
                                           {children}
                                         </a>
@@ -828,7 +828,7 @@ export const PatientAIChat: React.FC = () => {
                                     {historyBadges.map((badge) => (
                                       <span
                                         key={badge}
-                                        className="rounded-full border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-xs font-medium text-teal-200"
+                                        className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-200"
                                       >
                                         {t('patient.aiChat.usedPrefix', { label: badge })}
                                       </span>
@@ -842,7 +842,7 @@ export const PatientAIChat: React.FC = () => {
                                         key={`${message.id}-${action.href}`}
                                         type="button"
                                         onClick={() => navigate(action.href)}
-                                        className="rounded-full bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-teal-500/30 transition hover:bg-teal-500"
+                                        className="rounded-full bg-cyan-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-cyan-500/30 transition hover:bg-cyan-500"
                                       >
                                         {action.label}
                                       </button>
@@ -906,7 +906,7 @@ export const PatientAIChat: React.FC = () => {
                     return (
                       <div key={message.id} className="mb-8 flex justify-end">
                         <div className="max-w-[70%]">
-                          <div className="rounded-3xl rounded-tr-sm bg-teal-600 p-6 shadow-lg shadow-teal-500/30">
+                          <div className="rounded-3xl rounded-tr-sm bg-cyan-600 p-6 shadow-lg shadow-cyan-500/30">
                             {fileAttachments.length > 0 ? (
                               <div className="mb-3 flex flex-wrap gap-2">
                                 {fileAttachments.map((attachment) => (
@@ -933,16 +933,16 @@ export const PatientAIChat: React.FC = () => {
 
                 {isSending ? (
                   <div className="mb-8 flex max-w-[85%] items-start gap-4">
-                    <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-900">
-                      <Bot className="h-6 w-6 text-teal-400" />
+                    <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cyan-900">
+                      <Bot className="h-6 w-6 text-cyan-400" />
                     </div>
-                    <div className="rounded-3xl rounded-tl-sm border border-teal-500/20 bg-teal-900/[0.12] p-6">
+                    <div className="rounded-3xl rounded-tl-sm border border-cyan-500/20 bg-cyan-900/[0.12] p-6">
                       <div className="mb-2 flex items-center gap-2">
-                        <div className="h-2 w-2 animate-bounce rounded-full bg-teal-400" style={{ animationDelay: '0ms' }} />
-                        <div className="h-2 w-2 animate-bounce rounded-full bg-teal-400" style={{ animationDelay: '200ms' }} />
-                        <div className="h-2 w-2 animate-bounce rounded-full bg-teal-400" style={{ animationDelay: '400ms' }} />
+                        <div className="h-2 w-2 animate-bounce rounded-full bg-cyan-400" style={{ animationDelay: '0ms' }} />
+                        <div className="h-2 w-2 animate-bounce rounded-full bg-cyan-400" style={{ animationDelay: '200ms' }} />
+                        <div className="h-2 w-2 animate-bounce rounded-full bg-cyan-400" style={{ animationDelay: '400ms' }} />
                       </div>
-                      <p className="font-mono text-xs italic text-teal-300/60">
+                      <p className="font-mono text-xs italic text-cyan-300/60">
                         {t('patient.aiChat.thinking')}
                       </p>
                     </div>
@@ -1024,7 +1024,7 @@ export const PatientAIChat: React.FC = () => {
                           void handleSendMessage();
                         }
                       }}
-                      className="w-full resize-none rounded-3xl border border-white/10 bg-white/[0.06] px-5 py-3 text-white placeholder:text-white/40 outline-none transition focus:border-teal-500/50 focus:ring-2 focus:ring-teal-500/10"
+                      className="w-full resize-none rounded-3xl border border-white/10 bg-white/[0.06] px-5 py-3 text-white placeholder:text-white/40 outline-none transition focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/10"
                       style={{ minHeight: '48px', maxHeight: '120px' }}
                     />
                   </label>
@@ -1035,7 +1035,7 @@ export const PatientAIChat: React.FC = () => {
                     className={`rounded-xl p-4 transition-all ${
                       isSending || !input.trim()
                         ? 'bg-white/10 text-white/30'
-                        : 'bg-gradient-to-br from-teal-600 to-emerald-600 text-white shadow-lg shadow-teal-500/40 hover:scale-[1.04]'
+                        : 'bg-gradient-to-br from-cyan-600 to-emerald-600 text-white shadow-lg shadow-cyan-500/40 hover:scale-[1.04]'
                     }`}
                     aria-label={t('patient.aiChat.send')}
                   >
@@ -1066,7 +1066,7 @@ export const PatientAIChat: React.FC = () => {
                   <button
                     type="button"
                     onClick={startNewSession}
-                    className="rounded-full bg-teal-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm shadow-teal-500/30 transition hover:bg-teal-500"
+                    className="rounded-full bg-cyan-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm shadow-cyan-500/30 transition hover:bg-cyan-500"
                   >
                     {t('patient.aiChat.newChatShort')}
                   </button>
@@ -1078,7 +1078,7 @@ export const PatientAIChat: React.FC = () => {
                   onClick={startNewSession}
                   className={`w-full rounded-2xl border px-4 py-3 text-left transition ${
                     selectedSessionId === null
-                      ? 'border-teal-500/40 bg-teal-500/10'
+                      ? 'border-cyan-500/40 bg-cyan-500/10'
                       : 'border-white/10 bg-white/[0.04] hover:border-white/20'
                   }`}
                 >
@@ -1097,7 +1097,7 @@ export const PatientAIChat: React.FC = () => {
                     title={session.preview}
                     className={`w-full rounded-2xl border px-4 py-3 text-left transition ${
                       selectedSessionId === session.id
-                        ? 'border-teal-500/40 bg-teal-500/10'
+                        ? 'border-cyan-500/40 bg-cyan-500/10'
                         : 'border-white/10 bg-white/[0.04] hover:border-white/20'
                     }`}
                   >

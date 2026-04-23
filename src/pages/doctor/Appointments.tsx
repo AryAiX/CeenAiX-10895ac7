@@ -244,12 +244,12 @@ export const DoctorAppointments: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            <div className="flex flex-col gap-4 rounded-2xl bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-slate-900">
                   {viewMode === 'calendar' ? t('doctor.appointments.viewCalendar') : t('doctor.appointments.viewList')}
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-slate-600">
                   {viewMode === 'calendar'
                     ? visibleAppointments.length === 1
                       ? t('doctor.appointments.calendarSubOne', {
@@ -286,14 +286,14 @@ export const DoctorAppointments: React.FC = () => {
                 </p>
               </div>
 
-              <div className="inline-flex w-full rounded-2xl bg-gray-100 p-1 md:w-auto">
+              <div className="inline-flex w-full rounded-2xl bg-slate-100 p-1 md:w-auto">
                 <button
                   type="button"
                   onClick={() => setViewMode('list')}
                   className={`inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition md:flex-none ${
                     viewMode === 'list'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-white text-slate-900 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   <List className="h-4 w-4" />
@@ -304,8 +304,8 @@ export const DoctorAppointments: React.FC = () => {
                   onClick={() => setViewMode('calendar')}
                   className={`inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition md:flex-none ${
                     viewMode === 'calendar'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-white text-slate-900 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   <CalendarDays className="h-4 w-4" />
@@ -315,27 +315,27 @@ export const DoctorAppointments: React.FC = () => {
             </div>
 
             {viewMode === 'calendar' ? (
-              <section className="rounded-2xl bg-white p-4 shadow-sm sm:p-6">
+              <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{t('doctor.appointments.calTitle')}</h3>
-                    <p className="text-sm text-gray-600">{t('doctor.appointments.calSub')}</p>
+                    <h3 className="text-lg font-semibold text-slate-900">{t('doctor.appointments.calTitle')}</h3>
+                    <p className="text-sm text-slate-600">{t('doctor.appointments.calSub')}</p>
                   </div>
 
-                  <div className="flex items-center gap-2 self-start rounded-xl bg-gray-50 px-2 py-2 sm:gap-3 sm:px-3">
+                  <div className="flex items-center gap-2 self-start rounded-xl bg-slate-50 px-2 py-2 sm:gap-3 sm:px-3">
                     <button
                       type="button"
                       onClick={() => handleMonthChange(-1)}
                       className="rounded-lg p-2 transition hover:bg-white"
                       aria-label={t('doctor.appointments.prevMonth')}
                     >
-                      <ChevronLeft className="h-5 w-5 text-gray-700" />
+                      <ChevronLeft className="h-5 w-5 text-slate-700" />
                     </button>
                     <div className="min-w-28 text-center sm:min-w-36">
-                      <p className="text-sm font-semibold text-gray-900">
+                      <p className="text-sm font-semibold text-slate-900">
                         {currentMonth.toLocaleDateString(locale, dtOpts({ month: 'long', year: 'numeric' }))}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-slate-500">
                         {currentMonthAppointmentCount === 1
                           ? t('doctor.appointments.apptCountOne', {
                               count: formatLocaleDigits(currentMonthAppointmentCount, uiLang),
@@ -351,12 +351,12 @@ export const DoctorAppointments: React.FC = () => {
                       className="rounded-lg p-2 transition hover:bg-white"
                       aria-label={t('doctor.appointments.nextMonth')}
                     >
-                      <ChevronRight className="h-5 w-5 text-gray-700" />
+                      <ChevronRight className="h-5 w-5 text-slate-700" />
                     </button>
                   </div>
                 </div>
 
-                <div className="mt-6 grid grid-cols-7 gap-1 text-center text-[10px] font-semibold uppercase tracking-wide text-gray-500 sm:gap-2 sm:text-xs">
+                <div className="mt-6 grid grid-cols-7 gap-1 text-center text-[10px] font-semibold uppercase tracking-wide text-slate-500 sm:gap-2 sm:text-xs">
                   {weekdayLabels.map((label) => (
                     <div key={label} className="py-1 sm:py-2">
                       <span className="sm:hidden">{label.charAt(0)}</span>
@@ -389,23 +389,23 @@ export const DoctorAppointments: React.FC = () => {
                         className={`min-h-[4.5rem] rounded-xl border p-2 text-left transition sm:h-20 sm:rounded-2xl sm:p-3 ${
                           isSelected
                             ? 'border-cyan-500 bg-cyan-50 shadow-sm'
-                            : 'border-gray-200 bg-white hover:border-cyan-200 hover:bg-cyan-50/40'
+                            : 'border-slate-200 bg-white hover:border-cyan-200 hover:bg-cyan-50/40'
                         }`}
                       >
                         <div className="flex items-start justify-between">
                           <span
                             className={`text-xs font-semibold sm:text-sm ${
-                              isSelected ? 'text-cyan-700' : 'text-gray-900'
+                              isSelected ? 'text-cyan-700' : 'text-slate-900'
                             }`}
                           >
                             {formatLocaleDigits(date.getDate(), uiLang)}
                           </span>
                           {isToday ? (
                             <>
-                              <span className="hidden rounded-full bg-gray-900 px-2 py-0.5 text-[10px] font-semibold uppercase text-white sm:inline">
+                              <span className="hidden rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-semibold uppercase text-white sm:inline">
                                 {t('doctor.appointments.today')}
                               </span>
-                              <span className="inline h-2 w-2 rounded-full bg-gray-900 sm:hidden" />
+                              <span className="inline h-2 w-2 rounded-full bg-slate-900 sm:hidden" />
                             </>
                           ) : null}
                         </div>
@@ -426,7 +426,7 @@ export const DoctorAppointments: React.FC = () => {
                               </p>
                             </>
                           ) : (
-                            <p className="hidden text-xs text-gray-400 sm:block">{t('doctor.appointments.noApptsDay')}</p>
+                            <p className="hidden text-xs text-slate-400 sm:block">{t('doctor.appointments.noApptsDay')}</p>
                           )}
                         </div>
                       </button>
@@ -438,7 +438,7 @@ export const DoctorAppointments: React.FC = () => {
 
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-bold text-gray-900">
+                <h3 className="text-xl font-bold text-slate-900">
                   {viewMode === 'calendar'
                     ? t('doctor.appointments.headingCal', {
                         date: selectedCalendarDate.toLocaleDateString(
@@ -453,17 +453,17 @@ export const DoctorAppointments: React.FC = () => {
                       })
                     : t('doctor.appointments.headingAll')}
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-slate-600">
                   {viewMode === 'calendar' ? t('doctor.appointments.subCal') : t('doctor.appointments.subAll')}
                 </p>
               </div>
             </div>
 
             {visibleAppointments.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center shadow-sm">
-                <CalendarDays className="mx-auto mb-4 h-10 w-10 text-gray-400" />
-                <h3 className="text-xl font-bold text-gray-900">{t('doctor.appointments.noDayTitle')}</h3>
-                <p className="mt-2 text-sm text-gray-600">{t('doctor.appointments.noDayBody')}</p>
+              <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
+                <CalendarDays className="mx-auto mb-4 h-10 w-10 text-slate-400" />
+                <h3 className="text-xl font-bold text-slate-900">{t('doctor.appointments.noDayTitle')}</h3>
+                <p className="mt-2 text-sm text-slate-600">{t('doctor.appointments.noDayBody')}</p>
               </div>
             ) : (
               <div className="grid gap-6">
@@ -477,7 +477,7 @@ export const DoctorAppointments: React.FC = () => {
                     return (
                       <div
                         key={appointment.id}
-                        className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg transition-all duration-200 hover:shadow-xl"
+                        className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg transition-all duration-200 hover:shadow-xl"
                       >
                         <div
                           className={`p-4 ${
@@ -514,7 +514,7 @@ export const DoctorAppointments: React.FC = () => {
                                 </p>
                               </div>
                             </div>
-                            <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase text-gray-800">
+                            <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase text-slate-800">
                               {appointmentStatusLabel(t, appointment.status)}
                             </span>
                           </div>
@@ -527,8 +527,8 @@ export const DoctorAppointments: React.FC = () => {
                                 <Clock className="w-4 h-4 text-blue-600" />
                               </div>
                               <div>
-                                <p className="text-xs font-medium text-gray-500">{t('doctor.appointments.time')}</p>
-                                <p className="text-sm font-semibold text-gray-900">
+                                <p className="text-xs font-medium text-slate-500">{t('doctor.appointments.time')}</p>
+                                <p className="text-sm font-semibold text-slate-900">
                                   {new Date(appointment.scheduled_at).toLocaleString(
                                     locale,
                                     dtOpts({
@@ -543,8 +543,8 @@ export const DoctorAppointments: React.FC = () => {
                             </div>
 
                             <div>
-                              <p className="mb-1 text-xs font-medium text-gray-500">{t('doctor.appointments.duration')}</p>
-                              <p className="text-sm font-semibold text-gray-900">
+                              <p className="mb-1 text-xs font-medium text-slate-500">{t('doctor.appointments.duration')}</p>
+                              <p className="text-sm font-semibold text-slate-900">
                                 {t('shared.minutesUnit', {
                                   count: formatLocaleDigits(appointment.duration_minutes, uiLang),
                                 })}
@@ -552,17 +552,17 @@ export const DoctorAppointments: React.FC = () => {
                             </div>
 
                             <div>
-                              <p className="mb-1 text-xs font-medium text-gray-500">{t('doctor.appointments.type')}</p>
-                              <p className="text-sm font-semibold text-gray-900 capitalize">
+                              <p className="mb-1 text-xs font-medium text-slate-500">{t('doctor.appointments.type')}</p>
+                              <p className="text-sm font-semibold text-slate-900 capitalize">
                                 {appointmentTypeLabel(t, appointment.type)}
                               </p>
                             </div>
                           </div>
 
-                          <div className="mt-4 grid gap-4 border-t border-gray-100 pt-4 md:grid-cols-2">
+                          <div className="mt-4 grid gap-4 border-t border-slate-100 pt-4 md:grid-cols-2">
                             <div>
-                              <p className="text-xs font-medium uppercase text-gray-500">{t('doctor.appointments.reason')}</p>
-                              <p className="mt-2 text-sm text-gray-700">
+                              <p className="text-xs font-medium uppercase text-slate-500">{t('doctor.appointments.reason')}</p>
+                              <p className="mt-2 text-sm text-slate-700">
                                 {appointment.chief_complaint ? (
                                   uiLang.startsWith('ar') ? (
                                     <span dir="ltr" className="block text-start" translate="no">
@@ -578,8 +578,8 @@ export const DoctorAppointments: React.FC = () => {
                             </div>
 
                             <div>
-                              <p className="text-xs font-medium uppercase text-gray-500">{t('doctor.appointments.patientNotes')}</p>
-                              <p className="mt-2 text-sm text-gray-700">
+                              <p className="text-xs font-medium uppercase text-slate-500">{t('doctor.appointments.patientNotes')}</p>
+                              <p className="mt-2 text-sm text-slate-700">
                                 {appointment.notes ? (
                                   uiLang.startsWith('ar') ? (
                                     <span dir="ltr" className="block text-start" translate="no">
@@ -609,7 +609,7 @@ export const DoctorAppointments: React.FC = () => {
                                   <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-cyan-800">
                                     {t('doctor.appointments.aiSummary')}
                                   </p>
-                                  <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-700">
+                                  <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">
                                     {uiLang.startsWith('ar') ? (
                                       <span dir="ltr" className="block text-start" translate="no">
                                         {preVisitAssessment.summary.summary_text}
@@ -620,12 +620,12 @@ export const DoctorAppointments: React.FC = () => {
                                   </p>
                                 </>
                               ) : (
-                                <p className="mt-2 text-sm text-gray-700">{t('doctor.appointments.preVisitPending')}</p>
+                                <p className="mt-2 text-sm text-slate-700">{t('doctor.appointments.preVisitPending')}</p>
                               )}
                             </div>
                           ) : null}
 
-                          <div className="mt-4 flex flex-wrap gap-3 border-t border-gray-100 pt-4">
+                          <div className="mt-4 flex flex-wrap gap-3 border-t border-slate-100 pt-4">
                             <button
                               type="button"
                               onClick={() => navigate(`/doctor/appointments/${appointment.id}`)}
@@ -647,7 +647,7 @@ export const DoctorAppointments: React.FC = () => {
                             ) : null}
                           </div>
 
-                          <div className="mt-4 flex items-center space-x-2 border-t border-gray-100 pt-4 text-sm text-gray-600">
+                          <div className="mt-4 flex items-center space-x-2 border-t border-slate-100 pt-4 text-sm text-slate-600">
                             <User className="h-4 w-4" />
                             <span>{t('doctor.appointments.footerHint')}</span>
                           </div>

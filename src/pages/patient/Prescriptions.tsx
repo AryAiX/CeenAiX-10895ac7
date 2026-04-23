@@ -169,7 +169,7 @@ export const PatientPrescriptions: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h2 className="font-playfair text-2xl md:text-3xl font-bold text-slate-900 flex items-center gap-3">
           <span>💊 {t('patient.prescriptions.activeSection')}</span>
-          <span className="bg-teal-500 text-white text-xs font-bold rounded-full w-7 h-7 inline-flex items-center justify-center shadow-sm">
+          <span className="bg-ceenai-blue text-white text-xs font-bold rounded-full w-7 h-7 inline-flex items-center justify-center shadow-sm">
             {formatLocaleDigits(activePrescriptions.length, uiLang)}
           </span>
         </h2>
@@ -181,7 +181,7 @@ export const PatientPrescriptions: React.FC = () => {
       </div>
 
       {activePrescriptions.length === 0 ? (
-        <div className="relative bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+        <div className="relative bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 opacity-5">
             <img
               src="https://images.pexels.com/photos/3873146/pexels-photo-3873146.jpeg?auto=compress&cs=tinysrgb&w=400"
@@ -193,8 +193,8 @@ export const PatientPrescriptions: React.FC = () => {
             <div className="w-20 h-20 bg-gradient-to-br from-ceenai-cyan to-ceenai-blue rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
               <Pill className="w-10 h-10 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('patient.prescriptions.emptyActiveTitle')}</h3>
-            <p className="text-gray-600">{t('patient.prescriptions.emptyActiveBody')}</p>
+            <h3 className="text-2xl font-bold text-slate-900 mb-2">{t('patient.prescriptions.emptyActiveTitle')}</h3>
+            <p className="text-slate-600">{t('patient.prescriptions.emptyActiveBody')}</p>
           </div>
         </div>
       ) : (
@@ -205,7 +205,7 @@ export const PatientPrescriptions: React.FC = () => {
             return (
               <div
                 key={prescription.id}
-                className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200"
+                className="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden hover:shadow-lg transition-all duration-200"
               >
                 <div className="relative bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan p-6">
                   <div className="absolute inset-0 opacity-10">
@@ -272,28 +272,28 @@ export const PatientPrescriptions: React.FC = () => {
 
                 <div className="p-6">
                   <div className="grid gap-4 md:grid-cols-3 mb-6">
-                    <div className="rounded-xl bg-gray-50 p-4">
-                      <div className="flex items-center gap-2 text-xs font-semibold uppercase text-gray-500">
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <div className="flex items-center gap-2 text-xs font-semibold uppercase text-slate-500">
                         <Calendar className="h-4 w-4" />
                         <span>{t('patient.prescriptions.prescribedOn')}</span>
                       </div>
-                      <p className="mt-2 font-semibold text-gray-900">{formatDate(prescription.prescribed_at)}</p>
+                      <p className="mt-2 font-semibold text-slate-900">{formatDate(prescription.prescribed_at)}</p>
                     </div>
-                    <div className="rounded-xl bg-gray-50 p-4">
-                      <div className="flex items-center gap-2 text-xs font-semibold uppercase text-gray-500">
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <div className="flex items-center gap-2 text-xs font-semibold uppercase text-slate-500">
                         <Package className="h-4 w-4" />
                         <span>{t('patient.prescriptions.medItems')}</span>
                       </div>
-                      <p className="mt-2 font-semibold text-gray-900">
+                      <p className="mt-2 font-semibold text-slate-900">
                         {formatLocaleDigits(prescription.items.length, uiLang)}
                       </p>
                     </div>
-                    <div className="rounded-xl bg-gray-50 p-4">
-                      <div className="flex items-center gap-2 text-xs font-semibold uppercase text-gray-500">
+                    <div className="rounded-xl bg-slate-50 p-4">
+                      <div className="flex items-center gap-2 text-xs font-semibold uppercase text-slate-500">
                         <Clock className="h-4 w-4" />
                         <span>{t('patient.prescriptions.dispensing')}</span>
                       </div>
-                      <p className="mt-2 font-semibold text-gray-900">
+                      <p className="mt-2 font-semibold text-slate-900">
                         {t('patient.prescriptions.dispensedRatio', {
                           done: formatLocaleDigits(
                             prescription.items.filter((item) => item.is_dispensed).length,
@@ -307,19 +307,19 @@ export const PatientPrescriptions: React.FC = () => {
 
                   <div className="grid gap-4 md:grid-cols-2">
                     {prescription.items.map((item) => (
-                      <div key={item.id} className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+                      <div key={item.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                         <div className="flex items-start justify-between gap-3">
                           <div>
-                            <h4 className="text-lg font-bold text-gray-900">
+                            <h4 className="text-lg font-bold text-slate-900">
                               <MedicationNameDisplay
                                 canonicalName={item.medication_name}
                                 localizedName={item.medication_name_ar}
                                 language={uiLang}
                                 primaryClassName="block"
-                                secondaryClassName="block text-sm font-normal text-gray-500 mt-0.5"
+                                secondaryClassName="block text-sm font-normal text-slate-500 mt-0.5"
                               />
                             </h4>
-                            <p className="mt-1 text-sm text-gray-600">
+                            <p className="mt-1 text-sm text-slate-600">
                               {formatMedicationDetailLine(t, uiLang, {
                                 dosage: item.dosage,
                                 frequency: item.frequency,
@@ -345,14 +345,14 @@ export const PatientPrescriptions: React.FC = () => {
                           <div className="mt-4 rounded-xl border border-cyan-200 bg-cyan-50 p-4">
                             <div className="flex items-start gap-3">
                               <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-cyan-600" />
-                              <p className="text-sm text-gray-800 leading-relaxed">{item.instructions}</p>
+                              <p className="text-sm text-slate-800 leading-relaxed">{item.instructions}</p>
                             </div>
                           </div>
                         ) : null}
 
                         {item.quantity !== null ? (
-                          <p className="mt-4 text-sm text-gray-600">
-                            <span className="font-semibold text-gray-900">{t('patient.prescriptions.quantity')}</span>{' '}
+                          <p className="mt-4 text-sm text-slate-600">
+                            <span className="font-semibold text-slate-900">{t('patient.prescriptions.quantity')}</span>{' '}
                             {formatLocaleDigits(item.quantity, uiLang)}
                           </p>
                         ) : null}
@@ -394,28 +394,28 @@ export const PatientPrescriptions: React.FC = () => {
       </div>
 
       {pastPrescriptions.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
+        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-600">
           {t('patient.prescriptions.historyEmpty')}
         </div>
       ) : (
         <div className="space-y-4">
           {pastPrescriptions.map((prescription) => (
-            <div key={prescription.id} className="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all duration-200">
+            <div key={prescription.id} className="bg-white rounded-xl shadow-md border border-slate-200 p-6 hover:shadow-lg transition-all duration-200">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
-                    <Pill className="w-6 h-6 text-gray-600" />
+                  <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center">
+                    <Pill className="w-6 h-6 text-slate-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900">
+                    <h3 className="text-lg font-bold text-slate-900">
                       {prescription.items[0] ? (
                         <>
                           <MedicationNameDisplay
                             canonicalName={prescription.items[0].medication_name}
                             localizedName={prescription.items[0].medication_name_ar}
                             language={uiLang}
-                            primaryClassName="block text-lg font-bold text-gray-900"
-                            secondaryClassName="block text-sm font-normal text-gray-600 mt-0.5"
+                            primaryClassName="block text-lg font-bold text-slate-900"
+                            secondaryClassName="block text-sm font-normal text-slate-600 mt-0.5"
                           />
                           {prescription.items.length > 1
                             ? ` ${t('shared.moreSuffix', {
@@ -427,24 +427,24 @@ export const PatientPrescriptions: React.FC = () => {
                         t('shared.medicationPlan')
                       )}
                     </h3>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-slate-600 text-sm">
                       {t('patient.prescriptions.prescribedBy')} {prescription.doctorName}
                       {prescription.doctorSpecialty ? ` - ${prescription.doctorSpecialty}` : ''}
                     </p>
                   </div>
                 </div>
-                <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold uppercase">
+                <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-bold uppercase">
                   {prescriptionStatusLabel(t, prescription.status)}
                 </span>
               </div>
 
-              <div className="mt-4 grid gap-4 md:grid-cols-2 text-sm text-gray-600">
+              <div className="mt-4 grid gap-4 md:grid-cols-2 text-sm text-slate-600">
                 <div>
-                  <span className="font-semibold text-gray-900">{t('patient.prescriptions.prescribedOn')}:</span>{' '}
+                  <span className="font-semibold text-slate-900">{t('patient.prescriptions.prescribedOn')}:</span>{' '}
                   {formatDate(prescription.prescribed_at)}
                 </div>
                 <div>
-                  <span className="font-semibold text-gray-900">{t('patient.prescriptions.medItems')}:</span>{' '}
+                  <span className="font-semibold text-slate-900">{t('patient.prescriptions.medItems')}:</span>{' '}
                   {formatLocaleDigits(prescription.items.length, uiLang)}
                 </div>
               </div>
@@ -461,7 +461,7 @@ export const PatientPrescriptions: React.FC = () => {
                 {prescription.items.map((item) => (
                   <span
                     key={item.id}
-                    className="rounded-full border border-gray-200 px-3 py-1 text-xs font-medium text-gray-600"
+                    className="rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600"
                   >
                     <MedicationNameDisplay
                       canonicalName={item.medication_name}
@@ -510,7 +510,7 @@ export const PatientPrescriptions: React.FC = () => {
           </h1>
           <p className="mt-2 text-[15px] text-slate-400">{t('patient.prescriptions.subtitleLive')}</p>
         </div>
-        <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-teal-600 to-teal-700 px-6 py-3 text-white shadow-lg shadow-teal-500/30">
+        <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-ceenai-blue to-ceenai-cyan px-6 py-3 text-white shadow-lg shadow-ceenai-blue/30">
           <Pill className="h-4 w-4" />
           <span className="text-[13px] font-bold">
             {t('patient.prescriptions.activeMeds')}: {formatLocaleDigits(activeMedicationCount, uiLang)}
@@ -528,8 +528,8 @@ export const PatientPrescriptions: React.FC = () => {
         <div className="grid gap-4 md:grid-cols-3 mb-6 animate-slideUp" style={{ animationDelay: '80ms' }}>
           <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300">
             <div className="flex items-center gap-4 mb-3">
-              <div className="w-14 h-14 bg-teal-100 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-7 h-7 text-teal-600" />
+              <div className="w-14 h-14 bg-cyan-100 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-7 h-7 text-ceenai-blue" />
               </div>
               <div>
                 <div className="text-3xl font-mono font-bold text-slate-900">
@@ -576,13 +576,13 @@ export const PatientPrescriptions: React.FC = () => {
                 placeholder={t('patient.prescriptions.searchPh')}
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+                className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ceenai-blue/20 focus:border-ceenai-blue"
               />
             </div>
             <select
               value={statusFilter}
               onChange={(event) => setStatusFilter(event.target.value as 'all' | 'active' | 'history')}
-              className="w-full md:w-auto rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+              className="w-full md:w-auto rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ceenai-blue/20 focus:border-ceenai-blue"
             >
               <option value="all">{t('patient.prescriptions.filterAll')}</option>
               <option value="active">{t('patient.prescriptions.filterActive')}</option>
@@ -618,7 +618,7 @@ export const PatientPrescriptions: React.FC = () => {
                     type="button"
                     onClick={() => setActiveTab(tab.key)}
                     className={`py-4 px-2 text-[15px] font-medium transition-all duration-300 relative whitespace-nowrap ${
-                      isActive ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'
+                      isActive ? 'text-ceenai-blue' : 'text-slate-400 hover:text-slate-600'
                     }`}
                   >
                     <span className="flex items-center gap-2">
@@ -629,14 +629,14 @@ export const PatientPrescriptions: React.FC = () => {
                           className={`text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center ${
                             tab.key === 'past'
                               ? 'bg-slate-400 text-white'
-                              : 'bg-teal-500 text-white'
+                              : 'bg-ceenai-blue text-white'
                           }`}
                         >
                           {formatLocaleDigits(tab.count, uiLang)}
                         </span>
                       ) : null}
                     </span>
-                    {isActive ? <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-teal-600" /> : null}
+                    {isActive ? <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-ceenai-blue" /> : null}
                   </button>
                 );
               })}
@@ -670,7 +670,7 @@ export const PatientPrescriptions: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-6 rounded-xl border border-teal-100 bg-teal-50 px-4 py-3 text-sm text-teal-700">
+        <div className="mt-6 rounded-xl border border-cyan-100 bg-cyan-50 px-4 py-3 text-sm text-cyan-700">
           {t('patient.prescriptions.footerNote')}
         </div>
       </div>
