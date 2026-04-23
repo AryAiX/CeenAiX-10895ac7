@@ -287,7 +287,7 @@ export const PatientLabResults: React.FC = () => {
       return renderEmpty(
         t('patient.labResults.emptyTitle'),
         t('patient.labResults.emptyBody'),
-        <FlaskConical className="h-8 w-8 text-teal-600" />
+        <FlaskConical className="h-8 w-8 text-cyan-600" />
       );
     }
 
@@ -370,7 +370,7 @@ export const PatientLabResults: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/patient/messages')}
-                  className="mt-2 inline-flex items-center gap-2 rounded-lg border-2 border-teal-600 px-4 py-2 text-sm font-medium text-teal-600 transition-all hover:bg-teal-600 hover:text-white"
+                  className="mt-2 inline-flex items-center gap-2 rounded-lg border-2 border-cyan-600 px-4 py-2 text-sm font-medium text-cyan-600 transition-all hover:bg-cyan-600 hover:text-white"
                 >
                   <MessageCircle className="h-4 w-4" />
                   {t('patient.labResults.doctorMessageCta', { name: latestVisit.doctorName })}
@@ -623,7 +623,7 @@ export const PatientLabResults: React.FC = () => {
                             {trend.points.map((point, pointIdx) => (
                               <div
                                 key={pointIdx}
-                                className="flex-1 rounded-t bg-gradient-to-t from-teal-500 to-teal-400 transition-all duration-700"
+                                className="flex-1 rounded-t bg-gradient-to-t from-cyan-500 to-cyan-400 transition-all duration-700"
                                 style={{
                                   height: `${
                                     (point.value / Math.max(...trend.points.map((p) => p.value))) *
@@ -659,7 +659,7 @@ export const PatientLabResults: React.FC = () => {
 
                       <button
                         type="button"
-                        className="text-xs font-medium text-teal-600 hover:text-teal-700"
+                        className="text-xs font-medium text-cyan-600 hover:text-cyan-700"
                       >
                         {isExpanded
                           ? t('patient.labResults.lessDetails')
@@ -758,7 +758,7 @@ export const PatientLabResults: React.FC = () => {
               {hba1c.points.map((point, idx) => (
                 <div key={idx} className="flex flex-1 flex-col items-center gap-2">
                   <div
-                    className="w-full rounded-t bg-gradient-to-t from-teal-600 to-teal-400 transition-all duration-1000"
+                    className="w-full rounded-t bg-gradient-to-t from-cyan-600 to-cyan-400 transition-all duration-1000"
                     style={{ height: `${(point.value / maxVal) * 100}%` }}
                   />
                   <div className="font-mono text-xs text-slate-400">{point.label}</div>
@@ -791,7 +791,7 @@ export const PatientLabResults: React.FC = () => {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-50 to-cyan-50 p-8">
+        <div className="rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-50 to-cyan-50 p-8">
           <h4 className="mb-4 text-lg font-bold text-slate-900">
             {t('patient.labResults.trendsKeyInsightsTitle')}
           </h4>
@@ -832,7 +832,7 @@ export const PatientLabResults: React.FC = () => {
       return renderEmpty(
         t('patient.labResults.emptyTitle'),
         t('patient.labResults.emptyBody'),
-        <FlaskConical className="h-8 w-8 text-teal-600" />
+        <FlaskConical className="h-8 w-8 text-cyan-600" />
       );
     }
     return (
@@ -865,14 +865,14 @@ export const PatientLabResults: React.FC = () => {
             <div
               key={order.id}
               style={{ animationDelay: `${idx * 60}ms` }}
-              className="animate-slideUp rounded-xl border-l-4 border-teal-500 bg-white shadow-sm transition-all duration-300 hover:shadow-md"
+              className="animate-slideUp rounded-xl border-l-4 border-cyan-500 bg-white shadow-sm transition-all duration-300 hover:shadow-md"
             >
               <div
                 className="flex cursor-pointer items-center justify-between p-5"
                 onClick={() => toggleVisit(order.id)}
               >
                 <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-100 text-sm font-bold text-teal-600">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-100 text-sm font-bold text-cyan-600">
                     {order.labShortCode ?? order.labName?.slice(0, 3).toUpperCase() ?? 'LAB'}
                   </div>
                   <div>
@@ -1046,7 +1046,7 @@ export const PatientLabResults: React.FC = () => {
           <div className="mt-6 flex justify-center gap-3">
             <button
               type="button"
-              className="rounded-lg bg-teal-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-teal-700"
+              className="rounded-lg bg-cyan-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-cyan-700"
             >
               {t('patient.labResults.upcomingAddToCalendar')}
             </button>
@@ -1154,7 +1154,7 @@ export const PatientLabResults: React.FC = () => {
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3">
-                          <FlaskConical className="mt-0.5 h-5 w-5 text-teal-600" />
+                          <FlaskConical className="mt-0.5 h-5 w-5 text-cyan-600" />
                           <div>
                             <div className="text-sm font-bold text-slate-900">
                               {item.test_name}
@@ -1178,7 +1178,7 @@ export const PatientLabResults: React.FC = () => {
                               insurance: item.insurance_coverage_aed ?? 0,
                             })}
                           </div>
-                          <div className="text-sm font-bold text-teal-600">
+                          <div className="text-sm font-bold text-cyan-600">
                             {t('patient.labResults.upcomingPerTestPays', {
                               amount: item.patient_cost_aed ?? 0,
                             })}
@@ -1194,7 +1194,7 @@ export const PatientLabResults: React.FC = () => {
                   ))}
                 </div>
 
-                <div className="mt-6 rounded-lg border border-teal-200 bg-teal-50 p-4">
+                <div className="mt-6 rounded-lg border border-cyan-200 bg-cyan-50 p-4">
                   <div className="mb-2 flex items-center justify-between">
                     <span className="text-sm text-slate-600">
                       {t('patient.labResults.upcomingSummarySelfPay')}
@@ -1211,15 +1211,15 @@ export const PatientLabResults: React.FC = () => {
                       AED {totalInsurance}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between border-t border-teal-200 pt-2">
+                  <div className="flex items-center justify-between border-t border-cyan-200 pt-2">
                     <span className="text-base font-bold text-slate-900">
                       {t('patient.labResults.upcomingSummaryYourCost')}
                     </span>
-                    <span className="font-mono text-2xl font-bold text-teal-600">
+                    <span className="font-mono text-2xl font-bold text-cyan-600">
                       AED {totalPatient}
                     </span>
                   </div>
-                  <div className="mt-2 text-xs text-teal-700">
+                  <div className="mt-2 text-xs text-cyan-700">
                     <CreditCard className="me-1 inline h-3.5 w-3.5" />
                     {t('patient.labResults.upcomingSummaryBillNote')}
                   </div>
@@ -1292,7 +1292,7 @@ export const PatientLabResults: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setBookingConfirmed(true)}
-                        className="w-full rounded-lg bg-teal-600 px-6 py-3 font-bold text-white transition-colors hover:bg-teal-700"
+                        className="w-full rounded-lg bg-cyan-600 px-6 py-3 font-bold text-white transition-colors hover:bg-cyan-700"
                       >
                         {t('patient.labResults.upcomingConfirmBtn')}
                       </button>
@@ -1372,7 +1372,7 @@ export const PatientLabResults: React.FC = () => {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-teal-700"
+                  className="inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-700"
                 >
                   <Download className="h-4 w-4" />
                   {t('patient.labResults.reportsDownloadBtn')}
@@ -1486,8 +1486,8 @@ export const PatientLabResults: React.FC = () => {
       >
         <div className="rounded-2xl bg-white p-6 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md">
           <div className="mb-3 flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-teal-100">
-              <FlaskConical className="h-7 w-7 text-teal-600" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-cyan-100">
+              <FlaskConical className="h-7 w-7 text-cyan-600" />
             </div>
             <div>
               <div className="font-mono text-3xl font-bold text-slate-900">{totalTests}</div>
@@ -1496,7 +1496,7 @@ export const PatientLabResults: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="text-xs font-medium text-teal-600">
+          <div className="text-xs font-medium text-cyan-600">
             {t('patient.labResults.statAcrossVisits', { count: resultedOrders.length })}
           </div>
         </div>
@@ -1626,7 +1626,7 @@ export const PatientLabResults: React.FC = () => {
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={`relative px-2 py-4 text-[15px] font-medium transition-all duration-300 ${
-                  activeTab === tab.id ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'
+                  activeTab === tab.id ? 'text-cyan-600' : 'text-slate-400 hover:text-slate-600'
                 }`}
               >
                 <span className="flex items-center gap-2">
@@ -1638,7 +1638,7 @@ export const PatientLabResults: React.FC = () => {
                   ) : null}
                 </span>
                 {activeTab === tab.id ? (
-                  <span className="absolute inset-x-0 bottom-0 h-0.5 bg-teal-600" />
+                  <span className="absolute inset-x-0 bottom-0 h-0.5 bg-cyan-600" />
                 ) : null}
               </button>
             ))}
