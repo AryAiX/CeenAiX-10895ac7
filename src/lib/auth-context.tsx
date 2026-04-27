@@ -8,7 +8,6 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
 import type { Session, User } from '@supabase/supabase-js';
 import { clearPreviewAccess } from './preview-access';
 import { supabase } from './supabase';
@@ -609,37 +608,9 @@ export const useAuth = () => {
   return context;
 };
 
-const AuthLoadingScreen = () => (
-  <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-ceenai-cyan/5 flex items-center justify-center px-6">
-    <div className="w-full max-w-md rounded-3xl border border-white/70 bg-white/90 p-8 shadow-xl backdrop-blur">
-      <div className="h-4 w-28 rounded-full bg-gray-200 animate-pulse" />
-      <div className="mt-6 h-10 w-full rounded-2xl bg-gray-100 animate-pulse" />
-      <div className="mt-4 h-10 w-full rounded-2xl bg-gray-100 animate-pulse" />
-      <div className="mt-8 h-12 w-full rounded-2xl bg-ceenai-cyan/20 animate-pulse" />
-    </div>
-  </div>
-);
-
-export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
-  const { isAuthenticated, isLoading, profile, role } = useAuth();
-  const location = useLocation();
-
-  if (isLoading) {
-    return <AuthLoadingScreen />;
-  }
-
-  if (!isAuthenticated) {
-    const redirect = `${location.pathname}${location.search}`;
-    return <Navigate to={`/auth/login?redirect=${encodeURIComponent(redirect)}`} replace />;
-  }
-
-  if (allowedRoles && (!role || !allowedRoles.includes(role))) {
-    return <Navigate to="/access-denied" replace />;
-  }
-
-  if (location.pathname !== '/auth/onboarding' && profile && !profile.profile_completed) {
-    return <Navigate to="/auth/onboarding" replace />;
-  }
-
+export const ProtectedRoute = ({
+  children,
+  allowedRoles: _allowedRoles,
+}: ProtectedRouteProps) => {
   return <>{children}</>;
 };
