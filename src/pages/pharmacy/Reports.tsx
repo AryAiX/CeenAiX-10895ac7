@@ -12,7 +12,7 @@ const cleanMedication = (name: string) => name.replace(/\s+\d+\s?(?:mg|iu|mcg|g)
 export const PharmacyReports = () => {
   const { t } = useTranslation('common');
   const { data, loading } = usePharmacyPrescriptionQueue();
-  const queue = data?.queue ?? [];
+  const queue = useMemo(() => data?.queue ?? [], [data?.queue]);
 
   const prescriptionIds = useMemo(() => Array.from(new Set(queue.map((item) => item.prescriptionId))), [queue]);
   const dispensedIds = useMemo(() => {

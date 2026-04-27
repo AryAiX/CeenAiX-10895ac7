@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, CalendarCheck, CheckCircle2, Clock, MessageSquare, Plus, Search, TestTube2 } from 'lucide-react';
@@ -21,8 +21,11 @@ export const DoctorLabOrders: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [activeTab, setActiveTab] = useState<'critical' | 'pending' | 'results' | 'scheduled'>('critical');
 
-  const hasCriticalResult = (labOrder: (typeof labOrders)[number]) =>
-    labOrder.items.some((item) => item.is_abnormal && item.status === 'resulted');
+  const hasCriticalResult = useCallback(
+    (labOrder: (typeof labOrders)[number]) =>
+      labOrder.items.some((item) => item.is_abnormal && item.status === 'resulted'),
+    []
+  );
 
   const tabLabOrders = useMemo(() => {
     switch (activeTab) {
@@ -37,7 +40,7 @@ export const DoctorLabOrders: React.FC = () => {
       default:
         return labOrders;
     }
-  }, [activeTab, labOrders]);
+  }, [activeTab, hasCriticalResult, labOrders]);
 
   const filteredLabOrders = useMemo(
     () =>
@@ -74,7 +77,7 @@ export const DoctorLabOrders: React.FC = () => {
     () => labOrders.filter((labOrder) => labOrder.status !== 'reviewed').length,
     [labOrders]
   );
-  const criticalCount = useMemo(() => labOrders.filter(hasCriticalResult).length, [labOrders]);
+  const criticalCount = useMemo(() => labOrders.filter(hasCriticalResult).length, [hasCriticalResult, labOrders]);
   const resultedCount = useMemo(
     () => labOrders.filter((labOrder) => ['resulted', 'reviewed'].includes(labOrder.status)).length,
     [labOrders]
@@ -83,7 +86,7 @@ export const DoctorLabOrders: React.FC = () => {
     () => labOrders.filter((labOrder) => labOrder.status === 'ordered').length,
     [labOrders]
   );
-  const firstCriticalOrder = useMemo(() => labOrders.find(hasCriticalResult) ?? null, [labOrders]);
+  const firstCriticalOrder = useMemo(() => labOrders.find(hasCriticalResult) ?? null, [hasCriticalResult, labOrders]);
   const firstCriticalItem = firstCriticalOrder?.items.find((item) => item.is_abnormal && item.status === 'resulted') ?? null;
   const labTabs = [
     { id: 'critical' as const, label: 'Critical', count: criticalCount, icon: AlertTriangle },

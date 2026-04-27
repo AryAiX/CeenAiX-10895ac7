@@ -65,7 +65,7 @@ export const PatientInsurance = () => {
   const annualUsed = primaryPlan?.annualLimitUsed ?? 0;
   const usedPct = annualLimit && annualLimit > 0 ? Math.min(100, (annualUsed / annualLimit) * 100) : 0;
 
-  const activity = data?.activity ?? [];
+  const activity = useMemo(() => data?.activity ?? [], [data?.activity]);
   const totals = useMemo(
     () =>
       activity.reduce(

@@ -241,7 +241,7 @@ export const PharmacyDashboard = () => {
         tone: 'emerald',
       },
     ],
-    [data?.claims, data?.profile?.dhaConnected, data?.reportMetrics.dhaSubmittedCount, data?.queue.length, dispensedPrescriptions.length, inQueue.length, oldestQueueItem, onHold, paidRevenue, prescriptionsToday, stockAlerts]
+    [data?.claims, data?.profile?.dhaConnected, data?.reportMetrics.dhaSubmittedCount, dispensedPrescriptions.length, inQueue.length, oldestQueueItem, onHold, paidRevenue, prescriptionsToday, stockAlerts]
   );
 
   return (

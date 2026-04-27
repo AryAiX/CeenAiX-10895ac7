@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FileText, MoreVertical, Search, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -150,7 +150,7 @@ export const DoctorPatients: React.FC = () => {
 
     return new Date(value).toLocaleDateString(locale, dtOpts({ month: 'short', day: 'numeric', year: 'numeric' }));
   };
-  const isTodayDate = (value: string | null) => (value ? new Date(value).toDateString() === todayKey : false);
+  const isTodayDate = useCallback((value: string | null) => (value ? new Date(value).toDateString() === todayKey : false), [todayKey]);
   const filteredPatients = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
     const filtered = rawPatients.filter((patient) => {
@@ -198,10 +198,10 @@ export const DoctorPatients: React.FC = () => {
       return (right.lastAppointment ? new Date(right.lastAppointment).getTime() : 0) -
         (left.lastAppointment ? new Date(left.lastAppointment).getTime() : 0);
     });
-  }, [filterActive, rawPatients, searchQuery, sortBy, todayKey]);
+  }, [filterActive, isTodayDate, rawPatients, searchQuery, sortBy]);
   const todayPatients = useMemo(
     () => rawPatients.filter((patient) => isTodayDate(patient.lastAppointment) || isTodayDate(patient.nextAppointment)).length,
-    [rawPatients, todayKey]
+    [isTodayDate, rawPatients]
   );
   const criticalPatients = useMemo(() => rawPatients.filter((patient) => patient.risk === 'critical').length, [rawPatients]);
   const highRiskPatients = useMemo(() => rawPatients.filter((patient) => patient.risk === 'high').length, [rawPatients]);
