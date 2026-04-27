@@ -144,8 +144,8 @@ const formatNumber = (value: number | null | undefined) =>
 
 const toInventoryRows = (items: PharmacyInventoryDerivedItem[]): InventoryRow[] =>
   items.map((item) => {
-    const genericName = cleanMedicationName(item.name);
-    const strength = strengthForMedication(item.name);
+    const genericName = item.genericName || cleanMedicationName(item.name);
+    const strength = item.strength ?? strengthForMedication(item.name);
     const stockStatus = statusForInventory(item);
     const daysSupply =
       item.stock <= 0 ? 0 : stockStatus === 'in_stock' ? Math.max(7, Math.round(item.stock / 2)) : Math.max(1, Math.round(item.stock / 3));
@@ -153,20 +153,20 @@ const toInventoryRows = (items: PharmacyInventoryDerivedItem[]): InventoryRow[] 
     return {
       id: item.id,
       genericName,
-      brandName: genericName,
+      brandName: item.brandName || genericName,
       strength,
-      form: 'Tablets',
-      atcCode: atcForMedication(genericName),
-      category: categoryForMedication(genericName),
+      form: item.dosageForm || 'Tablets',
+      atcCode: item.atcCode ?? atcForMedication(genericName),
+      category: item.category ?? categoryForMedication(genericName),
       stockQty: item.stock,
-      unit: 'tabs',
+      unit: item.unit,
       reorderLevel: item.reorderPoint,
       daysSupply,
       stockStatus,
-      isControlled: /warfarin/i.test(genericName),
-      isDHAFormulary: true,
+      isControlled: item.isControlled,
+      isDHAFormulary: item.isDHAFormulary,
       affectedPrescriptions: stockStatus === 'out_of_stock' ? ['1 prescription on hold'] : [],
-      batchCount: stockStatus === 'out_of_stock' ? 0 : stockStatus === 'expiring_soon' ? 1 : 2,
+      batchCount: item.batchCount,
       nextExpiry: item.expiryMonth,
     };
   });
@@ -235,7 +235,7 @@ export const PharmacyInventory = () => {
           <div>
             <h2 className="text-[20px] font-bold text-slate-900">Inventory Management</h2>
             <div className="text-[13px] text-slate-400">
-              Stock levels · Al Shifa Pharmacy · {new Date().toLocaleDateString()}
+              Stock levels · {data?.profile?.displayName ?? data?.organization?.name ?? 'Pharmacy'} · {new Date().toLocaleDateString()}
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">

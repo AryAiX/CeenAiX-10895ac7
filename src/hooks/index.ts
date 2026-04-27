@@ -36,10 +36,29 @@ export { useLabDashboard, useLabOrderActions, useLabOrderDetail } from './use-la
 export type { LabDashboardData, LabWorklistItem, LabOrderActions, LabOrderDetail } from './use-lab-dashboard';
 export { usePharmacyPrescriptionQueue } from './use-pharmacy-prescription-queue';
 export type {
+  PharmacyClaimLedgerItem,
+  PharmacyFacilityProfile,
   PharmacyInventoryDerivedItem,
+  PharmacyMessageThread,
+  PharmacyOrganization,
   PharmacyPrescriptionQueueData,
   PharmacyQueuePrescriptionItem,
+  PharmacySettingItem,
+  PharmacyStaffMember,
 } from './use-pharmacy-prescription-queue';
+export { useInsurancePortal } from './use-insurance-portal';
+export type {
+  InsuranceClaim,
+  InsuranceFraudAlert,
+  InsuranceMember,
+  InsuranceNetworkProvider,
+  InsurancePayerProfile,
+  InsurancePortalData,
+  InsurancePreAuthorization,
+  InsuranceReportRun,
+  InsuranceRiskSegment,
+  InsuranceSetting,
+} from './use-insurance-portal';
 export {
   useAdminMetrics,
   useAdminUsers,

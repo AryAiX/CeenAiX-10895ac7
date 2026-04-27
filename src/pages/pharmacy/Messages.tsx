@@ -38,73 +38,37 @@ export const PharmacyMessages = () => {
   const { data } = usePharmacyPrescriptionQueue();
   const [draft, setDraft] = useState('');
   const messages = useMemo<PharmacyMessage[]>(() => {
-    const firstQueue = data?.queue[0];
-    return [
-      {
-        id: 'msg-doctor',
-        contact: firstQueue?.prescriber ?? 'Dr. Ahmed Al Mansoori',
-        specialty: 'Cardiology · Prescription clarification',
-        type: 'doctor',
-        status: 'awaiting',
-        unread: 1,
-        lastMessage: `Please confirm substitution for ${firstQueue?.medication ?? 'Atorvastatin 20mg'}.`,
+    return (data?.messages ?? []).map((message) => {
+      const contactTime = new Date(message.lastMessageAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      return {
+        id: message.id,
+        contact: message.contactName,
+        specialty: message.specialty,
+        type: message.messageType,
+        status: message.status,
+        unread: message.unreadCount,
+        lastMessage: message.lastMessage,
         thread: [
           {
             sender: 'contact',
-            kind: 'query',
-            content: `Please confirm substitution for ${firstQueue?.medication ?? 'Atorvastatin 20mg'} before dispensing.`,
-            time: '2:04 PM',
+            kind: message.messageType === 'dha' ? 'approval' : message.status === 'awaiting' ? 'query' : 'info',
+            content: message.contactMessage,
+            time: contactTime,
           },
-          {
-            sender: 'pharmacy',
-            kind: 'response',
-            content: 'Acknowledged. We are checking stock and insurance coverage now.',
-            time: '2:06 PM',
-          },
+          ...(message.pharmacyResponse
+            ? [
+                {
+                  sender: 'pharmacy' as const,
+                  kind: 'response' as const,
+                  content: message.pharmacyResponse,
+                  time: contactTime,
+                },
+              ]
+            : []),
         ],
-      },
-      {
-        id: 'msg-patient',
-        contact: firstQueue?.patientName ?? 'Aisha Mohammed',
-        specialty: 'Patient pickup window',
-        type: 'patient',
-        status: 'sent',
-        unread: 0,
-        lastMessage: 'Prescription will be ready after insurance verification.',
-        thread: [
-          {
-            sender: 'contact',
-            kind: 'info',
-            content: 'Can I pick up my medication after 5 PM today?',
-            time: '1:40 PM',
-          },
-          {
-            sender: 'pharmacy',
-            kind: 'response',
-            content: 'Yes. We will notify you once insurance verification is complete.',
-            time: '1:48 PM',
-          },
-        ],
-      },
-      {
-        id: 'msg-dha',
-        contact: 'DHA ePrescription',
-        specialty: 'Regulatory feed',
-        type: 'dha',
-        status: 'info',
-        unread: 0,
-        lastMessage: 'Daily dispensing ledger is ready for submission.',
-        thread: [
-          {
-            sender: 'contact',
-            kind: 'approval',
-            content: 'Daily dispensing ledger is ready for DHA submission.',
-            time: '12:00 PM',
-          },
-        ],
-      },
-    ];
-  }, [data?.queue]);
+      };
+    });
+  }, [data?.messages]);
 
   const [selectedId, setSelectedId] = useState(messages[0]?.id ?? 'msg-doctor');
   const selected = messages.find((message) => message.id === selectedId) ?? messages[0];
@@ -113,7 +77,7 @@ export const PharmacyMessages = () => {
   return (
     <OpsShell
       title="Messages"
-      subtitle="Pharmacy communications"
+      subtitle={`${data?.profile?.displayName ?? data?.organization?.name ?? 'Pharmacy'} communications`}
       eyebrow={t('pharmacy.dashboard.eyebrow')}
       navItems={PHARMACY_NAV_ITEMS(t, {
         prescriptions: data?.pendingPrescriptions || undefined,

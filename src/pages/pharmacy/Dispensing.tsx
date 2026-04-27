@@ -169,13 +169,13 @@ const groupPrescriptionRows = (items: PharmacyQueuePrescriptionItem[]): Prescrip
       avatarClass: avatarClassFor(prescriptionId),
       doctorName: first.prescriber,
       drugs: group.map((item) => item.medication || 'Medication pending'),
-      insurance: 'Coverage check',
-      copay: group.reduce((sum, item) => sum + Math.max(0, Math.min(40, item.quantity ?? 0)), 0),
+      insurance: first.insuranceProvider,
+      copay: group.reduce((sum, item) => sum + item.copayAed, 0),
       status: inferPrescriptionStatus(group),
       receivedAt,
       receivedTimeAgo,
       priority: first.priority,
-      hasAllergyFlag: group.some((item) => /penicillin|sulfa|shellfish/i.test(item.medication)),
+      hasAllergyFlag: group.some((item) => item.allergyFlag),
     };
   });
 };
@@ -235,7 +235,7 @@ export const PharmacyDispensing = () => {
   return (
     <OpsShell
       title="Prescriptions"
-      subtitle="Al Shifa Pharmacy · Live dispensing queue"
+      subtitle={`${data?.profile?.displayName ?? data?.organization?.name ?? 'Pharmacy'} · Live dispensing queue`}
       eyebrow={t('pharmacy.dashboard.eyebrow')}
       navItems={PHARMACY_NAV_ITEMS(t, {
         prescriptions: counts.new + counts.on_hold || undefined,
@@ -249,7 +249,9 @@ export const PharmacyDispensing = () => {
         <div className="mx-6 mb-4 mt-5 flex shrink-0 items-center justify-between">
           <div>
             <h2 className="text-[20px] font-bold text-slate-900">Prescriptions</h2>
-            <div className="text-[13px] text-slate-400">All prescriptions today · Al Shifa Pharmacy</div>
+            <div className="text-[13px] text-slate-400">
+              All prescriptions today · {data?.profile?.displayName ?? data?.organization?.name ?? 'Pharmacy'}
+            </div>
           </div>
         </div>
 

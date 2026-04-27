@@ -70,7 +70,17 @@ import { PharmacyProfile } from '../pages/pharmacy/Profile';
 import { PharmacyReports } from '../pages/pharmacy/Reports';
 import { PharmacyRevenue } from '../pages/pharmacy/Revenue';
 import { PharmacySettings } from '../pages/pharmacy/Settings';
-import { InsurancePortal } from '../pages/insurance/Portal';
+import {
+  InsuranceClaims,
+  InsuranceFraudDetection,
+  InsuranceMembers,
+  InsuranceNetworkProviders,
+  InsurancePortal,
+  InsurancePreAuthorizations,
+  InsuranceReports,
+  InsuranceRiskAnalytics,
+  InsuranceSettings,
+} from '../pages/insurance/Portal';
 import { AppointmentDesignShowcase } from '../pages/AppointmentDesignShowcase';
 import { AccessDenied } from '../pages/system/AccessDenied';
 
@@ -429,6 +439,50 @@ export const router = createBrowserRouter([
   },
   {
     path: '/insurance/portal',
-    element: withLayout(<InsurancePortal />),
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsurancePortal />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/dashboard',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsurancePortal />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/pre-authorizations',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsurancePreAuthorizations />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/preauth',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsurancePreAuthorizations />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/claims',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsuranceClaims />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/members',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsuranceMembers />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/fraud',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsuranceFraudDetection />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/risk-analytics',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsuranceRiskAnalytics />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/analytics',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsuranceRiskAnalytics />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/network',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsuranceNetworkProviders />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/reports',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsuranceReports />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/settings',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsuranceSettings />)}</ProtectedRoute>,
   },
 ]);

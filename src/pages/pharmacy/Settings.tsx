@@ -1,29 +1,13 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bell, DatabaseZap, ShieldCheck, SlidersHorizontal } from 'lucide-react';
 import { OpsShell } from '../../components/OpsShell';
 import { usePharmacyPrescriptionQueue } from '../../hooks';
 import { PHARMACY_NAV_ITEMS } from './navItems';
 
-const initialSettings = [
-  { title: 'Prescription Notifications', desc: 'Receive alerts for new ePrescriptions', on: true },
-  { title: 'Stock Alert Threshold', desc: 'Alert when stock falls below reorder level', on: true },
-  { title: 'Auto-submit DHA Records', desc: 'Automatically submit dispensing records to DHA', on: true },
-  { title: 'NABIDH Sync', desc: 'Sync dispensing data with NABIDH HIE', on: true },
-  { title: 'Insurance Pre-auth Alerts', desc: 'Notify when pre-authorization is needed', on: false },
-  { title: 'Expiry Alerts', desc: 'Alert 30 days before batch expiry', on: true },
-];
-
 export const PharmacySettings = () => {
   const { t } = useTranslation('common');
   const { data } = usePharmacyPrescriptionQueue();
-  const [settings, setSettings] = useState(initialSettings);
-
-  const toggle = (title: string) => {
-    setSettings((current) =>
-      current.map((setting) => (setting.title === title ? { ...setting, on: !setting.on } : setting))
-    );
-  };
+  const settings = data?.settings ?? [];
 
   return (
     <OpsShell
@@ -33,7 +17,7 @@ export const PharmacySettings = () => {
       navItems={PHARMACY_NAV_ITEMS(t, {
         prescriptions: data?.pendingPrescriptions || undefined,
         inventory: data?.lowStockAlerts || undefined,
-        messages: 1,
+        messages: data?.messages.reduce((sum, item) => sum + item.unreadCount, 0) || undefined,
       })}
       accent="emerald"
       variant="pharmacy"
@@ -42,7 +26,9 @@ export const PharmacySettings = () => {
         <div className="max-w-3xl">
           <div className="mb-5">
             <h2 className="text-[20px] font-bold text-slate-900">Settings</h2>
-            <div className="text-[13px] text-slate-400">Al Shifa Pharmacy portal preferences</div>
+            <div className="text-[13px] text-slate-400">
+              {data?.profile?.displayName ?? data?.organization?.name ?? 'Pharmacy'} portal preferences
+            </div>
           </div>
 
           <section className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -71,20 +57,19 @@ export const PharmacySettings = () => {
                   </div>
                   <div>
                     <div className="text-sm font-semibold text-slate-800">{setting.title}</div>
-                    <div className="mt-0.5 text-xs text-slate-400">{setting.desc}</div>
+                    <div className="mt-0.5 text-xs text-slate-400">{setting.description}</div>
                   </div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => toggle(setting.title)}
                   className={`relative h-6 w-12 shrink-0 rounded-full transition-colors ${
-                    setting.on ? 'bg-emerald-500' : 'bg-slate-200'
+                    setting.enabled ? 'bg-emerald-500' : 'bg-slate-200'
                   }`}
-                  aria-pressed={setting.on}
+                  aria-pressed={setting.enabled}
                 >
                   <span
                     className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                      setting.on ? 'translate-x-6' : 'translate-x-0.5'
+                      setting.enabled ? 'translate-x-6' : 'translate-x-0.5'
                     }`}
                   />
                 </button>

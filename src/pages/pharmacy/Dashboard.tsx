@@ -176,6 +176,9 @@ export const PharmacyDashboard = () => {
   );
   const onHold = onHoldPrescriptions.length;
   const prescriptionsToday = prescriptionGroups.length;
+  const paidRevenue = data?.claims
+    .filter((claim) => claim.status === 'paid')
+    .reduce((sum, claim) => sum + claim.amountAed, 0) ?? 0;
   const stockAlertSummary =
     stockAlerts.length > 0
       ? stockAlerts
@@ -225,20 +228,20 @@ export const PharmacyDashboard = () => {
       },
       {
         label: 'Revenue Today',
-        value: 'AED 0',
-        helper: 'Claims and collection tables pending activation',
+        value: `AED ${formatNumber(paidRevenue)}`,
+        helper: `${formatNumber(data?.claims.filter((claim) => claim.status === 'paid').length ?? 0)} paid claims from pharmacy_claims`,
         icon: CircleDollarSign,
         tone: 'emerald',
       },
       {
         label: 'DHA Status',
-        value: 'Compliant ✅',
-        helper: `${formatNumber(data?.queue.length ?? 0)} prescription item records available`,
+        value: data?.profile?.dhaConnected ? 'Compliant ✅' : 'Needs review',
+        helper: `${formatNumber(data?.reportMetrics.dhaSubmittedCount ?? 0)} dispensing records ready for DHA reporting`,
         icon: ShieldCheck,
         tone: 'emerald',
       },
     ],
-    [data?.queue.length, dispensedPrescriptions.length, inQueue.length, oldestQueueItem, onHold, prescriptionsToday, stockAlerts]
+    [data?.claims, data?.profile?.dhaConnected, data?.reportMetrics.dhaSubmittedCount, data?.queue.length, dispensedPrescriptions.length, inQueue.length, oldestQueueItem, onHold, paidRevenue, prescriptionsToday, stockAlerts]
   );
 
   return (

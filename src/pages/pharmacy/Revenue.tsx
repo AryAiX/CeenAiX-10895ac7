@@ -3,17 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { CircleDollarSign, CreditCard, Download, FileCheck2, ReceiptText } from 'lucide-react';
 import { OpsShell } from '../../components/OpsShell';
 import { usePharmacyPrescriptionQueue } from '../../hooks';
-import type { PharmacyQueuePrescriptionItem } from '../../hooks';
 import { PHARMACY_NAV_ITEMS } from './navItems';
 
 interface RevenuePrescription {
   id: string;
   patientName: string;
-  medicationCount: number;
-  isDispensed: boolean;
+  medication: string;
   amount: number;
   insurer: string;
-  status: 'paid' | 'review' | 'pending';
+  status: 'paid' | 'review' | 'pending' | 'denied';
 }
 
 const formatCurrency = (value: number) =>
@@ -23,42 +21,30 @@ const formatCurrency = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value);
 
-const insurers = ['Daman', 'AXA Gulf', 'ADNIC', 'Thiqa', 'Cash'];
-
-const groupRevenueRows = (items: PharmacyQueuePrescriptionItem[]): RevenuePrescription[] => {
-  const grouped = new Map<string, PharmacyQueuePrescriptionItem[]>();
-  for (const item of items) {
-    grouped.set(item.prescriptionId, [...(grouped.get(item.prescriptionId) ?? []), item]);
-  }
-
-  return Array.from(grouped.entries()).map(([id, group], index) => {
-    const quantity = group.reduce((sum, item) => sum + (item.quantity ?? 1), 0);
-    const isDispensed = group.every((item) => item.isDispensed);
-    const onHold = group.some((item) => (item.quantity ?? 0) === 0);
-
-    return {
-      id,
-      patientName: group[0]?.patientName ?? 'Patient',
-      medicationCount: group.length,
-      isDispensed,
-      amount: Math.max(85, group.length * 42 + quantity * 3),
-      insurer: insurers[index % insurers.length],
-      status: isDispensed ? 'paid' : onHold ? 'review' : 'pending',
-    };
-  });
-};
-
 export const PharmacyRevenue = () => {
   const { t } = useTranslation('common');
   const { data, loading } = usePharmacyPrescriptionQueue();
-  const rows = useMemo(() => groupRevenueRows(data?.queue ?? []), [data?.queue]);
+  const rows = useMemo<RevenuePrescription[]>(
+    () =>
+      (data?.claims ?? []).map((claim) => ({
+        id: claim.externalRef,
+        patientName: claim.patientName,
+        medication: claim.medication,
+        amount: claim.amountAed,
+        insurer: claim.payerName,
+        status: claim.status,
+      })),
+    [data?.claims]
+  );
   const paid = rows.filter((item) => item.status === 'paid');
   const review = rows.filter((item) => item.status === 'review');
   const pending = rows.filter((item) => item.status === 'pending');
   const revenueToday = paid.reduce((sum, item) => sum + item.amount, 0);
   const projected = rows.reduce((sum, item) => sum + item.amount, 0);
   const averageRx = rows.length ? Math.round(projected / rows.length) : 0;
+  const insurers = Array.from(new Set(rows.map((row) => row.insurer)));
   const maxChannel = Math.max(...insurers.map((insurer) => rows.filter((item) => item.insurer === insurer).length), 1);
+  const pharmacyName = data?.profile?.displayName ?? data?.organization?.name ?? 'Pharmacy';
 
   return (
     <OpsShell
@@ -68,7 +54,7 @@ export const PharmacyRevenue = () => {
       navItems={PHARMACY_NAV_ITEMS(t, {
         prescriptions: data?.pendingPrescriptions || undefined,
         inventory: data?.lowStockAlerts || undefined,
-        messages: 1,
+        messages: data?.messages.reduce((sum, item) => sum + item.unreadCount, 0) || undefined,
       })}
       accent="emerald"
       variant="pharmacy"
@@ -78,7 +64,7 @@ export const PharmacyRevenue = () => {
           <div>
             <h2 className="text-[20px] font-bold text-slate-900">Revenue</h2>
             <div className="text-[13px] text-slate-400">
-              Claims and payments · Al Shifa Pharmacy · {new Date().toLocaleDateString()}
+              Claims and payments · {pharmacyName} · {new Date().toLocaleDateString()}
             </div>
           </div>
           <button className="flex w-fit items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-700">
@@ -160,7 +146,7 @@ export const PharmacyRevenue = () => {
           <article className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm">
             <div className="border-b border-slate-100 px-5 py-4">
               <h3 className="text-[15px] font-bold text-slate-800">Recent Revenue Ledger</h3>
-              <div className="text-xs text-slate-400">Generated from live prescription queue records</div>
+              <div className="text-xs text-slate-400">Generated from pharmacy_claims records</div>
             </div>
             <div className="divide-y divide-slate-100">
               {rows.slice(0, 8).map((row) => (
@@ -168,7 +154,7 @@ export const PharmacyRevenue = () => {
                   <div className="min-w-0">
                     <div className="truncate text-sm font-semibold text-slate-800">{row.patientName}</div>
                     <div className="truncate text-xs text-slate-400">
-                      {row.medicationCount} medication{row.medicationCount === 1 ? '' : 's'} · {row.insurer}
+                      {row.medication} · {row.insurer}
                     </div>
                   </div>
                   <div className="font-mono text-sm font-bold text-slate-800">{formatCurrency(row.amount)}</div>

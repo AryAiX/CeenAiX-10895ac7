@@ -4,6 +4,7 @@ export type UserRole =
   | 'nurse'
   | 'pharmacy'
   | 'lab'
+  | 'insurance'
   | 'facility_admin'
   | 'super_admin';
 

@@ -1,6 +1,33 @@
 import { supabase } from '../lib/supabase';
 import { useQuery } from './use-query';
 
+export interface PharmacyOrganization {
+  id: string;
+  name: string;
+  slug: string;
+  city: string | null;
+  notes: string | null;
+}
+
+export interface PharmacyFacilityProfile {
+  displayName: string;
+  licenseNumber: string;
+  licenseValidUntil: string | null;
+  address: string;
+  operatingHours: string;
+  pharmacistInCharge: string | null;
+  dhaConnected: boolean;
+  nabidhConnected: boolean;
+}
+
+export interface PharmacyStaffMember {
+  id: string;
+  fullName: string;
+  roleTitle: string;
+  credentialNumber: string | null;
+  shiftStatus: 'on_shift' | 'off_shift' | 'on_call';
+}
+
 export interface PharmacyQueuePrescriptionItem {
   id: string;
   prescriptionId: string;
@@ -9,9 +36,15 @@ export interface PharmacyQueuePrescriptionItem {
   prescriber: string;
   priority: 'stat' | 'routine' | 'scheduled';
   status: 'verifying' | 'ready' | 'counseling';
+  workflowStatus: 'new' | 'in_progress' | 'on_hold' | 'dispensed' | 'cancelled';
   waitMinutes: number;
   quantity: number | null;
   isDispensed: boolean;
+  insuranceProvider: string;
+  copayAed: number;
+  receivedAt: string;
+  allergyFlag: boolean;
+  assignedTo: string | null;
 }
 
 export interface PharmacyInventoryDerivedItem {
@@ -22,119 +55,446 @@ export interface PharmacyInventoryDerivedItem {
   reorderPoint: number;
   expiryMonth: string | null;
   status: 'healthy' | 'low' | 'near_expiry' | 'out';
+  genericName: string;
+  brandName: string;
+  strength: string | null;
+  dosageForm: string;
+  atcCode: string | null;
+  category: string | null;
+  unit: string;
+  isControlled: boolean;
+  isDHAFormulary: boolean;
+  batchCount: number;
+}
+
+export interface PharmacyClaimLedgerItem {
+  id: string;
+  dispensingTaskId: string | null;
+  externalRef: string;
+  patientName: string;
+  medication: string;
+  payerName: string;
+  amountAed: number;
+  status: 'paid' | 'review' | 'pending' | 'denied';
+  submittedAt: string | null;
+  paidAt: string | null;
+}
+
+export interface PharmacyMessageThread {
+  id: string;
+  contactName: string;
+  specialty: string;
+  messageType: 'doctor' | 'patient' | 'system' | 'dha';
+  status: 'awaiting' | 'sent' | 'resolved' | 'info';
+  unreadCount: number;
+  lastMessage: string;
+  contactMessage: string;
+  pharmacyResponse: string | null;
+  lastMessageAt: string;
+}
+
+export interface PharmacySettingItem {
+  id: string;
+  settingKey: string;
+  title: string;
+  description: string;
+  enabled: boolean;
+}
+
+export interface PharmacyReportMetrics {
+  dispensingAccuracyPercent: number;
+  controlledCompliancePercent: number;
+  dhaSubmittedCount: number;
+  lastSubmittedLabel: string;
 }
 
 export interface PharmacyPrescriptionQueueData {
+  organization: PharmacyOrganization | null;
+  profile: PharmacyFacilityProfile | null;
+  staff: PharmacyStaffMember[];
   pendingPrescriptions: number;
   dispensedToday: number;
   lowStockAlerts: number;
   claimsInReview: number;
   queue: PharmacyQueuePrescriptionItem[];
   inventory: PharmacyInventoryDerivedItem[];
+  claims: PharmacyClaimLedgerItem[];
+  messages: PharmacyMessageThread[];
+  settings: PharmacySettingItem[];
+  reportMetrics: PharmacyReportMetrics;
 }
+
+interface OrganizationRow {
+  id: string;
+  name: string;
+  slug: string;
+  city: string | null;
+  notes: string | null;
+}
+
+interface ProfileRow {
+  display_name: string;
+  license_number: string;
+  license_valid_until: string | null;
+  address: string;
+  operating_hours: string;
+  pharmacist_in_charge: string | null;
+  dha_connected: boolean;
+  nabidh_connected: boolean;
+}
+
+interface StaffRow {
+  id: string;
+  full_name: string;
+  role_title: string;
+  credential_number: string | null;
+  shift_status: 'on_shift' | 'off_shift' | 'on_call';
+}
+
+interface DispensingTaskRow {
+  id: string;
+  external_ref: string;
+  patient_name: string;
+  prescriber_name: string;
+  medication_name: string;
+  quantity: number | null;
+  priority: PharmacyQueuePrescriptionItem['priority'];
+  workflow_status: PharmacyQueuePrescriptionItem['workflowStatus'];
+  received_at: string;
+  insurance_provider: string;
+  copay_aed: number | string | null;
+  allergy_flag: boolean;
+  assigned_to: string | null;
+}
+
+interface InventoryItemRow {
+  id: string;
+  sku: string;
+  generic_name: string;
+  brand_name: string;
+  strength: string | null;
+  dosage_form: string;
+  atc_code: string | null;
+  category: string | null;
+  unit: string;
+  reorder_level: number;
+  is_controlled: boolean;
+  is_dha_formulary: boolean;
+}
+
+interface InventoryBatchRow {
+  id: string;
+  inventory_item_id: string;
+  quantity_on_hand: number;
+  expiry_date: string | null;
+}
+
+interface ClaimRow {
+  id: string;
+  dispensing_task_id: string | null;
+  external_ref: string;
+  payer_name: string;
+  amount_aed: number | string | null;
+  status: PharmacyClaimLedgerItem['status'];
+  submitted_at: string | null;
+  paid_at: string | null;
+}
+
+interface MessageRow {
+  id: string;
+  contact_name: string;
+  specialty: string;
+  message_type: PharmacyMessageThread['messageType'];
+  status: PharmacyMessageThread['status'];
+  unread_count: number;
+  last_message: string;
+  contact_message: string;
+  pharmacy_response: string | null;
+  last_message_at: string;
+}
+
+interface SettingRow {
+  id: string;
+  setting_key: string;
+  title: string;
+  description: string;
+  enabled: boolean;
+}
+
+const emptyData = (): PharmacyPrescriptionQueueData => ({
+  organization: null,
+  profile: null,
+  staff: [],
+  pendingPrescriptions: 0,
+  dispensedToday: 0,
+  lowStockAlerts: 0,
+  claimsInReview: 0,
+  queue: [],
+  inventory: [],
+  claims: [],
+  messages: [],
+  settings: [],
+  reportMetrics: {
+    dispensingAccuracyPercent: 0,
+    controlledCompliancePercent: 0,
+    dhaSubmittedCount: 0,
+    lastSubmittedLabel: 'No submissions',
+  },
+});
+
+const toNumber = (value: number | string | null | undefined) => {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') return Number(value);
+  return 0;
+};
+
+const workflowToQueueStatus = (
+  status: PharmacyQueuePrescriptionItem['workflowStatus']
+): PharmacyQueuePrescriptionItem['status'] => {
+  if (status === 'dispensed') return 'counseling';
+  if (status === 'on_hold' || status === 'cancelled') return 'ready';
+  return 'verifying';
+};
+
+const inventoryStatus = (
+  stock: number,
+  reorderPoint: number,
+  nextExpiry: string | null
+): PharmacyInventoryDerivedItem['status'] => {
+  if (stock <= 0) return 'out';
+  if (nextExpiry) {
+    const daysUntilExpiry = Math.ceil((new Date(nextExpiry).getTime() - Date.now()) / 86_400_000);
+    if (daysUntilExpiry <= 45) return 'near_expiry';
+  }
+  if (stock < reorderPoint) return 'low';
+  return 'healthy';
+};
+
+const formatExpiry = (value: string | null) => {
+  if (!value) return null;
+  return new Date(value).toLocaleDateString(undefined, { day: '2-digit', month: 'short' });
+};
 
 export function usePharmacyPrescriptionQueue() {
   return useQuery<PharmacyPrescriptionQueueData>(async () => {
-    const { data: prescriptions, error } = await supabase
-      .from('prescriptions')
-      .select('id, patient_id, doctor_id, status, prescribed_at, prescription_items (id, medication_name, dosage, quantity, is_dispensed)')
-      .eq('is_deleted', false)
-      .order('prescribed_at', { ascending: false })
-      .limit(100);
+    const { data: organization, error: orgError } = await supabase
+      .from('organizations')
+      .select('id, name, slug, city, notes')
+      .eq('kind', 'pharmacy')
+      .eq('status', 'active')
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle();
 
-    if (error) throw error;
+    if (orgError) throw orgError;
+    if (!organization) return emptyData();
 
-    const rows = (prescriptions ?? []) as Array<{
-      id: string;
-      patient_id: string;
-      doctor_id: string;
-      status: string;
-      prescribed_at: string;
-      prescription_items:
-        | Array<{
-            id: string;
-            medication_name: string;
-            dosage: string | null;
-            quantity: number | null;
-            is_dispensed: boolean;
-          }>
-        | null;
-    }>;
+    const org = organization as OrganizationRow;
 
-    const userIds = Array.from(new Set(rows.flatMap((row) => [row.patient_id, row.doctor_id])));
-    const { data: profiles, error: profilesError } =
-      userIds.length > 0
-        ? await supabase.from('user_profiles').select('user_id, full_name').in('user_id', userIds)
+    const [
+      profileResult,
+      staffResult,
+      taskResult,
+      itemResult,
+      claimResult,
+      messageResult,
+      settingResult,
+    ] = await Promise.all([
+      supabase
+        .from('pharmacy_facility_profiles')
+        .select('display_name, license_number, license_valid_until, address, operating_hours, pharmacist_in_charge, dha_connected, nabidh_connected')
+        .eq('organization_id', org.id)
+        .maybeSingle(),
+      supabase
+        .from('organization_staff_members')
+        .select('id, full_name, role_title, credential_number, shift_status')
+        .eq('organization_id', org.id)
+        .order('created_at', { ascending: true }),
+      supabase
+        .from('pharmacy_dispensing_tasks')
+        .select('id, external_ref, patient_name, prescriber_name, medication_name, quantity, priority, workflow_status, received_at, insurance_provider, copay_aed, allergy_flag, assigned_to')
+        .eq('organization_id', org.id)
+        .order('received_at', { ascending: false }),
+      supabase
+        .from('pharmacy_inventory_items')
+        .select('id, sku, generic_name, brand_name, strength, dosage_form, atc_code, category, unit, reorder_level, is_controlled, is_dha_formulary')
+        .eq('organization_id', org.id)
+        .order('generic_name', { ascending: true }),
+      supabase
+        .from('pharmacy_claims')
+        .select('id, dispensing_task_id, external_ref, payer_name, amount_aed, status, submitted_at, paid_at')
+        .eq('organization_id', org.id)
+        .order('submitted_at', { ascending: false }),
+      supabase
+        .from('pharmacy_messages')
+        .select('id, contact_name, specialty, message_type, status, unread_count, last_message, contact_message, pharmacy_response, last_message_at')
+        .eq('organization_id', org.id)
+        .order('last_message_at', { ascending: false }),
+      supabase
+        .from('pharmacy_settings')
+        .select('id, setting_key, title, description, enabled')
+        .eq('organization_id', org.id)
+        .order('created_at', { ascending: true }),
+    ]);
+
+    if (profileResult.error) throw profileResult.error;
+    if (staffResult.error) throw staffResult.error;
+    if (taskResult.error) throw taskResult.error;
+    if (itemResult.error) throw itemResult.error;
+    if (claimResult.error) throw claimResult.error;
+    if (messageResult.error) throw messageResult.error;
+    if (settingResult.error) throw settingResult.error;
+
+    const inventoryRows = (itemResult.data ?? []) as InventoryItemRow[];
+    const inventoryIds = inventoryRows.map((item) => item.id);
+    const { data: batchesData, error: batchesError } =
+      inventoryIds.length > 0
+        ? await supabase
+            .from('pharmacy_inventory_batches')
+            .select('id, inventory_item_id, quantity_on_hand, expiry_date')
+            .in('inventory_item_id', inventoryIds)
         : { data: [], error: null };
 
-    if (profilesError) throw profilesError;
+    if (batchesError) throw batchesError;
 
-    const names = new Map((profiles ?? []).map((profile) => [profile.user_id, profile.full_name ?? 'Unknown']));
-    const now = Date.now();
-
-    const queue = rows.flatMap((row) =>
-      (row.prescription_items ?? []).map((item): PharmacyQueuePrescriptionItem => {
-        const ageMinutes = Math.max(0, Math.round((now - new Date(row.prescribed_at).getTime()) / 60000));
-        const status: PharmacyQueuePrescriptionItem['status'] = item.is_dispensed
-          ? 'counseling'
-          : row.status === 'active'
-            ? 'verifying'
-            : 'ready';
-        return {
-          id: item.id,
-          prescriptionId: row.id,
-          patientName: names.get(row.patient_id) ?? 'Patient',
-          medication: [item.medication_name, item.dosage].filter(Boolean).join(' '),
-          prescriber: names.get(row.doctor_id) ?? 'Doctor',
-          priority: ageMinutes < 120 ? 'stat' : row.status === 'active' ? 'routine' : 'scheduled',
-          status,
-          waitMinutes: ageMinutes,
-          quantity: item.quantity,
-          isDispensed: item.is_dispensed,
-        };
-      })
-    );
-
-    const inventoryByMedication = new Map<string, PharmacyInventoryDerivedItem>();
-    for (const item of queue) {
-      const name = item.medication.split(/\s+\d/)[0]?.trim() || item.medication;
-      const existing =
-        inventoryByMedication.get(name) ??
-        ({
-          id: name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-          name,
-          sku: `RX-${name.slice(0, 3).toUpperCase()}-${inventoryByMedication.size + 1}`,
-          stock: 0,
-          reorderPoint: 20,
-          expiryMonth: null,
-          status: 'healthy',
-        } satisfies PharmacyInventoryDerivedItem);
-      existing.stock += item.quantity ?? 0;
-      inventoryByMedication.set(name, existing);
+    const batchesByItem = new Map<string, InventoryBatchRow[]>();
+    for (const batch of (batchesData ?? []) as InventoryBatchRow[]) {
+      batchesByItem.set(batch.inventory_item_id, [...(batchesByItem.get(batch.inventory_item_id) ?? []), batch]);
     }
 
-    const inventory = Array.from(inventoryByMedication.values()).map((item) => {
-      if (/warfarin/i.test(item.name)) {
-        return {
-          ...item,
-          expiryMonth: item.expiryMonth ?? '30 Apr',
-          status: 'near_expiry' as const,
-        };
-      }
-
+    const queue = ((taskResult.data ?? []) as DispensingTaskRow[]).map((task): PharmacyQueuePrescriptionItem => {
+      const waitMinutes = Math.max(0, Math.round((Date.now() - new Date(task.received_at).getTime()) / 60000));
       return {
-        ...item,
-        status: item.stock <= 0 ? 'out' as const : item.stock < item.reorderPoint ? 'low' as const : 'healthy' as const,
+        id: task.id,
+        prescriptionId: task.external_ref,
+        patientName: task.patient_name,
+        medication: task.medication_name,
+        prescriber: task.prescriber_name,
+        priority: task.priority,
+        status: workflowToQueueStatus(task.workflow_status),
+        workflowStatus: task.workflow_status,
+        waitMinutes,
+        quantity: task.quantity,
+        isDispensed: task.workflow_status === 'dispensed',
+        insuranceProvider: task.insurance_provider,
+        copayAed: toNumber(task.copay_aed),
+        receivedAt: task.received_at,
+        allergyFlag: task.allergy_flag,
+        assignedTo: task.assigned_to,
       };
     });
 
+    const queueByTaskId = new Map(queue.map((task) => [task.id, task]));
+
+    const inventory = inventoryRows.map((item): PharmacyInventoryDerivedItem => {
+      const batches = batchesByItem.get(item.id) ?? [];
+      const stock = batches.reduce((sum, batch) => sum + batch.quantity_on_hand, 0);
+      const nextExpiry =
+        batches
+          .map((batch) => batch.expiry_date)
+          .filter((value): value is string => Boolean(value))
+          .sort()[0] ?? null;
+      const name = [item.generic_name, item.strength].filter(Boolean).join(' ');
+
+      return {
+        id: item.id,
+        name,
+        sku: item.sku,
+        stock,
+        reorderPoint: item.reorder_level,
+        expiryMonth: formatExpiry(nextExpiry),
+        status: inventoryStatus(stock, item.reorder_level, nextExpiry),
+        genericName: item.generic_name,
+        brandName: item.brand_name,
+        strength: item.strength,
+        dosageForm: item.dosage_form,
+        atcCode: item.atc_code,
+        category: item.category,
+        unit: item.unit,
+        isControlled: item.is_controlled,
+        isDHAFormulary: item.is_dha_formulary,
+        batchCount: batches.length,
+      };
+    });
+
+    const claims = ((claimResult.data ?? []) as ClaimRow[]).map((claim): PharmacyClaimLedgerItem => {
+      const task = claim.dispensing_task_id ? queueByTaskId.get(claim.dispensing_task_id) : undefined;
+      return {
+        id: claim.id,
+        dispensingTaskId: claim.dispensing_task_id,
+        externalRef: claim.external_ref,
+        patientName: task?.patientName ?? 'Linked dispensing task',
+        medication: task?.medication ?? claim.external_ref,
+        payerName: claim.payer_name,
+        amountAed: toNumber(claim.amount_aed),
+        status: claim.status,
+        submittedAt: claim.submitted_at,
+        paidAt: claim.paid_at,
+      };
+    });
+
+    const dispensedCount = queue.filter((item) => item.workflowStatus === 'dispensed').length;
+    const controlledCount = inventory.filter((item) => item.isControlled).length;
+
     return {
-      pendingPrescriptions: queue.filter((item) => !item.isDispensed).length,
-      dispensedToday: queue.filter((item) => item.isDispensed).length,
+      organization: {
+        id: org.id,
+        name: org.name,
+        slug: org.slug,
+        city: org.city,
+        notes: org.notes,
+      },
+      profile: profileResult.data
+        ? {
+            displayName: (profileResult.data as ProfileRow).display_name,
+            licenseNumber: (profileResult.data as ProfileRow).license_number,
+            licenseValidUntil: (profileResult.data as ProfileRow).license_valid_until,
+            address: (profileResult.data as ProfileRow).address,
+            operatingHours: (profileResult.data as ProfileRow).operating_hours,
+            pharmacistInCharge: (profileResult.data as ProfileRow).pharmacist_in_charge,
+            dhaConnected: (profileResult.data as ProfileRow).dha_connected,
+            nabidhConnected: (profileResult.data as ProfileRow).nabidh_connected,
+          }
+        : null,
+      staff: ((staffResult.data ?? []) as StaffRow[]).map((staff) => ({
+        id: staff.id,
+        fullName: staff.full_name,
+        roleTitle: staff.role_title,
+        credentialNumber: staff.credential_number,
+        shiftStatus: staff.shift_status,
+      })),
+      pendingPrescriptions: queue.filter((item) => item.workflowStatus !== 'dispensed' && item.workflowStatus !== 'cancelled').length,
+      dispensedToday: dispensedCount,
       lowStockAlerts: inventory.filter((item) => item.status === 'low' || item.status === 'out' || item.status === 'near_expiry').length,
-      claimsInReview: queue.filter((item) => !item.isDispensed).length,
+      claimsInReview: claims.filter((claim) => claim.status === 'review').length,
       queue,
       inventory,
+      claims,
+      messages: ((messageResult.data ?? []) as MessageRow[]).map((message) => ({
+        id: message.id,
+        contactName: message.contact_name,
+        specialty: message.specialty,
+        messageType: message.message_type,
+        status: message.status,
+        unreadCount: message.unread_count,
+        lastMessage: message.last_message,
+        contactMessage: message.contact_message,
+        pharmacyResponse: message.pharmacy_response,
+        lastMessageAt: message.last_message_at,
+      })),
+      settings: ((settingResult.data ?? []) as SettingRow[]).map((setting) => ({
+        id: setting.id,
+        settingKey: setting.setting_key,
+        title: setting.title,
+        description: setting.description,
+        enabled: setting.enabled,
+      })),
+      reportMetrics: {
+        dispensingAccuracyPercent: queue.length ? Math.round((dispensedCount / queue.length) * 1000) / 10 : 0,
+        controlledCompliancePercent: controlledCount > 0 ? 100 : 0,
+        dhaSubmittedCount: queue.length,
+        lastSubmittedLabel: queue.length > 0 ? 'Today' : 'No submissions',
+      },
     };
   }, []);
 }

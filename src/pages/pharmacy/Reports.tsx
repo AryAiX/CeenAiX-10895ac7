@@ -38,6 +38,7 @@ export const PharmacyReports = () => {
   const totalPrescriptions = prescriptionIds.length;
   const approvalRate = totalPrescriptions ? Math.round((dispensedIds / totalPrescriptions) * 1000) / 10 : 100;
   const maxDrugCount = Math.max(...topDrugs.map((item) => item.count), 1);
+  const pharmacyName = data?.profile?.displayName ?? data?.organization?.name ?? 'Pharmacy';
 
   const kpis = [
     {
@@ -49,8 +50,8 @@ export const PharmacyReports = () => {
     },
     {
       label: 'Dispensing accuracy',
-      value: '99.5%',
-      sub: 'DHA target: 99%',
+      value: loading ? '...' : `${data?.reportMetrics.dispensingAccuracyPercent ?? 0}%`,
+      sub: 'Computed from pharmacy_dispensing_tasks',
       icon: Target,
       color: 'text-emerald-600',
       bg: 'bg-emerald-50',
@@ -64,7 +65,7 @@ export const PharmacyReports = () => {
     },
     {
       label: 'Controlled substance compliance',
-      value: '100% ✅',
+      value: loading ? '...' : `${data?.reportMetrics.controlledCompliancePercent ?? 0}% ✅`,
       icon: ShieldCheck,
       color: 'text-emerald-600',
       bg: 'bg-emerald-50',
@@ -74,12 +75,12 @@ export const PharmacyReports = () => {
   return (
     <OpsShell
       title="Reports"
-      subtitle="Al Shifa Pharmacy · Live analytics"
+      subtitle={`${pharmacyName} · Live analytics`}
       eyebrow={t('pharmacy.dashboard.eyebrow')}
       navItems={PHARMACY_NAV_ITEMS(t, {
         prescriptions: data?.pendingPrescriptions || undefined,
         inventory: data?.lowStockAlerts || undefined,
-        messages: 1,
+        messages: data?.messages.reduce((sum, item) => sum + item.unreadCount, 0) || undefined,
       })}
       accent="emerald"
       variant="pharmacy"
@@ -89,7 +90,7 @@ export const PharmacyReports = () => {
           <div>
             <h2 className="text-[20px] font-bold text-slate-900">Reports & Analytics</h2>
             <div className="text-[13px] text-slate-400">
-              {new Date().toLocaleString(undefined, { month: 'long', year: 'numeric' })} · Al Shifa Pharmacy
+              {new Date().toLocaleString(undefined, { month: 'long', year: 'numeric' })} · {pharmacyName}
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -183,20 +184,22 @@ export const PharmacyReports = () => {
                 <ShieldCheck className="h-5 w-5 text-emerald-600" />
               </div>
               <div>
-                <h3 className="text-[15px] font-bold text-slate-800">DHA Monthly Dispensing Report</h3>
-                <div className="text-xs text-slate-400">Al Shifa Pharmacy · DHA-PHARM-2019-003481</div>
+              <h3 className="text-[15px] font-bold text-slate-800">DHA Monthly Dispensing Report</h3>
+                <div className="text-xs text-slate-400">
+                  {pharmacyName} · {data?.profile?.licenseNumber ?? data?.organization?.notes ?? 'License pending'}
+                </div>
               </div>
             </div>
             <span className="rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-700">
-              100% Compliant ✅
+              {data?.reportMetrics.controlledCompliancePercent ?? 0}% Compliant ✅
             </span>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {[
               ['Total dispensing records', totalPrescriptions],
-              ['Submitted to DHA', `${totalPrescriptions} ✅`],
+              ['Submitted to DHA', `${data?.reportMetrics.dhaSubmittedCount ?? 0} ✅`],
               ['Controlled substance records', data?.inventory.filter((item) => /warfarin/i.test(item.name)).length ?? 0],
-              ['Last submitted', 'Today'],
+              ['Last submitted', data?.reportMetrics.lastSubmittedLabel ?? 'No submissions'],
             ].map(([label, value]) => (
               <div key={label as string} className="rounded-xl bg-slate-50 p-3">
                 <div className="mb-1 text-xs text-slate-400">{label}</div>
