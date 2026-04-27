@@ -184,6 +184,14 @@ export const getDefaultRouteForRole = (role: UserRole | null | undefined) => {
     return '/doctor/dashboard';
   }
 
+  if (role === 'pharmacy') {
+    return '/pharmacy/dashboard';
+  }
+
+  if (role === 'lab') {
+    return '/lab/dashboard';
+  }
+
   if (role === 'super_admin') {
     return '/admin/dashboard';
   }

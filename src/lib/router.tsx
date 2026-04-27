@@ -65,6 +65,11 @@ import { LabRadiology } from '../pages/lab/Radiology';
 import { PharmacyDashboard } from '../pages/pharmacy/Dashboard';
 import { PharmacyDispensing } from '../pages/pharmacy/Dispensing';
 import { PharmacyInventory } from '../pages/pharmacy/Inventory';
+import { PharmacyMessages } from '../pages/pharmacy/Messages';
+import { PharmacyProfile } from '../pages/pharmacy/Profile';
+import { PharmacyReports } from '../pages/pharmacy/Reports';
+import { PharmacyRevenue } from '../pages/pharmacy/Revenue';
+import { PharmacySettings } from '../pages/pharmacy/Settings';
 import { InsurancePortal } from '../pages/insurance/Portal';
 import { AppointmentDesignShowcase } from '../pages/AppointmentDesignShowcase';
 import { AccessDenied } from '../pages/system/AccessDenied';
@@ -390,6 +395,36 @@ export const router = createBrowserRouter([
     path: '/pharmacy/inventory',
     element: (
       <ProtectedRoute allowedRoles={['pharmacy']}>{withLayout(<PharmacyInventory />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/pharmacy/messages',
+    element: (
+      <ProtectedRoute allowedRoles={['pharmacy']}>{withLayout(<PharmacyMessages />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/pharmacy/reports',
+    element: (
+      <ProtectedRoute allowedRoles={['pharmacy']}>{withLayout(<PharmacyReports />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/pharmacy/revenue',
+    element: (
+      <ProtectedRoute allowedRoles={['pharmacy']}>{withLayout(<PharmacyRevenue />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/pharmacy/profile',
+    element: (
+      <ProtectedRoute allowedRoles={['pharmacy']}>{withLayout(<PharmacyProfile />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/pharmacy/settings',
+    element: (
+      <ProtectedRoute allowedRoles={['pharmacy']}>{withLayout(<PharmacySettings />)}</ProtectedRoute>
     ),
   },
   {

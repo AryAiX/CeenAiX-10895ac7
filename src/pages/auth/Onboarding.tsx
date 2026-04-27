@@ -31,6 +31,11 @@ const JAKARTA: CSSProperties = { fontFamily: 'Plus Jakarta Sans, sans-serif' };
 
 const safeString = (value: unknown) => (typeof value === 'string' ? value : '');
 
+const onboardingRoles: readonly UserRole[] = ['patient', 'doctor', 'pharmacy', 'lab', 'super_admin'];
+
+const isOnboardingRole = (value: unknown): value is UserRole =>
+  typeof value === 'string' && onboardingRoles.includes(value as UserRole);
+
 const splitFullName = (fullName: string) => {
   const parts = fullName.trim().split(/\s+/).filter(Boolean);
 
@@ -53,7 +58,7 @@ const getOnboardingRole = (role: UserRole | null, metadataRole: unknown): UserRo
     return role;
   }
 
-  return metadataRole === 'doctor' ? 'doctor' : 'patient';
+  return isOnboardingRole(metadataRole) ? metadataRole : 'patient';
 };
 
 export const Onboarding = () => {

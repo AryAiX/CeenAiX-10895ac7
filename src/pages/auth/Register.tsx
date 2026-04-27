@@ -1,12 +1,50 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
-import { ArrowLeft, ArrowRight, CheckCircle2, KeyRound, Mail, ShieldCheck, Smartphone, Stethoscope, UserRound } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, FlaskConical, KeyRound, Mail, Pill, ShieldCheck, Smartphone, Stethoscope, UserRound } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthShell } from '../../components/AuthShell';
 import { useAuth } from '../../lib/auth-context';
+import type { UserRole } from '../../types';
 
 type RegistrationMode = 'email-password' | 'phone-otp';
-type RegistrationRole = 'patient' | 'doctor';
+type RegistrationRole = Extract<UserRole, 'patient' | 'doctor' | 'pharmacy' | 'lab'>;
+
+interface RegistrationRoleOption {
+  id: RegistrationRole;
+  titleKey: string;
+  descriptionKey: string;
+  icon: typeof UserRound;
+}
+
+const registrationRoles: RegistrationRoleOption[] = [
+  {
+    id: 'patient',
+    titleKey: 'auth.register.rolePatientTitle',
+    descriptionKey: 'auth.register.rolePatientDesc',
+    icon: UserRound,
+  },
+  {
+    id: 'doctor',
+    titleKey: 'auth.register.roleDoctorTitle',
+    descriptionKey: 'auth.register.roleDoctorDesc',
+    icon: Stethoscope,
+  },
+  {
+    id: 'pharmacy',
+    titleKey: 'auth.login.rolePharmacyTitle',
+    descriptionKey: 'auth.roleAccess.roles.pharmacy.description',
+    icon: Pill,
+  },
+  {
+    id: 'lab',
+    titleKey: 'auth.login.roleLabTitle',
+    descriptionKey: 'auth.roleAccess.roles.lab.description',
+    icon: FlaskConical,
+  },
+];
+
+const isRegistrationRole = (value: string | null): value is RegistrationRole =>
+  value === 'patient' || value === 'doctor' || value === 'pharmacy' || value === 'lab';
 
 export const Register = () => {
   const { t } = useTranslation('common');
@@ -23,7 +61,7 @@ export const Register = () => {
   } = useAuth();
   const requestedRole = searchParams.get('role');
   const resetRequested = searchParams.get('reset') === '1';
-  const safeRequestedRole = requestedRole === 'doctor' || requestedRole === 'patient' ? requestedRole : null;
+  const safeRequestedRole = isRegistrationRole(requestedRole) ? requestedRole : null;
 
   const [step, setStep] = useState(0);
   const [mode, setMode] = useState<RegistrationMode>('email-password');
@@ -86,8 +124,10 @@ export const Register = () => {
   };
 
   const normalizedEmail = email.trim();
-  const selectedRoleTitle =
-    selectedRole === 'doctor' ? t('auth.register.roleDoctorTitle') : t('auth.register.rolePatientTitle');
+  const selectedRoleOption =
+    registrationRoles.find((roleOption) => roleOption.id === selectedRole) ?? registrationRoles[0];
+  const SelectedRoleIcon = selectedRoleOption.icon;
+  const selectedRoleTitle = t(selectedRoleOption.titleKey);
 
   const handleResendConfirmation = async () => {
     if (!normalizedEmail) {
@@ -374,11 +414,7 @@ export const Register = () => {
             {safeRequestedRole ? (
               <div className="flex items-center gap-3 rounded-xl border border-cyan-200 bg-cyan-50 p-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white">
-                  {selectedRole === 'doctor' ? (
-                    <Stethoscope className="h-5 w-5 text-cyan-600" />
-                  ) : (
-                    <UserRound className="h-5 w-5 text-cyan-600" />
-                  )}
+                  <SelectedRoleIcon className="h-5 w-5 text-cyan-600" />
                 </div>
                 <div className="min-w-0">
                   <h3 className="text-sm font-semibold text-slate-900">{selectedRoleTitle}</h3>
@@ -387,41 +423,30 @@ export const Register = () => {
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
-                <button
-                  type="button"
-                  onClick={() => setSelectedRole('patient')}
-                  className={`rounded-[1.75rem] border p-5 text-left transition ${
-                    selectedRole === 'patient'
-                      ? 'border-cyan-500 bg-cyan-50 shadow-sm shadow-cyan-500/20'
-                      : 'border-gray-200 bg-white hover:border-slate-300 hover:bg-white'
-                  }`}
-                >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
-                    <UserRound className="h-6 w-6 text-cyan-600" />
-                  </div>
-                  <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.rolePatientTitle')}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                    {t('auth.register.rolePatientDesc')}
-                  </p>
-                </button>
+                {registrationRoles.map((roleOption) => {
+                  const Icon = roleOption.icon;
 
-                <button
-                  type="button"
-                  onClick={() => setSelectedRole('doctor')}
-                  className={`rounded-[1.75rem] border p-5 text-left transition ${
-                    selectedRole === 'doctor'
-                      ? 'border-cyan-500 bg-cyan-50 shadow-sm shadow-cyan-500/20'
-                      : 'border-gray-200 bg-white hover:border-slate-300 hover:bg-white'
-                  }`}
-                >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
-                    <Stethoscope className="h-6 w-6 text-cyan-600" />
-                  </div>
-                  <h3 className="mt-4 text-lg font-semibold text-gray-900">{t('auth.register.roleDoctorTitle')}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                    {t('auth.register.roleDoctorDesc')}
-                  </p>
-                </button>
+                  return (
+                    <button
+                      key={roleOption.id}
+                      type="button"
+                      onClick={() => setSelectedRole(roleOption.id)}
+                      className={`rounded-[1.75rem] border p-5 text-left transition ${
+                        selectedRole === roleOption.id
+                          ? 'border-cyan-500 bg-cyan-50 shadow-sm shadow-cyan-500/20'
+                          : 'border-gray-200 bg-white hover:border-slate-300 hover:bg-white'
+                      }`}
+                    >
+                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
+                        <Icon className="h-6 w-6 text-cyan-600" />
+                      </div>
+                      <h3 className="mt-4 text-lg font-semibold text-gray-900">{t(roleOption.titleKey)}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                        {t(roleOption.descriptionKey)}
+                      </p>
+                    </button>
+                  );
+                })}
               </div>
             )}
 

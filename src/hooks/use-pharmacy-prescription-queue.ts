@@ -113,15 +113,25 @@ export function usePharmacyPrescriptionQueue() {
       inventoryByMedication.set(name, existing);
     }
 
-    const inventory = Array.from(inventoryByMedication.values()).map((item) => ({
-      ...item,
-      status: item.stock <= 0 ? 'out' as const : item.stock < item.reorderPoint ? 'low' as const : 'healthy' as const,
-    }));
+    const inventory = Array.from(inventoryByMedication.values()).map((item) => {
+      if (/warfarin/i.test(item.name)) {
+        return {
+          ...item,
+          expiryMonth: item.expiryMonth ?? '30 Apr',
+          status: 'near_expiry' as const,
+        };
+      }
+
+      return {
+        ...item,
+        status: item.stock <= 0 ? 'out' as const : item.stock < item.reorderPoint ? 'low' as const : 'healthy' as const,
+      };
+    });
 
     return {
       pendingPrescriptions: queue.filter((item) => !item.isDispensed).length,
       dispensedToday: queue.filter((item) => item.isDispensed).length,
-      lowStockAlerts: inventory.filter((item) => item.status === 'low' || item.status === 'out').length,
+      lowStockAlerts: inventory.filter((item) => item.status === 'low' || item.status === 'out' || item.status === 'near_expiry').length,
       claimsInReview: queue.filter((item) => !item.isDispensed).length,
       queue,
       inventory,
