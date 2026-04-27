@@ -9,9 +9,10 @@ import {
   Bell,
   Bot,
   Calendar,
+  CalendarCheck,
+  CalendarDays,
   ChevronLeft,
   ChevronRight,
-  ClipboardList,
   FlaskConical,
   FolderOpen,
   Heart,
@@ -20,11 +21,13 @@ import {
   LogOut,
   Menu,
   MessageSquare,
+  PenLine,
   Pill,
   Scan,
   Settings,
   ShieldCheck,
   Stethoscope,
+  TrendingUp,
   UserCircle2,
   Users,
   X,
@@ -45,6 +48,11 @@ interface PortalShellProps {
    * page can render full-bleed (e.g. the dark AI Assistant canvas).
    */
   contentBleed?: boolean;
+  /**
+   * Replaces the default `max-w-[1320px] mx-auto px-6 py-6` main content wrapper.
+   * Ignored when `contentBleed` is true.
+   */
+  contentClassName?: string;
 }
 
 interface PortalNavItem {
@@ -82,7 +90,12 @@ const getInitials = (value: string) =>
     .join('')
     .slice(0, 2) || 'CX';
 
-export const PortalShell = ({ role, children, contentBleed = false }: PortalShellProps) => {
+export const PortalShell = ({
+  role,
+  children,
+  contentBleed = false,
+  contentClassName,
+}: PortalShellProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t, i18n } = useTranslation('common');
@@ -90,6 +103,7 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [portalMenuOpen, setPortalMenuOpen] = useState(false);
   const [patientSidebarCollapsed, setPatientSidebarCollapsed] = useState(false);
+  const [doctorSidebarCollapsed, setDoctorSidebarCollapsed] = useState(false);
   const [patientAlertDismissed, setPatientAlertDismissed] = useState(false);
 
   useEffect(() => {
@@ -197,7 +211,7 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
     const patientRoleLabel = t('header.patient');
 
     return (
-      <div className="h-screen bg-slate-50 flex flex-col overflow-hidden">
+      <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
         <div className="z-50 flex-shrink-0 border-b border-cyan-100 bg-white px-6 py-4 shadow-sm shadow-cyan-500/5">
           <div className={`flex items-center justify-between gap-4 ${isArabic ? 'flex-row-reverse' : ''}`}>
             <div className={`flex min-w-0 items-center gap-2 ${isArabic ? 'flex-row-reverse' : ''}`}>
@@ -390,7 +404,11 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
             {contentBleed ? (
               <div className="h-full">{children}</div>
             ) : (
-              <div className="max-w-[1320px] mx-auto px-6 py-6 space-y-6">{children}</div>
+              <div
+                className={contentClassName ?? 'max-w-[1320px] mx-auto px-6 py-6 space-y-6'}
+              >
+                {children}
+              </div>
             )}
           </main>
         </div>
@@ -418,24 +436,24 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
       title: 'CLINIC',
       items: [
         { href: '/doctor/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, badge: doctorChromeData?.todayAppointmentsCount ?? undefined, badgeTone: 'red' },
-        { href: '/doctor/appointments', label: "Today's Appointments", icon: Calendar, badge: doctorChromeData?.todayAppointmentsCount ?? undefined, badgeTone: 'amber' },
-        { href: '/doctor/appointments', label: t('nav.appointments'), icon: Calendar },
+        { href: '/doctor/today', label: "Today's Appointments", icon: CalendarCheck, badge: doctorChromeData?.todayAppointmentsCount ?? undefined, badgeTone: 'amber' },
+        { href: '/doctor/appointments', label: t('nav.appointments'), icon: CalendarDays },
         { href: '/doctor/patients', label: 'Patient Records', icon: Users },
       ],
     },
     {
       id: 'workflow',
       items: [
-        { href: '/doctor/prescriptions/new', label: 'Write Prescription', icon: ClipboardList, badge: 1, badgeTone: 'amber' },
-        { href: '/doctor/lab-orders/new', label: 'Lab Referrals', icon: FlaskConical, badge: doctorChromeData?.criticalResultsCount ?? undefined, badgeTone: 'red' },
-        { label: 'Imaging Center', icon: Scan, badge: 1, badgeTone: 'amber', disabled: true },
+        { href: '/doctor/prescribe', label: 'Write Prescription', icon: PenLine, badge: 1, badgeTone: 'amber' },
+        { href: '/doctor/labs', label: 'Lab Referrals', icon: FlaskConical, badge: doctorChromeData?.criticalResultsCount ?? undefined, badgeTone: 'red' },
+        { href: '/doctor/imaging', label: 'Imaging Center', icon: Scan, badge: 1, badgeTone: 'amber' },
         { href: '/doctor/messages', label: t('nav.messages'), icon: MessageSquare, badge: doctorChromeData?.unreadMessagesCount ?? undefined, badgeTone: 'blue' },
       ],
     },
     {
       id: 'analytics',
       title: 'ANALYTICS',
-      items: [{ label: 'Earnings', icon: Banknote, disabled: true }],
+      items: [{ href: '/doctor/earnings', label: 'Earnings', icon: TrendingUp }],
     },
     {
       id: 'account',
@@ -475,6 +493,23 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
   const doctorLicense = doctorProfile?.license_number?.trim() || 'License pending';
   const todayAppointmentsCount = doctorChromeData?.todayAppointmentsCount ?? 0;
   const completedTodayAppointmentsCount = doctorChromeData?.completedTodayAppointmentsCount ?? 0;
+  const doctorPageTitle =
+    [
+      { prefix: '/doctor/today', label: "Today's Appointments" },
+      { prefix: '/doctor/appointments', label: t('nav.appointments') },
+      { prefix: '/doctor/patients', label: 'Patient Records' },
+      { prefix: '/doctor/prescribe', label: 'Write Prescription' },
+      { prefix: '/doctor/prescriptions/new', label: 'Write Prescription' },
+      { prefix: '/doctor/prescriptions', label: 'Prescriptions' },
+      { prefix: '/doctor/labs', label: 'Lab Referrals' },
+      { prefix: '/doctor/lab-orders', label: 'Lab Referrals' },
+      { prefix: '/doctor/imaging', label: 'Imaging Center' },
+      { prefix: '/doctor/messages', label: t('nav.messages') },
+      { prefix: '/doctor/earnings', label: 'Earnings' },
+      { prefix: '/doctor/profile', label: 'My Profile' },
+      { prefix: '/doctor/settings', label: t('nav.settings') },
+    ].find((item) => location.pathname === item.prefix || location.pathname.startsWith(`${item.prefix}/`))
+      ?.label ?? t('nav.dashboard');
   const estimatedRevenueToday =
     doctorProfile?.consultation_fee && todayAppointmentsCount > 0
       ? doctorProfile.consultation_fee * todayAppointmentsCount
@@ -512,7 +547,9 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
             navigate(item.href);
           }
         }}
-        className={`flex w-full items-center justify-between rounded-lg px-4 py-2.5 text-left text-[13px] leading-5 font-medium transition-all duration-300 ${
+        className={`flex w-full items-center rounded-lg text-[13px] leading-5 font-medium transition-all duration-300 ${
+          doctorSidebarCollapsed ? 'justify-center px-0 py-3' : 'justify-between px-4 py-2.5 text-left'
+        } ${
           item.disabled
             ? 'cursor-not-allowed text-slate-500'
             : active
@@ -520,15 +557,15 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
               : 'text-slate-300 hover:bg-white/[0.05] hover:text-white'
         }`}
       >
-        <span className="flex min-w-0 items-center gap-3">
+        <span className={`flex min-w-0 items-center ${doctorSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
           <Icon
             className={`h-5 w-5 shrink-0 ${
               active ? 'text-white' : item.disabled ? 'text-slate-600' : 'text-slate-400'
             }`}
           />
-          <span className="truncate">{item.label}</span>
+          {!doctorSidebarCollapsed ? <span className="truncate">{item.label}</span> : null}
         </span>
-        {item.badge ? (
+        {!doctorSidebarCollapsed && item.badge ? (
           <span
             className={`min-w-[18px] rounded-full px-1.5 py-0.5 text-center text-[10px] font-bold ${
               active ? 'bg-white/20 text-white' : doctorBadgeToneClass(item.badgeTone)
@@ -543,20 +580,44 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#F8FAFC]">
-      <aside className="w-[260px] bg-[#0A1628] flex flex-col transition-all duration-300 shadow-2xl">
+      <aside className={`${doctorSidebarCollapsed ? 'w-[72px]' : 'w-[260px]'} bg-[#0A1628] flex flex-col transition-all duration-300 shadow-2xl`}>
         <div className="flex h-[72px] items-center justify-between border-b border-white/[0.06] px-6">
-          <button
-            type="button"
-            onClick={() => navigate('/doctor/dashboard')}
-            className="flex items-center gap-3 text-left"
-          >
-            <div>
-              <h1 className="text-lg font-bold text-white">CeenAiX</h1>
-              <p className="text-[10px] uppercase tracking-wide text-teal-400">{portalLabel}</p>
-            </div>
-          </button>
+          {!doctorSidebarCollapsed ? (
+            <>
+              <button
+                type="button"
+                onClick={() => navigate('/doctor/dashboard')}
+                className="min-w-0 text-left"
+              >
+                <h1 className="text-lg font-bold text-white">CeenAiX</h1>
+                <p className="truncate text-[10px] uppercase tracking-wide text-teal-400">{portalLabel}</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => setDoctorSidebarCollapsed(true)}
+                className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+                aria-label="Collapse doctor sidebar"
+                title="Collapse"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setDoctorSidebarCollapsed(false)}
+              className="mx-auto rounded-lg p-2 transition-colors hover:bg-white/10"
+              aria-label="Expand doctor sidebar"
+              title="Expand"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-teal-600 text-sm font-bold text-white">
+                C
+              </div>
+            </button>
+          )}
         </div>
 
+        {!doctorSidebarCollapsed ? (
         <div className="px-4 py-4">
           <div className="rounded-xl border border-teal-500/20 bg-teal-500/10 p-3">
             <div className="flex items-start gap-3">
@@ -584,11 +645,12 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
             </div>
           </div>
         </div>
+        ) : null}
 
         <nav className="flex-1 px-3 py-2 space-y-0.5 overflow-y-auto">
           {doctorTopNavGroups.map((group) => (
             <div key={group.id} className="space-y-0.5">
-              {group.title ? (
+              {group.title && !doctorSidebarCollapsed ? (
                 <div className="px-3 pt-2 pb-1 text-[9px] font-semibold uppercase tracking-[0.28em] text-slate-500/90">
                   {group.title}
                 </div>
@@ -598,10 +660,13 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
           ))}
         </nav>
 
-        <div className="px-3 pb-2 border-t border-white/[0.06] pt-2 mt-1">
-          {renderDoctorNavItem({ label: t('nav.settings'), icon: Settings, disabled: true }, 'doctor-settings')}
-        </div>
+        {!doctorSidebarCollapsed ? (
+          <div className="px-3 pb-2 border-t border-white/[0.06] pt-2 mt-1">
+            {renderDoctorNavItem({ href: '/doctor/settings', label: t('nav.settings'), icon: Settings }, 'doctor-settings')}
+          </div>
+        ) : null}
 
+        {!doctorSidebarCollapsed ? (
         <div className="border-t border-white/[0.06] p-3.5 space-y-2.5">
           <p className="px-2 text-[9px] font-semibold uppercase tracking-wider text-slate-500">TODAY</p>
           <div className="space-y-2 text-[12px]">
@@ -647,13 +712,24 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
             <span>Sign Out</span>
           </button>
         </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setDoctorSidebarCollapsed(false)}
+            className="border-t border-white/[0.06] p-4 text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
+            aria-label="Expand doctor sidebar"
+            title="Expand"
+          >
+            <ChevronRight className="mx-auto h-5 w-5" />
+          </button>
+        )}
       </aside>
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <div>
-              <p className="text-base font-semibold text-slate-900">{t('nav.dashboard')}</p>
+              <p className="text-base font-semibold text-slate-900">{doctorPageTitle}</p>
               <p className="hidden text-xs text-slate-500 sm:block">{formatDoctorNow}</p>
             </div>
           </div>

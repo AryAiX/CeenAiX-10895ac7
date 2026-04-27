@@ -316,7 +316,11 @@ describe('PatientAIChat', () => {
 
     render(<PatientAIChat />);
 
-    expect(screen.getByText('Review updates from this chat')).toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: /Chats/i }));
+    await user.click(screen.getByTitle('I moved to Abu Dhabi.'));
+
+    expect(await screen.findByText('Review updates from this chat')).toBeInTheDocument();
     expect(screen.getByText('Address')).toBeInTheDocument();
     expect(screen.getByText('Dubai Marina')).toBeInTheDocument();
     expect(screen.getByText('Abu Dhabi')).toBeInTheDocument();

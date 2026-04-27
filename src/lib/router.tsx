@@ -65,7 +65,22 @@ import { LabRadiology } from '../pages/lab/Radiology';
 import { PharmacyDashboard } from '../pages/pharmacy/Dashboard';
 import { PharmacyDispensing } from '../pages/pharmacy/Dispensing';
 import { PharmacyInventory } from '../pages/pharmacy/Inventory';
-import { InsurancePortal } from '../pages/insurance/Portal';
+import { PharmacyMessages } from '../pages/pharmacy/Messages';
+import { PharmacyProfile } from '../pages/pharmacy/Profile';
+import { PharmacyReports } from '../pages/pharmacy/Reports';
+import { PharmacyRevenue } from '../pages/pharmacy/Revenue';
+import { PharmacySettings } from '../pages/pharmacy/Settings';
+import {
+  InsuranceClaims,
+  InsuranceFraudDetection,
+  InsuranceMembers,
+  InsuranceNetworkProviders,
+  InsurancePortal,
+  InsurancePreAuthorizations,
+  InsuranceReports,
+  InsuranceRiskAnalytics,
+  InsuranceSettings,
+} from '../pages/insurance/Portal';
 import { AppointmentDesignShowcase } from '../pages/AppointmentDesignShowcase';
 import { AccessDenied } from '../pages/system/AccessDenied';
 
@@ -74,11 +89,15 @@ const withLayout = (page: ReactNode) => <Layout>{page}</Layout>;
 const withPortalProtection = (
   page: ReactNode,
   role: 'patient' | 'doctor',
-  options: { contentBleed?: boolean } = {}
+  options: { contentBleed?: boolean; contentClassName?: string } = {}
 ) => (
   <ProtectedRoute allowedRoles={[role]}>
     {withLayout(
-      <PortalShell role={role} contentBleed={options.contentBleed}>
+      <PortalShell
+        role={role}
+        contentBleed={options.contentBleed}
+        contentClassName={options.contentClassName}
+      >
         {page}
       </PortalShell>
     )}
@@ -164,7 +183,9 @@ export const router = createBrowserRouter([
   },
   {
     path: '/patient/prescriptions',
-    element: withPortalProtection(<PatientPrescriptions />, 'patient'),
+    element: withPortalProtection(<PatientPrescriptions />, 'patient', {
+      contentClassName: 'w-full min-w-0 space-y-6 p-6 sm:p-8',
+    }),
   },
   {
     path: '/pharmacy',
@@ -227,6 +248,10 @@ export const router = createBrowserRouter([
     element: withPortalProtection(<DoctorDashboard />, 'doctor'),
   },
   {
+    path: '/doctor/today',
+    element: withPortalProtection(<DoctorAppointments />, 'doctor'),
+  },
+  {
     path: '/doctor/appointments',
     element: withPortalProtection(<DoctorAppointments />, 'doctor'),
   },
@@ -247,12 +272,20 @@ export const router = createBrowserRouter([
     element: withPortalProtection(<DoctorSchedule />, 'doctor'),
   },
   {
+    path: '/doctor/prescribe',
+    element: withPortalProtection(<CreatePrescription />, 'doctor'),
+  },
+  {
     path: '/doctor/prescriptions',
     element: withPortalProtection(<DoctorPrescriptions />, 'doctor'),
   },
   {
     path: '/doctor/prescriptions/new',
     element: withPortalProtection(<CreatePrescription />, 'doctor'),
+  },
+  {
+    path: '/doctor/labs',
+    element: withPortalProtection(<DoctorLabOrders />, 'doctor'),
   },
   {
     path: '/doctor/lab-orders',
@@ -375,7 +408,81 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: '/pharmacy/messages',
+    element: (
+      <ProtectedRoute allowedRoles={['pharmacy']}>{withLayout(<PharmacyMessages />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/pharmacy/reports',
+    element: (
+      <ProtectedRoute allowedRoles={['pharmacy']}>{withLayout(<PharmacyReports />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/pharmacy/revenue',
+    element: (
+      <ProtectedRoute allowedRoles={['pharmacy']}>{withLayout(<PharmacyRevenue />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/pharmacy/profile',
+    element: (
+      <ProtectedRoute allowedRoles={['pharmacy']}>{withLayout(<PharmacyProfile />)}</ProtectedRoute>
+    ),
+  },
+  {
+    path: '/pharmacy/settings',
+    element: (
+      <ProtectedRoute allowedRoles={['pharmacy']}>{withLayout(<PharmacySettings />)}</ProtectedRoute>
+    ),
+  },
+  {
     path: '/insurance/portal',
-    element: withLayout(<InsurancePortal />),
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsurancePortal />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/dashboard',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsurancePortal />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/pre-authorizations',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsurancePreAuthorizations />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/preauth',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsurancePreAuthorizations />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/claims',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsuranceClaims />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/members',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsuranceMembers />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/fraud',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsuranceFraudDetection />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/risk-analytics',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsuranceRiskAnalytics />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/analytics',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsuranceRiskAnalytics />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/network',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsuranceNetworkProviders />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/reports',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsuranceReports />)}</ProtectedRoute>,
+  },
+  {
+    path: '/insurance/settings',
+    element: <ProtectedRoute allowedRoles={['insurance']}>{withLayout(<InsuranceSettings />)}</ProtectedRoute>,
   },
 ]);

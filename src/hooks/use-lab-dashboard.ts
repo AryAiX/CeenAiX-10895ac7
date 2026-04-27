@@ -77,13 +77,17 @@ export function useLabDashboard(userId: string | null | undefined) {
       labSlug = labRow?.slug ?? null;
     }
 
-    const ordersQuery = supabase
+    let ordersQuery = supabase
       .from('lab_orders')
       .select('id, patient_id, doctor_id, status, ordered_at, assigned_lab_id, updated_at')
       .eq('is_deleted', false)
       .in('status', ACTIVE_STATUSES)
       .order('ordered_at', { ascending: false })
       .limit(100);
+
+    if (labId) {
+      ordersQuery = ordersQuery.eq('assigned_lab_id', labId);
+    }
 
     const { data: orderRows, error: ordersError } = await ordersQuery;
     if (ordersError) {

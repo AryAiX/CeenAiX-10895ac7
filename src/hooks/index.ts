@@ -7,6 +7,10 @@ export { useAppointments } from './use-appointments';
 export { useNotifications } from './use-notifications';
 export { usePatientDashboard } from './use-patient-dashboard';
 export { usePatientPrescriptions } from './use-patient-prescriptions';
+export { usePatientPrimaryInsurance } from './use-patient-primary-insurance';
+export type { PatientPrimaryInsurance } from './use-patient-primary-insurance';
+export { usePatientInsurance } from './use-patient-insurance';
+export type { PatientInsuranceActivity, PatientInsuranceData, PatientInsurancePlan } from './use-patient-insurance';
 export { usePatientLabResults } from './use-patient-lab-results';
 export type { PatientLabOrderRecord } from './use-patient-lab-results';
 export { usePatientRecords } from './use-patient-records';
@@ -30,6 +34,31 @@ export { useSpecializations, useDoctorSpecializationIds } from './use-specializa
 export { useDoctorPreVisitTemplates, usePatientPreVisitAssessments, usePreVisitAssessment } from './use-pre-visit';
 export { useLabDashboard, useLabOrderActions, useLabOrderDetail } from './use-lab-dashboard';
 export type { LabDashboardData, LabWorklistItem, LabOrderActions, LabOrderDetail } from './use-lab-dashboard';
+export { usePharmacyPrescriptionQueue } from './use-pharmacy-prescription-queue';
+export type {
+  PharmacyClaimLedgerItem,
+  PharmacyFacilityProfile,
+  PharmacyInventoryDerivedItem,
+  PharmacyMessageThread,
+  PharmacyOrganization,
+  PharmacyPrescriptionQueueData,
+  PharmacyQueuePrescriptionItem,
+  PharmacySettingItem,
+  PharmacyStaffMember,
+} from './use-pharmacy-prescription-queue';
+export { useInsurancePortal } from './use-insurance-portal';
+export type {
+  InsuranceClaim,
+  InsuranceFraudAlert,
+  InsuranceMember,
+  InsuranceNetworkProvider,
+  InsurancePayerProfile,
+  InsurancePortalData,
+  InsurancePreAuthorization,
+  InsuranceReportRun,
+  InsuranceRiskSegment,
+  InsuranceSetting,
+} from './use-insurance-portal';
 export {
   useAdminMetrics,
   useAdminUsers,

@@ -603,12 +603,12 @@
   },
   "auth": {
     "shell": {
-      "headline": "Secure healthcare access built for patients and clinicians.",
-      "subhead": "Access your care journey, communicate securely, and move through the CeenAiX platform with role-based experiences designed for patients and clinicians.",
-      "cardPatient": "Patient-first journeys",
-      "cardPatientDesc": "Appointments, records, prescriptions.",
-      "cardDoctor": "Doctor-ready workflows",
-      "cardDoctorDesc": "Role-aware routing and profile setup.",
+      "headline": "Dubai's leading integrated healthcare platform",
+      "subhead": "One platform. Every stakeholder. Full DHA compliance across patient, clinical, pharmacy, lab, insurance, and admin workflows.",
+      "cardPatient": "Role-based portals",
+      "cardPatientDesc": "Every account lands in the correct workspace.",
+      "cardDoctor": "AI-powered operations",
+      "cardDoctorDesc": "Clinical and operational workflows stay connected.",
       "cardSecure": "Secure by default",
       "cardSecureDesc": "Supabase auth with guarded routes."
     },
@@ -673,9 +673,9 @@
       "trustSsl": "256-bit SSL"
     },
     "register": {
-      "badge": "Secure Registration",
-      "title": "Create your CeenAiX account",
-      "description": "Follow the staged sign-up flow for patients and doctors. Choose how you want to authenticate, define your role, and complete the first account setup step.",
+      "badge": "Healthcare Platform",
+      "title": "Create your account",
+      "description": "Choose the access method for your selected portal, add your account details, and continue into the right CeenAiX workspace.",
       "roleStepLabel": "Selected account role",
       "roleStepHint": "This keeps the sign-up journey aligned with the plan you chose.",
       "changeRole": "Change role",
