@@ -176,7 +176,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/patient/records',
-    element: withPortalProtection(<PatientRecords />, 'patient'),
+    element: withRoleProtection(<PatientRecords />, 'patient'),
   },
   {
     path: '/patient/ai-chat',
@@ -196,7 +196,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/patient/profile',
-    element: withPortalProtection(<PatientProfile />, 'patient'),
+    element: withRoleProtection(<PatientProfile />, 'patient'),
   },
   {
     path: '/patient/lab-results',
@@ -204,7 +204,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/patient/notifications',
-    element: withPortalProtection(<PatientNotifications />, 'patient'),
+    element: withRoleProtection(<PatientNotifications />, 'patient'),
   },
   {
     path: '/patient/telemedicine/:appointmentId',
@@ -212,19 +212,19 @@ export const router = createBrowserRouter([
   },
   {
     path: '/patient/settings',
-    element: withPortalProtection(<PatientSettings />, 'patient'),
+    element: withRoleProtection(<PatientSettings />, 'patient'),
   },
   {
     path: '/patient/imaging',
-    element: withPortalProtection(<PatientImaging />, 'patient'),
+    element: withRoleProtection(<PatientImaging />, 'patient'),
   },
   {
     path: '/patient/insurance',
-    element: withPortalProtection(<PatientInsurance />, 'patient'),
+    element: withRoleProtection(<PatientInsurance />, 'patient'),
   },
   {
     path: '/patient/documents',
-    element: withPortalProtection(<PatientDocuments />, 'patient'),
+    element: withRoleProtection(<PatientDocuments />, 'patient'),
   },
   {
     path: '/doctor/dashboard',

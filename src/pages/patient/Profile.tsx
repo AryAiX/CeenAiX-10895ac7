@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FamilyTree } from '../../components/FamilyTree';
 import { AccountSecurityPanel } from '../../components/AccountSecurityPanel';
+import { PatientReferenceShell } from '../../components/PatientReferenceShell';
 import { Upload, Camera, User, Shield, Users, Plus, Trash2, CreditCard as Edit2, Save } from 'lucide-react';
 
 interface FamilyMember {
@@ -95,7 +96,7 @@ export const Profile: React.FC = () => {
   };
 
   return (
-    <>
+    <PatientReferenceShell activeTab="profile">
       <div className="animate-fadeIn">
         <h1 className="font-playfair text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
           {t('patient.profile.title')}
@@ -689,6 +690,6 @@ export const Profile: React.FC = () => {
           </div>
         </div>
       </div>
-    </>
+    </PatientReferenceShell>
   );
 };
