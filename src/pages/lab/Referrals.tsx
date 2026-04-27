@@ -28,7 +28,7 @@ export const LabReferrals = () => {
       label: t('lab.referrals.kpiDoctors'),
       value: new Set(referrals.map((r) => r.doctorId)).size,
       icon: Users,
-      accent: 'from-emerald-500 to-teal-600',
+      accent: 'from-emerald-500 to-cyan-600',
     },
     {
       label: t('lab.referrals.kpiSla'),

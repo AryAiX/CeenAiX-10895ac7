@@ -20,8 +20,8 @@ export function LabTestNameDisplay({
   const useBoth =
     !language.startsWith('en') && loc.length > 0 && loc.toLowerCase() !== canonical.toLowerCase();
 
-  const primaryDefault = 'font-bold text-gray-900';
-  const secondaryDefault = 'mt-0.5 text-sm font-normal text-gray-500';
+  const primaryDefault = 'font-bold text-slate-900';
+  const secondaryDefault = 'mt-0.5 text-sm font-normal text-slate-500';
 
   if (!useBoth) {
     return (
@@ -33,9 +33,9 @@ export function LabTestNameDisplay({
 
   if (variant === 'compact') {
     return (
-      <span className={primaryClassName ?? 'text-gray-700'} dir="auto">
+      <span className={primaryClassName ?? 'text-slate-700'} dir="auto">
         <span dir="auto">{loc}</span>
-        <span className="mx-1 text-gray-400" aria-hidden>
+        <span className="mx-1 text-slate-400" aria-hidden>
           ·
         </span>
         <span dir="ltr">{canonical}</span>

@@ -70,9 +70,9 @@ export const SpecializationMultiSelect = ({
 
   return (
     <div className="space-y-3">
-      <span className="block text-sm font-semibold text-gray-700">{label}</span>
+      <span className="block text-sm font-semibold text-slate-700">{label}</span>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         {selectedOptions.length > 0 ? (
           <div className="mb-3 flex flex-wrap gap-2">
             {selectedOptions.map((option) => (
@@ -90,20 +90,20 @@ export const SpecializationMultiSelect = ({
         ) : null}
 
         <div className="relative">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             disabled={disabled || loading}
-            className="w-full rounded-2xl border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-gray-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-slate-900 outline-none transition focus:border-ceenai-cyan focus:ring-4 focus:ring-ceenai-cyan/10 disabled:cursor-not-allowed disabled:opacity-60"
             placeholder={placeholder}
           />
         </div>
 
         <div className="mt-3 max-h-56 space-y-2 overflow-y-auto pr-1">
           {loading ? (
-            <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-500">
+            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500">
               Loading specializations...
             </div>
           ) : filteredOptions.length > 0 ? (
@@ -118,26 +118,26 @@ export const SpecializationMultiSelect = ({
                   className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition ${
                     isSelected
                       ? 'border-ceenai-cyan bg-ceenai-cyan/10 text-ceenai-blue'
-                      : 'border-gray-200 bg-white text-gray-700 hover:border-ceenai-cyan/40 hover:bg-gray-50'
+                      : 'border-slate-200 bg-white text-slate-700 hover:border-ceenai-cyan/40 hover:bg-slate-50'
                   }`}
                 >
                   <div>
                     <p className="font-semibold">{option.name}</p>
-                    <p className="text-xs text-gray-500">{option.category}</p>
+                    <p className="text-xs text-slate-500">{option.category}</p>
                   </div>
                   {isSelected ? <Check className="h-4 w-4" /> : null}
                 </button>
               );
             })
           ) : (
-            <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-500">
+            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500">
               No matching specialties found.
             </div>
           )}
         </div>
       </div>
 
-      {helperText ? <p className="text-sm text-gray-500">{helperText}</p> : null}
+      {helperText ? <p className="text-sm text-slate-500">{helperText}</p> : null}
     </div>
   );
 };

@@ -287,7 +287,7 @@ export const Onboarding = () => {
   ];
 
   const inputClass =
-    'w-full rounded-lg border border-slate-200 py-2.5 px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500';
+    'w-full rounded-lg border border-slate-200 py-2.5 px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500';
 
   return (
     <div className="relative min-h-screen bg-slate-50 lg:flex">
@@ -296,7 +296,7 @@ export const Onboarding = () => {
       </div>
 
       <div className="relative hidden w-80 shrink-0 flex-col justify-between overflow-hidden bg-slate-900 p-8 lg:flex">
-        <div className="pointer-events-none absolute -right-20 top-16 h-64 w-64 rounded-full bg-teal-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 top-16 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" />
         <div className="pointer-events-none absolute -left-16 bottom-24 h-56 w-56 rounded-full bg-blue-500/10 blur-3xl" />
 
         <div className="relative">
@@ -306,7 +306,7 @@ export const Onboarding = () => {
               <div className="text-lg font-bold text-white" style={JAKARTA}>
                 CeenAiX
               </div>
-              <div className="text-xs text-teal-400">{t('auth.roleAccess.sidebarEyebrow')}</div>
+              <div className="text-xs text-cyan-400">{t('auth.roleAccess.sidebarEyebrow')}</div>
             </div>
           </Link>
 
@@ -323,7 +323,7 @@ export const Onboarding = () => {
             <div className="space-y-3">
               {sidebarFeatures.map((feature) => (
                 <div key={feature} className="flex items-center gap-3">
-                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-600">
+                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-cyan-600">
                     <svg
                       className="h-3 w-3 text-white"
                       fill="currentColor"
@@ -355,7 +355,7 @@ export const Onboarding = () => {
             </span>
           </div>
 
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-medium text-cyan-700">
             {t('auth.onboarding.badge')}
           </div>
 
@@ -533,7 +533,7 @@ export const Onboarding = () => {
                   type="checkbox"
                   checked={form.termsAccepted}
                   onChange={(event) => updateField('termsAccepted', event.target.checked)}
-                  className="mt-1 h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+                  className="mt-1 h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500"
                 />
                 <span className="text-sm leading-relaxed text-slate-600">
                   {t('auth.onboarding.fields.termsConfirm')}
@@ -552,7 +552,7 @@ export const Onboarding = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   <UserCheck className="h-4 w-4" />
                   <span>
@@ -569,7 +569,7 @@ export const Onboarding = () => {
                     await signOut();
                     navigate('/auth/login', { replace: true });
                   }}
-                  className="inline-flex items-center gap-2 text-xs font-medium text-slate-500 transition-colors hover:text-teal-700"
+                  className="inline-flex items-center gap-2 text-xs font-medium text-slate-500 transition-colors hover:text-cyan-700"
                 >
                   <LogOut className="h-3.5 w-3.5" />
                   <span>{t('auth.onboarding.buttons.useAnotherAccount')}</span>

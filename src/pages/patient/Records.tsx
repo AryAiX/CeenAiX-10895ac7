@@ -19,6 +19,7 @@ import { useAuth } from '../../lib/auth-context';
 import { dateTimeFormatWithNumerals, formatLocaleDigits, resolveLocale } from '../../lib/i18n-ui';
 import { supabase } from '../../lib/supabase';
 import type { AllergySeverity, ConditionStatus } from '../../types';
+import { PatientReferenceShell } from '../../components/PatientReferenceShell';
 
 type RecordCategoryFilter = 'all' | 'condition' | 'allergy' | 'vaccination';
 type RecordCategory = Exclude<RecordCategoryFilter, 'all'>;
@@ -475,7 +476,7 @@ export const PatientRecords: React.FC = () => {
   };
 
   return (
-    <>
+    <PatientReferenceShell activeTab="health">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">{t('patient.records.title')}</h1>
         <p className="mt-1 text-sm text-slate-500">{t('patient.records.subtitle')}</p>
@@ -1004,6 +1005,6 @@ export const PatientRecords: React.FC = () => {
           </div>
         ) : null}
       </div>
-    </>
+    </PatientReferenceShell>
   );
 };

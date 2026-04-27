@@ -37,7 +37,7 @@ export const PharmacyDispensing = () => {
       label: t('pharmacy.dispensing.kpiHandover'),
       value: data?.handoverToday ?? 0,
       icon: CheckCircle2,
-      accent: 'from-emerald-500 to-teal-600',
+      accent: 'from-emerald-500 to-cyan-600',
     },
   ];
 

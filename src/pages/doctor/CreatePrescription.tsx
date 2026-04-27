@@ -26,6 +26,7 @@ import { enrichMedicationCatalogEntry } from '../../lib/medication-enrichment';
 import { appointmentPickerLabel } from '../../lib/i18n-ui';
 import { resolveClinicalVocabLabel, type PrescriptionClinicalVocabRow } from '../../lib/prescription-vocab';
 import { supabase } from '../../lib/supabase';
+import { DoctorReferenceShell } from '../../components/DoctorReferenceShell';
 
 interface DraftPrescriptionItem {
   id: string;
@@ -942,12 +943,11 @@ export const CreatePrescription: React.FC = () => {
   };
 
   return (
-    <>
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">{t('doctor.createPrescription.title')}</h1>
-        <p className="mt-1 text-sm text-slate-500">{t('doctor.createPrescription.subtitle')}</p>
-      </div>
-
+    <DoctorReferenceShell
+      activeTab="prescriptions"
+      title={t('doctor.createPrescription.title')}
+      subtitle={t('doctor.createPrescription.subtitle')}
+    >
       <div className="mx-auto w-full max-w-5xl space-y-6">
         {feedback ? (
           <div
@@ -1072,6 +1072,6 @@ export const CreatePrescription: React.FC = () => {
           </button>
         </div>
       </div>
-    </>
+    </DoctorReferenceShell>
   );
 };

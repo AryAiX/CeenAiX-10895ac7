@@ -22,7 +22,7 @@ const FEATURE_CARDS = [
   {
     key: 'reports',
     icon: Stethoscope,
-    accent: 'from-emerald-500 to-teal-600',
+    accent: 'from-emerald-500 to-cyan-600',
   },
 ] as const;
 
@@ -79,13 +79,13 @@ export const LabRadiology = () => {
         <article className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div
             aria-hidden
-            className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 opacity-10"
+            className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-600 opacity-10"
           />
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
               {t('lab.radiology.kpiReported')}
             </span>
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-sm">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-600 text-white shadow-sm">
               <Stethoscope className="h-4 w-4" />
             </div>
           </div>

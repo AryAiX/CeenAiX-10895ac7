@@ -23,7 +23,7 @@ interface OpsShellProps {
 
 const ACCENT_BAR: Record<NonNullable<OpsShellProps['accent']>, string> = {
   slate: 'from-slate-600 to-slate-800',
-  emerald: 'from-emerald-500 to-teal-600',
+  emerald: 'from-emerald-500 to-cyan-600',
   cyan: 'from-cyan-500 to-blue-600',
   violet: 'from-violet-500 to-fuchsia-600',
 };

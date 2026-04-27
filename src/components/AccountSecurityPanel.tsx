@@ -27,15 +27,15 @@ export const AccountSecurityPanel = ({ tone = 'patient' }: AccountSecurityPanelP
 
   const headerClass =
     tone === 'doctor'
-      ? 'bg-gradient-to-r from-teal-600 to-emerald-600'
+      ? 'bg-gradient-to-r from-cyan-600 to-emerald-600'
       : 'bg-gradient-to-r from-blue-600 to-cyan-600';
   const focusClass =
     tone === 'doctor'
-      ? 'focus:border-teal-500 focus:ring-4 focus:ring-teal-500/20'
+      ? 'focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/20'
       : 'focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20';
   const primaryButtonClass =
     tone === 'doctor'
-      ? 'bg-teal-600 hover:bg-teal-700'
+      ? 'bg-cyan-600 hover:bg-cyan-700'
       : 'bg-blue-600 hover:bg-blue-700';
 
   const handlePasswordUpdate = async () => {
@@ -94,7 +94,7 @@ export const AccountSecurityPanel = ({ tone = 'patient' }: AccountSecurityPanelP
   };
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-gray-100/50 bg-white shadow-xl">
+    <div className="overflow-hidden rounded-3xl border border-slate-100/50 bg-white shadow-xl">
       <div className={`p-6 ${headerClass}`}>
         <div className="flex items-center gap-4">
           <div className="rounded-xl bg-white/20 p-3 backdrop-blur-sm">
@@ -108,39 +108,39 @@ export const AccountSecurityPanel = ({ tone = 'patient' }: AccountSecurityPanelP
       </div>
 
       <div className="space-y-8 p-8">
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-6">
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
           <div className="mb-5 flex items-center gap-3">
             <div className="rounded-xl bg-white p-3 shadow-sm">
-              <KeyRound className="h-5 w-5 text-gray-700" />
+              <KeyRound className="h-5 w-5 text-slate-700" />
             </div>
             <div>
-              <h4 className="text-lg font-bold text-gray-900">{t('accountSecurity.changePasswordTitle')}</h4>
-              <p className="text-sm text-gray-600">{t('accountSecurity.changePasswordLead')}</p>
+              <h4 className="text-lg font-bold text-slate-900">{t('accountSecurity.changePasswordTitle')}</h4>
+              <p className="text-sm text-slate-600">{t('accountSecurity.changePasswordLead')}</p>
             </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700">
+              <label className="mb-2 block text-sm font-semibold text-slate-700">
                 {t('accountSecurity.newPassword')}
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                className={`w-full rounded-xl border-2 border-gray-200 px-4 py-3 transition-all ${focusClass}`}
+                className={`w-full rounded-xl border-2 border-slate-200 px-4 py-3 transition-all ${focusClass}`}
                 placeholder={t('accountSecurity.newPasswordPlaceholder')}
               />
             </div>
             <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700">
+              <label className="mb-2 block text-sm font-semibold text-slate-700">
                 {t('accountSecurity.confirmPassword')}
               </label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
-                className={`w-full rounded-xl border-2 border-gray-200 px-4 py-3 transition-all ${focusClass}`}
+                className={`w-full rounded-xl border-2 border-slate-200 px-4 py-3 transition-all ${focusClass}`}
                 placeholder={t('accountSecurity.confirmPasswordPlaceholder')}
               />
             </div>
@@ -173,8 +173,8 @@ export const AccountSecurityPanel = ({ tone = 'patient' }: AccountSecurityPanelP
               <Trash2 className="h-5 w-5 text-red-600" />
             </div>
             <div>
-              <h4 className="text-lg font-bold text-gray-900">{t('accountSecurity.deleteTitle')}</h4>
-              <p className="text-sm text-gray-600">{t('accountSecurity.deleteLead')}</p>
+              <h4 className="text-lg font-bold text-slate-900">{t('accountSecurity.deleteTitle')}</h4>
+              <p className="text-sm text-slate-600">{t('accountSecurity.deleteLead')}</p>
             </div>
           </div>
 
@@ -190,7 +190,7 @@ export const AccountSecurityPanel = ({ tone = 'patient' }: AccountSecurityPanelP
           </div>
 
           <div className="mt-4">
-            <label className="mb-2 block text-sm font-semibold text-gray-700">
+            <label className="mb-2 block text-sm font-semibold text-slate-700">
               {t('accountSecurity.confirmationLabel')}
             </label>
             <input

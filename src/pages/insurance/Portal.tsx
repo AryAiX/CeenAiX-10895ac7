@@ -44,7 +44,7 @@ export const InsurancePortal = () => {
       label: t('insurance.portal.kpiApproved'),
       value: data?.approvedThisMonth ?? 0,
       icon: CheckCircle2,
-      accent: 'from-emerald-500 to-teal-600',
+      accent: 'from-emerald-500 to-cyan-600',
     },
     {
       label: t('insurance.portal.kpiEscalations'),
