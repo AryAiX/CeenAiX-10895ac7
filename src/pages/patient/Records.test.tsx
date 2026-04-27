@@ -106,7 +106,7 @@ describe('PatientRecords', () => {
 
     const user = userEvent.setup();
     await user.type(
-      screen.getByPlaceholderText('Search conditions, allergies, vaccinations...'),
+      screen.getByPlaceholderText('Search conditions, allergies, or vaccines...'),
       'shellfish'
     );
 

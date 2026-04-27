@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FamilyTree } from '../../components/FamilyTree';
 import { AccountSecurityPanel } from '../../components/AccountSecurityPanel';
 import { Upload, Camera, User, Shield, Users, Plus, Trash2, CreditCard as Edit2, Save } from 'lucide-react';
+import { usePatientInsurance, usePatientRecords, useUserProfile } from '../../hooks';
+import { useAuth } from '../../lib/auth-context';
+import { supabase } from '../../lib/supabase';
 
 interface FamilyMember {
   id: string;
@@ -15,6 +18,15 @@ interface FamilyMember {
 
 export const Profile: React.FC = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const { data: profile, refetch: refetchProfile } = useUserProfile();
+  const { data: records } = usePatientRecords(user?.id);
+  const { data: insurance } = usePatientInsurance(user?.id);
+  const [patientProfile, setPatientProfile] = useState<{
+    blood_type: string | null;
+    emergency_contact_name: string | null;
+    emergency_contact_phone: string | null;
+  } | null>(null);
   const [profileImage, setProfileImage] = useState<string>('');
   const [emiratesIdFront, setEmiratesIdFront] = useState<string>('');
   const [emiratesIdBack, setEmiratesIdBack] = useState<string>('');
@@ -46,6 +58,100 @@ export const Profile: React.FC = () => {
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [showAddFamily, setShowAddFamily] = useState(false);
   const [newFamilyMember, setNewFamilyMember] = useState<Partial<FamilyMember>>({});
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let mounted = true;
+    supabase
+      .from('patient_profiles')
+      .select('blood_type, emergency_contact_name, emergency_contact_phone')
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (mounted) {
+          setPatientProfile(data);
+        }
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    const primaryInsurance = insurance?.primaryPlan ?? null;
+    setProfileImage(profile?.avatar_url ?? '');
+    setPersonalInfo((current) => ({
+      ...current,
+      fullName: profile?.full_name ?? '',
+      emiratesId: profile?.emirates_id ?? '',
+      dateOfBirth: profile?.date_of_birth ?? '',
+      bloodType: patientProfile?.blood_type ?? '',
+      allergies: (records?.allergies ?? [])
+        .map((row) => (row.reaction ? `${row.allergen} (${row.reaction})` : row.allergen))
+        .join(', '),
+      chronicConditions: (records?.conditions ?? []).map((row) => row.condition_name).join(', '),
+      emergencyContactName: patientProfile?.emergency_contact_name ?? '',
+      emergencyContactPhone: patientProfile?.emergency_contact_phone ?? '',
+    }));
+    setInsuranceInfo((current) => ({
+      ...current,
+      provider: primaryInsurance?.providerCompany ?? '',
+      policyNumber: primaryInsurance?.policyNumber ?? '',
+      memberId: primaryInsurance?.memberId ?? '',
+      groupNumber: primaryInsurance?.networkType ?? '',
+      coverageType: primaryInsurance?.coverageType ?? '',
+      validFrom: primaryInsurance?.validFrom ?? '',
+      validUntil: primaryInsurance?.validUntil ?? '',
+      cardImage: primaryInsurance?.cardPhotoUrl ?? '',
+    }));
+  }, [insurance?.primaryPlan, patientProfile, profile, records?.allergies, records?.conditions]);
+
+  const savePersonalInfo = async () => {
+    if (!user?.id) return;
+    await supabase
+      .from('user_profiles')
+      .update({
+        full_name: personalInfo.fullName,
+        emirates_id: personalInfo.emiratesId,
+        date_of_birth: personalInfo.dateOfBirth || null,
+        avatar_url: profileImage || null,
+      })
+      .eq('user_id', user.id);
+    await supabase.from('patient_profiles').upsert(
+      {
+        user_id: user.id,
+        blood_type: personalInfo.bloodType || null,
+        emergency_contact_name: personalInfo.emergencyContactName || null,
+        emergency_contact_phone: personalInfo.emergencyContactPhone || null,
+      },
+      { onConflict: 'user_id' }
+    );
+    await refetchProfile();
+    setPatientProfile({
+      blood_type: personalInfo.bloodType || null,
+      emergency_contact_name: personalInfo.emergencyContactName || null,
+      emergency_contact_phone: personalInfo.emergencyContactPhone || null,
+    });
+    setIsEditingPersonal(false);
+  };
+
+  const saveInsuranceInfo = async () => {
+    if (!insurance?.primaryPlan) {
+      setIsEditingInsurance(false);
+      return;
+    }
+    await supabase
+      .from('patient_insurance')
+      .update({
+        policy_number: insuranceInfo.policyNumber || null,
+        member_id: insuranceInfo.memberId || null,
+        card_photo_url: insuranceInfo.cardImage || null,
+        valid_from: insuranceInfo.validFrom || null,
+        valid_until: insuranceInfo.validUntil || null,
+      })
+      .eq('id', insurance.primaryPlan.id);
+    setIsEditingInsurance(false);
+  };
 
   const handleImageUpload = (type: 'profile' | 'emiratesFront' | 'emiratesBack' | 'insurance') => {
     const input = document.createElement('input');
@@ -217,7 +323,13 @@ export const Profile: React.FC = () => {
                   </div>
                 </div>
                 <button
-                  onClick={() => setIsEditingPersonal(!isEditingPersonal)}
+                  onClick={() => {
+                    if (isEditingPersonal) {
+                      void savePersonalInfo();
+                    } else {
+                      setIsEditingPersonal(true);
+                    }
+                  }}
                   className="flex items-center space-x-2 px-5 py-2.5 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
                 >
                   {isEditingPersonal ? <Save className="w-5 h-5" /> : <Edit2 className="w-5 h-5" />}
@@ -448,7 +560,13 @@ export const Profile: React.FC = () => {
                   </div>
                 </div>
                 <button
-                  onClick={() => setIsEditingInsurance(!isEditingInsurance)}
+                  onClick={() => {
+                    if (isEditingInsurance) {
+                      void saveInsuranceInfo();
+                    } else {
+                      setIsEditingInsurance(true);
+                    }
+                  }}
                   className="flex items-center space-x-2 px-5 py-2.5 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
                 >
                   {isEditingInsurance ? <Save className="w-5 h-5" /> : <Edit2 className="w-5 h-5" />}

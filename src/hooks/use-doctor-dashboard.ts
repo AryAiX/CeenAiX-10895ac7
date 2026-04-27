@@ -9,9 +9,19 @@ interface DoctorNextAppointment {
   patientId: string;
   patientName: string;
   scheduledAt: string;
+  durationMinutes: number | null;
   type: AppointmentType;
   status: AppointmentStatus;
   chiefComplaint: string | null;
+  patientAgeGender: string | null;
+  bloodType: string | null;
+  insuranceName: string | null;
+  conditions: string[];
+  allergies: string[];
+  medications: string[];
+  flags: string[];
+  visitCount: number;
+  lastVisitAt: string | null;
 }
 
 export interface DoctorDashboardMessagePreview {
@@ -43,10 +53,13 @@ export interface DoctorQueueAppointment {
   patientId: string;
   patientName: string;
   scheduledAt: string;
+  durationMinutes: number | null;
   type: AppointmentType;
   status: AppointmentStatus;
   chiefComplaint: string | null;
   preVisitStatus: PreVisitAssessmentStatus | null;
+  insuranceName: string | null;
+  flags: string[];
 }
 
 export interface DoctorDashboardData {
@@ -57,6 +70,9 @@ export interface DoctorDashboardData {
   inProgressAppointments: number;
   unreadMessages: number;
   pendingReviews: number;
+  prescriptionsToday: number;
+  labOrdersToday: number;
+  estimatedRevenueToday: number | null;
   activeConsultation: DoctorNextAppointment | null;
   nextAppointment: DoctorNextAppointment | null;
   todaySchedule: DoctorQueueAppointment[];
@@ -70,9 +86,63 @@ interface AppointmentRow {
   id: string;
   patient_id: string;
   scheduled_at: string;
+  duration_minutes: number | null;
   type: AppointmentType;
   status: AppointmentStatus;
   chief_complaint: string | null;
+}
+
+interface PatientProfileRow {
+  user_id: string;
+  full_name: string | null;
+  date_of_birth: string | null;
+  gender: string | null;
+}
+
+interface PatientClinicalProfileRow {
+  user_id: string;
+  blood_type: string | null;
+}
+
+interface InsurancePlanRelation {
+  name: string | null;
+  provider_company: string | null;
+  coverage_type: string | null;
+}
+
+interface PatientInsuranceRow {
+  patient_id: string;
+  is_primary: boolean | null;
+  insurance_plans: InsurancePlanRelation | InsurancePlanRelation[] | null;
+}
+
+interface ConditionRow {
+  patient_id: string;
+  condition_name: string;
+  status: string;
+}
+
+interface AllergyRow {
+  patient_id: string;
+  allergen: string;
+  severity: string | null;
+}
+
+interface PrescriptionMedicationRow {
+  medication_name: string;
+  dosage: string | null;
+}
+
+interface PrescriptionRow {
+  id: string;
+  patient_id: string;
+  status: string;
+  prescribed_at: string;
+  prescription_items?: PrescriptionMedicationRow[] | null;
+}
+
+interface DoctorProfileFeeRow {
+  consultation_fee: number | null;
 }
 
 interface ConversationRow {
@@ -110,6 +180,43 @@ interface LabOrderItemRow {
 const UPCOMING_STATUSES = new Set<AppointmentStatus>(['scheduled', 'confirmed', 'in_progress']);
 const TODAY_ACTIVE_STATUSES = new Set<AppointmentStatus>(['scheduled', 'confirmed', 'in_progress', 'completed']);
 
+const firstRelation = <T,>(value: T | T[] | null | undefined): T | null =>
+  Array.isArray(value) ? value[0] ?? null : value ?? null;
+
+const calculateAge = (dateOfBirth: string | null | undefined) => {
+  if (!dateOfBirth) {
+    return null;
+  }
+
+  const birthDate = new Date(dateOfBirth);
+  if (Number.isNaN(birthDate.getTime())) {
+    return null;
+  }
+
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDelta = today.getMonth() - birthDate.getMonth();
+  if (monthDelta < 0 || (monthDelta === 0 && today.getDate() < birthDate.getDate())) {
+    age -= 1;
+  }
+
+  return age;
+};
+
+const formatAgeGender = (profile: PatientProfileRow | undefined) => {
+  const age = calculateAge(profile?.date_of_birth);
+  const gender = profile?.gender?.trim().charAt(0).toUpperCase() ?? '';
+  if (age !== null && gender) return `${age}${gender}`;
+  if (age !== null) return `${age}`;
+  return profile?.gender?.trim() || null;
+};
+
+const pushMapValue = <T,>(map: Map<string, T[]>, key: string, value: T) => {
+  const existing = map.get(key) ?? [];
+  existing.push(value);
+  map.set(key, existing);
+};
+
 export function useDoctorDashboard(userId: string | null | undefined) {
   return useQuery<DoctorDashboardData | null>(async () => {
     if (!userId) {
@@ -124,7 +231,7 @@ export function useDoctorDashboard(userId: string | null | undefined) {
     ] = await Promise.all([
       supabase
         .from('appointments')
-        .select('id, patient_id, scheduled_at, type, status, chief_complaint')
+        .select('id, patient_id, scheduled_at, duration_minutes, type, status, chief_complaint')
         .eq('doctor_id', userId)
         .eq('is_deleted', false)
         .order('scheduled_at', { ascending: true }),
@@ -153,13 +260,75 @@ export function useDoctorDashboard(userId: string | null | undefined) {
     const patientIds = Array.from(new Set(safeAppointments.map((appointment) => appointment.patient_id)));
     const appointmentIds = safeAppointments.map((appointment) => appointment.id);
 
+    const now = new Date();
+    const startOfToday = new Date(now);
+    startOfToday.setHours(0, 0, 0, 0);
+    const endOfToday = new Date(startOfToday);
+    endOfToday.setDate(endOfToday.getDate() + 1);
+
     const [
       { data: patientProfiles, error: patientProfilesError },
+      { data: patientClinicalProfiles, error: patientClinicalProfilesError },
+      { data: patientInsuranceRows, error: patientInsuranceError },
+      { data: conditionRows, error: conditionsError },
+      { data: allergyRows, error: allergiesError },
+      { data: prescriptionRows, error: prescriptionsError },
+      { data: doctorProfileRows, error: doctorProfileError },
+      { count: prescriptionsTodayCount, error: prescriptionsTodayError },
+      { count: labOrdersTodayCount, error: labOrdersTodayError },
       { data: preVisitAssessments, error: preVisitAssessmentsError },
     ] = await Promise.all([
       patientIds.length > 0
-        ? supabase.from('user_profiles').select('user_id, full_name').in('user_id', patientIds)
+        ? supabase.from('user_profiles').select('user_id, full_name, date_of_birth, gender').in('user_id', patientIds)
         : Promise.resolve({ data: [], error: null }),
+      patientIds.length > 0
+        ? supabase.from('patient_profiles').select('user_id, blood_type').in('user_id', patientIds)
+        : Promise.resolve({ data: [], error: null }),
+      patientIds.length > 0
+        ? supabase
+            .from('patient_insurance')
+            .select('patient_id, is_primary, insurance_plans (name, provider_company, coverage_type)')
+            .in('patient_id', patientIds)
+            .order('is_primary', { ascending: false })
+        : Promise.resolve({ data: [], error: null }),
+      patientIds.length > 0
+        ? supabase
+            .from('medical_conditions')
+            .select('patient_id, condition_name, status')
+            .in('patient_id', patientIds)
+            .eq('is_deleted', false)
+            .in('status', ['active', 'chronic'])
+        : Promise.resolve({ data: [], error: null }),
+      patientIds.length > 0
+        ? supabase
+            .from('allergies')
+            .select('patient_id, allergen, severity')
+            .in('patient_id', patientIds)
+            .eq('is_deleted', false)
+        : Promise.resolve({ data: [], error: null }),
+      patientIds.length > 0
+        ? supabase
+            .from('prescriptions')
+            .select('id, patient_id, status, prescribed_at, prescription_items (medication_name, dosage)')
+            .in('patient_id', patientIds)
+            .eq('doctor_id', userId)
+            .eq('is_deleted', false)
+        : Promise.resolve({ data: [], error: null }),
+      supabase.from('doctor_profiles').select('consultation_fee').eq('user_id', userId).maybeSingle(),
+      supabase
+        .from('prescriptions')
+        .select('id', { count: 'exact', head: true })
+        .eq('doctor_id', userId)
+        .eq('is_deleted', false)
+        .gte('prescribed_at', startOfToday.toISOString())
+        .lt('prescribed_at', endOfToday.toISOString()),
+      supabase
+        .from('lab_orders')
+        .select('id', { count: 'exact', head: true })
+        .eq('doctor_id', userId)
+        .eq('is_deleted', false)
+        .gte('ordered_at', startOfToday.toISOString())
+        .lt('ordered_at', endOfToday.toISOString()),
       appointmentIds.length > 0
         ? supabase
             .from('appointment_pre_visit_assessments')
@@ -169,16 +338,108 @@ export function useDoctorDashboard(userId: string | null | undefined) {
     ]);
 
     if (patientProfilesError) throw patientProfilesError;
+    if (patientClinicalProfilesError) throw patientClinicalProfilesError;
+    if (patientInsuranceError) throw patientInsuranceError;
+    if (conditionsError) throw conditionsError;
+    if (allergiesError) throw allergiesError;
+    if (prescriptionsError) throw prescriptionsError;
+    if (doctorProfileError) throw doctorProfileError;
+    if (prescriptionsTodayError) throw prescriptionsTodayError;
+    if (labOrdersTodayError) throw labOrdersTodayError;
     if (preVisitAssessmentsError) throw preVisitAssessmentsError;
 
     const patientNameById = new Map(
-      (patientProfiles ?? []).map((profile) => [profile.user_id, profile.full_name ?? 'Patient'])
+      ((patientProfiles ?? []) as PatientProfileRow[]).map((profile) => [profile.user_id, profile.full_name ?? 'Patient'])
+    );
+    const patientProfileById = new Map(
+      ((patientProfiles ?? []) as PatientProfileRow[]).map((profile) => [profile.user_id, profile])
+    );
+    const patientClinicalProfileById = new Map(
+      ((patientClinicalProfiles ?? []) as PatientClinicalProfileRow[]).map((profile) => [profile.user_id, profile])
     );
     const preVisitStatusByAppointmentId = new Map(
       (preVisitAssessments ?? []).map((assessment) => [assessment.appointment_id, assessment.status])
     );
 
-    const now = new Date();
+    const insuranceNameByPatientId = new Map<string, string>();
+    ((patientInsuranceRows ?? []) as PatientInsuranceRow[]).forEach((row) => {
+      if (insuranceNameByPatientId.has(row.patient_id)) {
+        return;
+      }
+      const plan = firstRelation(row.insurance_plans);
+      insuranceNameByPatientId.set(
+        row.patient_id,
+        plan ? [plan.provider_company, plan.name].filter(Boolean).join(' ') || plan.coverage_type || 'Insurance on file' : 'Insurance on file'
+      );
+    });
+
+    const conditionsByPatientId = new Map<string, string[]>();
+    ((conditionRows ?? []) as ConditionRow[]).forEach((condition) => {
+      pushMapValue(conditionsByPatientId, condition.patient_id, condition.condition_name);
+    });
+
+    const allergiesByPatientId = new Map<string, string[]>();
+    ((allergyRows ?? []) as AllergyRow[]).forEach((allergy) => {
+      pushMapValue(
+        allergiesByPatientId,
+        allergy.patient_id,
+        allergy.severity ? `${allergy.allergen} (${allergy.severity})` : allergy.allergen
+      );
+    });
+
+    const medicationsByPatientId = new Map<string, string[]>();
+    ((prescriptionRows ?? []) as PrescriptionRow[])
+      .filter((prescription) => prescription.status === 'active')
+      .forEach((prescription) => {
+        (prescription.prescription_items ?? []).forEach((item) => {
+          pushMapValue(
+            medicationsByPatientId,
+            prescription.patient_id,
+            [item.medication_name, item.dosage].filter(Boolean).join(' ')
+          );
+        });
+      });
+
+    const appointmentsByPatientId = new Map<string, AppointmentRow[]>();
+    safeAppointments.forEach((appointment) => {
+      pushMapValue(appointmentsByPatientId, appointment.patient_id, appointment);
+    });
+
+    const consultationFee = ((doctorProfileRows as DoctorProfileFeeRow | null) ?? null)?.consultation_fee ?? null;
+
+    const buildAppointment = (appointment: AppointmentRow): DoctorNextAppointment => {
+      const patientProfile = patientProfileById.get(appointment.patient_id);
+      const patientAppointments = appointmentsByPatientId.get(appointment.patient_id) ?? [];
+      const previousAppointments = patientAppointments
+        .filter((candidate) => new Date(candidate.scheduled_at).getTime() < new Date(appointment.scheduled_at).getTime())
+        .sort((a, b) => new Date(b.scheduled_at).getTime() - new Date(a.scheduled_at).getTime());
+      const allergies = allergiesByPatientId.get(appointment.patient_id) ?? [];
+      const medications = medicationsByPatientId.get(appointment.patient_id) ?? [];
+
+      return {
+        id: appointment.id,
+        patientId: appointment.patient_id,
+        patientName: patientNameById.get(appointment.patient_id) ?? 'Patient',
+        scheduledAt: appointment.scheduled_at,
+        durationMinutes: appointment.duration_minutes,
+        type: appointment.type,
+        status: appointment.status,
+        chiefComplaint: appointment.chief_complaint,
+        patientAgeGender: formatAgeGender(patientProfile),
+        bloodType: patientClinicalProfileById.get(appointment.patient_id)?.blood_type ?? null,
+        insuranceName: insuranceNameByPatientId.get(appointment.patient_id) ?? null,
+        conditions: (conditionsByPatientId.get(appointment.patient_id) ?? []).slice(0, 3),
+        allergies: allergies.slice(0, 3),
+        medications: medications.slice(0, 3),
+        flags: [
+          ...allergies.slice(0, 1).map((allergy) => `ALLERGY: ${allergy}`),
+          ...(medications.length > 0 ? [`${medications.length} active medications`] : []),
+        ],
+        visitCount: patientAppointments.length,
+        lastVisitAt: previousAppointments[0]?.scheduled_at ?? null,
+      };
+    };
+
     const todayAppointmentRows = safeAppointments.filter(
       (appointment) =>
         TODAY_ACTIVE_STATUSES.has(appointment.status) &&
@@ -214,10 +475,18 @@ export function useDoctorDashboard(userId: string | null | undefined) {
         patientId: appointment.patient_id,
         patientName: patientNameById.get(appointment.patient_id) ?? 'Patient',
         scheduledAt: appointment.scheduled_at,
+        durationMinutes: appointment.duration_minutes,
         type: appointment.type,
         status: appointment.status,
         chiefComplaint: appointment.chief_complaint,
         preVisitStatus: preVisitStatusByAppointmentId.get(appointment.id) ?? null,
+        insuranceName: insuranceNameByPatientId.get(appointment.patient_id) ?? null,
+        flags: [
+          ...((allergiesByPatientId.get(appointment.patient_id) ?? []).slice(0, 1).map((allergy) => `ALLERGY: ${allergy}`)),
+          ...((medicationsByPatientId.get(appointment.patient_id) ?? []).length > 0
+            ? [`${(medicationsByPatientId.get(appointment.patient_id) ?? []).length} active medications`]
+            : []),
+        ],
       }));
     const todaySchedule = safeAppointments
       .filter(
@@ -230,10 +499,18 @@ export function useDoctorDashboard(userId: string | null | undefined) {
         patientId: appointment.patient_id,
         patientName: patientNameById.get(appointment.patient_id) ?? 'Patient',
         scheduledAt: appointment.scheduled_at,
+        durationMinutes: appointment.duration_minutes,
         type: appointment.type,
         status: appointment.status,
         chiefComplaint: appointment.chief_complaint,
         preVisitStatus: preVisitStatusByAppointmentId.get(appointment.id) ?? null,
+        insuranceName: insuranceNameByPatientId.get(appointment.patient_id) ?? null,
+        flags: [
+          ...((allergiesByPatientId.get(appointment.patient_id) ?? []).slice(0, 1).map((allergy) => `ALLERGY: ${allergy}`)),
+          ...((medicationsByPatientId.get(appointment.patient_id) ?? []).length > 0
+            ? [`${(medicationsByPatientId.get(appointment.patient_id) ?? []).length} active medications`]
+            : []),
+        ],
       }));
 
     const preVisitReviewCount = (preVisitAssessments ?? []).filter(
@@ -382,28 +659,12 @@ export function useDoctorDashboard(userId: string | null | undefined) {
       inProgressAppointments,
       unreadMessages,
       pendingReviews: (pendingNotesCount ?? 0) + preVisitReviewCount + (patientUpdateReviewCount ?? 0),
-      activeConsultation: activeConsultationSource
-        ? {
-            id: activeConsultationSource.id,
-            patientId: activeConsultationSource.patient_id,
-            patientName: patientNameById.get(activeConsultationSource.patient_id) ?? 'Patient',
-            scheduledAt: activeConsultationSource.scheduled_at,
-            type: activeConsultationSource.type,
-            status: activeConsultationSource.status,
-            chiefComplaint: activeConsultationSource.chief_complaint,
-          }
-        : null,
-      nextAppointment: nextAppointmentSource
-        ? {
-            id: nextAppointmentSource.id,
-            patientId: nextAppointmentSource.patient_id,
-            patientName: patientNameById.get(nextAppointmentSource.patient_id) ?? 'Patient',
-            scheduledAt: nextAppointmentSource.scheduled_at,
-            type: nextAppointmentSource.type,
-            status: nextAppointmentSource.status,
-            chiefComplaint: nextAppointmentSource.chief_complaint,
-          }
-        : null,
+      prescriptionsToday: prescriptionsTodayCount ?? 0,
+      labOrdersToday: labOrdersTodayCount ?? 0,
+      estimatedRevenueToday:
+        consultationFee !== null && todayAppointments > 0 ? consultationFee * todayAppointments : null,
+      activeConsultation: activeConsultationSource ? buildAppointment(activeConsultationSource) : null,
+      nextAppointment: nextAppointmentSource ? buildAppointment(nextAppointmentSource) : null,
       todaySchedule,
       todayQueue,
       criticalResults,

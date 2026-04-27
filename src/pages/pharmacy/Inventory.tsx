@@ -1,14 +1,14 @@
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, Calendar, Package, TrendingDown } from 'lucide-react';
 import { OpsShell } from '../../components/OpsShell';
-import { usePharmacyInventoryStub } from '../../hooks';
-import type { PharmacyInventoryItem } from '../../hooks';
+import { usePharmacyPrescriptionQueue } from '../../hooks';
+import type { PharmacyInventoryDerivedItem } from '../../hooks';
 import { PHARMACY_NAV_ITEMS } from './navItems';
 
 const formatNumber = (value: number | null | undefined) =>
   typeof value === 'number' ? value.toLocaleString() : '—';
 
-const STATUS_PILL: Record<PharmacyInventoryItem['status'], string> = {
+const STATUS_PILL: Record<PharmacyInventoryDerivedItem['status'], string> = {
   healthy: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
   low: 'bg-amber-50 text-amber-700 ring-amber-200',
   near_expiry: 'bg-violet-50 text-violet-700 ring-violet-200',
@@ -17,25 +17,25 @@ const STATUS_PILL: Record<PharmacyInventoryItem['status'], string> = {
 
 export const PharmacyInventory = () => {
   const { t } = useTranslation('common');
-  const stub = usePharmacyInventoryStub();
-  const data = stub.data;
+  const { data, loading } = usePharmacyPrescriptionQueue();
+  const items = data?.inventory ?? [];
 
   const kpis = [
     {
       label: t('pharmacy.inventory.kpiTotal'),
-      value: data?.totalSkus ?? 0,
+      value: items.length,
       icon: Package,
       accent: 'from-slate-600 to-slate-800',
     },
     {
       label: t('pharmacy.inventory.kpiNearExpiry'),
-      value: data?.nearExpiry ?? 0,
+      value: items.filter((item) => item.status === 'near_expiry').length,
       icon: Calendar,
       accent: 'from-violet-500 to-fuchsia-600',
     },
     {
       label: t('pharmacy.inventory.kpiOutOfStock'),
-      value: data?.outOfStock ?? 0,
+      value: items.filter((item) => item.status === 'out').length,
       icon: AlertTriangle,
       accent: 'from-rose-500 to-orange-500',
     },
@@ -72,7 +72,7 @@ export const PharmacyInventory = () => {
                 </div>
               </div>
               <p className="mt-4 text-3xl font-bold text-slate-900">
-                {stub.loading ? '…' : formatNumber(kpi.value)}
+                {loading ? '…' : formatNumber(kpi.value)}
               </p>
             </article>
           );
@@ -111,7 +111,7 @@ export const PharmacyInventory = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {(data?.items ?? []).map((item) => (
+              {items.map((item) => (
                 <tr key={item.id}>
                   <td className="px-4 py-3 font-semibold text-slate-900">{item.name}</td>
                   <td className="px-4 py-3 text-slate-500">{item.sku}</td>

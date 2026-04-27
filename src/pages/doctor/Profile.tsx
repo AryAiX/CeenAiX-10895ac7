@@ -147,6 +147,7 @@ export const DoctorProfile: React.FC = () => {
   const [templateExtracting, setTemplateExtracting] = useState(false);
   const [templateErrorMessage, setTemplateErrorMessage] = useState<string | null>(null);
   const [templateSuccessMessage, setTemplateSuccessMessage] = useState<string | null>(null);
+  const [activeProfileTab, setActiveProfileTab] = useState<'profile' | 'preview' | 'compliance'>('profile');
   const [formData, setFormData] = useState<DoctorProfileFormState>({
     fullName: '',
     email: '',
@@ -172,6 +173,18 @@ export const DoctorProfile: React.FC = () => {
   );
   const activePreVisitTemplate =
     preVisitTemplates.find((template) => template.isActive) ?? preVisitTemplates[0] ?? null;
+  const profileCompleteness = useMemo(() => {
+    const fields = [
+      formData.fullName,
+      formData.email,
+      formData.phone,
+      formData.licenseNumber,
+      formData.bio,
+      formData.selectedSpecializationIds.length > 0 ? 'specialization' : '',
+      activePreVisitTemplate ? 'template' : '',
+    ];
+    return Math.round((fields.filter(Boolean).length / fields.length) * 100);
+  }, [activePreVisitTemplate, formData]);
 
   useEffect(() => {
     if (isEditing) {
@@ -603,6 +616,45 @@ export const DoctorProfile: React.FC = () => {
             <Edit2 className="w-4 h-4" />
             Edit profile
           </button>
+        ) : null}
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-col gap-4 border-b border-slate-100 p-5 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Profile completeness</p>
+            <div className="mt-2 flex items-center gap-3">
+              <div className="h-2 w-48 overflow-hidden rounded-full bg-slate-100">
+                <div className="h-full rounded-full bg-teal-600" style={{ width: `${profileCompleteness}%` }} />
+              </div>
+              <span className="font-mono text-sm font-bold text-teal-700">{profileCompleteness}%</span>
+            </div>
+          </div>
+          <div className="flex gap-2 overflow-x-auto">
+            {[
+              { id: 'profile' as const, label: 'My Profile' },
+              { id: 'preview' as const, label: 'Public Preview' },
+              { id: 'compliance' as const, label: 'DHA & Compliance' },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveProfileTab(tab.id)}
+                className={`whitespace-nowrap rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                  activeProfileTab === tab.id ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/20' : 'text-slate-500 hover:bg-slate-50'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {activeProfileTab !== 'profile' ? (
+          <div className="p-5">
+            <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm text-slate-500">
+              This view is ready for the public preview and compliance-specific tables. The editable profile and pre-visit template sections below remain connected to the canonical profile data.
+            </div>
+          </div>
         ) : null}
       </div>
 

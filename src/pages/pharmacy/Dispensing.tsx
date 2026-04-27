@@ -2,14 +2,14 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { CheckCircle2, ClipboardCheck, Clock, Inbox, Pill, UserCheck } from 'lucide-react';
 import { OpsShell } from '../../components/OpsShell';
-import { usePharmacyDispensingStub } from '../../hooks';
-import type { PharmacyDispensingItem } from '../../hooks';
+import { usePharmacyPrescriptionQueue } from '../../hooks';
+import type { PharmacyQueuePrescriptionItem } from '../../hooks';
 import { PHARMACY_NAV_ITEMS } from './navItems';
 
 const formatNumber = (value: number | null | undefined) =>
   typeof value === 'number' ? value.toLocaleString() : '—';
 
-const STATUS_PILL: Record<PharmacyDispensingItem['status'], string> = {
+const STATUS_PILL: Record<PharmacyQueuePrescriptionItem['status'], string> = {
   verifying: 'bg-amber-50 text-amber-700 ring-amber-200',
   counseling: 'bg-cyan-50 text-cyan-700 ring-cyan-200',
   ready: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
@@ -17,25 +17,25 @@ const STATUS_PILL: Record<PharmacyDispensingItem['status'], string> = {
 
 export const PharmacyDispensing = () => {
   const { t } = useTranslation('common');
-  const stub = usePharmacyDispensingStub();
-  const data = stub.data;
+  const { data, loading } = usePharmacyPrescriptionQueue();
+  const items = data?.queue ?? [];
 
   const kpis = [
     {
       label: t('pharmacy.dispensing.kpiVerification'),
-      value: data?.inVerification ?? 0,
+      value: items.filter((item) => item.status === 'verifying').length,
       icon: ClipboardCheck,
       accent: 'from-amber-500 to-orange-500',
     },
     {
       label: t('pharmacy.dispensing.kpiCounseling'),
-      value: data?.readyForCounseling ?? 0,
+      value: items.filter((item) => item.status === 'ready').length,
       icon: UserCheck,
       accent: 'from-cyan-500 to-blue-600',
     },
     {
       label: t('pharmacy.dispensing.kpiHandover'),
-      value: data?.handoverToday ?? 0,
+      value: items.filter((item) => item.status === 'counseling').length,
       icon: CheckCircle2,
       accent: 'from-emerald-500 to-teal-600',
     },
@@ -72,7 +72,7 @@ export const PharmacyDispensing = () => {
                 </div>
               </div>
               <p className="mt-4 text-3xl font-bold text-slate-900">
-                {stub.loading ? '…' : formatNumber(kpi.value)}
+                {loading ? '…' : formatNumber(kpi.value)}
               </p>
             </article>
           );
@@ -86,7 +86,7 @@ export const PharmacyDispensing = () => {
               {t('pharmacy.dispensing.queueHeading')}
             </h2>
             <p className="mt-1 text-lg font-bold text-slate-900">
-              {formatNumber(data?.items.length ?? 0)}{' '}
+              {formatNumber(items.length)}{' '}
               {t('pharmacy.dispensing.queueCountLabel')}
             </p>
           </div>
@@ -100,7 +100,7 @@ export const PharmacyDispensing = () => {
         </div>
 
         <ul className="mt-4 divide-y divide-slate-100">
-          {(data?.items ?? []).map((item) => (
+          {items.map((item) => (
             <li key={item.id} className="flex items-center gap-3 py-3">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
                 <Pill className="h-4 w-4" />

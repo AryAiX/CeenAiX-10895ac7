@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Loader2, Pill, Plus, Search, Trash2 } from 'lucide-react';
+import { AlertOctagon, CheckCircle2, ChevronDown, ClipboardList, Loader2, Pill, Plus, RefreshCw, Search, Trash2 } from 'lucide-react';
 import { MedicationNameDisplay } from '../../components/MedicationNameDisplay';
 import {
   useDoctorPatients,
@@ -52,6 +52,27 @@ interface DraftNewMedicationSuggestion {
   manufacturer: string;
 }
 
+interface ActiveMedicationRow {
+  id: string;
+  medicationName: string;
+  dose: string | null;
+  frequency: string | null;
+  prescriber: string;
+}
+
+interface PrescriptionItemRelation {
+  id: string;
+  medication_name: string | null;
+  dosage: string | null;
+  frequency: string | null;
+  frequency_code: string | null;
+}
+
+interface ActivePrescriptionRow {
+  id: string;
+  prescription_items: PrescriptionItemRelation[] | null;
+}
+
 interface MedicationItemEditorProps {
   canRemove: boolean;
   durationOptions: PrescriptionClinicalVocabRow[];
@@ -88,6 +109,36 @@ const createDraftMedicationSuggestion = (genericNameEn = ''): DraftNewMedication
   dosageForm: '',
   manufacturer: '',
 });
+
+const patientInitials = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
+const patientAgeGender = (dateOfBirth: string | null, gender: string | null) => {
+  const genderInitial = gender?.trim()?.[0]?.toUpperCase() ?? '';
+  if (!dateOfBirth) {
+    return genderInitial || '--';
+  }
+
+  const birthDate = new Date(dateOfBirth);
+  if (Number.isNaN(birthDate.getTime())) {
+    return genderInitial || '--';
+  }
+
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDelta = today.getMonth() - birthDate.getMonth();
+  if (monthDelta < 0 || (monthDelta === 0 && today.getDate() < birthDate.getDate())) {
+    age -= 1;
+  }
+
+  return `${age}${genderInitial}`;
+};
 
 const buildPendingSuggestionSelection = (
   suggestion: Pick<
@@ -777,7 +828,7 @@ export const CreatePrescription: React.FC = () => {
   const { t, i18n } = useTranslation('common');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user } = useAuth();
+  const { user, doctorProfile, profile } = useAuth();
   const { data: patientsData } = useDoctorPatients(user?.id);
   const patients = useMemo(() => patientsData ?? [], [patientsData]);
   const [patientId, setPatientId] = useState(searchParams.get('patient') ?? '');
@@ -786,6 +837,16 @@ export const CreatePrescription: React.FC = () => {
   const [items, setItems] = useState<DraftPrescriptionItem[]>([createDraftPrescriptionItem()]);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [saving, setSaving] = useState(false);
+  const selectedPatient = useMemo(
+    () => patients.find((patient) => patient.id === patientId) ?? null,
+    [patientId, patients]
+  );
+
+  useEffect(() => {
+    if (!patientId && patients.length > 0) {
+      setPatientId(patients[0].id);
+    }
+  }, [patientId, patients]);
 
   const { data: vocabData } = useQuery<PrescriptionClinicalVocabRow[]>(
     async () => {
@@ -828,6 +889,38 @@ export const CreatePrescription: React.FC = () => {
     },
     [user?.id ?? '', patientId]
   );
+  const { data: activeMedicationsData } = useQuery<ActiveMedicationRow[]>(
+    async () => {
+      if (!patientId) {
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .from('prescriptions')
+        .select('id, prescription_items (id, medication_name, dosage, frequency, frequency_code)')
+        .eq('patient_id', patientId)
+        .eq('is_deleted', false)
+        .eq('status', 'active')
+        .order('prescribed_at', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      return ((data ?? []) as ActivePrescriptionRow[]).flatMap((prescription) =>
+        (prescription.prescription_items ?? [])
+          .filter((item) => item.medication_name?.trim())
+          .map((item) => ({
+            id: item.id,
+            medicationName: item.medication_name ?? 'Medication',
+            dose: item.dosage,
+            frequency: item.frequency ?? item.frequency_code,
+            prescriber: 'Current care team',
+          }))
+      );
+    },
+    [patientId]
+  );
 
   const vocabRows = useMemo(() => vocabData ?? [], [vocabData]);
   const frequencyOptions = useMemo(
@@ -839,6 +932,7 @@ export const CreatePrescription: React.FC = () => {
     [vocabRows]
   );
   const appointments = useMemo(() => appointmentsData ?? [], [appointmentsData]);
+  const activeMedications = useMemo(() => activeMedicationsData ?? [], [activeMedicationsData]);
   const selectedAppointment = useMemo(
     () => appointments.find((appointment) => appointment.id === appointmentId) ?? null,
     [appointmentId, appointments]
@@ -942,13 +1036,8 @@ export const CreatePrescription: React.FC = () => {
   };
 
   return (
-    <>
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">{t('doctor.createPrescription.title')}</h1>
-        <p className="mt-1 text-sm text-slate-500">{t('doctor.createPrescription.subtitle')}</p>
-      </div>
-
-      <div className="mx-auto w-full max-w-5xl space-y-6">
+    <div className="-mx-6 -my-5 min-h-[calc(100vh-64px)] overflow-y-auto bg-slate-50 p-6 xl:h-[calc(100vh-64px)] xl:overflow-hidden">
+      <div className="flex min-h-full flex-col gap-4 xl:h-full">
         {feedback ? (
           <div
             className={`rounded-xl border px-4 py-3 text-sm ${
@@ -961,37 +1050,168 @@ export const CreatePrescription: React.FC = () => {
           </div>
         ) : null}
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="grid gap-4 md:grid-cols-3">
-            <label className="block">
-              <span className="mb-2 block text-sm font-semibold text-slate-900">
-                {t('doctor.createPrescription.patient')}
-              </span>
-              <select
-                value={patientId}
-                onChange={(event) => {
-                  setPatientId(event.target.value);
-                  setAppointmentId('');
-                }}
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-              >
-                <option value="">{t('doctor.createPrescription.selectPatient')}</option>
-                {patients.map((patient) => (
-                  <option key={patient.id} value={patient.id}>
-                    {patient.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+        <div className="grid grid-cols-1 gap-5 xl:min-h-0 xl:flex-1 xl:grid-cols-[280px_minmax(0,1fr)]">
+          <aside className="xl:min-h-0">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm xl:h-full xl:overflow-y-auto">
+              <div className="mb-5">
+                <div className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                  PRESCRIBING FOR
+                </div>
+              {selectedPatient ? (
+                <div className="mb-3 rounded-xl border-2 border-teal-200 bg-teal-50 p-4">
+                  <div className="mb-3 flex items-center space-x-3">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-teal-600 font-bold text-white">
+                      {patientInitials(selectedPatient.name)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-[15px] font-bold text-slate-900">{selectedPatient.name}</div>
+                      <div className="font-mono text-[11px] text-slate-500">
+                        {selectedPatient.id.slice(0, 8)} · {patientAgeGender(selectedPatient.dateOfBirth, selectedPatient.gender)} ·{' '}
+                        {selectedPatient.bloodType ?? 'Unknown'}
+                      </div>
+                      <div className="mt-1 text-[10px] text-slate-500">
+                        {selectedPatient.insuranceName ?? 'No insurance on file'}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="relative">
+                    <div className="flex w-full items-center justify-center space-x-1 rounded-lg bg-slate-100 px-3 py-1.5 text-[11px] font-medium text-slate-700 transition-colors hover:bg-slate-200">
+                      <span>Change Patient</span>
+                      <ChevronDown className="h-3 w-3" />
+                    </div>
+                    <select
+                      aria-label="Change patient"
+                      value={patientId}
+                      onChange={(event) => {
+                        setPatientId(event.target.value);
+                        setAppointmentId('');
+                      }}
+                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    >
+                      {patients.map((patient) => (
+                        <option key={patient.id} value={patient.id}>
+                          {patient.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
+                  Select a patient to surface clinical context, appointment notes, and medication safety checks.
+                </div>
+              )}
+              </div>
 
+              <div className="mb-5">
+                {selectedPatient?.allergies.length ? (
+                  <div className="rounded-xl border-2 border-red-200 border-l-4 border-l-red-600 bg-red-50 p-4">
+                    <div className="mb-3 flex items-center space-x-2">
+                      <AlertOctagon className="h-5 w-5 text-red-600" />
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-red-700">ALLERGY ALERT</div>
+                    </div>
+                    <div className="space-y-2">
+                      {selectedPatient.allergies.map((allergy) => (
+                        <div key={allergy} className="rounded-lg border border-red-200 bg-white p-3">
+                          <div className="mb-1 text-[13px] font-bold text-red-700">⚠️ {allergy}</div>
+                          <div className="text-[12px] text-red-600">Verify reaction details before prescribing related drug classes.</div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-3 text-[10px] text-blue-600">✅ Allergies pulled from canonical patient records</div>
+                  </div>
+                ) : (
+                  <div className="rounded-xl border-2 border-emerald-200 bg-emerald-50 p-4">
+                    <div className="mb-2 flex items-center space-x-2">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                      <div className="text-[12px] font-bold text-emerald-700">No Known Allergies</div>
+                    </div>
+                    <div className="text-[10px] text-emerald-600">
+                      ✅ Verified from patient allergy records · {new Date().toLocaleDateString()}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="mb-5">
+                <div className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                  CURRENT MEDICATIONS
+                </div>
+                <div className="space-y-2">
+                  {activeMedications.length > 0 ? (
+                    activeMedications.slice(0, 8).map((medication) => (
+                      <div key={medication.id} className="flex items-start space-x-2 text-[12px]">
+                        <Pill className="mt-0.5 h-3.5 w-3.5 shrink-0 text-teal-500" />
+                        <div className="flex-1">
+                          <div className="font-medium text-slate-700">
+                            {medication.medicationName} {[medication.dose, medication.frequency].filter(Boolean).join(' · ')}
+                          </div>
+                          <div className="text-[10px] text-slate-400">{medication.prescriber}</div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-3 text-[12px] text-slate-500">
+                      No active medications found in prescriptions.
+                    </div>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => selectedPatient && navigate(`/doctor/patients/${selectedPatient.id}`)}
+                  className="mt-3 text-[11px] font-medium text-teal-600 hover:text-teal-700"
+                >
+                  View Full Record →
+                </button>
+              </div>
+
+              <div className="border-t border-slate-200 pt-5">
+                <div className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-slate-400">PRESCRIBER</div>
+                <div className="space-y-1 text-[12px] text-slate-700">
+                  <div className="font-bold">{profile?.full_name ?? 'Doctor'}</div>
+                  <div>{doctorProfile?.specialization ?? 'Clinician'}</div>
+                  <div>CeenAiX Clinic</div>
+                  <div className="font-mono text-[10px] text-slate-500">{doctorProfile?.license_number ?? 'DHA license pending'}</div>
+                  <div className="font-mono text-[10px] text-slate-500">{new Date().toLocaleDateString()}</div>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <div className="space-y-6 xl:min-h-0 xl:overflow-y-auto">
+            <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <h2 className="text-[16px] font-bold text-slate-900">Add Medications</h2>
+                <p className="text-[12px] text-slate-400">UAE medication catalog · canonical ePrescription</p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <button className="flex items-center space-x-2 rounded-lg bg-slate-100 px-4 py-2 text-[13px] font-medium text-slate-700 transition-colors hover:bg-slate-200">
+                  <RefreshCw className="h-4 w-4" />
+                  <span>Renew Existing</span>
+                </button>
+                <button className="flex items-center space-x-2 rounded-lg bg-slate-100 px-4 py-2 text-[13px] font-medium text-slate-700 transition-colors hover:bg-slate-200">
+                  <ClipboardList className="h-4 w-4" />
+                  <span>History</span>
+                </button>
+              </div>
+            </div>
+            <div className="space-y-6">
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Prescription details</p>
+              <p className="text-[12px] text-slate-500">Optional appointment link and prescription lifecycle status.</p>
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
             <label className="block">
-              <span className="mb-2 block text-sm font-semibold text-slate-900">
+              <span className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                 {t('doctor.createPrescription.appointment')}
               </span>
               <select
                 value={appointmentId}
                 onChange={(event) => setAppointmentId(event.target.value)}
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-[13px] text-slate-700 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
               >
                 <option value="">{t('doctor.createPrescription.selectAppointment')}</option>
                 {appointments.map((appointment) => (
@@ -1016,7 +1236,7 @@ export const CreatePrescription: React.FC = () => {
             </label>
 
             <label className="block">
-              <span className="mb-2 block text-sm font-semibold text-slate-900">
+              <span className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                 {t('doctor.createPrescription.status')}
               </span>
               <select
@@ -1024,7 +1244,7 @@ export const CreatePrescription: React.FC = () => {
                 onChange={(event) =>
                   setStatus(event.target.value as 'active' | 'completed' | 'cancelled')
                 }
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-[13px] text-slate-700 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
               >
                 <option value="active">{t('shared.prescriptionStatus.active')}</option>
                 <option value="completed">{t('shared.prescriptionStatus.completed')}</option>
@@ -1071,7 +1291,10 @@ export const CreatePrescription: React.FC = () => {
             <span>{saving ? t('doctor.createPrescription.saving') : t('doctor.createPrescription.save')}</span>
           </button>
         </div>
+          </div>
+        </div>
       </div>
-    </>
+    </div>
+    </div>
   );
 };

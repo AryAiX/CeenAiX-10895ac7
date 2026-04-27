@@ -74,11 +74,15 @@ const withLayout = (page: ReactNode) => <Layout>{page}</Layout>;
 const withPortalProtection = (
   page: ReactNode,
   role: 'patient' | 'doctor',
-  options: { contentBleed?: boolean } = {}
+  options: { contentBleed?: boolean; contentClassName?: string } = {}
 ) => (
   <ProtectedRoute allowedRoles={[role]}>
     {withLayout(
-      <PortalShell role={role} contentBleed={options.contentBleed}>
+      <PortalShell
+        role={role}
+        contentBleed={options.contentBleed}
+        contentClassName={options.contentClassName}
+      >
         {page}
       </PortalShell>
     )}
@@ -164,7 +168,9 @@ export const router = createBrowserRouter([
   },
   {
     path: '/patient/prescriptions',
-    element: withPortalProtection(<PatientPrescriptions />, 'patient'),
+    element: withPortalProtection(<PatientPrescriptions />, 'patient', {
+      contentClassName: 'w-full min-w-0 space-y-6 p-6 sm:p-8',
+    }),
   },
   {
     path: '/pharmacy',
@@ -227,6 +233,10 @@ export const router = createBrowserRouter([
     element: withPortalProtection(<DoctorDashboard />, 'doctor'),
   },
   {
+    path: '/doctor/today',
+    element: withPortalProtection(<DoctorAppointments />, 'doctor'),
+  },
+  {
     path: '/doctor/appointments',
     element: withPortalProtection(<DoctorAppointments />, 'doctor'),
   },
@@ -247,12 +257,20 @@ export const router = createBrowserRouter([
     element: withPortalProtection(<DoctorSchedule />, 'doctor'),
   },
   {
+    path: '/doctor/prescribe',
+    element: withPortalProtection(<CreatePrescription />, 'doctor'),
+  },
+  {
     path: '/doctor/prescriptions',
     element: withPortalProtection(<DoctorPrescriptions />, 'doctor'),
   },
   {
     path: '/doctor/prescriptions/new',
     element: withPortalProtection(<CreatePrescription />, 'doctor'),
+  },
+  {
+    path: '/doctor/labs',
+    element: withPortalProtection(<DoctorLabOrders />, 'doctor'),
   },
   {
     path: '/doctor/lab-orders',

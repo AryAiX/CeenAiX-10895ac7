@@ -11,7 +11,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { OpsShell } from '../../components/OpsShell';
-import { usePharmacyDashboardStub } from '../../hooks';
+import { usePharmacyPrescriptionQueue } from '../../hooks';
 import { PHARMACY_NAV_ITEMS } from './navItems';
 
 const formatNumber = (value: number | null | undefined) =>
@@ -19,40 +19,48 @@ const formatNumber = (value: number | null | undefined) =>
 
 export const PharmacyDashboard = () => {
   const { t } = useTranslation('common');
-  const stub = usePharmacyDashboardStub();
+  const { data, loading } = usePharmacyPrescriptionQueue();
 
   const kpis = useMemo(
     () => [
       {
         label: t('pharmacy.dashboard.kpiQueue'),
-        value: stub.data?.pendingPrescriptions ?? 0,
+        value: data?.pendingPrescriptions ?? 0,
         icon: Inbox,
         accent: 'from-cyan-500 to-blue-600',
       },
       {
         label: t('pharmacy.dashboard.kpiDispensed'),
-        value: stub.data?.dispensedToday ?? 0,
+        value: data?.dispensedToday ?? 0,
         icon: CheckCircle2,
         accent: 'from-emerald-500 to-teal-600',
       },
       {
         label: t('pharmacy.dashboard.kpiStockAlerts'),
-        value: stub.data?.lowStockAlerts ?? 0,
+        value: data?.lowStockAlerts ?? 0,
         icon: AlertCircle,
         accent: 'from-rose-500 to-orange-500',
       },
       {
         label: t('pharmacy.dashboard.kpiClaims'),
-        value: stub.data?.claimsInReview ?? 0,
+        value: data?.claimsInReview ?? 0,
         icon: Receipt,
         accent: 'from-violet-500 to-fuchsia-600',
       },
     ],
-    [stub.data, t],
+    [data, t],
   );
 
-  const queue = stub.data?.queue ?? [];
-  const stockAlerts = stub.data?.stockAlerts ?? [];
+  const queue = data?.queue.filter((item) => !item.isDispensed) ?? [];
+  const stockAlerts =
+    data?.inventory
+      .filter((item) => item.status === 'low' || item.status === 'out')
+      .map((item) => ({
+        id: item.id,
+        item: item.name,
+        quantity: item.stock,
+        severity: item.status === 'out' ? 'critical' as const : 'low' as const,
+      })) ?? [];
 
   return (
     <OpsShell
@@ -85,7 +93,7 @@ export const PharmacyDashboard = () => {
                 </div>
               </div>
               <p className="mt-4 text-3xl font-bold text-slate-900">
-                {stub.loading ? '…' : formatNumber(kpi.value)}
+                {loading ? '…' : formatNumber(kpi.value)}
               </p>
             </article>
           );
@@ -129,7 +137,7 @@ export const PharmacyDashboard = () => {
                 </span>
               </li>
             ))}
-            {!stub.loading && queue.length === 0 ? (
+            {!loading && queue.length === 0 ? (
               <li className="py-6 text-center text-sm text-slate-500">
                 {t('pharmacy.dashboard.queueEmpty')}
               </li>
@@ -164,7 +172,7 @@ export const PharmacyDashboard = () => {
                 </span>
               </li>
             ))}
-            {!stub.loading && stockAlerts.length === 0 ? (
+            {!loading && stockAlerts.length === 0 ? (
               <li className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">
                 <Shield className="mr-2 inline h-4 w-4" />
                 {t('pharmacy.dashboard.stockAllGood')}
