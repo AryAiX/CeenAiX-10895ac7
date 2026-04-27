@@ -178,7 +178,7 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
                   ? 'text-slate-500 hover:bg-red-50 hover:text-red-600'
                   : compact
                     ? 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
-                    : 'text-slate-700 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 hover:text-cyan-700'
+                    : 'text-gray-700 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 hover:text-cyan-700'
           }`}
         >
           <Icon className={`${compact ? 'h-[18px] w-[18px]' : 'h-5 w-5'} shrink-0`} />
@@ -319,7 +319,7 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
 
         <div className="flex flex-1 overflow-hidden">
           <div
-            className={`flex flex-shrink-0 flex-col overflow-hidden border-r border-slate-200 bg-white transition-all duration-300 ${
+            className={`flex flex-shrink-0 flex-col overflow-hidden border-r border-gray-200 bg-white transition-all duration-300 ${
               patientSidebarCollapsed ? 'w-20' : 'w-60'
             }`}
           >
@@ -327,16 +327,16 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
               <nav className="space-y-1 px-3">{patientNavItems.map((item) => renderPatientNavItem(item))}</nav>
             </div>
 
-            <div className="border-t border-slate-200">
+            <div className="border-t border-gray-200">
               <nav className="space-y-1 px-3 py-3">
                 {patientBottomItems.map((item) => renderPatientNavItem(item, true))}
               </nav>
 
-              <div className="border-t border-slate-200 p-3">
+              <div className="border-t border-gray-200 p-3">
                 <button
                   type="button"
                   onClick={() => setPatientSidebarCollapsed((current) => !current)}
-                  className={`flex w-full items-center justify-center rounded-lg px-4 py-3 text-slate-600 transition-colors hover:bg-slate-100 ${isArabic ? 'flex-row-reverse' : ''}`}
+                  className={`flex w-full items-center justify-center rounded-lg px-4 py-3 text-gray-600 transition-colors hover:bg-gray-100 ${isArabic ? 'flex-row-reverse' : ''}`}
                 >
                   {patientSidebarCollapsed ? (
                     <ChevronRight className={`h-5 w-5 ${isArabic ? 'rotate-180' : ''}`} />
@@ -489,7 +489,7 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
       case 'blue':
         return 'bg-blue-500 text-white';
       case 'teal':
-        return 'bg-cyan-500 text-white';
+        return 'bg-teal-500 text-white';
       default:
         return 'bg-white/10 text-slate-200';
     }
@@ -516,7 +516,7 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
           item.disabled
             ? 'cursor-not-allowed text-slate-500'
             : active
-              ? 'bg-gradient-to-r from-cyan-600 to-cyan-500 text-white shadow-lg shadow-cyan-500/20'
+              ? 'bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-lg shadow-teal-500/20'
               : 'text-slate-300 hover:bg-white/[0.05] hover:text-white'
         }`}
       >
@@ -552,23 +552,23 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
           >
             <div>
               <h1 className="text-lg font-bold text-white">CeenAiX</h1>
-              <p className="text-[10px] uppercase tracking-wide text-cyan-400">{portalLabel}</p>
+              <p className="text-[10px] uppercase tracking-wide text-teal-400">{portalLabel}</p>
             </div>
           </button>
         </div>
 
         <div className="px-4 py-4">
-          <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/10 p-3">
+          <div className="rounded-xl border border-teal-500/20 bg-teal-500/10 p-3">
             <div className="flex items-start gap-3">
               <div className="relative">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#0A1628] to-cyan-600 text-sm font-bold text-white shadow-lg">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#0A1628] to-teal-600 text-sm font-bold text-white shadow-lg">
                   {getInitials(accountDisplayName)}
                 </div>
                 <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#0A1628] bg-emerald-500" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[13px] font-bold text-white">{accountDisplayName}</p>
-                <p className="truncate text-[11px] text-cyan-300">{doctorSpecialty}</p>
+                <p className="truncate text-[11px] text-teal-300">{doctorSpecialty}</p>
                 <p className="mt-0.5 truncate text-[11px] text-slate-400">{doctorFacility}</p>
                 <div
                   className={`mt-1.5 inline-flex items-center rounded px-2 py-0.5 text-[9px] font-medium ${
@@ -610,7 +610,7 @@ export const PortalShell = ({ role, children, contentBleed = false }: PortalShel
                 <Calendar className="h-3.5 w-3.5" />
                 <span>{todayAppointmentsCount} appointments</span>
               </div>
-              <span className="font-mono text-[12px] font-semibold text-cyan-400">
+              <span className="font-mono text-[12px] font-semibold text-teal-400">
                 {completedTodayAppointmentsCount}/{todayAppointmentsCount} done
               </span>
             </div>

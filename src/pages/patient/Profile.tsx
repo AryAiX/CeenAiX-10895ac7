@@ -370,7 +370,7 @@ export const Profile: React.FC = () => {
             </div>
 
             <div className="overflow-hidden rounded-3xl border border-slate-100/80 bg-white shadow-xl">
-              <div className="bg-gradient-to-r from-emerald-600 to-cyan-600 p-6 flex justify-between items-center">
+              <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-6 flex justify-between items-center">
                 <div className="flex items-center space-x-4">
                   <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl">
                     <Camera className="w-6 h-6 text-white" />

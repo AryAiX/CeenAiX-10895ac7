@@ -583,7 +583,7 @@ export const DoctorProfile: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-cyan-600" />
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-teal-600" />
       </div>
     );
   }
@@ -598,7 +598,7 @@ export const DoctorProfile: React.FC = () => {
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
-            className="flex items-center gap-2 rounded-lg bg-cyan-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-cyan-700"
+            className="flex items-center gap-2 rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-700"
           >
             <Edit2 className="w-4 h-4" />
             Edit profile
@@ -612,7 +612,7 @@ export const DoctorProfile: React.FC = () => {
             <div className="bg-gradient-to-r from-slate-900 to-emerald-800 px-8 py-12">
               <div className="flex items-center space-x-6">
                 <div className="flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-lg">
-                  <User className="w-12 h-12 text-cyan-600" />
+                  <User className="w-12 h-12 text-teal-600" />
                 </div>
                 <div className="text-white">
                   <h2 className="text-3xl font-bold">{formData.fullName || 'Doctor profile'}</h2>
@@ -646,7 +646,7 @@ export const DoctorProfile: React.FC = () => {
                       type="text"
                       value={formData.fullName}
                       onChange={(event) => setFormData({ ...formData, fullName: event.target.value })}
-                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-cyan-500"
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                       placeholder="Enter your full name"
                     />
                   </div>
@@ -668,7 +668,7 @@ export const DoctorProfile: React.FC = () => {
                         type="tel"
                         value={formData.phone}
                         onChange={(event) => setFormData({ ...formData, phone: event.target.value })}
-                        className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-cyan-500"
+                        className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                         placeholder="Enter your phone number"
                       />
                     </div>
@@ -695,7 +695,7 @@ export const DoctorProfile: React.FC = () => {
                       onChange={(event) =>
                         setFormData({ ...formData, licenseNumber: event.target.value })
                       }
-                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-cyan-500"
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                       placeholder="Enter your medical license number"
                     />
                   </div>
@@ -708,7 +708,7 @@ export const DoctorProfile: React.FC = () => {
                       onChange={(event) =>
                         setFormData({ ...formData, dateOfBirth: event.target.value })
                       }
-                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-cyan-500"
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                     />
                   </div>
 
@@ -717,7 +717,7 @@ export const DoctorProfile: React.FC = () => {
                     <select
                       value={formData.gender}
                       onChange={(event) => setFormData({ ...formData, gender: event.target.value })}
-                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-cyan-500"
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                     >
                       <option value="">Select gender</option>
                       <option value="male">Male</option>
@@ -731,7 +731,7 @@ export const DoctorProfile: React.FC = () => {
                     <textarea
                       value={formData.address}
                       onChange={(event) => setFormData({ ...formData, address: event.target.value })}
-                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-cyan-500"
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                       rows={3}
                       placeholder="Enter your address"
                     />
@@ -742,7 +742,7 @@ export const DoctorProfile: React.FC = () => {
                     <textarea
                       value={formData.bio}
                       onChange={(event) => setFormData({ ...formData, bio: event.target.value })}
-                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-cyan-500"
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                       rows={4}
                       placeholder="Summarize your expertise and care approach"
                     />
@@ -752,7 +752,7 @@ export const DoctorProfile: React.FC = () => {
                     <button
                       onClick={handleSave}
                       disabled={saving}
-                      className="flex items-center gap-2 rounded-lg bg-cyan-600 px-6 py-2 text-white transition-colors hover:bg-cyan-700 disabled:opacity-50"
+                      className="flex items-center gap-2 rounded-lg bg-teal-600 px-6 py-2 text-white transition-colors hover:bg-teal-700 disabled:opacity-50"
                     >
                       <Save className="w-4 h-4" />
                       {saving ? 'Saving...' : 'Save Changes'}
@@ -802,7 +802,7 @@ export const DoctorProfile: React.FC = () => {
                           {selectedSpecializations.map((specialization) => (
                             <span
                               key={specialization.id}
-                              className="rounded-full bg-cyan-50 px-3 py-1 text-sm font-medium text-cyan-700"
+                              className="rounded-full bg-teal-50 px-3 py-1 text-sm font-medium text-teal-700"
                             >
                               {specialization.name}
                             </span>
@@ -974,7 +974,7 @@ export const DoctorProfile: React.FC = () => {
                         type="text"
                         value={templateDraft.title}
                         onChange={(event) => updateTemplateDraft({ title: event.target.value })}
-                        className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-cyan-500"
+                        className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                         placeholder="Cardiology pre-visit intake"
                       />
                     </label>
@@ -986,7 +986,7 @@ export const DoctorProfile: React.FC = () => {
                         onChange={(event) =>
                           updateTemplateDraft({ specializationId: event.target.value || null })
                         }
-                        className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-cyan-500"
+                        className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                       >
                         <option value="">Use doctor primary specialty</option>
                         {specializationOptions.map((specialization) => (
@@ -1004,7 +1004,7 @@ export const DoctorProfile: React.FC = () => {
                       value={templateDraft.description}
                       onChange={(event) => updateTemplateDraft({ description: event.target.value })}
                       rows={3}
-                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-cyan-500"
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                       placeholder="Short note shown in the patient pre-visit flow."
                     />
                   </label>
@@ -1033,7 +1033,7 @@ export const DoctorProfile: React.FC = () => {
                               onChange={(event) =>
                                 handleTemplateQuestionChange(index, { label: event.target.value })
                               }
-                              className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-cyan-500"
+                              className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                               placeholder="Describe your current symptoms"
                             />
                           </label>
@@ -1047,7 +1047,7 @@ export const DoctorProfile: React.FC = () => {
                                   type: event.target.value as PreVisitTemplateQuestionDraft['type'],
                                 })
                               }
-                              className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-cyan-500"
+                              className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                             >
                               <option value="short_text">Short text</option>
                               <option value="long_text">Long text</option>
@@ -1068,7 +1068,7 @@ export const DoctorProfile: React.FC = () => {
                                   autofillSource: event.target.value || null,
                                 })
                               }
-                              className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-cyan-500"
+                              className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                             >
                               <option value="">No autofill</option>
                               {PRE_VISIT_AUTOFILL_SOURCE_OPTIONS.map((option) => (
@@ -1089,7 +1089,7 @@ export const DoctorProfile: React.FC = () => {
                                   memoryKey: event.target.value || null,
                                 })
                               }
-                              className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-cyan-500"
+                              className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                               placeholder="symptom_duration"
                             />
                             <p className="mt-1 text-xs text-slate-500">
@@ -1105,7 +1105,7 @@ export const DoctorProfile: React.FC = () => {
                                 handleTemplateQuestionChange(index, { helpText: event.target.value })
                               }
                               rows={2}
-                              className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-cyan-500"
+                              className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                               placeholder="Explain what the patient should include."
                             />
                           </label>
@@ -1127,7 +1127,7 @@ export const DoctorProfile: React.FC = () => {
                                   })
                                 }
                                 rows={3}
-                                className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-cyan-500"
+                                className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-teal-500"
                                 placeholder={'Chest pain\nShortness of breath\nPalpitations'}
                               />
                             </label>
@@ -1140,7 +1140,7 @@ export const DoctorProfile: React.FC = () => {
                               onChange={(event) =>
                                 handleTemplateQuestionChange(index, { required: event.target.checked })
                               }
-                              className="h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500"
+                              className="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
                             />
                             Required question
                           </label>

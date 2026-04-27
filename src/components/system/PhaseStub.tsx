@@ -36,7 +36,7 @@ const ACCENT_MAP: Record<
     text: 'text-violet-700',
   },
   emerald: {
-    gradient: 'from-emerald-500 via-cyan-500 to-cyan-600',
+    gradient: 'from-emerald-500 via-teal-500 to-cyan-600',
     badge: 'bg-emerald-50 text-emerald-700 ring-emerald-100',
     ring: 'ring-emerald-100',
     text: 'text-emerald-700',

@@ -488,7 +488,7 @@ export const PatientRecords: React.FC = () => {
             <p className="mt-2 text-2xl font-bold text-slate-900">
               {formatLocaleDigits(conditions.length, i18n.language)}
             </p>
-            <p className="mt-1 text-xs font-medium text-cyan-600">{t('patient.records.conditionsSub')}</p>
+            <p className="mt-1 text-xs font-medium text-teal-600">{t('patient.records.conditionsSub')}</p>
           </div>
           <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
             <p className="text-sm font-medium text-slate-500">{t('patient.records.allergies')}</p>
@@ -996,9 +996,9 @@ export const PatientRecords: React.FC = () => {
         )}
 
         {!loading && totalRecords > 0 ? (
-          <div className="mt-6 rounded-xl border border-cyan-100 bg-cyan-50 px-4 py-3 text-sm text-cyan-700">
+          <div className="mt-6 rounded-xl border border-teal-100 bg-teal-50 px-4 py-3 text-sm text-teal-700">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-cyan-600" />
+              <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-teal-600" />
               <p>{t('patient.records.footerDisclaimer')}</p>
             </div>
           </div>
