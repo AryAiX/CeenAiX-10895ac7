@@ -890,7 +890,7 @@ export const DoctorProfile: React.FC = () => {
             </div>
         </div>
 
-        <div className="overflow-hidden rounded-3xl bg-white shadow-md">
+          <div className="overflow-hidden rounded-3xl bg-white shadow-md">
             <div className="border-b border-slate-100 px-8 py-6">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
