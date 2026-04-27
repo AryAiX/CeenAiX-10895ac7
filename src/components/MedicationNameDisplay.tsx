@@ -26,8 +26,8 @@ export function MedicationNameDisplay({
   const useBoth =
     !language.startsWith('en') && loc.length > 0 && loc.toLowerCase() !== canonical.toLowerCase();
 
-  const primaryDefault = 'font-bold text-gray-900';
-  const secondaryDefault = 'text-sm font-normal text-gray-500 mt-0.5';
+  const primaryDefault = 'font-bold text-slate-900';
+  const secondaryDefault = 'text-sm font-normal text-slate-500 mt-0.5';
 
   if (!useBoth) {
     return (
@@ -39,9 +39,9 @@ export function MedicationNameDisplay({
 
   if (variant === 'compact') {
     return (
-      <span className={primaryClassName ?? 'text-gray-700'} dir="auto">
+      <span className={primaryClassName ?? 'text-slate-700'} dir="auto">
         <span dir="auto">{loc}</span>
-        <span className="text-gray-400 mx-1" aria-hidden>
+        <span className="text-slate-400 mx-1" aria-hidden>
           ·
         </span>
         <span dir="ltr">{canonical}</span>

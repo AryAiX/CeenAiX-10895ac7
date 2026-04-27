@@ -39,7 +39,7 @@ export const PatientInsurance = () => {
         <button
           type="button"
           onClick={() => navigate('/insurance')}
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:shadow-md"
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:shadow-md"
         >
           <span>{t('patient.insurance.actionFindPlans')}</span>
         </button>

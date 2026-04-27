@@ -31,8 +31,8 @@ interface MessagesWorkspaceProps {
 }
 
 const AVATAR_GRADIENTS: readonly string[] = [
-  'from-slate-800 to-teal-700',
-  'from-emerald-700 to-teal-600',
+  'from-slate-800 to-cyan-700',
+  'from-emerald-700 to-cyan-600',
   'from-blue-700 to-indigo-600',
   'from-rose-600 to-pink-600',
   'from-amber-600 to-orange-500',
@@ -558,22 +558,22 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md">
-        <div className="border-b border-gray-100 px-5 py-4">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md">
+        <div className="border-b border-slate-100 px-5 py-4">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-lg font-bold text-gray-900">{t(`${namespace}.conversations`)}</h2>
+            <h2 className="text-lg font-bold text-slate-900">{t(`${namespace}.conversations`)}</h2>
             <span className={`rounded-full px-3 py-1 text-xs font-semibold ${theme.badge}`}>
               {t(`${namespace}.conversationCount`, { count: conversations.length })}
             </span>
           </div>
           <div className="relative mt-4">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 rtl:left-auto rtl:right-4" />
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 rtl:left-auto rtl:right-4" />
             <input
               type="search"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder={t(`${namespace}.searchPlaceholder`)}
-              className="w-full rounded-xl border border-gray-200 py-3 pl-11 pr-4 text-sm text-gray-700 outline-none transition focus:border-gray-300 focus:ring-2 focus:ring-gray-200 rtl:pl-4 rtl:pr-11"
+              className="w-full rounded-xl border border-slate-200 py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-slate-200 rtl:pl-4 rtl:pr-11"
             />
           </div>
         </div>
@@ -582,7 +582,7 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
           {loadingConversations ? (
             <div className="space-y-3">
               {Array.from({ length: 5 }).map((_, index) => (
-                <div key={index} className="rounded-2xl border border-gray-100 p-4">
+                <div key={index} className="rounded-2xl border border-slate-100 p-4">
                   <Skeleton className="h-4 w-1/2" />
                   <Skeleton className="mt-3 h-3 w-5/6" />
                   <Skeleton className="mt-2 h-3 w-1/3" />
@@ -594,10 +594,10 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-500">
                 <MessageSquare className="h-7 w-7" />
               </div>
-              <p className="mt-4 font-semibold text-gray-900">
+              <p className="mt-4 font-semibold text-slate-900">
                 {searchQuery.trim() ? t(`${namespace}.noResultsTitle`) : t(`${namespace}.noneTitle`)}
               </p>
-              <p className="mt-2 text-sm text-gray-600">
+              <p className="mt-2 text-sm text-slate-600">
                 {searchQuery.trim() ? t(`${namespace}.noResultsBody`) : t(`${namespace}.noneBody`)}
               </p>
             </div>
@@ -611,8 +611,8 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
                     key={conversation.id}
                     type="button"
                     onClick={() => navigate(`/${role}/messages/${conversation.id}`)}
-                    className={`w-full rounded-2xl border p-4 text-left transition hover:border-gray-300 hover:bg-slate-50 ${
-                      isActive ? theme.selected : 'border-gray-100'
+                    className={`w-full rounded-2xl border p-4 text-left transition hover:border-slate-300 hover:bg-slate-50 ${
+                      isActive ? theme.selected : 'border-slate-100'
                     }`}
                   >
                     <div className="flex items-start gap-3">
@@ -626,8 +626,8 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <p className="truncate font-semibold text-gray-900">{conversation.counterpart.name}</p>
-                            <p className="truncate text-xs text-gray-500">
+                            <p className="truncate font-semibold text-slate-900">{conversation.counterpart.name}</p>
+                            <p className="truncate text-xs text-slate-500">
                               {conversation.counterpart.email ?? t(`${namespace}.noEmail`)}
                             </p>
                           </div>
@@ -637,10 +637,10 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
                             </span>
                           ) : null}
                         </div>
-                        <p className="mt-2 line-clamp-2 text-sm text-gray-600">
+                        <p className="mt-2 line-clamp-2 text-sm text-slate-600">
                           {conversation.lastMessagePreview ?? t(`${namespace}.emptyPreview`)}
                         </p>
-                        <div className="mt-2 flex items-center justify-between gap-3 text-xs text-gray-500">
+                        <div className="mt-2 flex items-center justify-between gap-3 text-xs text-slate-500">
                           <span className="truncate">{conversation.subject ?? t(`${namespace}.defaultSubject`)}</span>
                           <span className="shrink-0">
                             {conversation.lastMessageAt
@@ -658,7 +658,7 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
         </div>
       </div>
 
-      <div className="flex min-h-[680px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md">
+      <div className="flex min-h-[680px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md">
         {conversationError ? (
           <div className="border-b border-red-200 bg-red-50 px-5 py-3 text-sm text-red-700">
             {t(`${namespace}.loadError`)}
@@ -677,7 +677,7 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
 
         {activeConversation ? (
           <>
-            <div className="border-b border-gray-100 px-5 py-4">
+            <div className="border-b border-slate-100 px-5 py-4">
               <div className="flex items-start gap-4">
                 <div
                   className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-base font-bold text-white shadow-sm ${avatarGradient(
@@ -687,11 +687,11 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
                   {avatarInitials(activeConversation.counterpart.name)}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-lg font-bold text-gray-900">{activeConversation.counterpart.name}</p>
-                  <p className="truncate text-sm text-gray-500">
+                  <p className="text-lg font-bold text-slate-900">{activeConversation.counterpart.name}</p>
+                  <p className="truncate text-sm text-slate-500">
                     {activeConversation.counterpart.email ?? t(`${namespace}.noEmail`)}
                   </p>
-                  <p className="mt-2 text-xs text-gray-500">
+                  <p className="mt-2 text-xs text-slate-500">
                     {activeConversation.lastMessageAt
                       ? t(`${namespace}.lastUpdated`, {
                           time: formatTimestamp(activeConversation.lastMessageAt),
@@ -699,7 +699,7 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
                       : t(`${namespace}.newConversation`)}
                   </p>
                 </div>
-                <ChevronRight className="mt-1 h-5 w-5 text-gray-300 rtl:rotate-180" />
+                <ChevronRight className="mt-1 h-5 w-5 text-slate-300 rtl:rotate-180" />
               </div>
             </div>
 
@@ -708,7 +708,7 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
                 <div className="space-y-4">
                   {Array.from({ length: 4 }).map((_, index) => (
                     <div key={index} className={index % 2 === 0 ? 'flex justify-end' : 'flex justify-start'}>
-                      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-4">
+                      <div className="w-full max-w-md rounded-2xl border border-slate-100 bg-white p-4">
                         <Skeleton className="h-4 w-1/3" />
                         <Skeleton className="mt-3 h-3 w-full" />
                         <Skeleton className="mt-2 h-3 w-2/3" />
@@ -721,8 +721,8 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
                   <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-white text-slate-500 shadow-sm">
                     <MessageSquare className="h-8 w-8" />
                   </div>
-                  <h3 className="mt-5 text-xl font-bold text-gray-900">{t(`${namespace}.threadEmptyTitle`)}</h3>
-                  <p className="mt-2 max-w-md text-sm text-gray-600">{t(`${namespace}.threadEmptyBody`)}</p>
+                  <h3 className="mt-5 text-xl font-bold text-slate-900">{t(`${namespace}.threadEmptyTitle`)}</h3>
+                  <p className="mt-2 max-w-md text-sm text-slate-600">{t(`${namespace}.threadEmptyBody`)}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -733,14 +733,14 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
                       <div key={message.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
                         <div
                           className={`w-full max-w-xl rounded-2xl border px-4 py-3 shadow-sm ${
-                            isOwn ? theme.ownBubble : 'border-gray-200 bg-white text-gray-900'
+                            isOwn ? theme.ownBubble : 'border-slate-200 bg-white text-slate-900'
                           }`}
                         >
                           <div className="flex items-center justify-between gap-4 text-xs">
-                            <span className={isOwn ? 'text-white/85' : 'text-gray-500'}>
+                            <span className={isOwn ? 'text-white/85' : 'text-slate-500'}>
                               {isOwn ? t(`${namespace}.you`) : activeConversation.counterpart.name}
                             </span>
-                            <span className={isOwn ? 'text-white/80' : 'text-gray-400'}>
+                            <span className={isOwn ? 'text-white/80' : 'text-slate-400'}>
                               {formatTimestamp(message.sent_at)}
                             </span>
                           </div>
@@ -754,7 +754,7 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
               )}
             </div>
 
-            <form onSubmit={handleSubmit} className="border-t border-gray-100 bg-white p-4">
+            <form onSubmit={handleSubmit} className="border-t border-slate-100 bg-white p-4">
               {doctorQuickActions.length > 0 ? (
                 <div className="mb-3 flex flex-wrap gap-2">
                   {doctorQuickActions.map((action) => {
@@ -779,9 +779,9 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
                 {t(`${namespace}.composerLabel`)}
               </label>
               {role === 'doctor' ? (
-                <div className={`relative w-full rounded-2xl border border-gray-200 px-4 py-3 transition ${theme.composerBorder}`}>
+                <div className={`relative w-full rounded-2xl border border-slate-200 px-4 py-3 transition ${theme.composerBorder}`}>
                   {!doctorComposerFocused && !doctorComposerBody ? (
-                    <div className="pointer-events-none absolute left-4 right-4 top-3 text-sm text-gray-400 rtl:left-4 rtl:right-4">
+                    <div className="pointer-events-none absolute left-4 right-4 top-3 text-sm text-slate-400 rtl:left-4 rtl:right-4">
                       {t(`${namespace}.composerPlaceholder`)}
                     </div>
                   ) : null}
@@ -814,11 +814,11 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
                         insertLineBreakIntoDoctorComposer();
                       }
                     }}
-                    className="min-h-[28px] whitespace-pre-wrap break-words text-sm leading-6 text-gray-700 outline-none"
+                    className="min-h-[28px] whitespace-pre-wrap break-words text-sm leading-6 text-slate-700 outline-none"
                   />
                 </div>
               ) : (
-                <div className={`w-full rounded-2xl border border-gray-200 px-4 py-3 transition ${theme.composerBorder}`}>
+                <div className={`w-full rounded-2xl border border-slate-200 px-4 py-3 transition ${theme.composerBorder}`}>
                   <textarea
                     id={`${role}-message-draft`}
                     value={draft}
@@ -827,12 +827,12 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
                     maxLength={MESSAGE_DRAFT_MAX_LENGTH}
                     rows={1}
                     placeholder={t(`${namespace}.composerPlaceholder`)}
-                    className="min-h-[28px] w-full resize-none border-0 bg-transparent p-0 text-sm leading-6 text-gray-700 outline-none focus:outline-none focus:ring-0"
+                    className="min-h-[28px] w-full resize-none border-0 bg-transparent p-0 text-sm leading-6 text-slate-700 outline-none focus:outline-none focus:ring-0"
                   />
                 </div>
               )}
               <div className="mt-3 flex items-center justify-between gap-3">
-                <p className="text-xs text-gray-500">{t(`${namespace}.composerHint`)}</p>
+                <p className="text-xs text-slate-500">{t(`${namespace}.composerHint`)}</p>
                 <button
                   type="submit"
                   disabled={working || !trimMessageDraft(getCurrentComposerBody())}
@@ -849,8 +849,8 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
             <div className={`flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-r text-white ${theme.button}`}>
               <UserCircle2 className="h-10 w-10" />
             </div>
-            <h3 className="mt-6 text-2xl font-bold text-gray-900">{t(`${namespace}.selectTitle`)}</h3>
-            <p className="mt-3 max-w-md text-sm text-gray-600">{t(`${namespace}.selectBody`)}</p>
+            <h3 className="mt-6 text-2xl font-bold text-slate-900">{t(`${namespace}.selectTitle`)}</h3>
+            <p className="mt-3 max-w-md text-sm text-slate-600">{t(`${namespace}.selectBody`)}</p>
           </div>
         )}
       </div>

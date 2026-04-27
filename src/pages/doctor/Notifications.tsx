@@ -98,7 +98,7 @@ export const DoctorNotifications: React.FC = () => {
                 type="button"
                 onClick={markAllRead}
                 disabled={busyId === 'all' || unreadCount === 0}
-                className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-teal-700 disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-cyan-700 disabled:opacity-60"
               >
                 {busyId === 'all' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCheck className="h-3.5 w-3.5" />}
                 <span>{t('doctor.notifications.markAllRead')}</span>
@@ -109,7 +109,7 @@ export const DoctorNotifications: React.FC = () => {
 
         <section className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
           <div className="mb-4 flex items-center gap-2">
-            <MessageSquare className="h-4 w-4 text-teal-600" />
+            <MessageSquare className="h-4 w-4 text-cyan-600" />
             <h2 className="text-base font-semibold text-slate-900">{t('doctor.notifications.liveAttention')}</h2>
           </div>
 
@@ -122,7 +122,7 @@ export const DoctorNotifications: React.FC = () => {
                   key={notification.id}
                   type="button"
                   onClick={() => navigate(notification.actionUrl)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-teal-200 hover:bg-teal-50/40"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-cyan-200 hover:bg-cyan-50/40"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <p className="font-semibold text-slate-900">{notification.title}</p>

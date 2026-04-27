@@ -38,9 +38,9 @@ const getRolePresets = (t: (key: string) => string): Record<LoginRole, RolePrese
   patient: {
     title: t('auth.login.rolePatientTitle'),
     icon: UserRound,
-    colorClass: 'text-teal-700',
-    bgClass: 'bg-teal-50',
-    borderClass: 'border-teal-200',
+    colorClass: 'text-cyan-700',
+    bgClass: 'bg-cyan-50',
+    borderClass: 'border-cyan-200',
   },
   doctor: {
     title: t('auth.login.roleDoctorTitle'),
@@ -234,7 +234,7 @@ export const Login = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-cyan-900/75 to-blue-900/85" />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent" />
-        <div className="pointer-events-none absolute -right-20 top-16 h-64 w-64 rounded-full bg-teal-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 top-16 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" />
         <div className="pointer-events-none absolute -left-16 bottom-24 h-56 w-56 rounded-full bg-blue-500/10 blur-3xl" />
 
         <div className="relative z-10 flex h-full w-full flex-col justify-between p-8">
@@ -245,7 +245,7 @@ export const Login = () => {
                 <div className="text-lg font-bold text-white" style={JAKARTA}>
                   CeenAiX
                 </div>
-                <div className="text-xs text-teal-300">{t('auth.roleAccess.sidebarEyebrow')}</div>
+                <div className="text-xs text-cyan-300">{t('auth.roleAccess.sidebarEyebrow')}</div>
               </div>
             </Link>
 
@@ -260,7 +260,7 @@ export const Login = () => {
               <div className="space-y-3">
                 {sidebarFeatures.map((feature) => (
                   <div key={feature} className="flex items-center gap-3">
-                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-500/90">
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-cyan-500/90">
                       <svg
                         className="h-3 w-3 text-white"
                         fill="currentColor"
@@ -323,7 +323,7 @@ export const Login = () => {
                     type="password"
                     value={newPassword}
                     onChange={(event) => setNewPassword(event.target.value)}
-                    className="w-full rounded-lg border border-slate-200 py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full rounded-lg border border-slate-200 py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
                     placeholder={t('auth.login.newPasswordPlaceholder')}
                     autoComplete="new-password"
                     required
@@ -337,7 +337,7 @@ export const Login = () => {
                     type="password"
                     value={confirmNewPassword}
                     onChange={(event) => setConfirmNewPassword(event.target.value)}
-                    className="w-full rounded-lg border border-slate-200 py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full rounded-lg border border-slate-200 py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
                     placeholder={t('auth.login.repeatPasswordPlaceholder')}
                     autoComplete="new-password"
                     required
@@ -347,7 +347,7 @@ export const Login = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-teal-700 disabled:opacity-70"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-cyan-700 disabled:opacity-70"
                 >
                   <KeyRound className="h-4 w-4" />
                   <span>
@@ -423,7 +423,7 @@ export const Login = () => {
                           type="email"
                           value={email}
                           onChange={(event) => setEmail(event.target.value)}
-                          className="w-full rounded-lg border border-slate-200 py-2.5 ps-9 pe-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                          className="w-full rounded-lg border border-slate-200 py-2.5 ps-9 pe-3 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
                           placeholder={t('auth.login.emailPlaceholder')}
                           autoComplete="email"
                           required
@@ -441,7 +441,7 @@ export const Login = () => {
                           type={showPassword ? 'text' : 'password'}
                           value={password}
                           onChange={(event) => setPassword(event.target.value)}
-                          className="w-full rounded-lg border border-slate-200 py-2.5 ps-9 pe-10 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                          className="w-full rounded-lg border border-slate-200 py-2.5 ps-9 pe-10 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
                           placeholder={t('auth.login.passwordPlaceholder')}
                           autoComplete="current-password"
                           required
@@ -472,14 +472,14 @@ export const Login = () => {
                           resetFeedback();
                           setMode('otp');
                         }}
-                        className="inline-flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-teal-700"
+                        className="inline-flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-cyan-700"
                       >
                         <Smartphone className="h-3.5 w-3.5" />
                         <span>{t('auth.login.switchToOtp')}</span>
                       </button>
                       <Link
                         to="/auth/forgot-password"
-                        className="text-xs font-medium text-teal-700 transition-colors hover:text-teal-800"
+                        className="text-xs font-medium text-cyan-700 transition-colors hover:text-cyan-800"
                       >
                         {t('auth.login.forgotPassword')}
                       </Link>
@@ -488,7 +488,7 @@ export const Login = () => {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-teal-700 disabled:opacity-70"
+                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-cyan-700 disabled:opacity-70"
                     >
                       {isSubmitting ? (
                         <>
@@ -515,7 +515,7 @@ export const Login = () => {
                           type="tel"
                           value={phone}
                           onChange={(event) => setPhone(event.target.value)}
-                          className="w-full rounded-lg border border-slate-200 py-2.5 ps-9 pe-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                          className="w-full rounded-lg border border-slate-200 py-2.5 ps-9 pe-3 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
                           placeholder="+971 50 123 4567"
                           autoComplete="tel"
                           required
@@ -533,7 +533,7 @@ export const Login = () => {
                         resetFeedback();
                         setMode('password');
                       }}
-                      className="inline-flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-teal-700"
+                      className="inline-flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-cyan-700"
                     >
                       <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
                       <span>{t('auth.login.switchToPassword')}</span>
@@ -542,7 +542,7 @@ export const Login = () => {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-teal-700 disabled:opacity-70"
+                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-cyan-700 disabled:opacity-70"
                     >
                       <Smartphone className="h-4 w-4" />
                       <span>
@@ -562,7 +562,7 @@ export const Login = () => {
                         ? `/auth/register?role=${selectedRole}`
                         : '/auth/register'
                     }
-                    className="font-semibold text-teal-700 transition-colors hover:text-teal-800"
+                    className="font-semibold text-cyan-700 transition-colors hover:text-cyan-800"
                   >
                     {t('auth.login.createAccount')}
                   </Link>

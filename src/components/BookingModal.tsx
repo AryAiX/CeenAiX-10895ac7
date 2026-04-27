@@ -181,7 +181,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ doctor, onClose, onB
         </div>
 
         <div className="p-6">
-          <div className="flex items-center space-x-2 text-gray-600 mb-6">
+          <div className="flex items-center space-x-2 text-slate-600 mb-6">
             <MapPin className="w-5 h-5" />
             <span>{doctor.location}</span>
           </div>
@@ -189,7 +189,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ doctor, onClose, onB
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
                   Appointment Type
                 </label>
                 <div className="flex space-x-3">
@@ -198,7 +198,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ doctor, onClose, onB
                     className={`flex-1 py-3 px-4 rounded-xl border-2 font-semibold transition-all ${
                       appointmentType === 'in-person'
                         ? 'border-ceenai-blue bg-ceenai-blue text-white'
-                        : 'border-gray-200 text-gray-700 hover:border-ceenai-cyan'
+                        : 'border-slate-200 text-slate-700 hover:border-ceenai-cyan'
                     }`}
                   >
                     In-Person
@@ -209,7 +209,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ doctor, onClose, onB
                       className={`flex-1 py-3 px-4 rounded-xl border-2 font-semibold transition-all flex items-center justify-center space-x-2 ${
                         appointmentType === 'video'
                           ? 'border-ceenai-blue bg-ceenai-blue text-white'
-                          : 'border-gray-200 text-gray-700 hover:border-ceenai-cyan'
+                          : 'border-slate-200 text-slate-700 hover:border-ceenai-cyan'
                       }`}
                     >
                       <Video className="w-4 h-4" />
@@ -219,7 +219,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ doctor, onClose, onB
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+              <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
                 <div className="flex items-center justify-between mb-4">
                   <button
                     onClick={handlePreviousMonth}
@@ -227,16 +227,16 @@ export const BookingModal: React.FC<BookingModalProps> = ({ doctor, onClose, onB
                       currentMonth.getMonth() === today.getMonth() &&
                       currentMonth.getFullYear() === today.getFullYear()
                     }
-                    className="p-2 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="p-2 hover:bg-slate-200 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
-                  <div className="font-bold text-gray-900">
+                  <div className="font-bold text-slate-900">
                     {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
                   </div>
                   <button
                     onClick={handleNextMonth}
-                    className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                    className="p-2 hover:bg-slate-200 rounded-lg transition-colors"
                   >
                     <ChevronRight className="w-5 h-5" />
                   </button>
@@ -244,7 +244,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ doctor, onClose, onB
 
                 <div className="grid grid-cols-7 gap-1 mb-2">
                   {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                    <div key={day} className="text-center text-xs font-semibold text-gray-600 py-2">
+                    <div key={day} className="text-center text-xs font-semibold text-slate-600 py-2">
                       {day}
                     </div>
                   ))}
@@ -267,12 +267,12 @@ export const BookingModal: React.FC<BookingModalProps> = ({ doctor, onClose, onB
                         disabled={isPast}
                         className={`aspect-square rounded-lg font-medium transition-all ${
                           isPast
-                            ? 'text-gray-300 cursor-not-allowed'
+                            ? 'text-slate-300 cursor-not-allowed'
                             : isSelected
                             ? 'bg-ceenai-blue text-white shadow-md scale-105'
                             : isToday
                             ? 'bg-ceenai-cyan/20 text-ceenai-blue hover:bg-ceenai-cyan/30'
-                            : 'hover:bg-gray-200 text-gray-700'
+                            : 'hover:bg-slate-200 text-slate-700'
                         }`}
                       >
                         {date.getDate()}
@@ -285,11 +285,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({ doctor, onClose, onB
 
             <div>
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center">
                   <Clock className="w-4 h-4 mr-2" />
                   Select Time Slot (30 min each)
                 </label>
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 max-h-80 overflow-y-auto">
+                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 max-h-80 overflow-y-auto">
                   <div className="grid grid-cols-3 gap-2">
                     {timeSlots.map((slot) => (
                       <button
@@ -312,14 +312,14 @@ export const BookingModal: React.FC<BookingModalProps> = ({ doctor, onClose, onB
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
                   Reason for Visit
                 </label>
                 <textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   placeholder="Describe your symptoms or reason for appointment..."
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-ceenai-cyan focus:outline-none resize-none"
+                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-ceenai-cyan focus:outline-none resize-none"
                   rows={4}
                 />
               </div>
@@ -328,9 +328,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({ doctor, onClose, onB
                 <div className="bg-ceenai-cyan/10 border border-ceenai-cyan/30 rounded-xl p-4 mb-4">
                   <div className="flex items-center space-x-2 mb-2">
                     <Calendar className="w-5 h-5 text-ceenai-blue" />
-                    <span className="font-semibold text-gray-900">Selected Appointment</span>
+                    <span className="font-semibold text-slate-900">Selected Appointment</span>
                   </div>
-                  <p className="text-gray-700">
+                  <p className="text-slate-700">
                     {selectedDate.toLocaleDateString(
                       locale,
                       dtOpts({
@@ -341,8 +341,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({ doctor, onClose, onB
                       })
                     )}
                   </p>
-                  <p className="text-gray-700 font-semibold">{selectedTime}</p>
-                  <p className="text-sm text-gray-600 mt-1">{appointmentType === 'video' ? 'Video Consultation' : 'In-Person Visit'}</p>
+                  <p className="text-slate-700 font-semibold">{selectedTime}</p>
+                  <p className="text-sm text-slate-600 mt-1">{appointmentType === 'video' ? 'Video Consultation' : 'In-Person Visit'}</p>
                 </div>
               )}
 

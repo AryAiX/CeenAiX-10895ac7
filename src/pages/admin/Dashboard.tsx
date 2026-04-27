@@ -68,7 +68,7 @@ export const AdminDashboard = () => {
             label: 'Completed this month',
             value: totals?.completedConsultsThisMonth,
             icon: Activity,
-            accent: 'from-emerald-500 to-teal-600',
+            accent: 'from-emerald-500 to-cyan-600',
           },
           {
             label: 'Active incidents',

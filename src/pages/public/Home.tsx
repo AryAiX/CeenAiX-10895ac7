@@ -90,7 +90,7 @@ export const Home = () => {
     () => [
       { label: t('home.landing.portals.patient'), path: '/patient/dashboard', color: 'from-cyan-500 to-blue-500', icon: Heart },
       { label: t('home.landing.portals.doctor'), path: '/doctor/dashboard', color: 'from-blue-500 to-sky-500', icon: Stethoscope },
-      { label: t('home.landing.portals.pharmacy'), path: '/pharmacy/dashboard', color: 'from-emerald-500 to-teal-600', icon: Pill },
+      { label: t('home.landing.portals.pharmacy'), path: '/pharmacy/dashboard', color: 'from-emerald-500 to-cyan-600', icon: Pill },
       { label: t('home.landing.portals.lab'), path: '/lab/dashboard', color: 'from-violet-500 to-blue-500', icon: FlaskConical },
       { label: t('home.landing.portals.insurance'), path: '/insurance/portal', color: 'from-amber-500 to-orange-500', icon: FileText },
       { label: t('home.landing.portals.admin'), path: '/admin/dashboard', color: 'from-rose-500 to-pink-500', icon: Shield },
@@ -112,7 +112,7 @@ export const Home = () => {
         icon: Shield,
         photo:
           'https://images.pexels.com/photos/5722164/pexels-photo-5722164.jpeg?auto=compress&cs=tinysrgb&w=800',
-        color: 'from-emerald-500 to-teal-600',
+        color: 'from-emerald-500 to-cyan-600',
       },
       {
         key: 'guardian',
@@ -502,7 +502,7 @@ export const Home = () => {
                 style={{ animationDelay: '1s' }}
               >
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center flex-shrink-0">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center flex-shrink-0">
                     <Bell className="w-4 h-4 text-white" />
                   </div>
                   <div>

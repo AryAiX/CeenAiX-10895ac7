@@ -26,7 +26,7 @@ export const AdminAiAnalytics = () => {
       label: 'Sessions (30d)',
       value: sessions?.last30Days,
       icon: BrainCircuit,
-      accent: 'from-emerald-500 to-teal-600',
+      accent: 'from-emerald-500 to-cyan-600',
     },
     {
       label: 'Guest sessions (30d)',

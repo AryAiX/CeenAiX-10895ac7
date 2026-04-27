@@ -33,7 +33,7 @@ export const PharmacyDashboard = () => {
         label: t('pharmacy.dashboard.kpiDispensed'),
         value: stub.data?.dispensedToday ?? 0,
         icon: CheckCircle2,
-        accent: 'from-emerald-500 to-teal-600',
+        accent: 'from-emerald-500 to-cyan-600',
       },
       {
         label: t('pharmacy.dashboard.kpiStockAlerts'),

@@ -32,8 +32,8 @@ const roleOptions: RoleOption[] = [
     titleKey: 'auth.roleAccess.roles.patient.title',
     descriptionKey: 'auth.roleAccess.roles.patient.description',
     icon: UserRound,
-    accentClass: 'text-teal-700 bg-teal-50',
-    borderClass: 'border-teal-200 hover:border-teal-300',
+    accentClass: 'text-cyan-700 bg-cyan-50',
+    borderClass: 'border-cyan-200 hover:border-cyan-300',
     enabled: true,
   },
   {
@@ -121,7 +121,7 @@ export const PortalAccess = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-cyan-900/75 to-blue-900/85" />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent" />
-        <div className="pointer-events-none absolute -right-20 top-16 h-64 w-64 rounded-full bg-teal-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 top-16 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" />
         <div className="pointer-events-none absolute -left-16 bottom-24 h-56 w-56 rounded-full bg-blue-500/10 blur-3xl" />
 
         <div className="relative z-10 flex h-full w-full flex-col justify-between p-8">
@@ -132,7 +132,7 @@ export const PortalAccess = () => {
                 <div className="text-lg font-bold text-white" style={JAKARTA}>
                   CeenAiX
                 </div>
-                <div className="text-xs text-teal-300">{t('auth.roleAccess.sidebarEyebrow')}</div>
+                <div className="text-xs text-cyan-300">{t('auth.roleAccess.sidebarEyebrow')}</div>
               </div>
             </div>
 
@@ -149,7 +149,7 @@ export const PortalAccess = () => {
               <div className="space-y-3">
                 {sidebarFeatures.map((feature) => (
                   <div key={feature} className="flex items-center gap-3">
-                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-500/90">
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-cyan-500/90">
                       <svg className="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path
                           fillRule="evenodd"
@@ -248,7 +248,7 @@ export const PortalAccess = () => {
                 <span>{t('auth.roleAccess.needAccount')}</span>
                 <Link
                   to="/auth/portal-access?intent=register"
-                  className="font-semibold text-teal-700 transition-colors hover:text-teal-800"
+                  className="font-semibold text-cyan-700 transition-colors hover:text-cyan-800"
                 >
                   {t('auth.roleAccess.createAccount')}
                 </Link>
@@ -258,7 +258,7 @@ export const PortalAccess = () => {
                 <span>{t('auth.roleAccess.haveAccount')}</span>
                 <Link
                   to="/auth/portal-access?intent=login"
-                  className="font-semibold text-teal-700 transition-colors hover:text-teal-800"
+                  className="font-semibold text-cyan-700 transition-colors hover:text-cyan-800"
                 >
                   {t('auth.roleAccess.signInInstead')}
                 </Link>

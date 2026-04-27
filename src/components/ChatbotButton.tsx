@@ -26,9 +26,9 @@ export const ChatbotButton: React.FC = () => {
         <div className="relative">
           {/* Tooltip */}
           {showTooltip && (
-            <div className="absolute bottom-full right-0 mb-2 px-4 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-lg whitespace-nowrap animate-fade-in">
+            <div className="absolute bottom-full right-0 mb-2 px-4 py-2 bg-slate-900 text-white text-sm rounded-lg shadow-lg whitespace-nowrap animate-fade-in">
               Chat with AI Health Assistant
-              <div className="absolute bottom-0 right-6 transform translate-y-1/2 rotate-45 w-2 h-2 bg-gray-900"></div>
+              <div className="absolute bottom-0 right-6 transform translate-y-1/2 rotate-45 w-2 h-2 bg-slate-900"></div>
             </div>
           )}
 

@@ -117,13 +117,13 @@ export const DoctorLabOrders: React.FC = () => {
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder={t('doctor.labOrders.searchPlaceholder')}
-                  className="w-full rounded-lg border border-slate-200 py-2.5 pl-10 pr-4 text-sm text-slate-700 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 rtl:pl-4 rtl:pr-10"
+                  className="w-full rounded-lg border border-slate-200 py-2.5 pl-10 pr-4 text-sm text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 rtl:pl-4 rtl:pr-10"
                 />
               </div>
               <select
                 value={statusFilter}
                 onChange={(event) => setStatusFilter(event.target.value)}
-                className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm text-slate-700 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
               >
                 <option value="all">{t('doctor.labOrders.allStatuses')}</option>
                 <option value="ordered">{t('shared.labOrderStatus.ordered')}</option>
@@ -137,7 +137,7 @@ export const DoctorLabOrders: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/doctor/lab-orders/new')}
-              className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-700"
+              className="inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-cyan-700"
             >
               <Plus className="h-4 w-4" />
               <span>{t('doctor.labOrders.create')}</span>

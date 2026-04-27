@@ -89,11 +89,11 @@ export const AppointmentDesignShowcase: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-white mb-4 tracking-tight">Appointment Design Gallery</h1>
-          <p className="text-xl text-gray-400">Explore three distinct card design styles</p>
+          <p className="text-xl text-slate-400">Explore three distinct card design styles</p>
 
           <div className="flex items-center justify-center gap-4 mt-8">
             <button
@@ -101,7 +101,7 @@ export const AppointmentDesignShowcase: React.FC = () => {
               className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
                 selectedStyle === 'modern'
                   ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-xl scale-105'
-                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
               }`}
             >
               Modern Style
@@ -110,8 +110,8 @@ export const AppointmentDesignShowcase: React.FC = () => {
               onClick={() => setSelectedStyle('minimal')}
               className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
                 selectedStyle === 'minimal'
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-xl scale-105'
-                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                  ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-xl scale-105'
+                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
               }`}
             >
               Minimal Style
@@ -121,7 +121,7 @@ export const AppointmentDesignShowcase: React.FC = () => {
               className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
                 selectedStyle === 'bold'
                   ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-xl scale-105'
-                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
               }`}
             >
               Bold Style
@@ -134,7 +134,7 @@ export const AppointmentDesignShowcase: React.FC = () => {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-4xl font-bold text-white">Upcoming Appointments</h2>
-                <p className="text-gray-400 mt-2 text-lg">Your scheduled consultations</p>
+                <p className="text-slate-400 mt-2 text-lg">Your scheduled consultations</p>
               </div>
               <div className="flex items-center gap-2 bg-blue-500/20 backdrop-blur-lg px-5 py-2 rounded-full border border-blue-500/30">
                 <Bell className="w-4 h-4 text-blue-400" />
@@ -146,7 +146,7 @@ export const AppointmentDesignShowcase: React.FC = () => {
               {upcomingAppointments.map((appointment) => {
                 if (selectedStyle === 'modern') {
                   return (
-                    <div key={appointment.id} className="group relative bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl overflow-hidden border border-gray-700 hover:border-blue-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-2">
+                    <div key={appointment.id} className="group relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl overflow-hidden border border-slate-700 hover:border-blue-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-2">
                       <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                       <div className="relative p-8">
@@ -156,7 +156,7 @@ export const AppointmentDesignShowcase: React.FC = () => {
                             <img
                               src={appointment.image}
                               alt={appointment.doctorName}
-                              className="relative w-24 h-24 rounded-2xl object-cover ring-2 ring-gray-700"
+                              className="relative w-24 h-24 rounded-2xl object-cover ring-2 ring-slate-700"
                             />
                             <div className={`absolute -bottom-2 -right-2 ${appointment.type === 'video' ? 'bg-gradient-to-br from-purple-500 to-pink-500' : 'bg-gradient-to-br from-blue-500 to-cyan-500'} p-2 rounded-lg shadow-lg`}>
                               {appointment.type === 'video' ? <Video className="w-4 h-4 text-white" /> : <MapPin className="w-4 h-4 text-white" />}
@@ -175,27 +175,27 @@ export const AppointmentDesignShowcase: React.FC = () => {
                             </div>
 
                             <div className="grid grid-cols-2 gap-4 mb-4">
-                              <div className="flex items-center gap-3 bg-gray-800/50 p-3 rounded-xl border border-gray-700">
+                              <div className="flex items-center gap-3 bg-slate-800/50 p-3 rounded-xl border border-slate-700">
                                 <Calendar className="w-5 h-5 text-blue-400" />
                                 <div>
-                                  <p className="text-xs text-gray-400">Date</p>
+                                  <p className="text-xs text-slate-400">Date</p>
                                   <p className="text-sm font-semibold text-white">{appointment.date}</p>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-3 bg-gray-800/50 p-3 rounded-xl border border-gray-700">
+                              <div className="flex items-center gap-3 bg-slate-800/50 p-3 rounded-xl border border-slate-700">
                                 <Clock className="w-5 h-5 text-cyan-400" />
                                 <div>
-                                  <p className="text-xs text-gray-400">Time</p>
+                                  <p className="text-xs text-slate-400">Time</p>
                                   <p className="text-sm font-semibold text-white">{appointment.time}</p>
                                 </div>
                               </div>
                             </div>
 
-                            <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700 mb-6">
-                              <p className="text-xs text-gray-400 mb-1">Location</p>
+                            <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 mb-6">
+                              <p className="text-xs text-slate-400 mb-1">Location</p>
                               <p className="text-sm text-white font-medium">{appointment.location}</p>
-                              <p className="text-xs text-gray-400 mt-2">Reason</p>
-                              <p className="text-sm text-gray-300">{appointment.reason}</p>
+                              <p className="text-xs text-slate-400 mt-2">Reason</p>
+                              <p className="text-sm text-slate-300">{appointment.reason}</p>
                             </div>
 
                             <div className="flex gap-3">
@@ -212,7 +212,7 @@ export const AppointmentDesignShowcase: React.FC = () => {
                                   </>
                                 )}
                               </button>
-                              <button className="px-6 py-3 rounded-xl font-semibold bg-gray-700 text-white hover:bg-gray-600 transition-all duration-300">
+                              <button className="px-6 py-3 rounded-xl font-semibold bg-slate-700 text-white hover:bg-slate-600 transition-all duration-300">
                                 Reschedule
                               </button>
                               <button className="px-6 py-3 rounded-xl font-semibold bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition-all duration-300">
@@ -234,25 +234,25 @@ export const AppointmentDesignShowcase: React.FC = () => {
                           className="w-16 h-16 rounded-full object-cover"
                         />
                         <div className="flex-1">
-                          <h3 className="text-xl font-bold text-gray-900">{appointment.doctorName}</h3>
+                          <h3 className="text-xl font-bold text-slate-900">{appointment.doctorName}</h3>
                           <p className="text-sm text-emerald-600 font-medium">{appointment.specialty}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-semibold text-gray-900">{appointment.date}</p>
-                          <p className="text-sm text-gray-500">{appointment.time}</p>
+                          <p className="text-sm font-semibold text-slate-900">{appointment.date}</p>
+                          <p className="text-sm text-slate-500">{appointment.time}</p>
                         </div>
                       </div>
 
-                      <div className="border-t border-gray-100 pt-4 mb-4">
-                        <p className="text-sm text-gray-600 mb-2">{appointment.location}</p>
-                        <p className="text-sm text-gray-900">{appointment.reason}</p>
+                      <div className="border-t border-slate-100 pt-4 mb-4">
+                        <p className="text-sm text-slate-600 mb-2">{appointment.location}</p>
+                        <p className="text-sm text-slate-900">{appointment.reason}</p>
                       </div>
 
                       <div className="flex gap-2">
                         <button className="flex-1 py-2 px-4 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors font-medium text-sm">
                           {appointment.type === 'video' ? 'Join Video' : 'Get Directions'}
                         </button>
-                        <button className="py-2 px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium text-sm">
+                        <button className="py-2 px-4 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-medium text-sm">
                           Reschedule
                         </button>
                       </div>
@@ -321,7 +321,7 @@ export const AppointmentDesignShowcase: React.FC = () => {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-4xl font-bold text-white">Past Appointments</h2>
-                <p className="text-gray-400 mt-2 text-lg">Consultation history</p>
+                <p className="text-slate-400 mt-2 text-lg">Consultation history</p>
               </div>
               <div className="flex items-center gap-2 bg-green-500/20 backdrop-blur-lg px-5 py-2 rounded-full border border-green-500/30">
                 <CheckCircle className="w-4 h-4 text-green-400" />
@@ -333,14 +333,14 @@ export const AppointmentDesignShowcase: React.FC = () => {
               {pastAppointments.map((appointment) => {
                 if (selectedStyle === 'modern') {
                   return (
-                    <div key={appointment.id} className="group bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl overflow-hidden border border-gray-700 hover:border-green-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-green-500/20">
+                    <div key={appointment.id} className="group bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl overflow-hidden border border-slate-700 hover:border-green-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-green-500/20">
                       <div className="p-8">
                         <div className="flex items-start gap-6">
                           <div className="relative">
                             <img
                               src={appointment.image}
                               alt={appointment.doctorName}
-                              className="w-24 h-24 rounded-2xl object-cover ring-2 ring-gray-700 group-hover:ring-green-500/50 transition-all duration-500"
+                              className="w-24 h-24 rounded-2xl object-cover ring-2 ring-slate-700 group-hover:ring-green-500/50 transition-all duration-500"
                             />
                             <div className="absolute -bottom-2 -right-2 bg-gradient-to-br from-green-500 to-emerald-500 p-2 rounded-lg shadow-lg">
                               <CheckCircle className="w-4 h-4 text-white" />
@@ -357,7 +357,7 @@ export const AppointmentDesignShowcase: React.FC = () => {
                                 {[...Array(5)].map((_, i) => (
                                   <Star
                                     key={i}
-                                    className={`w-4 h-4 ${i < appointment.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`}
+                                    className={`w-4 h-4 ${i < appointment.rating ? 'text-yellow-400 fill-yellow-400' : 'text-slate-600'}`}
                                   />
                                 ))}
                                 <span className="ml-2 text-sm font-bold text-yellow-400">{appointment.rating}.0</span>
@@ -365,25 +365,25 @@ export const AppointmentDesignShowcase: React.FC = () => {
                             </div>
 
                             <div className="grid grid-cols-3 gap-3 mb-4">
-                              <div className="bg-gray-800/50 p-3 rounded-xl border border-gray-700">
-                                <p className="text-xs text-gray-400 mb-1">Date</p>
+                              <div className="bg-slate-800/50 p-3 rounded-xl border border-slate-700">
+                                <p className="text-xs text-slate-400 mb-1">Date</p>
                                 <p className="text-sm font-semibold text-white">{appointment.date}</p>
                               </div>
-                              <div className="bg-gray-800/50 p-3 rounded-xl border border-gray-700">
-                                <p className="text-xs text-gray-400 mb-1">Time</p>
+                              <div className="bg-slate-800/50 p-3 rounded-xl border border-slate-700">
+                                <p className="text-xs text-slate-400 mb-1">Time</p>
                                 <p className="text-sm font-semibold text-white">{appointment.time}</p>
                               </div>
-                              <div className="bg-gray-800/50 p-3 rounded-xl border border-gray-700">
-                                <p className="text-xs text-gray-400 mb-1">Status</p>
+                              <div className="bg-slate-800/50 p-3 rounded-xl border border-slate-700">
+                                <p className="text-xs text-slate-400 mb-1">Status</p>
                                 <p className="text-sm font-semibold text-green-400">Completed</p>
                               </div>
                             </div>
 
-                            <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700 mb-4">
-                              <p className="text-xs text-gray-400 mb-1">Visit Reason</p>
+                            <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 mb-4">
+                              <p className="text-xs text-slate-400 mb-1">Visit Reason</p>
                               <p className="text-sm text-white">{appointment.reason}</p>
                               {appointment.prescription && (
-                                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-700">
+                                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-700">
                                   <FileText className="w-4 h-4 text-blue-400" />
                                   <p className="text-xs text-blue-400 font-medium">Prescription Available</p>
                                 </div>
@@ -401,11 +401,11 @@ export const AppointmentDesignShowcase: React.FC = () => {
                                 <Calendar className="w-5 h-5" />
                                 <span>Book Again</span>
                               </button>
-                              <button className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold bg-gray-700 text-white hover:bg-gray-600 transition-all duration-300">
+                              <button className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold bg-slate-700 text-white hover:bg-slate-600 transition-all duration-300">
                                 <MessageSquare className="w-5 h-5" />
                                 <span>Message</span>
                               </button>
-                              <button className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold bg-gray-700 text-white hover:bg-gray-600 transition-all duration-300">
+                              <button className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold bg-slate-700 text-white hover:bg-slate-600 transition-all duration-300">
                                 <Phone className="w-5 h-5" />
                                 <span>Call</span>
                               </button>
@@ -425,32 +425,32 @@ export const AppointmentDesignShowcase: React.FC = () => {
                           className="w-16 h-16 rounded-full object-cover"
                         />
                         <div className="flex-1">
-                          <h3 className="text-xl font-bold text-gray-900">{appointment.doctorName}</h3>
+                          <h3 className="text-xl font-bold text-slate-900">{appointment.doctorName}</h3>
                           <p className="text-sm text-green-600 font-medium">{appointment.specialty}</p>
                         </div>
                         <div className="flex items-center gap-1">
                           {[...Array(5)].map((_, i) => (
-                            <Star key={i} className={`w-4 h-4 ${i < appointment.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                            <Star key={i} className={`w-4 h-4 ${i < appointment.rating ? 'text-yellow-400 fill-yellow-400' : 'text-slate-300'}`} />
                           ))}
                         </div>
                       </div>
 
-                      <div className="border-t border-gray-100 pt-4 mb-4">
+                      <div className="border-t border-slate-100 pt-4 mb-4">
                         <div className="flex items-center justify-between mb-2">
-                          <p className="text-sm text-gray-500">{appointment.date} at {appointment.time}</p>
+                          <p className="text-sm text-slate-500">{appointment.date} at {appointment.time}</p>
                           <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium">Completed</span>
                         </div>
-                        <p className="text-sm text-gray-900">{appointment.reason}</p>
+                        <p className="text-sm text-slate-900">{appointment.reason}</p>
                       </div>
 
                       <div className="flex gap-2">
                         <button className="flex-1 py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium text-sm">
                           Book Again
                         </button>
-                        <button className="py-2 px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium text-sm">
+                        <button className="py-2 px-4 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-medium text-sm">
                           Message
                         </button>
-                        <button className="py-2 px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium text-sm">
+                        <button className="py-2 px-4 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-medium text-sm">
                           Call
                         </button>
                       </div>
@@ -459,7 +459,7 @@ export const AppointmentDesignShowcase: React.FC = () => {
                 } else {
                   return (
                     <div key={appointment.id} className="relative overflow-hidden rounded-3xl shadow-2xl hover:shadow-green-500/50 transition-all duration-500">
-                      <div className="absolute inset-0 bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-green-500 via-emerald-500 to-cyan-500" />
                       <div className="relative bg-gradient-to-br from-black/40 to-black/60 backdrop-blur-sm p-8 text-white">
                         <div className="flex items-start gap-6">
                           <div className="relative">
