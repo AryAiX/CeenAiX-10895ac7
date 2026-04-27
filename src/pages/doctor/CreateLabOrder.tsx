@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Loader2, Plus, Search, TestTube2, Trash2 } from 'lucide-react';
 import { LabTestNameDisplay } from '../../components/LabTestNameDisplay';
+import { DoctorReferenceShell } from '../../components/DoctorReferenceShell';
 import {
   useDoctorPatients,
   useLabTestCatalogSearch,
@@ -750,10 +751,12 @@ export const CreateLabOrder: React.FC = () => {
   };
 
   return (
-    <>
+    <DoctorReferenceShell
+      activeTab="labs"
+      title={t('doctor.createLabOrder.title')}
+      subtitle={t('doctor.createLabOrder.subtitle')}
+    >
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">{t('doctor.createLabOrder.title')}</h1>
-        <p className="mt-1 text-sm text-slate-500">{t('doctor.createLabOrder.subtitle')}</p>
       </div>
 
       <div className="mx-auto w-full max-w-5xl space-y-6">
@@ -861,6 +864,6 @@ export const CreateLabOrder: React.FC = () => {
           </button>
         </div>
       </div>
-    </>
+    </DoctorReferenceShell>
   );
 };

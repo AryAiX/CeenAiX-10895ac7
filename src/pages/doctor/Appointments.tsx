@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, CalendarDays, ChevronLeft, ChevronRight, ClipboardList, Clock, List, MapPin, User, Video } from 'lucide-react';
+import { DoctorReferenceShell } from '../../components/DoctorReferenceShell';
 import { Skeleton } from '../../components/Skeleton';
 import { useAppointments, useQuery } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
@@ -203,12 +204,15 @@ export const DoctorAppointments: React.FC = () => {
   };
 
   return (
-    <>
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">{t('doctor.appointments.title')}</h1>
-        <p className="mt-1 text-sm text-slate-500">{t('doctor.appointments.subtitle')}</p>
-      </div>
-
+    <DoctorReferenceShell
+      title={t('doctor.appointments.title')}
+      subtitle={t('doctor.appointments.subtitle')}
+      activeTab="appointments"
+      stats={{
+        todayAppointments: appointments.length,
+        completedTodayAppointments: appointments.filter((appointment) => appointment.status === 'completed').length,
+      }}
+    >
       <div>
         <div className="mb-4">
           <h2 className="text-base font-semibold text-slate-900">{t('doctor.appointments.sectionTitle')}</h2>
@@ -661,6 +665,6 @@ export const DoctorAppointments: React.FC = () => {
           </div>
         )}
       </div>
-    </>
+    </DoctorReferenceShell>
   );
 };

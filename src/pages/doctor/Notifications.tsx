@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Bell, CheckCheck, Loader2, MessageSquare, RefreshCcw } from 'lucide-react';
 import { Skeleton } from '../../components/Skeleton';
+import { DoctorReferenceShell } from '../../components/DoctorReferenceShell';
 import { useDoctorNotifications } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
 import { formatRelativeTime } from '../../lib/i18n-ui';
@@ -47,7 +48,11 @@ export const DoctorNotifications: React.FC = () => {
 
   if (loading) {
     return (
-      <>
+      <DoctorReferenceShell
+        activeTab="notifications"
+        title={t('doctor.notifications.title')}
+        subtitle={t('doctor.notifications.subtitle')}
+      >
         <div>
           <h1 className="text-2xl font-bold text-slate-900">{t('doctor.notifications.title')}</h1>
           <p className="mt-1 text-sm text-slate-500">{t('doctor.notifications.subtitle')}</p>
@@ -57,7 +62,7 @@ export const DoctorNotifications: React.FC = () => {
           <Skeleton className="h-56 w-full rounded-2xl" />
           <Skeleton className="h-56 w-full rounded-2xl" />
         </div>
-      </>
+      </DoctorReferenceShell>
     );
   }
 
@@ -66,7 +71,11 @@ export const DoctorNotifications: React.FC = () => {
   const liveAttentionItems = data?.derivedNotifications ?? [];
 
   return (
-    <>
+    <DoctorReferenceShell
+      activeTab="notifications"
+      title={t('doctor.notifications.title')}
+      subtitle={t('doctor.notifications.subtitle')}
+    >
       <div>
         <h1 className="text-2xl font-bold text-slate-900">{t('doctor.notifications.title')}</h1>
         <p className="mt-1 text-sm text-slate-500">{t('doctor.notifications.subtitle')}</p>
@@ -206,6 +215,6 @@ export const DoctorNotifications: React.FC = () => {
           )}
         </section>
       </div>
-    </>
+    </DoctorReferenceShell>
   );
 };
