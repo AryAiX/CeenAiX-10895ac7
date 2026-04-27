@@ -1,23 +1,15 @@
 import React, { useMemo } from 'react';
 import {
   AlertTriangle,
-  Bell,
   Clock,
   FlaskConical,
-  LayoutDashboard,
   MessageSquare,
-  PenLine,
   PlayCircle,
-  Scan,
-  Settings,
   Sparkles,
-  TrendingUp,
-  UserCircle2,
   Users,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { DoctorReferenceShell } from '../../components/DoctorReferenceShell';
 import { Skeleton } from '../../components/Skeleton';
 import { useDoctorDashboard } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
@@ -151,9 +143,6 @@ export const DoctorDashboard: React.FC = () => {
   );
   const completedTodayAppointments = data?.completedTodayAppointments ?? 0;
   const todayAppointments = data?.todayAppointments ?? 0;
-  const pendingReviews = data?.pendingReviews ?? 0;
-  const unreadMessages = data?.unreadMessages ?? 0;
-  const criticalResultsCount = data?.criticalResults.length ?? 0;
   const activeConsultation = data?.activeConsultation ?? null;
   const nextAppointment = data?.nextAppointment ?? null;
   const todaySchedule = data?.todaySchedule ?? [];
@@ -173,60 +162,6 @@ export const DoctorDashboard: React.FC = () => {
       sublabel: doctorLicense,
     },
   ];
-  const clinicNav = [
-    {
-      id: 'dashboard',
-      href: '/doctor/dashboard',
-      label: 'Dashboard',
-      icon: LayoutDashboard,
-      badge: todayAppointments,
-      badgeTone: 'red' as const,
-    },
-    {
-      id: 'today',
-      href: '/doctor/appointments',
-      label: "Today's Appointments",
-      icon: Clock,
-      badge: todayAppointments,
-      badgeTone: 'amber' as const,
-    },
-    { id: 'appointments', href: '/doctor/appointments', label: 'Appointments', icon: Clock },
-    { id: 'patients', href: '/doctor/patients', label: 'Patient Records', icon: Users },
-    {
-      id: 'prescribe',
-      href: '/doctor/prescriptions/new',
-      label: 'Write Prescription',
-      icon: PenLine,
-      badge: pendingReviews ? 1 : undefined,
-      badgeTone: 'amber' as const,
-    },
-    {
-      id: 'labs',
-      href: '/doctor/lab-orders',
-      label: 'Lab Referrals',
-      icon: FlaskConical,
-      badge: criticalResultsCount || undefined,
-      badgeTone: 'red' as const,
-    },
-    {
-      id: 'imaging',
-      href: '/doctor/imaging',
-      label: 'Imaging Center',
-      icon: Scan,
-      badge: 1,
-      badgeTone: 'amber' as const,
-    },
-    {
-      id: 'messages',
-      href: '/doctor/messages',
-      label: 'Messages',
-      icon: MessageSquare,
-      badge: unreadMessages || undefined,
-      badgeTone: 'blue' as const,
-    },
-  ];
-  const analyticsNav = [{ id: 'earnings', href: '/doctor/earnings', label: 'Earnings', icon: TrendingUp }];
-  const accountNav = [{ id: 'profile', href: '/doctor/profile', label: 'My Profile', icon: UserCircle2 }];
 
   const renderComplaint = (value: string | null | undefined, emptyLabel: string) => {
     if (!value?.trim()) {
@@ -264,35 +199,12 @@ export const DoctorDashboard: React.FC = () => {
   };
 
   return (
-    <DoctorReferenceShell
-      activeTab="dashboard"
-      clinicNav={clinicNav}
-      analyticsNav={analyticsNav}
-      accountNav={accountNav}
-      stats={{
-        todayAppointments,
-        completedTodayAppointments,
-        criticalAlerts: criticalResultsCount,
-      }}
-      title={t('doctor.dashboard.title')}
-      subtitle={t('doctor.dashboard.subtitle')}
-      rightActions={
-        <div className="flex items-center gap-2">
-          <button className="rounded-lg border border-slate-200 bg-white p-2 text-slate-600 transition hover:bg-slate-50">
-            <Bell className="h-4 w-4" />
-          </button>
-          <button className="rounded-lg border border-slate-200 bg-white p-2 text-slate-600 transition hover:bg-slate-50">
-            <Settings className="h-4 w-4" />
-          </button>
+    <div className="space-y-6">
+      {error ? (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          {t('doctor.dashboard.loadError')}
         </div>
-      }
-    >
-      <div className="space-y-6">
-        {error ? (
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            {t('doctor.dashboard.loadError')}
-          </div>
-        ) : null}
+      ) : null}
 
       <div className={`rounded-2xl p-5 shadow-sm ${criticalResult ? 'border border-rose-200 bg-rose-50' : 'border border-slate-200 bg-white'}`}>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -477,7 +389,7 @@ export const DoctorDashboard: React.FC = () => {
         ))}
       </div>
 
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="space-y-6 xl:col-span-2">
           <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
             <div className="mb-5 flex items-center justify-between gap-4">
@@ -667,8 +579,7 @@ export const DoctorDashboard: React.FC = () => {
             </div>
           </div>
         </div>
-        </div>
       </div>
-    </DoctorReferenceShell>
+    </div>
   );
 };

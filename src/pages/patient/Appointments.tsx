@@ -321,11 +321,11 @@ export const PatientAppointments: React.FC = () => {
     const canJoin = isTeleconsult && isWithin10Min(appointment);
     const typeBadge = isTeleconsult
       ? 'bg-violet-100 text-violet-700 border-violet-300'
-      : 'bg-cyan-100 text-cyan-700 border-cyan-300';
+      : 'bg-teal-100 text-teal-700 border-teal-300';
     const statusBadge = upcoming
       ? 'bg-green-100 text-green-700 border-green-300'
       : 'bg-amber-100 text-amber-700 border-amber-300';
-    const borderAccent = upcoming ? 'border-cyan-600' : 'border-slate-300';
+    const borderAccent = upcoming ? 'border-teal-600' : 'border-slate-300';
 
     return (
       <div
@@ -336,7 +336,7 @@ export const PatientAppointments: React.FC = () => {
           <div
             className={`flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full text-lg font-semibold ${
               upcoming
-                ? 'bg-gradient-to-br from-cyan-500 to-cyan-600 text-white'
+                ? 'bg-gradient-to-br from-teal-500 to-teal-600 text-white'
                 : 'bg-slate-200 text-slate-700'
             }`}
             aria-hidden
@@ -382,7 +382,7 @@ export const PatientAppointments: React.FC = () => {
 
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mb-4">
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-cyan-600" />
+                <Calendar className="w-4 h-4 text-teal-600" />
                 <span className="text-lg font-serif font-semibold text-slate-900">
                   {new Date(appointment.scheduled_at).toLocaleDateString(
                     locale,
@@ -391,7 +391,7 @@ export const PatientAppointments: React.FC = () => {
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-cyan-600" />
+                <Clock className="w-4 h-4 text-teal-600" />
                 <span className="text-lg font-serif font-semibold text-slate-900">
                   {new Date(appointment.scheduled_at).toLocaleTimeString(
                     locale,
@@ -428,11 +428,11 @@ export const PatientAppointments: React.FC = () => {
             ) : null}
 
             {preVisitAssessment ? (
-              <div className="mb-4 rounded-lg border border-cyan-100 bg-cyan-50/70 p-4">
+              <div className="mb-4 rounded-lg border border-teal-100 bg-teal-50/70 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
-                    <ClipboardList className="h-4 w-4 text-cyan-700" />
-                    <p className="text-sm font-semibold text-cyan-900">
+                    <ClipboardList className="h-4 w-4 text-teal-700" />
+                    <p className="text-sm font-semibold text-teal-900">
                       {t('patient.appointments.preVisitPrefix')}{' '}
                       {preVisitStatusLabel(t, preVisitAssessment.status)}
                     </p>
@@ -440,7 +440,7 @@ export const PatientAppointments: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => navigate(`/patient/pre-visit/${preVisitAssessment.id}`)}
-                    className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-cyan-700 shadow-sm transition hover:shadow"
+                    className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-teal-700 shadow-sm transition hover:shadow"
                   >
                     {preVisitAssessment.status === 'completed' || preVisitAssessment.status === 'reviewed'
                       ? t('patient.appointments.reviewIntake')
@@ -576,7 +576,7 @@ export const PatientAppointments: React.FC = () => {
               onClick={() => setStatusFilter(opt.value)}
               className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 statusFilter === opt.value
-                  ? 'bg-cyan-100 text-cyan-700'
+                  ? 'bg-teal-100 text-teal-700'
                   : 'text-slate-700 hover:bg-slate-100'
               }`}
             >
@@ -596,7 +596,7 @@ export const PatientAppointments: React.FC = () => {
               onClick={() => setTypeFilter(opt.value)}
               className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 typeFilter === opt.value
-                  ? 'bg-cyan-100 text-cyan-700'
+                  ? 'bg-teal-100 text-teal-700'
                   : 'text-slate-700 hover:bg-slate-100'
               }`}
             >
@@ -615,7 +615,7 @@ export const PatientAppointments: React.FC = () => {
           value={specialtyQuery}
           onChange={(event) => setSpecialtyQuery(event.target.value)}
           placeholder={t('patient.appointments.searchSpecialtyPh')}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
         />
       </div>
 
@@ -628,7 +628,7 @@ export const PatientAppointments: React.FC = () => {
           value={providerQuery}
           onChange={(event) => setProviderQuery(event.target.value)}
           placeholder={t('patient.appointments.searchProviderPh')}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
         />
       </div>
 
@@ -696,12 +696,12 @@ export const PatientAppointments: React.FC = () => {
                     setDateTo(iso);
                   }}
                   className={`relative w-8 h-8 rounded-full text-xs font-medium transition-colors ${
-                    isToday ? 'bg-cyan-600 text-white' : 'text-slate-700 hover:bg-slate-200'
+                    isToday ? 'bg-teal-600 text-white' : 'text-slate-700 hover:bg-slate-200'
                   }`}
                 >
                   {day}
                   {hasAppointment ? (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-cyan-600 rounded-full" />
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-teal-600 rounded-full" />
                   ) : null}
                 </button>
               );
@@ -719,13 +719,13 @@ export const PatientAppointments: React.FC = () => {
             type="date"
             value={dateFrom}
             onChange={(event) => setDateFrom(event.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
           <input
             type="date"
             value={dateTo}
             onChange={(event) => setDateTo(event.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
         </div>
       </div>
@@ -789,7 +789,7 @@ export const PatientAppointments: React.FC = () => {
                   {pastAppointments.map((appointment) => {
                     const doctorProfile = doctorProfileById.get(appointment.doctor_id);
                     const typeColor =
-                      appointment.type === 'virtual' ? 'text-violet-700' : 'text-cyan-700';
+                      appointment.type === 'virtual' ? 'text-violet-700' : 'text-teal-700';
                     return (
                       <React.Fragment key={appointment.id}>
                         <tr className="hover:bg-slate-50">
@@ -832,7 +832,7 @@ export const PatientAppointments: React.FC = () => {
                                   selectedPastId === appointment.id ? null : appointment.id
                                 )
                               }
-                              className="text-sm text-cyan-600 hover:text-cyan-700 font-medium flex items-center gap-1"
+                              className="text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1"
                             >
                               <FileText className="w-4 h-4" />
                               {appointment.chief_complaint ?? t('shared.scheduledConsultation')}
@@ -895,7 +895,7 @@ export const PatientAppointments: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate('/patient/appointments/book')}
-          className="inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-300 hover:bg-cyan-700 hover:shadow-xl"
+          className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-500/30 transition-all duration-300 hover:bg-teal-700 hover:shadow-xl"
         >
           <Plus className="h-5 w-5" />
           <span>{t('patient.appointments.book')}</span>
@@ -903,7 +903,7 @@ export const PatientAppointments: React.FC = () => {
       </div>
 
       {nextTeleconsult ? (
-        <div className="mt-6 bg-cyan-600 text-white p-4 rounded-lg border-4 border-cyan-400 animate-pulse-border">
+        <div className="mt-6 bg-teal-600 text-white p-4 rounded-lg border-4 border-teal-400 animate-pulse-border">
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-white/20 rounded-full">
@@ -917,7 +917,7 @@ export const PatientAppointments: React.FC = () => {
                       t('shared.doctor'),
                   })}
                 </h3>
-                <p className="text-cyan-100">
+                <p className="text-teal-100">
                   {t('patient.appointments.teleconsultBannerStartsIn', {
                     time: teleconsultCountdown,
                   })}
@@ -927,7 +927,7 @@ export const PatientAppointments: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate(`/patient/telemedicine/${nextTeleconsult.id}`)}
-              className="px-6 py-3 bg-white text-cyan-600 rounded-lg font-semibold hover:bg-cyan-50 transition-colors"
+              className="px-6 py-3 bg-white text-teal-600 rounded-lg font-semibold hover:bg-teal-50 transition-colors"
             >
               {t('patient.appointments.joinWaitingRoom')}
             </button>
@@ -983,8 +983,8 @@ export const PatientAppointments: React.FC = () => {
               </div>
             ) : !hasAnyAppointments ? (
               <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-white p-12 text-center shadow-sm">
-                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-cyan-50">
-                  <Calendar className="h-8 w-8 text-cyan-600" />
+                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50">
+                  <Calendar className="h-8 w-8 text-teal-600" />
                 </div>
                 <h2 className="font-playfair text-xl font-bold text-slate-900">
                   {t('patient.appointments.emptyTitle')}
@@ -995,7 +995,7 @@ export const PatientAppointments: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/patient/appointments/book')}
-                  className="mt-6 inline-flex items-center gap-2 rounded-lg bg-cyan-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all duration-300 hover:bg-cyan-700 hover:shadow-xl"
+                  className="mt-6 inline-flex items-center gap-2 rounded-lg bg-teal-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-500/30 transition-all duration-300 hover:bg-teal-700 hover:shadow-xl"
                 >
                   <Plus className="h-5 w-5" />
                   <span>{t('patient.appointments.book')}</span>
@@ -1019,7 +1019,7 @@ export const PatientAppointments: React.FC = () => {
                       <h2 className="font-playfair text-2xl md:text-3xl font-bold text-slate-900">
                         {t('patient.appointments.upcomingTitle')}
                       </h2>
-                      <span className="rounded-full bg-cyan-600 px-3 py-1 text-sm font-semibold text-white shadow-sm">
+                      <span className="rounded-full bg-teal-600 px-3 py-1 text-sm font-semibold text-white shadow-sm">
                         {upcomingAppointments.length}
                       </span>
                     </div>

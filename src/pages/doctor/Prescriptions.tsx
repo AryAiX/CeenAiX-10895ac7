@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, CheckCircle, MessageSquare, Pill, Search, Users } from 'lucide-react';
-import { DoctorReferenceShell } from '../../components/DoctorReferenceShell';
 import { Skeleton } from '../../components/Skeleton';
 import { MedicationNameDisplay } from '../../components/MedicationNameDisplay';
 import { useDoctorPrescriptions } from '../../hooks';
@@ -98,21 +97,47 @@ export const DoctorPrescriptions: React.FC = () => {
     [prescriptions]
   );
 
-  const content = loading ? (
-    <div className="space-y-4">
-      <Skeleton className="h-28 w-full rounded-2xl" />
-      <Skeleton className="h-40 w-full rounded-2xl" />
-      <Skeleton className="h-40 w-full rounded-2xl" />
-    </div>
-  ) : (
-    <div>
-      {error ? (
-        <div className="mb-4 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-          {t('doctor.prescriptions.loadError')}
+  if (loading) {
+    return (
+      <>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">{t('doctor.prescriptions.title')}</h1>
+          <p className="mt-1 text-sm text-slate-500">{t('doctor.prescriptions.subtitle')}</p>
         </div>
-      ) : null}
+        <div className="space-y-4">
+          <Skeleton className="h-28 w-full rounded-2xl" />
+          <Skeleton className="h-40 w-full rounded-2xl" />
+          <Skeleton className="h-40 w-full rounded-2xl" />
+        </div>
+      </>
+    );
+  }
 
-      <div className="mb-6 grid gap-4 md:grid-cols-3">
+  return (
+    <>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">{t('doctor.prescriptions.title')}</h1>
+          <p className="mt-1 text-sm text-slate-500">{t('doctor.prescriptions.subtitle')}</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => navigate('/doctor/prescriptions/new')}
+          className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:shadow-md"
+        >
+          <Pill className="h-4 w-4" />
+          <span>{t('doctor.createPrescription.create')}</span>
+        </button>
+      </div>
+
+      <div>
+        {error ? (
+          <div className="mb-4 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+            {t('doctor.prescriptions.loadError')}
+          </div>
+        ) : null}
+
+        <div className="mb-6 grid gap-4 md:grid-cols-3">
           <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
@@ -178,7 +203,7 @@ export const DoctorPrescriptions: React.FC = () => {
           </div>
         </div>
 
-      <div className="space-y-8">
+        <div className="space-y-8">
           <section>
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-2xl font-bold text-slate-900">{t('doctor.prescriptions.activeSection')}</h2>
@@ -335,31 +360,7 @@ export const DoctorPrescriptions: React.FC = () => {
             )}
           </section>
         </div>
-    </div>
-  );
-
-  return (
-    <DoctorReferenceShell
-      title={t('doctor.prescriptions.title')}
-      subtitle={t('doctor.prescriptions.subtitle')}
-      activeTab="prescriptions"
-      stats={{
-        todayAppointments: 0,
-        completedTodayAppointments: 0,
-        criticalAlerts: pendingDispenseCount,
-      }}
-      rightActions={
-        <button
-          type="button"
-          onClick={() => navigate('/doctor/prescriptions/new')}
-          className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:shadow-md"
-        >
-          <Pill className="h-4 w-4" />
-          <span>{t('doctor.createPrescription.create')}</span>
-        </button>
-      }
-    >
-      {content}
-    </DoctorReferenceShell>
+      </div>
+    </>
   );
 };
