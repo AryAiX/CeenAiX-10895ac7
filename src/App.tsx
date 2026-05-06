@@ -1,3 +1,4 @@
+// starting 
 import { RouterProvider } from 'react-router-dom';
 import { PreviewPinGate } from './components/PreviewPinGate';
 import { AuthProvider } from './lib/auth-context';
