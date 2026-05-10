@@ -240,6 +240,10 @@ Each bug includes a short identifier, the file affected, a description, and the 
 108. **CreatePrescription: 'Change Patient' button label + select `aria-label` were hard-coded English.** Routed both through a new `doctor.createPrescription.changePatient` key (EN + AR).
 109. **DoctorSchedule: form-submit/error/success/confirm strings only had `defaultValue` fallbacks** — so even Arabic users would see the English copy because the keys weren't materialized in `extra.json`. Added a full `doctor.schedule.*` namespace (EN + AR) covering availability + blocked-time auth errors, validation errors, success banners, and `window.confirm` prompts, plus the Reason label + textarea placeholder. Arabic users now get translated copy.
 
+### Area 3 — Doctor portal follow-up (Dashboard)
+
+110a. **DoctorDashboard: lab-result "Acknowledge" button was inert and English-only.** The button had no `type`, no `onClick`, and a literal `Acknowledge` string. Tapping it was a no-op despite the "DHA requires acknowledgment within 1 hour" warning right above it. Added `type="button"`, wired it to navigate to `/doctor/labs` (where the doctor can actually take action), and routed the label + "Reviewed" badge through existing localized keys.
+
 ### Cross-cutting i18n materialization
 
 110. **62 i18n keys had `defaultValue: 'English copy'` but no actual entries in the Arabic locale files.** Across the prior 105 fixes I'd been using i18next's `defaultValue` option as a safety net, but that means Arabic users still see the English fallback whenever the key is missing in `ar/{common,extra}.json`. Audited every `t('...', { defaultValue: ... })` call in `src/` and materialized the missing Arabic translations for:

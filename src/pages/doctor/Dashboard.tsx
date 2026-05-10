@@ -668,11 +668,17 @@ export const DoctorDashboard: React.FC = () => {
                       </p>
                     </div>
                     {result.labOrderStatus === 'resulted' ? (
-                      <button className="rounded bg-red-600 px-3 py-1.5 text-[11px] font-bold text-white transition-colors hover:bg-red-700">
-                        Acknowledge
+                      <button
+                        type="button"
+                        onClick={() => navigate('/doctor/labs')}
+                        className="rounded bg-red-600 px-3 py-1.5 text-[11px] font-bold text-white transition-colors hover:bg-red-700"
+                      >
+                        {t('doctor.patients.acknowledge', { defaultValue: 'Acknowledge' })}
                       </button>
                     ) : (
-                      <span className="rounded bg-emerald-100 px-2 py-1 text-[10px] font-medium text-emerald-700">✅ Reviewed</span>
+                      <span className="rounded bg-emerald-100 px-2 py-1 text-[10px] font-medium text-emerald-700">
+                        ✅ {t('shared.labOrderStatus.reviewed', { defaultValue: 'Reviewed' })}
+                      </span>
                     )}
                   </div>
                 </div>
