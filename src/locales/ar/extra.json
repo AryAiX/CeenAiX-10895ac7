@@ -7,6 +7,9 @@
     "no": "لا",
     "previousMonth": "الشهر السابق",
     "nextMonth": "الشهر التالي",
+    "errors": {
+      "unknown": "حدث خطأ غير معروف"
+    },
     "time": {
       "minutesAgo": "منذ {{count}} د",
       "hoursAgo": "منذ {{count}} س",

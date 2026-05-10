@@ -7,6 +7,9 @@
     "no": "No",
     "previousMonth": "Previous month",
     "nextMonth": "Next month",
+    "errors": {
+      "unknown": "An unknown error occurred"
+    },
     "time": {
       "minutesAgo": "{{count}}m ago",
       "hoursAgo": "{{count}}h ago",

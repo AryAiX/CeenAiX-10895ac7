@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
+import i18n from 'i18next';
 
 interface UseQueryResult<T> {
   data: T | null;
@@ -42,7 +43,11 @@ export function useQuery<T>(
       }
     } catch (err) {
       if (mountedRef.current && currentRequestId === requestIdRef.current) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        setError(
+          err instanceof Error
+            ? err.message
+            : i18n.t('shared.errors.unknown', { defaultValue: 'An unknown error occurred' })
+        );
       }
     } finally {
       if (mountedRef.current && currentRequestId === requestIdRef.current) {
