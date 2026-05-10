@@ -86,3 +86,15 @@ Each bug includes a short identifier, the file affected, a description, and the 
 ### Area 1 — Auth flows (continued)
 
 31. **auth-context: null reference on Supabase insert error.** `userProfileInsertError.message.toLowerCase()` would throw if Supabase ever returned an error without a string `message`, kicking the user out of session bootstrap on first login. Made the message check null-safe.
+
+### Area 8 — Hooks and data-fetching layer (continued)
+
+32. **useBookableDoctors: hard-coded English "Doctor" fallback.** Now resolves to `shared.doctor` (already translated).
+33. **usePatientDashboard: hard-coded English "Care Team Clinician" / "Care Team" / "Active prescription" / "Insurance Provider" / "Patient Plan" / "Upcoming appointment scheduled" / "Next with {name}" fallbacks.** All routed through new `patient.dashboard.*` and `messaging.careTeamFallback` keys in both locales.
+34. **useDoctorDashboard: hard-coded English "Patient" fallback used in 5 places.** Routed through `shared.patient`.
+35. **usePatientPrescriptions: hard-coded English "Doctor" fallback in 2 places.** Routed through `shared.doctor`.
+36. **useDoctorPrescriptions: hard-coded English "Patient" fallback in 2 places.** Routed through `shared.patient`.
+37. **usePreVisit: hard-coded English "Doctor" fallback in 3 places.** Routed through `shared.doctor`.
+38. **usePatientAiChat: hard-coded English "Doctor" fallback.** Routed through `shared.doctor`.
+39. **usePatientNotifications: hard-coded English titles/bodies ("New message from", "Upcoming visit with", "New lab results from", "Your care team", "Open the thread to review...", "Review the appointment detail..."), all rendered to Arabic users.** Now all routed through new `patient.notifications.*` keys in both locales.
+40. **useDoctorNotifications: same problem — "New message from", "Open the thread...", "{patient} completed pre-visit intake", "{patient} updated chart information", body texts.** Routed through new `doctor.notifications.*` keys in both locales.

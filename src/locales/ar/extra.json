@@ -82,6 +82,12 @@
   },
   "patient": {
     "dashboard": {
+      "careTeamClinicianFallback": "طبيب فريق الرعاية",
+      "activePrescriptionFallback": "وصفة فعّالة",
+      "insuranceProviderFallback": "مزوّد التأمين",
+      "patientPlanFallback": "خطة المريض",
+      "upcomingAppointmentScheduled": "تم جدولة موعد قادم",
+      "nextWith": "التالي مع {{name}}",
       "welcome": "مرحباً بعودتك، {{name}}!",
       "careOverview": "إليك نظرة على رعايتك اليوم.",
       "profileStatus": "حالة الملف",

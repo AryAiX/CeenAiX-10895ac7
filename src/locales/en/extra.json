@@ -82,6 +82,12 @@
   },
   "patient": {
     "dashboard": {
+      "careTeamClinicianFallback": "Care team clinician",
+      "activePrescriptionFallback": "Active prescription",
+      "insuranceProviderFallback": "Insurance provider",
+      "patientPlanFallback": "Patient plan",
+      "upcomingAppointmentScheduled": "Upcoming appointment scheduled",
+      "nextWith": "Next with {{name}}",
       "welcome": "Welcome back, {{name}}!",
       "careOverview": "Here is your care overview for today.",
       "profileStatus": "Profile Status",
