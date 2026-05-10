@@ -48,10 +48,11 @@ interface StatCounterProps {
 
 const StatCounter = ({ value, suffix, label, active }: StatCounterProps) => {
   const count = useCounter(value, active);
+  const { i18n } = useTranslation('common');
   return (
     <div className="text-center group">
       <div className="text-5xl font-black mb-2 bg-gradient-to-br from-cyan-400 to-blue-400 bg-clip-text text-transparent tabular-nums">
-        {count.toLocaleString()}
+        {count.toLocaleString(i18n.language.startsWith('ar') ? 'ar-AE' : 'en-US')}
         {suffix}
       </div>
       <div className="text-cyan-100 font-medium text-sm uppercase tracking-widest">{label}</div>

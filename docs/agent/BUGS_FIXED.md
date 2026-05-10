@@ -50,3 +50,21 @@ Each bug includes a short identifier, the file affected, a description, and the 
 14. **PatientAppointments: calendar weekday header was hard-coded `['S','M','T','W','T','F','S']` letters.** Switched to `calendarWeekdayShort(t)[..].charAt(0)` so Arabic users see Arabic initials and other localized weekdays render correctly.
 15. **PatientAppointments: tapping a day in the mini-calendar shifted by ~4h.** `selected.toISOString().slice(0,10)` formatted the date in UTC, so users in UTC+04 (UAE) tapping midnight local saw the *previous* calendar day in the filter. Now constructs a local `YYYY-MM-DD` string from the chosen day.
 16. **PatientAppointments: `dateFrom`/`dateTo` filter parsing used UTC.** `new Date('2025-01-01')` is UTC midnight, so the range bracket shifted in UAE. Added a local `parseLocal` helper that interprets the picker value in the browser's timezone.
+
+### Area 3 — Doctor portal pages
+
+17. **DoctorDashboard: greeting hard-coded "Good afternoon".** Now hour-aware in both locale branches.
+18. **DoctorDashboard: `finishEstimate` hard-coded "~4:00 PM" fallback.** Misled doctors on empty days. Replaced with em-dash.
+
+### Area 7 — Public pages
+
+19. **FindDoctor: doctor ratings randomised on every render.** `rating: 4.2 + Math.random() * 0.8` returned a fresh value every page load, so the star ratings visibly changed without any data change. Replaced with a deterministic hash of the doctor id so each card has a stable pseudo-rating until a real rating column is wired up.
+20. **Home: `count.toLocaleString()` ignored UI locale.** Counter values now respect the resolved Arabic / English locale.
+
+### Area 9 — Shared components
+
+21. **Header: brand logo `div` was a non-keyboard accessible click target.** Promoted to a `<button type="button">` with an `aria-label` and focus ring; image `alt` removed (decorative) since the brand text provides the label.
+22. **Header: nav buttons missing `type="button"` + active-page semantics.** Added explicit types and `aria-current="page"` on the active route.
+23. **Footer: link buttons missing `type="button"` defaulted to "submit".** Set explicit types and made the brand image decorative.
+24. **AccessDenied: "Dashboard" button always pointed to `dashboardPath`, which falls through to `/auth/login` for unauthenticated users.** Now branches on `isAuthenticated`, showing a "Sign in" CTA for anonymous visitors, and the chevron flips on RTL.
+25. **PatientNotifications: unread count not localized.** Was rendering Western digits in Arabic UI. Now uses `formatLocaleDigits`.
