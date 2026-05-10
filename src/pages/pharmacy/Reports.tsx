@@ -42,7 +42,7 @@ export const PharmacyReports = () => {
   const maxDrugCount = Math.max(...topDrugs.map((item) => item.count), 1);
   const pharmacyFallback = t('pharmacy.reports.fallbackName', { defaultValue: 'Pharmacy' });
   const pharmacyName = data?.profile?.displayName ?? data?.organization?.name ?? pharmacyFallback;
-  const monthYear = dateTimeFormatWithNumerals(new Date(), uiLang, { month: 'long', year: 'numeric' });
+  const monthYear = new Date().toLocaleDateString(uiLang, dateTimeFormatWithNumerals(uiLang, { month: 'long', year: 'numeric' }));
 
   const kpis = [
     {

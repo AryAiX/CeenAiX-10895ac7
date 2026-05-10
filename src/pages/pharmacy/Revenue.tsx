@@ -54,11 +54,11 @@ export const PharmacyRevenue = () => {
   const maxChannel = Math.max(...insurers.map((insurer) => rows.filter((item) => item.insurer === insurer).length), 1);
   const pharmacyFallback = t('pharmacy.revenue.fallbackName', { defaultValue: 'Pharmacy' });
   const pharmacyName = data?.profile?.displayName ?? data?.organization?.name ?? pharmacyFallback;
-  const todayLabel = dateTimeFormatWithNumerals(new Date(), uiLang, {
+  const todayLabel = new Date().toLocaleDateString(uiLang, dateTimeFormatWithNumerals(uiLang, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-  });
+  }));
 
   return (
     <OpsShell
