@@ -18,6 +18,12 @@
     "tooltip": "Chat with AI Health Assistant",
     "ariaOpen": "Open AI Health Assistant"
   },
+  "portalShell": {
+    "collapseSidebar": "Collapse sidebar",
+    "expandSidebar": "Expand sidebar",
+    "collapse": "Collapse",
+    "expand": "Expand"
+  },
   "header": {
     "doctors": "Doctors",
     "clinics": "Clinics",
@@ -73,7 +79,8 @@
   },
   "language": {
     "enShort": "EN",
-    "arShort": "عربي"
+    "arShort": "عربي",
+    "switcherAriaLabel": "Language"
   },
   "home": {
     "features": "Features",

@@ -18,6 +18,12 @@
     "tooltip": "تحدث مع مساعد الصحة الذكي",
     "ariaOpen": "فتح مساعد الصحة الذكي"
   },
+  "portalShell": {
+    "collapseSidebar": "طي الشريط الجانبي",
+    "expandSidebar": "توسيع الشريط الجانبي",
+    "collapse": "طي",
+    "expand": "توسيع"
+  },
   "header": {
     "doctors": "الأطباء",
     "clinics": "العيادات",
@@ -73,7 +79,8 @@
   },
   "language": {
     "enShort": "EN",
-    "arShort": "عربي"
+    "arShort": "عربي",
+    "switcherAriaLabel": "اللغة"
   },
   "home": {
     "features": "الميزات",

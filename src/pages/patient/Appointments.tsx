@@ -25,6 +25,7 @@ import {
   appointmentStatusLabel,
   calendarWeekdayShort,
   dateTimeFormatWithNumerals,
+  formatLocaleDigits,
   preVisitStatusLabel,
   resolveLocale,
 } from '../../lib/i18n-ui';
@@ -281,18 +282,23 @@ export const PatientAppointments: React.FC = () => {
       }
       const totalMinutes = Math.floor(diff / 60_000);
       const seconds = Math.floor((diff % 60_000) / 1000);
+      const lang = i18n.language;
       if (totalMinutes >= 60) {
         const hours = Math.floor(totalMinutes / 60);
         const minutes = totalMinutes % 60;
-        setTeleconsultCountdown(`${hours}h ${minutes}m`);
+        setTeleconsultCountdown(
+          `${formatLocaleDigits(hours, lang)}${t('shared.hourShort', { defaultValue: 'h' })} ${formatLocaleDigits(minutes, lang)}${t('shared.minuteShort', { defaultValue: 'm' })}`
+        );
       } else {
-        setTeleconsultCountdown(`${totalMinutes}m ${seconds}s`);
+        setTeleconsultCountdown(
+          `${formatLocaleDigits(totalMinutes, lang)}${t('shared.minuteShort', { defaultValue: 'm' })} ${formatLocaleDigits(seconds, lang)}${t('shared.secondShort', { defaultValue: 's' })}`
+        );
       }
     };
     update();
     const interval = window.setInterval(update, 1000);
     return () => window.clearInterval(interval);
-  }, [nextTeleconsult, t]);
+  }, [nextTeleconsult, t, i18n.language]);
 
   const handleCancelAppointment = async (appointmentId: string) => {
     setFeedback(null);

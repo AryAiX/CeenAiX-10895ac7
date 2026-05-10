@@ -51,6 +51,9 @@
     "scheduledConsultation": "Scheduled consultation",
     "doctor": "Doctor",
     "patient": "Patient",
+    "hourShort": "h",
+    "minuteShort": "m",
+    "secondShort": "s",
     "clinicPending": "Clinic details will be confirmed after booking",
     "clinicTbd": "Clinic location to be confirmed",
     "clinicAfterBooking": "Clinic details will be confirmed after booking",
@@ -1142,6 +1145,7 @@
     "messages": {
       "title": "Messages",
       "subtitle": "Stay in touch with patients through secure care conversations.",
+      "encrypted": "Encrypted",
       "conversations": "Patient conversations",
       "conversationCount_one": "{{count}} thread",
       "conversationCount_other": "{{count}} threads",

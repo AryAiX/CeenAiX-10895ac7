@@ -106,3 +106,24 @@ Each bug includes a short identifier, the file affected, a description, and the 
 43. **ErrorBoundary: fallback UI hard-coded in English.** "Something went wrong", "An unexpected error occurred.", "Try again" rendered to Arabic users. Extracted a functional `DefaultErrorFallback` that pulls `errorBoundary.*` keys via `useTranslation`, added type="button" on the retry CTA.
 44. **ChatbotButton: tooltip and aria-label hard-coded in English.** Routed through new `chatbot.tooltip` / `chatbot.ariaOpen` keys; added `type="button"`.
 45. **AuthShell: copyright string hard-coded in English with a frozen 2026 year.** Replaced with `t('auth.shell.copyright', { year })` using the current year, with Arabic translation added.
+46. **LanguageSwitcher: `aria-label` hard-coded in English.** Routed through `language.switcherAriaLabel` key.
+47. **PortalShell: doctor sidebar collapse/expand `aria-label` + `title` hard-coded in English.** Routed through new `portalShell.collapseSidebar` / `expandSidebar` / `collapse` / `expand` keys.
+
+### Area 3 — Doctor portal pages (continued)
+
+48. **DoctorAppointments: hard-coded fake clinic name "Al Noor Medical Center — Cardiology Suite" shown to every doctor.** Misleading because it doesn't reflect the actual clinic the doctor is linked to. Now uses `doctorProfile?.specialization` when available, falling back to the localized `doctor.appointments.subtitle` ("Manage your patient schedule").
+49. **DoctorAppointments: month no-show rate divided by total appointments instead of month's.** `monthNoShows / appointments.length` was incorrect — `monthNoShows` is filtered by the current month but the denominator was *all* appointments ever, leading to artificially low rates as historical data grew. Now divides by the count of appointments scheduled in that same month.
+50. **DoctorMessages: hard-coded English "Encrypted" badge + non-functional "Mark all read" + visual-only filter chips.** The "Mark all read" button had no handler and the `['All','Patients','Doctors','Pharmacy','Labs']` chips never filtered anything. Removed the dead controls, localized the encrypted badge through new `doctor.messages.encrypted` key.
+51. **DoctorNotifications: unread count rendered with Western digits in Arabic UI.** Now formatted via `formatLocaleDigits`.
+52. **DoctorSchedule: `getTodayDate()` used `new Date().toISOString().slice(0,10)`, which is UTC.** In UAE (UTC+04) the date input's `min` and default could be the previous day for late-night users, allowing a doctor to schedule "today" against yesterday's date. Now formats the local `YYYY-MM-DD`.
+53. **DoctorSchedule: hard-coded English error/success copy in form handlers** (`"You need to be signed in as a doctor to manage availability."`, etc). Routed through new `doctor.schedule.*` keys with English defaults.
+
+### Area 2 — Patient portal pages (continued)
+
+54. **PatientAppointments: teleconsult countdown rendered with hard-coded English `h`/`m`/`s` units and Western digits.** Now uses `formatLocaleDigits` and i18n keys (`shared.hourShort` / `minuteShort` / `secondShort`) so the live countdown reads correctly in Arabic.
+
+### Area 8 — Hooks and data-fetching layer (continued)
+
+55. **useDoctorSchedule: today filter for `blocked_date` used UTC ISO date.** Same UAE timezone shift as above — late-night users could see yesterday's blocks treated as past. Now formats `today` from local `getFullYear`/`getMonth`/`getDate`.
+56. **useDoctorBookingAvailability: blocked-slot range filter used UTC ISO date** for `gte` / `lte`. Same fix — local date formatting helper added.
+57. **usePatientDashboard: insurance "today" key computed in UTC.** Could shift policy validity comparisons by ~4h. Now uses local-date formatting.

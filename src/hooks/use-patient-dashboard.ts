@@ -582,7 +582,7 @@ export function usePatientDashboard(userId: string | null | undefined, uiLanguag
       const annualLimit = planRow?.annual_limit ?? null;
       const annualLimitUsed = Number(primaryInsurance.annual_limit_used ?? 0);
       const remainingAmount = annualLimit !== null ? Math.max(annualLimit - annualLimitUsed, 0) : null;
-      const nowDateKey = now.toISOString().slice(0, 10);
+      const nowDateKey = `${now.getFullYear()}-${`${now.getMonth() + 1}`.padStart(2, '0')}-${`${now.getDate()}`.padStart(2, '0')}`;
       const validUntil = primaryInsurance.valid_until;
 
       insurance = {

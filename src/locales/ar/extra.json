@@ -51,6 +51,9 @@
     "scheduledConsultation": "استشارة مجدولة",
     "doctor": "طبيب",
     "patient": "مريض",
+    "hourShort": "س",
+    "minuteShort": "د",
+    "secondShort": "ث",
     "clinicPending": "تأكيد تفاصيل العيادة بعد الحجز",
     "clinicTbd": "موقع العيادة سيُؤكد لاحقاً",
     "clinicAfterBooking": "تأكيد تفاصيل العيادة بعد الحجز",
@@ -1142,6 +1145,7 @@
     "messages": {
       "title": "الرسائل",
       "subtitle": "ابقَ على تواصل مع المرضى عبر محادثات رعاية آمنة.",
+      "encrypted": "مشفّر",
       "conversations": "محادثات المرضى",
       "conversationCount_one": "{{count}} محادثة",
       "conversationCount_other": "{{count}} محادثات",
