@@ -100,3 +100,9 @@ Each bug includes a short identifier, the file affected, a description, and the 
 40. **useDoctorNotifications: same problem — "New message from", "Open the thread...", "{patient} completed pre-visit intake", "{patient} updated chart information", body texts.** Routed through new `doctor.notifications.*` keys in both locales.
 41. **useDoctorPatients: hard-coded English "Insurance on file" fallback.** Routed through `doctor.patients.insuranceOnFile`.
 42. **usePharmacyPrescriptionQueue: hard-coded English "Linked dispensing task" fallback.** Routed through `pharmacy.queue.linkedDispensingTask`.
+
+### Area 9 — Shared components (continued)
+
+43. **ErrorBoundary: fallback UI hard-coded in English.** "Something went wrong", "An unexpected error occurred.", "Try again" rendered to Arabic users. Extracted a functional `DefaultErrorFallback` that pulls `errorBoundary.*` keys via `useTranslation`, added type="button" on the retry CTA.
+44. **ChatbotButton: tooltip and aria-label hard-coded in English.** Routed through new `chatbot.tooltip` / `chatbot.ariaOpen` keys; added `type="button"`.
+45. **AuthShell: copyright string hard-coded in English with a frozen 2026 year.** Replaced with `t('auth.shell.copyright', { year })` using the current year, with Arabic translation added.

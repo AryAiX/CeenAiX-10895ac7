@@ -9,6 +9,15 @@
     "errLoadConversations": "Unable to load conversations.",
     "errLoadMessages": "Unable to load messages."
   },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "body": "An unexpected error occurred.",
+    "retry": "Try again"
+  },
+  "chatbot": {
+    "tooltip": "Chat with AI Health Assistant",
+    "ariaOpen": "Open AI Health Assistant"
+  },
   "header": {
     "doctors": "Doctors",
     "clinics": "Clinics",
@@ -618,7 +627,8 @@
       "cardDoctor": "AI-powered operations",
       "cardDoctorDesc": "Clinical and operational workflows stay connected.",
       "cardSecure": "Secure by default",
-      "cardSecureDesc": "Supabase auth with guarded routes."
+      "cardSecureDesc": "Supabase auth with guarded routes.",
+      "copyright": "© {{year}} CeenAiX Healthcare Technologies, Dubai, UAE"
     },
     "login": {
       "badge": "Secure Sign In",

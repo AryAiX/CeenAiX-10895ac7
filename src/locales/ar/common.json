@@ -9,6 +9,15 @@
     "errLoadConversations": "تعذّر تحميل المحادثات.",
     "errLoadMessages": "تعذّر تحميل الرسائل."
   },
+  "errorBoundary": {
+    "title": "حدث خطأ",
+    "body": "حدث خطأ غير متوقع.",
+    "retry": "حاول مرة أخرى"
+  },
+  "chatbot": {
+    "tooltip": "تحدث مع مساعد الصحة الذكي",
+    "ariaOpen": "فتح مساعد الصحة الذكي"
+  },
   "header": {
     "doctors": "الأطباء",
     "clinics": "العيادات",
@@ -618,7 +627,8 @@
       "cardDoctor": "عمليات مدعومة بالذكاء الاصطناعي",
       "cardDoctorDesc": "تبقى سير العمل السريرية والتشغيلية متصلة.",
       "cardSecure": "آمن افتراضياً",
-      "cardSecureDesc": "مصادقة عبر Supabase مع مسارات محمية."
+      "cardSecureDesc": "مصادقة عبر Supabase مع مسارات محمية.",
+      "copyright": "© {{year}} سينيكس لتقنيات الرعاية الصحية، دبي، الإمارات"
     },
     "login": {
       "badge": "تسجيل دخول آمن",
