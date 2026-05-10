@@ -4,7 +4,7 @@ import type { Conversation, Message } from '../types';
 import {
   buildDirectParticipantIds,
   ConversationListItem,
-  DEFAULT_CARE_CONVERSATION_SUBJECT,
+  getDefaultCareConversationSubject,
   getMessagePreviewText,
   getConversationCounterpartyId,
   isMissingMessagingRpcError,
@@ -261,7 +261,7 @@ export function useMessagingHub(userId: string | null | undefined, selectedConve
       setActionError(null);
 
       try {
-        const effectiveSubject = subject?.trim() || DEFAULT_CARE_CONVERSATION_SUBJECT;
+        const effectiveSubject = subject?.trim() || getDefaultCareConversationSubject();
         const { data, error } = await supabase.rpc('get_or_create_direct_conversation', {
           p_other_user_id: otherUserId,
           p_subject: effectiveSubject,

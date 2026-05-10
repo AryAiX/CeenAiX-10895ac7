@@ -7,7 +7,12 @@
     "errStartConversation": "Unable to start this conversation.",
     "errSendMessage": "Unable to send message.",
     "errLoadConversations": "Unable to load conversations.",
-    "errLoadMessages": "Unable to load messages."
+    "errLoadMessages": "Unable to load messages.",
+    "actionBookingLink": "Appointment link",
+    "actionAppointmentsLink": "Appointments reminder",
+    "actionRecordsLink": "Records reminder",
+    "actionCareDefault": "Care action",
+    "defaultCareSubject": "Care conversation"
   },
   "errorBoundary": {
     "title": "Something went wrong",

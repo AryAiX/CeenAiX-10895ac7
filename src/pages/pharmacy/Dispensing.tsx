@@ -4,6 +4,7 @@ import { ChevronDown, MessageSquare, Play, Search } from 'lucide-react';
 import { OpsShell } from '../../components/OpsShell';
 import { usePharmacyPrescriptionQueue } from '../../hooks';
 import type { PharmacyQueuePrescriptionItem } from '../../hooks';
+import { formatLocaleDigits } from '../../lib/i18n-ui';
 import { PHARMACY_NAV_ITEMS } from './navItems';
 
 type FilterType = 'all' | 'new' | 'in_progress' | 'on_hold' | 'dispensed' | 'cancelled';
@@ -90,8 +91,8 @@ const statusSortOrder: Record<Exclude<FilterType, 'all'>, number> = {
   cancelled: 4,
 };
 
-const formatNumber = (value: number | null | undefined) =>
-  typeof value === 'number' ? value.toLocaleString() : '—';
+const formatNumber = (value: number | null | undefined, language: string) =>
+  typeof value === 'number' ? formatLocaleDigits(value, language) : '—';
 
 const avatarClasses = [
   'bg-rose-500',
@@ -181,7 +182,8 @@ const groupPrescriptionRows = (items: PharmacyQueuePrescriptionItem[]): Prescrip
 };
 
 export const PharmacyDispensing = () => {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
+  const uiLang = i18n.language ?? 'en';
   const { data, loading } = usePharmacyPrescriptionQueue();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterType>('all');
@@ -279,7 +281,7 @@ export const PharmacyDispensing = () => {
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
-                {filterLabels[key]} ({formatNumber(counts[key])})
+                {filterLabels[key]} ({formatNumber(counts[key], uiLang)})
               </button>
             ))}
           </div>
@@ -377,7 +379,7 @@ export const PharmacyDispensing = () => {
 
                     <div>
                       <div className="truncate text-[11px] text-slate-600">{row.insurance}</div>
-                      <div className="font-mono text-[11px] font-bold text-emerald-600">AED {formatNumber(row.copay)}</div>
+                      <div className="font-mono text-[11px] font-bold text-emerald-600">AED {formatNumber(row.copay, uiLang)}</div>
                     </div>
 
                     <div>

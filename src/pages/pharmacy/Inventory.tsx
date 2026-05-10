@@ -12,6 +12,7 @@ import {
 import { OpsShell } from '../../components/OpsShell';
 import { usePharmacyPrescriptionQueue } from '../../hooks';
 import type { PharmacyInventoryDerivedItem } from '../../hooks';
+import { formatLocaleDigits } from '../../lib/i18n-ui';
 import { PHARMACY_NAV_ITEMS } from './navItems';
 
 type FilterType =
@@ -139,8 +140,8 @@ const statusForInventory = (item: PharmacyInventoryDerivedItem): InventoryRow['s
   return 'in_stock';
 };
 
-const formatNumber = (value: number | null | undefined) =>
-  typeof value === 'number' ? value.toLocaleString() : '—';
+const formatNumber = (value: number | null | undefined, language: string) =>
+  typeof value === 'number' ? formatLocaleDigits(value, language) : '—';
 
 const toInventoryRows = (items: PharmacyInventoryDerivedItem[]): InventoryRow[] =>
   items.map((item) => {
@@ -172,7 +173,8 @@ const toInventoryRows = (items: PharmacyInventoryDerivedItem[]): InventoryRow[] 
   });
 
 export const PharmacyInventory = () => {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
+  const uiLang = i18n.language ?? 'en';
   const { data, loading } = usePharmacyPrescriptionQueue();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterType>('all');
@@ -266,7 +268,7 @@ export const PharmacyInventory = () => {
           ].map((stat) => (
             <div key={stat.label} className={`rounded-xl border border-slate-100 px-4 py-3 shadow-sm ${stat.bg}`}>
               <div className={`font-mono text-[22px] font-bold ${stat.color}`}>
-                {loading ? '…' : formatNumber(stat.value)}
+                {loading ? '…' : formatNumber(stat.value, uiLang)}
               </div>
               <div className="mt-0.5 text-[11px] text-slate-500">{stat.label}</div>
             </div>
@@ -296,7 +298,7 @@ export const PharmacyInventory = () => {
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
-                {filterLabels[key]} ({formatNumber(counts[key])})
+                {filterLabels[key]} ({formatNumber(counts[key], uiLang)})
               </button>
             ))}
           </div>
@@ -375,7 +377,7 @@ export const PharmacyInventory = () => {
                               : 'text-slate-800'
                         }`}
                       >
-                        {formatNumber(item.stockQty)}{' '}
+                        {formatNumber(item.stockQty, uiLang)}{' '}
                         <span className="text-[10px] font-normal text-slate-400">{item.unit}</span>
                       </div>
                       <div className="mt-1 h-1.5 w-24 rounded-full bg-slate-200">
@@ -401,7 +403,7 @@ export const PharmacyInventory = () => {
                     </div>
 
                     <div className="font-mono text-[12px] text-slate-500">
-                      {formatNumber(item.reorderLevel)} {item.unit}
+                      {formatNumber(item.reorderLevel, uiLang)} {item.unit}
                     </div>
 
                     <div>
