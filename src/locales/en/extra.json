@@ -1241,6 +1241,7 @@
     "patients": {
       "title": "Patients",
       "subtitle": "Review your real patient list from completed and upcoming appointments.",
+      "insuranceOnFile": "Insurance on file",
       "searchPlaceholder": "Search patients by name, email, phone, blood type, or concern...",
       "searchPh": "Search by name, Emirates ID, condition, or medication...",
       "count_one": "{{count}} patient",
