@@ -168,6 +168,7 @@ test('admin, patient, doctor, lab, and patient complete a clinical order journey
   await closePage(labDashboardPage);
 
   const patientLabResultsPage = await openRolePage(browser, state, 'patient', '/patient/lab-results');
+  await patientLabResultsPage.getByRole('button', { name: /upcoming/i }).click();
   await expect(patientLabResultsPage.getByText(/Complete Blood Count/).first()).toBeVisible();
   await expect(patientLabResultsPage.getByText(/ordered|pending|processing/i).first()).toBeVisible();
   await closePage(patientLabResultsPage);
