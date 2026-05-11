@@ -87,6 +87,7 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
   const [doctorComposerFocused, setDoctorComposerFocused] = useState(false);
   const [attachment, setAttachment] = useState<AttachmentPreview | null>(null);
   const [sentAttachments, setSentAttachments] = useState<Record<string, AttachmentPreview>>({});
+  const [readMessageIds, setReadMessageIds] = useState<Set<string>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const bootstrappedTargetRef = useRef<string | null>(null);
   const doctorComposerRef = useRef<HTMLDivElement | null>(null);
@@ -133,8 +134,14 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
   }, [composeParam, composeTargetId, ensureDirectConversation, namespace, navigate, role, t, user?.id]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (messages.length === 0) return;
+    const ids = messages
+      .filter((m) => m.sender_id !== user?.id)
+      .map((m) => m.id);
+    if (ids.length > 0) {
+      setReadMessageIds((prev) => new Set([...prev, ...ids]));
+    }
+  }, [messages, user?.id]);
 
   // Cleanup attachment preview URLs on unmount
   useEffect(() => {
@@ -846,6 +853,15 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
                             </div>
                           ) : null}
                           <div className="mt-2">{renderMessageBody(message.body, isOwn)}</div>
+                          {isOwn ? (
+                            <div className="mt-1 flex items-center justify-end gap-1">
+                              {readMessageIds.has(message.id) ? (
+                                <span className="text-[10px] text-white/70">{'✓✓ Read'}</span>
+                              ) : (
+                                <span className="text-[10px] text-white/60">{'✓ Sent'}</span>
+                              )}
+                            </div>
+                          ) : null}
                         </div>
                       </div>
                     );
