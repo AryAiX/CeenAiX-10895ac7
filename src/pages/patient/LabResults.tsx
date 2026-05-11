@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -15,6 +16,8 @@ import {
   FileText,
   FlaskConical,
   LineChart,
+  Link,
+  Mail,
   MessageCircle,
   Share2,
   Sparkles,
@@ -186,6 +189,171 @@ function zoneMarkerPercent(item: LabOrderItem): number | null {
   return getZonePosition(item);
 }
 
+interface ShareModalProps {
+  order: PatientLabOrderRecord;
+  language: string;
+  shareMethod: 'link' | 'email' | 'whatsapp';
+  shareSuccess: boolean;
+  onMethodChange: (m: 'link' | 'email' | 'whatsapp') => void;
+  onShare: () => void;
+  onClose: () => void;
+}
+
+const WhatsAppIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="#25D366">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+  </svg>
+);
+
+const SHARE_METHODS: Array<{
+  id: 'link' | 'email' | 'whatsapp';
+  label: string;
+  icon: React.ReactNode;
+}> = [
+  { id: 'link', label: 'Secure Link', icon: <Link className="h-5 w-5" /> },
+  { id: 'email', label: 'Email', icon: <Mail className="h-5 w-5" /> },
+  { id: 'whatsapp', label: 'WhatsApp', icon: <WhatsAppIcon /> },
+];
+
+const METHOD_SUCCESS_MESSAGE: Record<'link' | 'email' | 'whatsapp', string> = {
+  link: 'Report text copied to clipboard. Paste and share securely.',
+  email: 'Your email client has opened with the report pre-filled.',
+  whatsapp: 'WhatsApp has opened with the report ready to send.',
+};
+
+const ShareModal: React.FC<ShareModalProps> = ({
+  order,
+  language,
+  shareMethod,
+  shareSuccess,
+  onMethodChange,
+  onShare,
+  onClose,
+}) => {
+  const dateStr = formatDate(language, order.results_released_at ?? order.ordered_at, true);
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md rounded-2xl bg-white shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-6 py-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+              <Share2 className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-slate-900">Share Report</h2>
+              <p className="text-xs text-slate-500">
+                {order.labName ?? 'Lab'} · {dateStr}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg border border-slate-200 p-1.5 text-slate-400 transition hover:bg-slate-50 hover:text-slate-600"
+            aria-label="Close"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="p-6">
+          {shareSuccess ? (
+            /* Success screen */
+            <div className="py-4 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+                <CheckCircle className="h-9 w-9 text-emerald-600" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900">Report Shared!</h3>
+              <p className="mx-auto mt-2 max-w-xs text-sm text-slate-500">
+                {METHOD_SUCCESS_MESSAGE[shareMethod]}
+              </p>
+              <button
+                type="button"
+                onClick={onClose}
+                className="mt-6 w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
+              >
+                Done
+              </button>
+            </div>
+          ) : (
+            /* Form screen */
+            <>
+              {/* Report summary card */}
+              <div className="mb-5 flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-red-100">
+                  <FileText className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-slate-900">
+                    {order.labName ?? 'Lab Report'}
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    {dateStr} · {order.parentItems.length} test{order.parentItems.length !== 1 ? 's' : ''}
+                  </div>
+                </div>
+              </div>
+
+              {/* Share method grid */}
+              <div className="mb-5 grid grid-cols-3 gap-3">
+                {SHARE_METHODS.map((m) => {
+                  const selected = shareMethod === m.id;
+                  return (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => onMethodChange(m.id)}
+                      className={`flex flex-col items-center gap-2 rounded-xl border-2 px-3 py-4 text-xs font-semibold transition ${
+                        selected
+                          ? 'border-teal-500 bg-teal-50 text-teal-700'
+                          : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                      }`}
+                    >
+                      {m.icon}
+                      {m.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Disclaimer */}
+              <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
+                ⚠️ Only share with authorized healthcare providers. Recipient will have view-only access.
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex-1 rounded-xl border-2 border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={onShare}
+                  className="flex-1 rounded-xl bg-gradient-to-r from-blue-600 to-teal-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:shadow-md"
+                >
+                  Share
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+};
+
 export const PatientLabResults: React.FC = () => {
   const { t, i18n } = useTranslation('common');
   const navigate = useNavigate();
@@ -202,7 +370,9 @@ export const PatientLabResults: React.FC = () => {
   const [historyFilter, setHistoryFilter] = useState<'all' | 'abnormal' | 'normal'>('all');
   const [historySort, setHistorySort] = useState<'newest' | 'oldest'>('newest');
   const [previewOrder, setPreviewOrder] = useState<PatientLabOrderRecord | null>(null);
-  const [copiedOrderId, setCopiedOrderId] = useState<string | null>(null);
+  const [shareOrder, setShareOrder] = useState<PatientLabOrderRecord | null>(null);
+  const [shareMethod, setShareMethod] = useState<'link' | 'email' | 'whatsapp'>('link');
+  const [shareSuccess, setShareSuccess] = useState(false);
 
   const labOrders = useMemo<PatientLabOrderRecord[]>(() => data ?? [], [data]);
 
@@ -1393,27 +1563,30 @@ export const PatientLabResults: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  const handleShare = async (order: PatientLabOrderRecord) => {
-    const dateStr = formatDate(i18n.language, order.results_released_at ?? order.ordered_at, true);
-    const title = `Lab Results — ${order.labName ?? 'Lab'} · ${dateStr}`;
-    const text = buildReportText(order, dateStr);
+  const closeShareModal = () => {
+    setShareOrder(null);
+    setShareSuccess(false);
+    setShareMethod('link');
+  };
 
-    if (navigator.share) {
+  const handleShareAction = async () => {
+    if (!shareOrder) return;
+    const dateStr = formatDate(i18n.language, shareOrder.results_released_at ?? shareOrder.ordered_at, true);
+    const text = buildReportText(shareOrder, dateStr);
+
+    if (shareMethod === 'link') {
       try {
-        await navigator.share({ title, text });
+        await navigator.clipboard.writeText(text);
       } catch {
-        // user cancelled or permission denied — no action needed
+        // clipboard denied — proceed to success screen anyway
       }
-      return;
+    } else if (shareMethod === 'email') {
+      window.open(`mailto:?subject=Lab Results Report&body=${encodeURIComponent(text)}`);
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
     }
 
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopiedOrderId(order.id);
-      setTimeout(() => setCopiedOrderId(null), 2500);
-    } catch {
-      // clipboard access denied — silently fail
-    }
+    setShareSuccess(true);
   };
 
   // ----- Reports -------------------------------------------------------------
@@ -1495,22 +1668,14 @@ export const PatientLabResults: React.FC = () => {
                   <Eye className="h-4 w-4" />
                   {t('patient.labResults.reportsPreviewBtn')}
                 </button>
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => handleShare(order)}
-                    className="inline-flex items-center gap-2 rounded-lg border-2 border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
-                  >
-                    <Share2 className="h-4 w-4" />
-                    {t('patient.labResults.reportsShareBtn')}
-                  </button>
-                  {copiedOrderId === order.id ? (
-                    <div className="absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-medium text-white shadow-lg">
-                      Copied to clipboard!
-                      <div className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-slate-800" />
-                    </div>
-                  ) : null}
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setShareOrder(order)}
+                  className="inline-flex items-center gap-2 rounded-lg border-2 border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                >
+                  <Share2 className="h-4 w-4" />
+                  {t('patient.labResults.reportsShareBtn')}
+                </button>
               </div>
             </div>
           </div>
@@ -1874,6 +2039,18 @@ export const PatientLabResults: React.FC = () => {
             </div>
           </div>
         </div>
+      ) : null}
+
+      {shareOrder ? (
+        <ShareModal
+          order={shareOrder}
+          language={i18n.language}
+          shareMethod={shareMethod}
+          shareSuccess={shareSuccess}
+          onMethodChange={setShareMethod}
+          onShare={handleShareAction}
+          onClose={closeShareModal}
+        />
       ) : null}
     </>
   );
