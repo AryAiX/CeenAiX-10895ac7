@@ -163,6 +163,11 @@ export const PatientPrescriptions: React.FC = () => {
   const [expandedLineIds, setExpandedLineIds] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState<MedicationTab>('active');
   const [takenDoseKeys, setTakenDoseKeys] = useState<Set<string>>(new Set());
+  const [pausedReminderIds, setPausedReminderIds] = useState<Set<string>>(new Set());
+  const [editingReminderId, setEditingReminderId] = useState<string | null>(null);
+  const [deletedReminderIds, setDeletedReminderIds] = useState<Set<string>>(new Set());
+  const [reminderTimes, setReminderTimes] = useState<Record<string, string>>({});
+  const [editingTime, setEditingTime] = useState('');
 
   const prescriptions = useMemo(() => data ?? [], [data]);
 
@@ -625,7 +630,9 @@ export const PatientPrescriptions: React.FC = () => {
   };
 
   const renderRemindersTab = () => {
-    if (reminderRows.length === 0) {
+    const visibleReminders = reminderRows.filter((r) => !deletedReminderIds.has(r.id));
+
+    if (visibleReminders.length === 0) {
       return renderEmptyTab(
         <Bell className="h-7 w-7" />,
         'patient.prescriptions.remindersEmptyTitle',
@@ -662,7 +669,7 @@ export const PatientPrescriptions: React.FC = () => {
             </div>
             <div className="text-sm text-teal-100">
               {t('patient.prescriptions.reminderAdherenceCounts', {
-                configured: formatLocaleDigits(reminderRows.length, uiLang),
+                configured: formatLocaleDigits(visibleReminders.length, uiLang),
                 active: formatLocaleDigits(activeMedicationCount, uiLang),
               })}
             </div>
@@ -703,18 +710,27 @@ export const PatientPrescriptions: React.FC = () => {
           </div>
 
           <div className="space-y-4">
-            {reminderRows.map((reminder, idx) => {
+            {visibleReminders.map((reminder, idx) => {
               const accent = lineAccent(reminder.row.item.medication_name);
+              const isPaused = pausedReminderIds.has(reminder.id);
+              const isEditing = editingReminderId === reminder.id;
+              const displayTime = reminderTimes[reminder.id] ?? reminder.time;
               return (
                 <div
                   key={reminder.id}
                   style={{ animationDelay: `${idx * 80}ms`, borderLeftColor: accent.hex }}
-                  className="animate-slideUp rounded-xl border-l-4 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md"
+                  className={`animate-slideUp rounded-xl border-l-4 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md ${
+                    isPaused ? 'opacity-60' : ''
+                  }`}
                 >
                   <div className="mb-3 flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-100">
-                        <Bell className="h-5 w-5 text-teal-600" />
+                      <div
+                        className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                          isPaused ? 'bg-amber-100' : 'bg-teal-100'
+                        }`}
+                      >
+                        <Bell className={`h-5 w-5 ${isPaused ? 'text-amber-600' : 'text-teal-600'}`} />
                       </div>
                       <div>
                         <h4 className="text-sm font-bold text-slate-900">
@@ -726,12 +742,18 @@ export const PatientPrescriptions: React.FC = () => {
                           />{' '}
                           — {reminder.doseLabel}
                         </h4>
-                        <div className="mt-1 text-sm text-slate-600">⏰ {reminder.time}</div>
+                        <div className="mt-1 text-sm text-slate-600">⏰ {displayTime}</div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
-                      {t('patient.prescriptions.reminderDerivedStatus')}
-                    </div>
+                    {isPaused ? (
+                      <div className="flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">
+                        Paused
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
+                        {t('patient.prescriptions.reminderDerivedStatus')}
+                      </div>
+                    )}
                   </div>
 
                   <div className="mb-3 flex flex-wrap items-center gap-3">
@@ -751,19 +773,85 @@ export const PatientPrescriptions: React.FC = () => {
                       {t('patient.prescriptions.reminderPreview', {
                         name: reminder.row.item.medication_name,
                         dose: reminder.row.item.dosage ?? t('patient.prescriptions.frequencyDosing'),
-                        time: reminder.time,
+                        time: displayTime,
                       })}
                     </div>
                   </div>
 
+                  {isEditing ? (
+                    <div className="mb-3 rounded-xl border border-teal-200 bg-teal-50 p-4">
+                      <p className="mb-3 text-xs font-semibold text-teal-800">
+                        {t('patient.prescriptions.reminderEdit')} — {t('patient.prescriptions.scheduleMorning')}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <input
+                          type="time"
+                          value={editingTime}
+                          onChange={(e) => setEditingTime(e.target.value)}
+                          className="rounded-lg border border-teal-300 bg-white px-3 py-2 text-sm font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setReminderTimes((prev) => ({ ...prev, [reminder.id]: editingTime }));
+                            setEditingReminderId(null);
+                          }}
+                          className="rounded-lg bg-teal-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-teal-700"
+                        >
+                          Save
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingReminderId(null)}
+                          className="rounded-lg border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+
                   <div className="flex flex-wrap items-center gap-2">
-                    <button type="button" className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-teal-600 transition-all hover:bg-teal-50">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingReminderId(reminder.id);
+                        setEditingTime(reminderTimes[reminder.id] ?? reminder.time);
+                      }}
+                      className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-teal-600 transition-all hover:bg-teal-50"
+                    >
                       <CreditCard className="h-3.5 w-3.5" /> {t('patient.prescriptions.reminderEdit')}
                     </button>
-                    <button type="button" className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-amber-600 transition-all hover:bg-amber-50">
-                      <Pause className="h-3.5 w-3.5" /> {t('patient.prescriptions.reminderPause')}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setPausedReminderIds((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(reminder.id)) {
+                            next.delete(reminder.id);
+                          } else {
+                            next.add(reminder.id);
+                          }
+                          return next;
+                        })
+                      }
+                      className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-amber-600 transition-all hover:bg-amber-50"
+                    >
+                      <Pause className="h-3.5 w-3.5" />
+                      {isPaused ? 'Resume' : t('patient.prescriptions.reminderPause')}
                     </button>
-                    <button type="button" className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 transition-all hover:bg-red-50">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (window.confirm('Are you sure you want to delete this reminder?')) {
+                          setDeletedReminderIds((prev) => new Set([...prev, reminder.id]));
+                          if (editingReminderId === reminder.id) {
+                            setEditingReminderId(null);
+                          }
+                        }
+                      }}
+                      className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 transition-all hover:bg-red-50"
+                    >
                       <Trash2 className="h-3.5 w-3.5" /> {t('patient.prescriptions.reminderDelete')}
                     </button>
                   </div>
