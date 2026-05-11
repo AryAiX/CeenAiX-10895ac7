@@ -1282,10 +1282,19 @@ const currentTableRow = (
   table: string,
   rows: JsonRecord[],
   currentUser: E2EUser,
-  profileCompleted: boolean
+  profileCompleted: boolean,
+  url?: URL
 ): JsonRecord | null => {
   if (table === 'user_profiles') {
     return userProfile(currentUser, profileCompleted);
+  }
+
+  if (table === 'appointments') {
+    const idFilter = url?.searchParams.get('id');
+    const id = idFilter?.startsWith('eq.') ? idFilter.slice(3) : null;
+    if (id) {
+      return rows.find((row) => row.id === id) ?? null;
+    }
   }
 
   if (table === 'patient_profiles') {
@@ -1483,7 +1492,7 @@ const handleRestRoute = async (
       return;
     }
 
-    const body = isObjectResponse(route) ? currentTableRow(table, rows, currentUser, profileCompleted) ?? {} : rows;
+    const body = isObjectResponse(route) ? currentTableRow(table, rows, currentUser, profileCompleted, url) ?? {} : rows;
     await json(route, body);
     return;
   }
@@ -1500,7 +1509,7 @@ const handleRestRoute = async (
   }
 
   if (isObjectResponse(route)) {
-    await json(route, currentTableRow(table, rows, currentUser, profileCompleted));
+    await json(route, currentTableRow(table, rows, currentUser, profileCompleted, url));
     return;
   }
 

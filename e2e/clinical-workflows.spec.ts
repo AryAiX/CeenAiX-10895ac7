@@ -383,7 +383,7 @@ test('admin cannot onboard an organization without a required name', async ({ br
   await page.getByRole('button', { name: /\+ add organization/i }).click();
   await page.getByRole('button', { name: /create organization/i }).click();
 
-  await expect(page.getByText(/organization name is required/i)).toBeVisible();
+  await expect(page.locator('#org-name')).toBeInvalid();
   expect(state.organizations).toHaveLength(0);
   await closePage(page);
 });
@@ -397,7 +397,7 @@ test('admin cannot onboard an organization with an invalid contact email', async
   await page.getByLabel(/primary contact email/i).fill('not-an-email');
   await page.getByRole('button', { name: /create organization/i }).click();
 
-  await expect(page.getByText(/email looks invalid/i)).toBeVisible();
+  await expect(page.locator('#org-contact-email')).toBeInvalid();
   expect(state.organizations).toHaveLength(0);
   await closePage(page);
 });
@@ -448,7 +448,7 @@ test('patient can cancel a future appointment', async ({ browser }) => {
   const state = createE2EWorkflowState({ includeBaselineData: true });
   const page = await openRolePage(browser, state, 'patient', '/patient/appointments');
 
-  await page.getByRole('button', { name: /^cancel$/i }).first().click();
+  await page.getByRole('button', { name: /cancel appointment/i }).first().click();
 
   await expect(page.getByText(/appointment cancelled successfully/i)).toBeVisible();
   expect(state.appointments[0]).toEqual(expect.objectContaining({ status: 'cancelled' }));
@@ -480,12 +480,13 @@ test('patient no-show appears in cancelled appointments', async ({ browser }) =>
   seedAppointment(state, {
     id: 'appointment-no-show-patient',
     status: 'no_show',
-    scheduled_at: scenarioYesterday,
+    scheduled_at: scenarioTomorrow,
     chief_complaint: 'Missed monthly no-show',
   });
   const page = await openRolePage(browser, state, 'patient', '/patient/appointments');
 
   await page.getByRole('button', { name: /cancelled/i }).click();
+  await page.getByRole('button', { name: /past activity/i }).click();
 
   await expect(page.getByText('Missed monthly no-show')).toBeVisible();
   await expect(page.getByText(/no show/i).first()).toBeVisible();
@@ -497,12 +498,13 @@ test('doctor no-show analytics include missed appointments', async ({ browser })
   seedAppointment(state, {
     id: 'appointment-no-show-doctor',
     status: 'no_show',
-    scheduled_at: scenarioYesterday,
+    scheduled_at: scenarioTomorrow,
     chief_complaint: 'Doctor sees no-show',
   });
   const page = await openRolePage(browser, state, 'doctor', '/doctor/appointments');
 
   await expect(page.getByText(/No-Shows This Month/i)).toBeVisible();
+  await page.getByRole('button', { name: /list view/i }).click();
   await expect(page.getByText('Doctor sees no-show')).toBeVisible();
   await closePage(page);
 });
@@ -534,6 +536,7 @@ test('doctor can cancel a future appointment from the worklist', async ({ browse
   const state = createE2EWorkflowState({ includeBaselineData: true });
   const page = await openRolePage(browser, state, 'doctor', '/doctor/appointments');
 
+  await page.getByRole('button', { name: /list view/i }).click();
   await page.getByRole('button', { name: /^cancel$/i }).first().click();
 
   await expect(page.getByText(/appointment cancelled/i)).toBeVisible();
@@ -550,6 +553,7 @@ test('doctor sees completed pre-visit AI summary before the visit', async ({ bro
   seedPreVisit(state, appointment.id, 'completed');
   const page = await openRolePage(browser, state, 'doctor', '/doctor/appointments');
 
+  await page.getByRole('button', { name: /list view/i }).click();
   await expect(page.getByText('Pre-visit summary concern')).toBeVisible();
   await expect(page.getByText(/Scenario AI summary/i)).toBeVisible();
   await closePage(page);
