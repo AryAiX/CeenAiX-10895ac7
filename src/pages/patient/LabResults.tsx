@@ -171,6 +171,8 @@ export const PatientLabResults: React.FC = () => {
   const [bookingDate, setBookingDate] = useState('');
   const [bookingTime, setBookingTime] = useState('08:00');
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
+  const [historyFilter, setHistoryFilter] = useState<'all' | 'abnormal' | 'normal'>('all');
+  const [historySort, setHistorySort] = useState<'newest' | 'oldest'>('newest');
 
   const labOrders = useMemo<PatientLabOrderRecord[]>(() => data ?? [], [data]);
 
@@ -835,6 +837,23 @@ export const PatientLabResults: React.FC = () => {
         <FlaskConical className="h-8 w-8 text-teal-600" />
       );
     }
+
+    const filteredOrders = resultedOrders.filter((order) => {
+      if (historyFilter === 'abnormal') {
+        return order.parentItems.some((item) => item.is_abnormal === true);
+      }
+      if (historyFilter === 'normal') {
+        return order.parentItems.every((item) => item.is_abnormal !== true);
+      }
+      return true;
+    });
+
+    const sortedFilteredOrders = [...filteredOrders].sort((a, b) => {
+      const dateA = new Date(a.results_released_at ?? a.ordered_at).getTime();
+      const dateB = new Date(b.results_released_at ?? b.ordered_at).getTime();
+      return historySort === 'oldest' ? dateA - dateB : dateB - dateA;
+    });
+
     return (
       <div className="space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -847,19 +866,41 @@ export const PatientLabResults: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <select className="rounded-lg border border-slate-200 px-3 py-2 text-sm">
-              <option>{t('patient.labResults.historyFilterAll')}</option>
-              <option>{t('patient.labResults.historyFilterAbnormal')}</option>
-              <option>{t('patient.labResults.historyFilterNormal')}</option>
+            <select
+              value={historyFilter}
+              onChange={(e) => setHistoryFilter(e.target.value as 'all' | 'abnormal' | 'normal')}
+              className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            >
+              <option value="all">{t('patient.labResults.historyFilterAll')}</option>
+              <option value="abnormal">{t('patient.labResults.historyFilterAbnormal')}</option>
+              <option value="normal">{t('patient.labResults.historyFilterNormal')}</option>
             </select>
-            <select className="rounded-lg border border-slate-200 px-3 py-2 text-sm">
-              <option>{t('patient.labResults.historyFilterNewest')}</option>
-              <option>{t('patient.labResults.historyFilterOldest')}</option>
+            <select
+              value={historySort}
+              onChange={(e) => setHistorySort(e.target.value as 'newest' | 'oldest')}
+              className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            >
+              <option value="newest">{t('patient.labResults.historyFilterNewest')}</option>
+              <option value="oldest">{t('patient.labResults.historyFilterOldest')}</option>
             </select>
           </div>
         </div>
 
-        {resultedOrders.map((order, idx) => {
+        {sortedFilteredOrders.length === 0 ? (
+          <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-white p-12 text-center shadow-sm">
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-50">
+              <FlaskConical className="h-8 w-8 text-teal-600" />
+            </div>
+            <h2 className="font-playfair text-xl font-bold text-slate-900">
+              {t('patient.labResults.emptyTitle')}
+            </h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
+              {t('patient.labResults.emptyBody')}
+            </p>
+          </div>
+        ) : null}
+
+        {sortedFilteredOrders.map((order, idx) => {
           const isExpanded = expandedVisits.includes(order.id);
           return (
             <div
