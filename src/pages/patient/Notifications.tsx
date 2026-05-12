@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Bell, CheckCheck, Loader2, RefreshCcw, Sparkles } from 'lucide-react';
+import { Bell, CheckCheck, Loader2, RefreshCcw, Sparkles, Trash2 } from 'lucide-react';
 import { Skeleton } from '../../components/Skeleton';
 import { usePatientNotifications } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
@@ -14,6 +14,9 @@ export const PatientNotifications: React.FC = () => {
   const { user } = useAuth();
   const { data, loading, error, refetch } = usePatientNotifications(user?.id);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
+  const [undoDeleteId, setUndoDeleteId] = useState<string | null>(null);
+  const undoTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   const markRead = async (notificationId: string) => {
     setBusyId(notificationId);
@@ -45,6 +48,35 @@ export const PatientNotifications: React.FC = () => {
     }
   };
 
+  const deleteNotification = (notificationId: string) => {
+    setDeletedIds((prev) => new Set(prev).add(notificationId));
+    setUndoDeleteId(notificationId);
+
+    const timer = setTimeout(async () => {
+      setUndoDeleteId((current) => (current === notificationId ? null : current));
+      await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', notificationId)
+        .eq('user_id', user?.id ?? '');
+      refetch();
+      delete undoTimers.current[notificationId];
+    }, 5000);
+
+    undoTimers.current[notificationId] = timer;
+  };
+
+  const undoDelete = (notificationId: string) => {
+    clearTimeout(undoTimers.current[notificationId]);
+    delete undoTimers.current[notificationId];
+    setDeletedIds((prev) => {
+      const next = new Set(prev);
+      next.delete(notificationId);
+      return next;
+    });
+    setUndoDeleteId((current) => (current === notificationId ? null : current));
+  };
+
   if (loading) {
     return (
       <>
@@ -61,7 +93,8 @@ export const PatientNotifications: React.FC = () => {
     );
   }
 
-  const storedNotifications = data?.notifications ?? [];
+  const allStoredNotifications = data?.notifications ?? [];
+  const storedNotifications = allStoredNotifications.filter((n) => !deletedIds.has(n.id));
   const unreadCount = storedNotifications.filter((notification) => !notification.is_read).length;
   const liveAttentionItems = data?.derivedNotifications ?? [];
 
@@ -147,65 +180,93 @@ export const PatientNotifications: React.FC = () => {
             <h2 className="text-base font-semibold text-slate-900">{t('patient.notifications.logTitle')}</h2>
           </div>
 
-          {storedNotifications.length === 0 ? (
+          {allStoredNotifications.length === 0 ? (
             <p className="text-sm text-slate-600">{t('patient.notifications.emptyLog')}</p>
           ) : (
             <div className="space-y-3">
-              {storedNotifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`rounded-2xl border p-4 ${
-                    notification.is_read
-                      ? 'border-slate-200 bg-slate-50'
-                      : 'border-emerald-200 bg-emerald-50/50'
-                  }`}
-                >
-                  <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-semibold text-slate-900">{notification.title}</p>
-                        {!notification.is_read ? (
-                          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
-                            {t('patient.notifications.unreadBadge')}
-                          </span>
-                        ) : null}
-                      </div>
-                      {notification.body ? (
-                        <p className="mt-2 text-sm text-slate-600">{notification.body}</p>
-                      ) : null}
-                      <p className="mt-2 text-xs font-semibold text-slate-500">
-                        {formatRelativeTime(t, notification.created_at)}
-                      </p>
+              {allStoredNotifications.map((notification) => {
+                if (deletedIds.has(notification.id)) {
+                  return undoDeleteId === notification.id ? (
+                    <div
+                      key={notification.id}
+                      className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3"
+                    >
+                      <span className="text-sm text-amber-700">Notification deleted</span>
+                      <button
+                        type="button"
+                        onClick={() => undoDelete(notification.id)}
+                        className="text-sm font-bold text-amber-700 underline hover:text-amber-900"
+                      >
+                        Undo
+                      </button>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {notification.action_url ? (
+                  ) : null;
+                }
+
+                return (
+                  <div
+                    key={notification.id}
+                    className={`rounded-2xl border p-4 ${
+                      notification.is_read
+                        ? 'border-slate-200 bg-slate-50'
+                        : 'border-emerald-200 bg-emerald-50/50'
+                    }`}
+                  >
+                    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-semibold text-slate-900">{notification.title}</p>
+                          {!notification.is_read ? (
+                            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+                              {t('patient.notifications.unreadBadge')}
+                            </span>
+                          ) : null}
+                        </div>
+                        {notification.body ? (
+                          <p className="mt-2 text-sm text-slate-600">{notification.body}</p>
+                        ) : null}
+                        <p className="mt-2 text-xs font-semibold text-slate-500">
+                          {formatRelativeTime(t, notification.created_at)}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {notification.action_url ? (
+                          <button
+                            type="button"
+                            onClick={() => navigate(notification.action_url ?? '/patient/dashboard')}
+                            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                          >
+                            {t('patient.notifications.open')}
+                          </button>
+                        ) : null}
+                        {!notification.is_read ? (
+                          <button
+                            type="button"
+                            onClick={() => markRead(notification.id)}
+                            disabled={busyId === notification.id}
+                            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
+                          >
+                            {busyId === notification.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <CheckCheck className="h-4 w-4" />
+                            )}
+                            <span>{t('patient.notifications.markRead')}</span>
+                          </button>
+                        ) : null}
                         <button
                           type="button"
-                          onClick={() => navigate(notification.action_url ?? '/patient/dashboard')}
-                          className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                          onClick={() => deleteNotification(notification.id)}
+                          className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100"
+                          title="Delete notification"
                         >
-                          {t('patient.notifications.open')}
+                          <Trash2 className="h-4 w-4" />
                         </button>
-                      ) : null}
-                      {!notification.is_read ? (
-                        <button
-                          type="button"
-                          onClick={() => markRead(notification.id)}
-                          disabled={busyId === notification.id}
-                          className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
-                        >
-                          {busyId === notification.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <CheckCheck className="h-4 w-4" />
-                          )}
-                          <span>{t('patient.notifications.markRead')}</span>
-                        </button>
-                      ) : null}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>
