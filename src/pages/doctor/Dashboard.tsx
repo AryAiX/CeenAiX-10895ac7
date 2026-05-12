@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Activity,
   AlertTriangle,
@@ -15,6 +15,7 @@ import {
   MessageSquare,
   PenLine,
   PlayCircle,
+  RefreshCcw,
   Send,
   Sparkles,
   TestTube,
@@ -48,6 +49,13 @@ export const DoctorDashboard: React.FC = () => {
   const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(uiLang, options);
   const { doctorProfile, profile, user } = useAuth();
   const { data, loading, error } = useDoctorDashboard(user?.id);
+
+  const [refreshing, setRefreshing] = useState(false);
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setRefreshing(false);
+  };
 
   const displayName = getDisplayName(profile?.full_name, profile?.first_name) || t('shared.doctor');
   const doctorName = /^dr\.?/i.test(displayName) ? displayName : uiLang.startsWith('ar') ? `د. ${displayName}` : `Dr. ${displayName}`;
@@ -357,25 +365,36 @@ export const DoctorDashboard: React.FC = () => {
             {new Date().toLocaleDateString(locale, dtOpts({ weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }))} · {doctorFacility}
           </p>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white px-5 py-3 shadow-sm">
-          {loading ? (
-            <Skeleton className="h-12 w-52" />
-          ) : (
-            <div className="flex items-center space-x-6">
-              <div>
-                <p className="font-mono text-xl font-bold text-teal-600">
-                  {formatLocaleDigits(completedTodayAppointments, uiLang)} of {formatLocaleDigits(todayAppointments, uiLang)}
-                </p>
-                <p className="text-xs text-slate-500">appointments done</p>
-              </div>
-              <div className="w-32">
-                <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
-                  <div className="h-full rounded-full bg-teal-600 transition-all duration-600" style={{ width: `${appointmentProgress}%` }} />
+        <div className="flex items-center gap-3">
+          <button
+            type='button'
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className='inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 shadow-sm transition hover:bg-slate-50 disabled:opacity-60'
+          >
+            <RefreshCcw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+            <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
+          </button>
+          <div className="rounded-2xl border border-slate-200 bg-white px-5 py-3 shadow-sm">
+            {loading ? (
+              <Skeleton className="h-12 w-52" />
+            ) : (
+              <div className="flex items-center space-x-6">
+                <div>
+                  <p className="font-mono text-xl font-bold text-teal-600">
+                    {formatLocaleDigits(completedTodayAppointments, uiLang)} of {formatLocaleDigits(todayAppointments, uiLang)}
+                  </p>
+                  <p className="text-xs text-slate-500">appointments done</p>
                 </div>
-                <p className="mt-1 text-[11px] text-slate-400">{localCopy.finishEstimate.replace('{{time}}', finishEstimate)}</p>
+                <div className="w-32">
+                  <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
+                    <div className="h-full rounded-full bg-teal-600 transition-all duration-600" style={{ width: `${appointmentProgress}%` }} />
+                  </div>
+                  <p className="mt-1 text-[11px] text-slate-400">{localCopy.finishEstimate.replace('{{time}}', finishEstimate)}</p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
