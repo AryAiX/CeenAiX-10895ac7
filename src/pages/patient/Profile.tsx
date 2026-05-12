@@ -32,6 +32,7 @@ export const Profile: React.FC = () => {
   const [emiratesIdBack, setEmiratesIdBack] = useState<string>('');
   const [isEditingPersonal, setIsEditingPersonal] = useState(false);
   const [isEditingInsurance, setIsEditingInsurance] = useState(false);
+  const [personalInfoErrors, setPersonalInfoErrors] = useState<Record<string, string>>({});
 
   const [personalInfo, setPersonalInfo] = useState({
     fullName: '',
@@ -117,8 +118,35 @@ export const Profile: React.FC = () => {
     }));
   }, [insurance?.primaryPlan, patientProfile, profile, records?.allergies, records?.conditions]);
 
+  const validatePersonalInfo = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (!personalInfo.fullName.trim() || personalInfo.fullName.trim().length < 2) {
+      errors.fullName = 'Full name is required (minimum 2 characters)';
+    }
+
+    if (personalInfo.emiratesId.trim() && !/^784-\d{4}-\d{7}-\d{1}$/.test(personalInfo.emiratesId.trim())) {
+      errors.emiratesId = 'Emirates ID format should be 784-XXXX-XXXXXXX-X';
+    }
+
+    if (personalInfo.dateOfBirth && new Date(personalInfo.dateOfBirth) > new Date()) {
+      errors.dateOfBirth = 'Date of birth cannot be in the future';
+    }
+
+    if (
+      personalInfo.emergencyContactPhone.trim() &&
+      !/^(\+971|00971|05)\d{7,9}$/.test(personalInfo.emergencyContactPhone.trim())
+    ) {
+      errors.emergencyContactPhone = 'Please enter a valid UAE phone number';
+    }
+
+    setPersonalInfoErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const savePersonalInfo = async () => {
     if (!user?.id) return;
+    if (!validatePersonalInfo()) return;
     await supabase
       .from('user_profiles')
       .update({
@@ -360,6 +388,7 @@ export const Profile: React.FC = () => {
                     type="button"
                     onClick={() => {
                       setPersonalInfoSnapshot(personalInfo);
+                      setPersonalInfoErrors({});
                       setIsEditingPersonal(true);
                     }}
                     className="flex items-center space-x-2 px-5 py-2.5 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
@@ -378,11 +407,17 @@ export const Profile: React.FC = () => {
                         type="text"
                         disabled={!isEditingPersonal}
                         value={personalInfo.fullName}
-                        onChange={(e) => setPersonalInfo({ ...personalInfo, fullName: e.target.value })}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
+                        onChange={(e) => {
+                          setPersonalInfo({ ...personalInfo, fullName: e.target.value });
+                          if (personalInfoErrors.fullName) setPersonalInfoErrors((prev) => { const { fullName: _, ...rest } = prev; return rest; });
+                        }}
+                        className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium ${personalInfoErrors.fullName ? 'border-red-400' : 'border-gray-200'}`}
                         placeholder={t('patient.profile.phFullName')}
                       />
                     </div>
+                    {personalInfoErrors.fullName ? (
+                      <p className="mt-1 text-xs text-red-500">{personalInfoErrors.fullName}</p>
+                    ) : null}
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2.5">{t('patient.profile.emiratesId')}</label>
@@ -391,11 +426,17 @@ export const Profile: React.FC = () => {
                         type="text"
                         disabled={!isEditingPersonal}
                         value={personalInfo.emiratesId}
-                        onChange={(e) => setPersonalInfo({ ...personalInfo, emiratesId: e.target.value })}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
+                        onChange={(e) => {
+                          setPersonalInfo({ ...personalInfo, emiratesId: e.target.value });
+                          if (personalInfoErrors.emiratesId) setPersonalInfoErrors((prev) => { const { emiratesId: _, ...rest } = prev; return rest; });
+                        }}
+                        className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium ${personalInfoErrors.emiratesId ? 'border-red-400' : 'border-gray-200'}`}
                         placeholder={t('patient.profile.phEmiratesId')}
                       />
                     </div>
+                    {personalInfoErrors.emiratesId ? (
+                      <p className="mt-1 text-xs text-red-500">{personalInfoErrors.emiratesId}</p>
+                    ) : null}
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2.5">{t('patient.profile.dob')}</label>
@@ -404,8 +445,11 @@ export const Profile: React.FC = () => {
                         type="date"
                         disabled={!isEditingPersonal}
                         value={personalInfo.dateOfBirth}
-                        onChange={(e) => setPersonalInfo({ ...personalInfo, dateOfBirth: e.target.value })}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
+                        onChange={(e) => {
+                          setPersonalInfo({ ...personalInfo, dateOfBirth: e.target.value });
+                          if (personalInfoErrors.dateOfBirth) setPersonalInfoErrors((prev) => { const { dateOfBirth: _, ...rest } = prev; return rest; });
+                        }}
+                        className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium ${personalInfoErrors.dateOfBirth ? 'border-red-400' : 'border-gray-200'}`}
                       />
                       {!isEditingPersonal && (
                         <button
@@ -416,6 +460,9 @@ export const Profile: React.FC = () => {
                         </button>
                       )}
                     </div>
+                    {personalInfoErrors.dateOfBirth ? (
+                      <p className="mt-1 text-xs text-red-500">{personalInfoErrors.dateOfBirth}</p>
+                    ) : null}
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2.5">{t('patient.profile.bloodType')}</label>
@@ -496,8 +543,11 @@ export const Profile: React.FC = () => {
                         type="tel"
                         disabled={!isEditingPersonal}
                         value={personalInfo.emergencyContactPhone}
-                        onChange={(e) => setPersonalInfo({ ...personalInfo, emergencyContactPhone: e.target.value })}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium"
+                        onChange={(e) => {
+                          setPersonalInfo({ ...personalInfo, emergencyContactPhone: e.target.value });
+                          if (personalInfoErrors.emergencyContactPhone) setPersonalInfoErrors((prev) => { const { emergencyContactPhone: _, ...rest } = prev; return rest; });
+                        }}
+                        className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 transition-all duration-200 font-medium ${personalInfoErrors.emergencyContactPhone ? 'border-red-400' : 'border-gray-200'}`}
                         placeholder={t('patient.profile.phEmergencyPhone')}
                       />
                       {!isEditingPersonal && (
@@ -509,6 +559,9 @@ export const Profile: React.FC = () => {
                         </button>
                       )}
                     </div>
+                    {personalInfoErrors.emergencyContactPhone ? (
+                      <p className="mt-1 text-xs text-red-500">{personalInfoErrors.emergencyContactPhone}</p>
+                    ) : null}
                   </div>
                 </div>
               </div>
