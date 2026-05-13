@@ -192,6 +192,16 @@ export const BookAppointment: React.FC = () => {
     specializationOptions,
   ]);
 
+  // Fast path: set selectedDoctorId as soon as rescheduleAppointment is available,
+  // without waiting for the full init effect. This prevents the right column from
+  // staying empty while doctors/availability are still loading.
+  useEffect(() => {
+    if (!isRescheduling || !rescheduleAppointment || selectedDoctorId) {
+      return;
+    }
+    setSelectedDoctorId(rescheduleAppointment.doctor_id);
+  }, [isRescheduling, rescheduleAppointment, selectedDoctorId]);
+
   useEffect(() => {
     if (!isRescheduling || !rescheduleAppointment || didInitializeReschedule) {
       return;
@@ -211,11 +221,17 @@ export const BookAppointment: React.FC = () => {
     [doctors, selectedDoctorId]
   );
 
+  // When rescheduling, fall back to the appointment's doctor ID so availability
+  // begins loading as soon as the appointment data arrives, before selectedDoctorId
+  // is set by the init effect.
+  const availabilityDoctorId =
+    selectedDoctorId ?? (isRescheduling ? (rescheduleAppointment?.doctor_id ?? null) : null);
+
   const {
     data: availabilityData,
     loading: availabilityLoading,
     error: availabilityError,
-  } = useDoctorBookingAvailability(selectedDoctorId);
+  } = useDoctorBookingAvailability(availabilityDoctorId);
 
   const filteredDoctors = useMemo(
     () =>
@@ -393,7 +409,7 @@ export const BookAppointment: React.FC = () => {
         return;
       }
 
-      if (preVisitAssessment?.id) {
+      if (!isRescheduling && preVisitAssessment?.id) {
         navigate(`/patient/pre-visit/${preVisitAssessment.id}`, {
           replace: true,
         });
