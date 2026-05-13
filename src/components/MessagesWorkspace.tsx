@@ -16,6 +16,7 @@ import {
 import { useMessagingHub } from '../hooks';
 import { useAuth } from '../lib/auth-context';
 import { dateTimeFormatWithNumerals, formatRelativeTime, resolveLocale } from '../lib/i18n-ui';
+import { supabase } from '../lib/supabase';
 import {
   type MessageBodyPart,
   type MessageActionKind,
@@ -92,7 +93,7 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
   const [editingMessageText, setEditingMessageText] = useState('');
   const [deletedMessageIds, setDeletedMessageIds] = useState<Set<string>>(new Set());
   const [undoMessageId, setUndoMessageId] = useState<string | null>(null);
-  const [undoTimers, setUndoTimers] = useState<Record<string, ReturnType<typeof setTimeout>>>({});
+  const undoTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const bootstrappedTargetRef = useRef<string | null>(null);
   const doctorComposerRef = useRef<HTMLDivElement | null>(null);
@@ -154,6 +155,13 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
       if (attachment) URL.revokeObjectURL(attachment.previewUrl);
     };
   }, [attachment]);
+
+  // Cancel any pending delete timers on unmount to prevent Supabase calls after navigation
+  useEffect(() => {
+    return () => {
+      Object.values(undoTimers.current).forEach(clearTimeout);
+    };
+  }, []);
 
   const filteredConversations = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -526,11 +534,18 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
     setDeletedMessageIds((prev) => new Set([...prev, messageId]));
     setUndoMessageId(messageId);
 
-    const timer = setTimeout(() => {
-      setUndoMessageId(null);
+    const timer = setTimeout(async () => {
+      await supabase
+        .from('messages')
+        .delete()
+        .eq('id', messageId)
+        .eq('sender_id', user?.id ?? '');
+
+      setUndoMessageId((prev) => (prev === messageId ? null : prev));
+      delete undoTimers.current[messageId];
     }, 5000);
 
-    setUndoTimers((prev) => ({ ...prev, [messageId]: timer }));
+    undoTimers.current[messageId] = timer;
   };
 
   const handleUndoDelete = (messageId: string) => {
@@ -540,14 +555,9 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
       return next;
     });
     setUndoMessageId(null);
-    if (undoTimers[messageId]) {
-      clearTimeout(undoTimers[messageId]);
-      setUndoTimers((prev) => {
-        const next = { ...prev };
-        delete next[messageId];
-        return next;
-      });
-    }
+
+    clearTimeout(undoTimers.current[messageId]);
+    delete undoTimers.current[messageId];
   };
   const renderInlineText = (text: string, isOwn: boolean) => {
     const linkClassName = isOwn
