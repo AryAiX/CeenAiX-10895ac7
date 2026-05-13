@@ -92,7 +92,7 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
   const [editingMessageText, setEditingMessageText] = useState('');
   const [deletedMessageIds, setDeletedMessageIds] = useState<Set<string>>(new Set());
   const [undoMessageId, setUndoMessageId] = useState<string | null>(null);
-  const [undoTimers, setUndoTimers] = useState<Record<string, ReturnType<typeof setTimeout>>>({});
+  const undoTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const bootstrappedTargetRef = useRef<string | null>(null);
   const doctorComposerRef = useRef<HTMLDivElement | null>(null);
@@ -112,6 +112,7 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
     actionError,
     ensureDirectConversation,
     sendMessage,
+    deleteMessage,
   } = useMessagingHub(user?.id, conversationId ?? null);
 
   useEffect(() => {
@@ -154,6 +155,13 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
       if (attachment) URL.revokeObjectURL(attachment.previewUrl);
     };
   }, [attachment]);
+
+  // Cancel any pending delete timers on unmount to prevent stale Supabase calls
+  useEffect(() => {
+    return () => {
+      Object.values(undoTimers.current).forEach(clearTimeout);
+    };
+  }, []);
 
   const filteredConversations = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -526,11 +534,12 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
     setDeletedMessageIds((prev) => new Set([...prev, messageId]));
     setUndoMessageId(messageId);
 
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       setUndoMessageId(null);
+      await deleteMessage(messageId);
     }, 5000);
 
-    setUndoTimers((prev) => ({ ...prev, [messageId]: timer }));
+    undoTimers.current[messageId] = timer;
   };
 
   const handleUndoDelete = (messageId: string) => {
@@ -540,13 +549,9 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
       return next;
     });
     setUndoMessageId(null);
-    if (undoTimers[messageId]) {
-      clearTimeout(undoTimers[messageId]);
-      setUndoTimers((prev) => {
-        const next = { ...prev };
-        delete next[messageId];
-        return next;
-      });
+    if (undoTimers.current[messageId]) {
+      clearTimeout(undoTimers.current[messageId]);
+      delete undoTimers.current[messageId];
     }
   };
   const renderInlineText = (text: string, isOwn: boolean) => {
@@ -1138,68 +1143,3 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
     </div>
   );
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
