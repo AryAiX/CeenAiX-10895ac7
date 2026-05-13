@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import {
   AlertCircle,
   Calendar,
+  CheckCircle,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -108,6 +109,8 @@ export const PatientAppointments: React.FC = () => {
   const [showDirectionsModal, setShowDirectionsModal] = useState(false);
   const [directionsAppointmentId, setDirectionsAppointmentId] = useState<string | null>(null);
   const [addressCopied, setAddressCopied] = useState(false);
+  const [showIntakeModal, setShowIntakeModal] = useState(false);
+  const [intakeAppointmentId, setIntakeAppointmentId] = useState<string | null>(null);
   const { data: preVisitAssessmentsData } = usePatientPreVisitAssessments(user?.id);
   const preVisitAssessments = useMemo(
     () => preVisitAssessmentsData ?? [],
@@ -456,7 +459,10 @@ export const PatientAppointments: React.FC = () => {
                   </div>
                   <button
                     type="button"
-                    onClick={() => navigate(`/patient/pre-visit/${preVisitAssessment.id}`)}
+                    onClick={() => {
+                      setIntakeAppointmentId(appointment.id);
+                      setShowIntakeModal(true);
+                    }}
                     className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-teal-700 shadow-sm transition hover:shadow"
                   >
                     {preVisitAssessment.status === 'completed' || preVisitAssessment.status === 'reviewed'
@@ -552,6 +558,234 @@ export const PatientAppointments: React.FC = () => {
           </div>
         </div>
       </div>
+    );
+  };
+
+  const renderIntakeModal = () => {
+    if (!showIntakeModal || !intakeAppointmentId) return null;
+
+    const appointment = appointments.find((a) => a.id === intakeAppointmentId);
+    if (!appointment) return null;
+
+    const doctorProfile = doctorProfileById.get(appointment.doctor_id);
+    const doctorName = doctorProfile?.fullName ?? t('shared.doctor');
+    const preVisitAssessment = preVisitAssessmentByAppointmentId.get(appointment.id);
+    const appointmentDate = new Date(appointment.scheduled_at);
+    const isTeleconsult = appointment.type === 'virtual';
+
+    const closeIntakeModal = () => {
+      setShowIntakeModal(false);
+      setIntakeAppointmentId(null);
+    };
+
+    const isAssessmentDone =
+      preVisitAssessment?.status === 'completed' || preVisitAssessment?.status === 'reviewed';
+
+    return createPortal(
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        onClick={closeIntakeModal}
+      >
+        <div
+          className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <div className="flex items-center gap-3">
+              <ClipboardList className="h-5 w-5 text-teal-600" />
+              <h2 className="text-lg font-semibold text-gray-900">Pre-Visit Intake Summary</h2>
+            </div>
+            <button
+              type="button"
+              onClick={closeIntakeModal}
+              aria-label="Close"
+              className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X className="h-5 w-5 text-gray-500" />
+            </button>
+          </div>
+
+          <div className="p-6 space-y-5">
+            {/* Doctor info card */}
+            <div className="flex gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-teal-600 text-white font-semibold text-lg">
+                {doctorProfile ? getDoctorInitials(doctorName) : <User className="h-6 w-6" />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-slate-900">{doctorName}</p>
+                <p className="text-sm text-slate-600">
+                  {doctorProfile?.specialty ?? t('shared.careVisit')}
+                </p>
+                <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-700">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="h-3.5 w-3.5 text-teal-600" />
+                    {appointmentDate.toLocaleDateString(
+                      locale,
+                      dtOpts({ month: 'short', day: '2-digit', year: 'numeric' })
+                    )}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-3.5 w-3.5 text-teal-600" />
+                    {appointmentDate.toLocaleTimeString(
+                      locale,
+                      dtOpts({ hour: 'numeric', minute: '2-digit' })
+                    )}
+                  </span>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
+                      isTeleconsult
+                        ? 'border-violet-300 bg-violet-100 text-violet-700'
+                        : 'border-teal-300 bg-teal-100 text-teal-700'
+                    }`}
+                  >
+                    {isTeleconsult ? <Video className="h-3 w-3" /> : null}
+                    {isTeleconsult
+                      ? t('patient.appointments.filterTeleconsult')
+                      : t('patient.appointments.filterInPerson')}
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">
+                    <Clock className="h-3 w-3" />
+                    {t('shared.minutesUnit', { count: appointment.duration_minutes })}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Reason for Visit */}
+            <div>
+              <h3 className="mb-2 text-sm font-semibold text-gray-900">Reason for Visit</h3>
+              <div className="rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-900">
+                {appointment.chief_complaint ?? (
+                  <span className="text-teal-500 italic">No reason provided</span>
+                )}
+              </div>
+            </div>
+
+            {/* Additional Notes */}
+            <div>
+              <h3 className="mb-2 text-sm font-semibold text-gray-900">Additional Notes</h3>
+              <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                {appointment.notes ? (
+                  <span className="whitespace-pre-wrap">{appointment.notes}</span>
+                ) : (
+                  <span className="text-slate-400 italic">No additional notes provided</span>
+                )}
+              </div>
+            </div>
+
+            {/* Pre-Visit Assessment */}
+            {preVisitAssessment ? (
+              <div>
+                <h3 className="mb-2 text-sm font-semibold text-gray-900">Pre-Visit Assessment</h3>
+                <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <ClipboardList className="h-4 w-4 text-teal-600" />
+                    <span className="text-sm font-medium text-gray-700">
+                      {t('patient.appointments.preVisitPrefix')}{' '}
+                      {preVisitStatusLabel(t, preVisitAssessment.status)}
+                    </span>
+                  </div>
+                  {isAssessmentDone ? (
+                    <div className="flex items-center gap-2 text-sm text-green-700">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      Assessment completed
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-amber-700">
+                        <AlertCircle className="h-4 w-4 text-amber-500" />
+                        Assessment not yet completed
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigate(`/patient/pre-visit/${preVisitAssessment.id}`);
+                          closeIntakeModal();
+                        }}
+                        className="rounded-lg bg-teal-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-teal-700"
+                      >
+                        Complete Intake Form
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : null}
+
+            {/* Appointment Details grid */}
+            <div>
+              <h3 className="mb-2 text-sm font-semibold text-gray-900">Appointment Details</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {(
+                  [
+                    [
+                      t('patient.appointments.filterStatus'),
+                      appointmentStatusLabel(t, appointment.status),
+                    ],
+                    [
+                      t('patient.appointments.filterType'),
+                      isTeleconsult
+                        ? t('patient.appointments.filterTeleconsult')
+                        : t('patient.appointments.filterInPerson'),
+                    ],
+                    [
+                      t('patient.appointments.date'),
+                      appointmentDate.toLocaleDateString(
+                        locale,
+                        dtOpts({ month: 'short', day: '2-digit', year: 'numeric' })
+                      ),
+                    ],
+                    [
+                      'Time',
+                      appointmentDate.toLocaleTimeString(
+                        locale,
+                        dtOpts({ hour: 'numeric', minute: '2-digit' })
+                      ),
+                    ],
+                    [
+                      'Duration',
+                      t('shared.minutesUnit', { count: appointment.duration_minutes }),
+                    ],
+                  ] as [string, string][]
+                ).map(([label, value]) => (
+                  <div key={label} className="rounded-lg bg-slate-50 px-3 py-2">
+                    <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                      {label}
+                    </p>
+                    <p className="mt-0.5 text-sm font-semibold text-slate-800">{value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="flex gap-3 px-6 pb-6">
+            <button
+              type="button"
+              onClick={closeIntakeModal}
+              className="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-sm transition-colors"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                navigate(`/patient/messages?doctor=${appointment.doctor_id}`);
+                closeIntakeModal();
+              }}
+              className="flex-1 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2"
+            >
+              <MessageSquare className="h-4 w-4" />
+              Message Doctor
+            </button>
+          </div>
+        </div>
+      </div>,
+      document.body
     );
   };
 
@@ -1361,6 +1595,7 @@ export const PatientAppointments: React.FC = () => {
         .animate-pulse-border { animation: pulse-border 2s ease-in-out infinite; }
       `}</style>
 
+      {renderIntakeModal()}
       {renderDirectionsModal()}
       {renderCancelModal()}
     </>
