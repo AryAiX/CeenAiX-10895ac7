@@ -87,7 +87,6 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
   const [doctorComposerFocused, setDoctorComposerFocused] = useState(false);
   const [attachment, setAttachment] = useState<AttachmentPreview | null>(null);
   const [sentAttachments, setSentAttachments] = useState<Record<string, AttachmentPreview>>({});
-  const [readMessageIds, setReadMessageIds] = useState<Set<string>>(new Set());
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [editingMessageText, setEditingMessageText] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
@@ -140,16 +139,6 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
       }
     })();
   }, [composeParam, composeTargetId, ensureDirectConversation, namespace, navigate, role, t, user?.id]);
-
-  useEffect(() => {
-    if (messages.length === 0) return;
-    const ids = messages
-      .filter((m) => m.sender_id !== user?.id)
-      .map((m) => m.id);
-    if (ids.length > 0) {
-      setReadMessageIds((prev) => new Set([...prev, ...ids]));
-    }
-  }, [messages, user?.id]);
 
   useEffect(() => {
     setSentAttachments((prev) => {
@@ -1004,7 +993,7 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
                     )}
                     {isOwn && editingMessageId !== message.id ? (
                       <div className="mt-1 flex items-center justify-end gap-1">
-                        {readMessageIds.has(message.id) ? (
+                        {message.read_at ? (
                           <span className="text-[10px] text-white/70">✓✓ Read</span>
                         ) : (
                           <span className="text-[10px] text-white/60">✓ Sent</span>
