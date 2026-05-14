@@ -689,9 +689,21 @@ export const PatientAppointments: React.FC = () => {
                     </span>
                   </div>
                   {isAssessmentDone ? (
-                    <div className="flex items-center gap-2 text-sm text-green-700">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                      Assessment completed
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-green-700">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        Assessment completed
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigate(`/patient/pre-visit/${preVisitAssessment.id}`);
+                          closeIntakeModal();
+                        }}
+                        className="rounded-lg border border-teal-200 bg-white px-3 py-1.5 text-xs font-semibold text-teal-700 transition hover:bg-teal-50"
+                      >
+                        ✏️ Edit Intake Form
+                      </button>
                     </div>
                   ) : (
                     <div className="space-y-2">
