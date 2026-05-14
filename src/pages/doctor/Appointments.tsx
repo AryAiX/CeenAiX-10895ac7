@@ -380,6 +380,7 @@ export const DoctorAppointments: React.FC = () => {
                 iconClass: 'bg-teal-100 text-teal-600',
                 valueClass: 'text-slate-900',
                 progress: todayAppointmentsForStats.length > 0 ? (todayDone / todayAppointmentsForStats.length) * 100 : 0,
+                onClick: () => navigate('/doctor/today'),
               },
               {
                 label: 'This Week',
@@ -388,6 +389,7 @@ export const DoctorAppointments: React.FC = () => {
                 icon: Calendar,
                 iconClass: 'bg-blue-100 text-blue-600',
                 valueClass: 'text-slate-900',
+                onClick: () => handleTabChange('list'),
               },
               {
                 label: 'Pending Requests',
@@ -397,6 +399,7 @@ export const DoctorAppointments: React.FC = () => {
                 iconClass: 'bg-amber-100 text-amber-600',
                 valueClass: 'text-amber-600',
                 urgent: pendingRequestCount > 0,
+                onClick: () => handleTabChange('pending'),
               },
               {
                 label: 'No-Shows This Month',
@@ -405,6 +408,7 @@ export const DoctorAppointments: React.FC = () => {
                 icon: UserX,
                 iconClass: 'bg-red-100 text-red-500',
                 valueClass: 'text-red-500',
+                onClick: () => handleTabChange('analytics'),
               },
               {
                 label: 'Week Revenue',
@@ -414,6 +418,7 @@ export const DoctorAppointments: React.FC = () => {
                 iconClass: 'bg-emerald-100 text-emerald-600',
                 valueClass: 'text-emerald-600',
                 wide: true,
+                onClick: () => navigate('/doctor/earnings'),
               },
             ].map((card) => {
               const Icon = card.icon;
@@ -421,6 +426,7 @@ export const DoctorAppointments: React.FC = () => {
                 <button
                   key={card.label}
                   type="button"
+                  onClick={() => card.onClick?.()}
                   className={`cursor-pointer rounded-xl border bg-white p-5 text-left transition-transform hover:scale-[1.02] ${
                     card.urgent ? 'animate-pulse border-2 border-amber-200' : 'border-slate-200'
                   }`}
