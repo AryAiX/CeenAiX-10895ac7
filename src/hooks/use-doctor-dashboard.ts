@@ -533,12 +533,14 @@ export function useDoctorDashboard(userId: string | null | undefined) {
           .select('id', { count: 'exact', head: true })
           .in('conversation_id', conversationIds)
           .is('read_at', null)
-          .neq('sender_id', userId),
+          .neq('sender_id', userId)
+          .eq('is_deleted', false),
         supabase
           .from('messages')
           .select('id, conversation_id, sender_id, body, sent_at, read_at')
           .in('conversation_id', conversationIds)
           .neq('sender_id', userId)
+          .eq('is_deleted', false)
           .order('sent_at', { ascending: false })
           .limit(4),
       ]);
