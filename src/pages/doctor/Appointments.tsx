@@ -61,6 +61,13 @@ export const DoctorAppointments: React.FC = () => {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showNewApptHint, setShowNewApptHint] = useState<boolean>(false);
+  const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => {
+    const now = new Date();
+    const weekStart = new Date(now);
+    weekStart.setHours(0, 0, 0, 0);
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+    return weekStart;
+  });
   const [exportRange, setExportRange] = useState<'today' | 'week' | 'month'>('today');
   const [exportType, setExportType] = useState<'administrative' | 'personal' | 'billing'>('administrative');
   const [exportSuccess, setExportSuccess] = useState(false);
@@ -244,24 +251,34 @@ export const DoctorAppointments: React.FC = () => {
   const consultationFee = doctorProfile?.consultation_fee ?? 0;
   const weekRevenue = weekDone * consultationFee;
   const todayRemainingRevenue = todayUpcoming * consultationFee;
-  const weekDays = useMemo(
+  const weekDaysForView = useMemo(
     () =>
       Array.from({ length: 7 }, (_, index) => {
-        const date = new Date(startOfWeek);
-        date.setDate(startOfWeek.getDate() + index);
+        const date = new Date(currentWeekStart);
+        date.setDate(currentWeekStart.getDate() + index);
         return date;
       }),
-    [startOfWeek]
+    [currentWeekStart]
   );
-  const weekAppointmentsByDate = useMemo(
+  const weekAppointmentsForView = useMemo(
     () =>
-      weekAppointments.reduce<Map<string, typeof weekAppointments>>((map, appointment) => {
+      appointments.filter((appointment) => {
+        const d = new Date(appointment.scheduled_at);
+        const weekEnd = new Date(currentWeekStart.getTime() + 7 * 24 * 60 * 60 * 1000);
+        return d >= currentWeekStart && d < weekEnd;
+      }),
+    [appointments, currentWeekStart]
+  );
+  const weekAppointmentsForViewByDate = useMemo(
+    () =>
+      weekAppointmentsForView.reduce<Map<string, typeof weekAppointmentsForView>>((map, appointment) => {
         const key = formatDateKey(new Date(appointment.scheduled_at));
         map.set(key, [...(map.get(key) ?? []), appointment]);
         return map;
       }, new Map()),
-    [weekAppointments]
+    [weekAppointmentsForView]
   );
+
   const appointmentTabs: Array<{ id: AppointmentBodyTab; label: string; icon: typeof CalendarDays }> = [
     { id: 'calendar', label: 'Calendar', icon: CalendarDays },
     { id: 'list', label: 'List', icon: List },
@@ -607,27 +624,14 @@ export const DoctorAppointments: React.FC = () => {
                   <div className="flex flex-wrap items-center gap-3">
                     <button
                       type="button"
-                      onClick={() => handleMonthChange(-1)}
-                      className="rounded-lg p-2 transition-colors hover:bg-slate-100"
-                      aria-label={t('doctor.appointments.prevMonth')}
-                    >
-                      <ChevronLeft className="h-5 w-5 text-slate-400" />
-                    </button>
-                    <h2 className="text-[16px] font-bold text-slate-800">
-                      Week of {startOfWeek.toLocaleDateString(locale, dtOpts({ month: 'short', day: 'numeric' }))} –{' '}
-                      {new Date(endOfWeek.getTime() - 1).toLocaleDateString(locale, dtOpts({ month: 'short', day: 'numeric', year: 'numeric' }))}
-                    </h2>
-                    <button
-                      type="button"
-                      onClick={() => handleMonthChange(1)}
-                      className="rounded-lg p-2 transition-colors hover:bg-slate-100"
-                      aria-label={t('doctor.appointments.nextMonth')}
-                    >
-                      <ChevronRight className="h-5 w-5 text-slate-400" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedCalendarDate(new Date())}
+                      onClick={() => {
+                        setSelectedCalendarDate(new Date());
+                        const now = new Date();
+                        const ws = new Date(now);
+                        ws.setHours(0, 0, 0, 0);
+                        ws.setDate(ws.getDate() - ws.getDay());
+                        setCurrentWeekStart(ws);
+                      }}
                       className="rounded-lg bg-teal-50 px-3 py-1.5 text-[12px] font-bold text-teal-700"
                     >
                       Today
@@ -690,10 +694,42 @@ export const DoctorAppointments: React.FC = () => {
 
             {!isTodayRoute && activeTab === 'calendar' && calendarViewType === 'week' ? (
               <section className="overflow-x-auto rounded-xl border border-slate-200 bg-white p-4">
+                <div className="mb-4 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const prev = new Date(currentWeekStart);
+                      prev.setDate(prev.getDate() - 7);
+                      setCurrentWeekStart(prev);
+                    }}
+                    className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Previous Week
+                  </button>
+                  <div className="text-center">
+                    <p className="text-base font-bold text-slate-800">
+                      Week of {currentWeekStart.toLocaleDateString(locale, dtOpts({ month: 'short', day: 'numeric' }))} –{' '}
+                      {new Date(currentWeekStart.getTime() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString(locale, dtOpts({ month: 'short', day: 'numeric', year: 'numeric' }))}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = new Date(currentWeekStart);
+                      next.setDate(next.getDate() + 7);
+                      setCurrentWeekStart(next);
+                    }}
+                    className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+                  >
+                    Next Week
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
                 <div className="grid min-w-[980px] grid-cols-7 gap-3">
-                  {weekDays.map((date) => {
+                  {weekDaysForView.map((date) => {
                     const dateKey = formatDateKey(date);
-                    const dayAppointments = weekAppointmentsByDate.get(dateKey) ?? [];
+                    const dayAppointments = weekAppointmentsForViewByDate.get(dateKey) ?? [];
                     const isToday = dateKey === todayDateKey;
                     return (
                       <div
