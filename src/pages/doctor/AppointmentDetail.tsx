@@ -208,6 +208,22 @@ export const DoctorAppointmentDetail: React.FC = () => {
     );
   }
 
+  const formatPreVisitAnswer = (answerText: string | null, answerJson: unknown): string => {
+    if (Array.isArray(answerJson) && answerJson.length > 0) {
+      return (answerJson as string[]).join(', ');
+    }
+    if (answerText === 'Yes' || answerText === 'No') {
+      return answerText;
+    }
+    if (answerText && /^\d{4}-\d{2}-\d{2}$/.test(answerText)) {
+      return new Date(answerText).toLocaleDateString(locale, dtOpts({ year: 'numeric', month: 'long', day: 'numeric' }));
+    }
+    if (answerText?.trim()) {
+      return answerText.trim();
+    }
+    return 'No answer provided';
+  };
+
   return (
     <>
       <div>
@@ -418,14 +434,28 @@ export const DoctorAppointmentDetail: React.FC = () => {
                     <div className="rounded-2xl bg-slate-50 p-4">
                       <p className="text-sm font-semibold text-slate-900">{t('doctor.appointmentDetail.preVisitAnswers')}</p>
                       <div className="mt-3 space-y-3">
-                        {data.preVisitAnswers.map((answer) => (
-                          <div key={answer.id} className="rounded-xl bg-white px-3 py-3">
-                            <p className="text-sm font-semibold text-slate-900">{answer.question_label}</p>
-                            <p className="mt-1 text-sm text-slate-600">
-                              {answer.answer_text?.trim() || JSON.stringify(answer.answer_json ?? '') || t('doctor.patientDetail.noneRecorded')}
-                            </p>
-                          </div>
-                        ))}
+                        {data.preVisitAnswers.map((answer) => {
+                          const badge = answer.question_type === 'boolean' ? (
+                            <span className="rounded-full bg-teal-100 px-2 py-0.5 text-[10px] font-semibold text-teal-700">Yes/No</span>
+                          ) : answer.question_type === 'multi_select' ? (
+                            <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700">Multi-select</span>
+                          ) : answer.question_type === 'single_select' ? (
+                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">Single choice</span>
+                          ) : answer.question_type === 'date' ? (
+                            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">Date</span>
+                          ) : null;
+                          return (
+                            <div key={answer.id} className="rounded-xl bg-white px-3 py-3">
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm font-semibold text-slate-900">{answer.question_label}</p>
+                                {badge}
+                              </div>
+                              <p className="mt-1 text-sm text-slate-600">
+                                {formatPreVisitAnswer(answer.answer_text, answer.answer_json)}
+                              </p>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   ) : null}
