@@ -81,6 +81,7 @@ interface MedicationItemEditorProps {
   index: number;
   onChange: (id: string, nextState: Partial<DraftPrescriptionItem>) => void;
   onRemove: (id: string) => void;
+  showErrors: boolean;
   uiLanguage: string;
   userId: string;
 }
@@ -175,6 +176,7 @@ const MedicationItemEditor: React.FC<MedicationItemEditorProps> = ({
   index,
   onChange,
   onRemove,
+  showErrors,
   uiLanguage,
   userId,
 }) => {
@@ -434,9 +436,18 @@ const MedicationItemEditor: React.FC<MedicationItemEditorProps> = ({
                 })
               }
               placeholder={t('doctor.createPrescription.searchMedicationPlaceholder')}
-              className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 rtl:pl-4 rtl:pr-11"
+              className={`w-full rounded-2xl border py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:ring-2 rtl:pl-4 rtl:pr-11 ${
+                showErrors && !item.medicationName
+                  ? 'border-red-400 bg-red-50 focus:border-red-500 focus:ring-red-500/20'
+                  : 'border-slate-200 bg-white focus:border-emerald-500 focus:ring-emerald-500/20'
+              }`}
             />
           </div>
+          {showErrors && !item.medicationName ? (
+            <p className="mt-1.5 text-xs font-medium text-red-600">
+              ⚠️ Please search and select a medication
+            </p>
+          ) : null}
         </label>
 
         {item.medicationName ? (
@@ -779,7 +790,11 @@ const MedicationItemEditor: React.FC<MedicationItemEditorProps> = ({
           <select
             value={item.frequencyCode}
             onChange={(event) => onChange(item.id, { frequencyCode: event.target.value })}
-            className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+            className={`w-full rounded-2xl border px-4 py-3 text-sm text-slate-700 outline-none transition ${
+              showErrors && !item.frequencyCode
+                ? 'border-red-400 bg-red-50'
+                : 'border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20'
+            }`}
           >
             <option value="">{t('doctor.createPrescription.selectFrequency')}</option>
             {frequencyOptions.map((option) => (
@@ -788,6 +803,9 @@ const MedicationItemEditor: React.FC<MedicationItemEditorProps> = ({
               </option>
             ))}
           </select>
+          {showErrors && !item.frequencyCode ? (
+            <p className="mt-1.5 text-xs font-medium text-red-600">⚠️ Please select a frequency</p>
+          ) : null}
         </label>
 
         <label className="block">
@@ -837,6 +855,7 @@ export const CreatePrescription: React.FC = () => {
   const [items, setItems] = useState<DraftPrescriptionItem[]>([createDraftPrescriptionItem()]);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [saving, setSaving] = useState(false);
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
   const selectedPatient = useMemo(
     () => patients.find((patient) => patient.id === patientId) ?? null,
     [patientId, patients]
@@ -949,6 +968,8 @@ export const CreatePrescription: React.FC = () => {
   };
 
   const submit = async () => {
+    setShowValidationErrors(true);
+
     if (!user?.id || !patientId) {
       setFeedback({ type: 'error', message: t('doctor.createPrescription.patientRequired') });
       return;
@@ -1031,6 +1052,7 @@ export const CreatePrescription: React.FC = () => {
     });
 
     setSaving(false);
+    setShowValidationErrors(false);
     setFeedback({ type: 'success', message: t('doctor.createPrescription.saveSuccess') });
     navigate('/doctor/prescriptions');
   };
@@ -1275,6 +1297,7 @@ export const CreatePrescription: React.FC = () => {
               index={index}
               onChange={updateItem}
               onRemove={removeItem}
+              showErrors={showValidationErrors}
               uiLanguage={i18n.language ?? 'en'}
               userId={user?.id ?? ''}
             />
