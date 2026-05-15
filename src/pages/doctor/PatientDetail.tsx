@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Calendar,
+  ChevronLeft,
   ClipboardList,
   HeartPulse,
   Loader2,
@@ -106,6 +107,14 @@ export const DoctorPatientDetail: React.FC = () => {
   return (
     <>
       <div>
+        <button
+          type="button"
+          onClick={() => navigate('/doctor/patients')}
+          className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-900"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          Back to Patients
+        </button>
         <h1 className="text-2xl font-bold text-slate-900">{patientName}</h1>
         <p className="mt-1 text-sm text-slate-500">{t('doctor.patientDetail.subtitle')}</p>
       </div>
