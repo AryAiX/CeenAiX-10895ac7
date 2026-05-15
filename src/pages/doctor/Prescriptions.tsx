@@ -340,19 +340,57 @@ export const DoctorPrescriptions: React.FC = () => {
                     key={prescription.id}
                     className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
                   >
-                    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <p className="text-lg font-semibold text-gray-900">{prescription.patientName}</p>
                         <p className="mt-1 text-sm text-gray-500">
                           {t('doctor.prescriptions.prescribedAt', { date: formatDate(prescription.prescribed_at) })}
                         </p>
-                        <p className="mt-3 text-sm text-gray-600">
-                          {prescription.items.map((item) => item.medication_name).join(', ')}
-                        </p>
                       </div>
                       <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase text-slate-700">
                         {prescriptionStatusLabel(t, prescription.status)}
                       </span>
+                    </div>
+
+                    <div className="mt-4 space-y-2">
+                      {prescription.items.map((item) => (
+                        <div key={item.id} className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <MedicationNameDisplay
+                                canonicalName={item.medication_name}
+                                localizedName={item.medication_name_ar}
+                                language={uiLang}
+                                primaryClassName="font-semibold text-slate-900"
+                                secondaryClassName="text-xs text-slate-500 mt-0.5"
+                              />
+                              <p className="mt-1 text-sm text-slate-500">
+                                {formatMedicationDetailLine(t, uiLang, {
+                                  dosage: item.dosage,
+                                  frequency: item.frequency,
+                                  duration: item.duration,
+                                  detail: '',
+                                  emptyFallback: t('doctor.prescriptions.noMedicationDetail'),
+                                }) || t('doctor.prescriptions.noMedicationDetail')}
+                              </p>
+                              {item.instructions ? (
+                                <p className="mt-1 text-xs text-slate-400">{item.instructions}</p>
+                              ) : null}
+                            </div>
+                            <span
+                              className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                                item.is_dispensed
+                                  ? 'bg-emerald-100 text-emerald-700'
+                                  : 'bg-amber-100 text-amber-700'
+                              }`}
+                            >
+                              {item.is_dispensed
+                                ? t('doctor.prescriptions.dispensed')
+                                : t('doctor.prescriptions.pending')}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                     <div className="mt-4 flex flex-wrap gap-2">
                       <button
