@@ -140,12 +140,19 @@ export const DoctorPatients: React.FC = () => {
   const [filterActive, setFilterActive] = useState<PatientFilter>('all');
   const [sortBy, setSortBy] = useState<PatientSort>('lastVisit');
   const [openMenuPatientId, setOpenMenuPatientId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const PATIENTS_PER_PAGE = 10;
 
   useEffect(() => {
     const handleClickOutside = () => setOpenMenuPatientId(null);
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterActive, sortBy]);
   const { data, loading, error } = useDoctorPatients(user?.id);
   const rawPatients = useMemo(() => data ?? [], [data]);
   const uiLang = i18n.language ?? 'en';
@@ -212,6 +219,11 @@ export const DoctorPatients: React.FC = () => {
   );
   const criticalPatients = useMemo(() => rawPatients.filter((patient) => patient.risk === 'critical').length, [rawPatients]);
   const highRiskPatients = useMemo(() => rawPatients.filter((patient) => patient.risk === 'high').length, [rawPatients]);
+  const totalPages = Math.max(1, Math.ceil(filteredPatients.length / PATIENTS_PER_PAGE));
+  const paginatedPatients = useMemo(() => {
+    const start = (currentPage - 1) * PATIENTS_PER_PAGE;
+    return filteredPatients.slice(start, start + PATIENTS_PER_PAGE);
+  }, [filteredPatients, currentPage]);
 
   return (
     <div className="space-y-4">
@@ -339,7 +351,7 @@ export const DoctorPatients: React.FC = () => {
                 <div className="col-span-1 text-right">Actions</div>
               </div>
 
-              {filteredPatients.map((patient) => (
+              {paginatedPatients.map((patient) => (
                 <div
                   key={patient.id}
                   onClick={() => navigate(`/doctor/patients/${patient.id}`)}
@@ -472,18 +484,48 @@ export const DoctorPatients: React.FC = () => {
 
           <div className="flex flex-col gap-2 border-t border-slate-200 bg-slate-50 px-5 py-3 text-[12px] text-slate-500 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              Showing {formatLocaleDigits(filteredPatients.length, uiLang)} of {formatLocaleDigits(rawPatients.length, uiLang)} patients · Sorted by:{' '}
+              Showing{' '}
+              {formatLocaleDigits((currentPage - 1) * PATIENTS_PER_PAGE + 1, uiLang)}–{formatLocaleDigits(Math.min(currentPage * PATIENTS_PER_PAGE, filteredPatients.length), uiLang)}{' '}
+              of {formatLocaleDigits(filteredPatients.length, uiLang)} patients · Sorted by:{' '}
               {sortBy === 'lastVisit' ? 'Last Visit' : sortBy === 'risk' ? 'Risk' : sortBy === 'name' ? 'Name A-Z' : 'Next Appointment'}
             </div>
-            <div className="flex items-center space-x-2">
-              <button className="rounded border border-slate-300 px-3 py-1 transition-colors hover:bg-white">← 1</button>
-              <button className="rounded border border-slate-300 px-3 py-1 transition-colors hover:bg-white">2 →</button>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="rounded border border-slate-300 px-3 py-1.5 text-xs font-medium transition-colors hover:bg-white disabled:opacity-40"
+              >
+                ← Prev
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  type="button"
+                  onClick={() => setCurrentPage(page)}
+                  className={`rounded border px-3 py-1.5 text-xs font-medium transition-colors ${
+                    page === currentPage
+                      ? 'border-teal-500 bg-teal-600 text-white'
+                      : 'border-slate-300 hover:bg-white'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="rounded border border-slate-300 px-3 py-1.5 text-xs font-medium transition-colors hover:bg-white disabled:opacity-40"
+              >
+                Next →
+              </button>
             </div>
           </div>
         </div>
       ) : (
         <div className="grid gap-4 xl:grid-cols-2">
-          {filteredPatients.map((patient) => (
+          {paginatedPatients.map((patient) => (
             <button
               key={patient.id}
               type="button"
