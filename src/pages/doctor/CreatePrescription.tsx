@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { AlertOctagon, CheckCircle2, ChevronDown, ClipboardList, Loader2, Pill, Plus, RefreshCw, Search, Trash2 } from 'lucide-react';
+import { AlertOctagon, CheckCircle2, ChevronDown, ChevronLeft, ClipboardList, Loader2, Pill, Plus, RefreshCw, Search, Trash2 } from 'lucide-react';
 import { MedicationNameDisplay } from '../../components/MedicationNameDisplay';
 import {
   useDoctorPatients,
@@ -1038,6 +1038,16 @@ export const CreatePrescription: React.FC = () => {
   return (
     <div className="-mx-6 -my-5 min-h-[calc(100vh-64px)] overflow-y-auto bg-slate-50 p-6 xl:h-[calc(100vh-64px)] xl:overflow-hidden">
       <div className="flex min-h-full flex-col gap-4 xl:h-full">
+        <div>
+          <button
+            type="button"
+            onClick={() => navigate('/doctor/prescriptions')}
+            className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-900"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back to Prescriptions
+          </button>
+        </div>
         {feedback ? (
           <div
             className={`rounded-xl border px-4 py-3 text-sm ${
