@@ -800,64 +800,71 @@ export const DoctorAppointments: React.FC = () => {
                     <ChevronRight className="h-4 w-4" />
                   </button>
                 </div>
-                <div className="space-y-1">
-                  {Array.from({ length: 25 }, (_, i) => {
-                    const hour = 8 + Math.floor(i / 2);
-                    const minute = i % 2 === 0 ? 0 : 30;
-                    if (hour > 20) return null;
-                    const slotDate = new Date(selectedCalendarDate);
-                    slotDate.setHours(hour, minute, 0, 0);
-                    const slotLabel = slotDate.toLocaleTimeString(locale, dtOpts({ hour: 'numeric', minute: '2-digit' }));
-                    const slotAppts = routeAppointments.filter((appt) => {
-                      const d = new Date(appt.scheduled_at);
-                      return (
-                        formatDateKey(d) === formatDateKey(selectedCalendarDate) &&
-                        d.getHours() === hour &&
-                        d.getMinutes() >= minute &&
-                        d.getMinutes() < minute + 30
-                      );
-                    });
+                {(() => {
+                  const dayAppointments = routeAppointments
+                    .filter((appt) => formatDateKey(new Date(appt.scheduled_at)) === formatDateKey(selectedCalendarDate))
+                    .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime());
+                  if (dayAppointments.length === 0) {
                     return (
-                      <div key={`${hour}-${minute}`} className="flex gap-3">
-                        <div className="w-20 shrink-0 pt-2 text-right font-mono text-[11px] text-slate-400">{slotLabel}</div>
-                        <div className="flex-1 border-t border-slate-100 pb-1 pt-1">
-                          {slotAppts.length > 0 ? (
-                            <div className="space-y-1">
-                              {slotAppts.map((appt) => (
-                                <button
-                                  key={appt.id}
-                                  type="button"
-                                  onClick={() => navigate(`/doctor/appointments/${appt.id}`)}
-                                  className={`w-full rounded-lg border px-3 py-2 text-left transition hover:shadow-sm ${
-                                    appt.status === 'completed'
-                                      ? 'border-emerald-200 bg-emerald-50'
-                                      : appt.status === 'in_progress'
-                                        ? 'border-teal-200 bg-teal-100'
-                                        : 'border-blue-200 bg-blue-50'
-                                  }`}
-                                >
-                                  <p className="text-[12px] font-bold text-slate-900">
-                                    {patientNameById.get(appt.patient_id) ?? t('shared.patient')}
-                                  </p>
-                                  <p className="mt-0.5 line-clamp-1 text-[11px] text-slate-500">
-                                    {appt.chief_complaint ?? appointmentTypeLabel(t, appt.type)}
-                                  </p>
-                                  <span className="mt-1 inline-block rounded bg-white/80 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600">
-                                    {appointmentStatusLabel(t, appt.status)}
-                                  </span>
-                                </button>
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="rounded border border-dashed border-slate-200 px-3 py-1 text-[11px] text-slate-300">
-                              Available
-                            </div>
-                          )}
-                        </div>
+                      <div className="rounded-2xl border border-dashed border-slate-200 p-10 text-center">
+                        <CalendarDays className="mx-auto mb-4 h-10 w-10 text-slate-300" />
+                        <p className="font-semibold text-slate-900">No appointments this day</p>
+                        <p className="mt-2 text-sm text-slate-500">There are no appointments scheduled for this day.</p>
                       </div>
                     );
-                  })}
-                </div>
+                  }
+                  return (
+                    <div className="space-y-2">
+                      {dayAppointments.map((appt) => {
+                        const apptDate = new Date(appt.scheduled_at);
+                        const timeLabel = apptDate.toLocaleTimeString(locale, dtOpts({ hour: 'numeric', minute: '2-digit' }));
+                        const borderColor =
+                          appt.status === 'completed'
+                            ? 'border-emerald-400'
+                            : appt.status === 'in_progress'
+                              ? 'border-teal-400'
+                              : appt.status === 'cancelled'
+                                ? 'border-red-400'
+                                : 'border-blue-400';
+                        const statusBadgeColor =
+                          appt.status === 'completed'
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : appt.status === 'in_progress'
+                              ? 'bg-teal-100 text-teal-700'
+                              : appt.status === 'cancelled'
+                                ? 'bg-red-100 text-red-600'
+                                : 'bg-blue-100 text-blue-700';
+                        return (
+                          <button
+                            key={appt.id}
+                            type="button"
+                            onClick={() => navigate(`/doctor/appointments/${appt.id}`)}
+                            className={`flex w-full items-stretch gap-4 rounded-xl border border-slate-200 bg-white px-4 py-3 text-left transition hover:shadow-sm`}
+                          >
+                            <div className="w-16 shrink-0 pt-0.5 font-mono text-[12px] text-slate-400">{timeLabel}</div>
+                            <div className={`w-0.5 shrink-0 self-stretch rounded-full ${borderColor}`} />
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-[13px] font-bold text-slate-900">
+                                {patientNameById.get(appt.patient_id) ?? t('shared.patient')}
+                              </p>
+                              <p className="mt-0.5 truncate text-[12px] text-slate-500">
+                                {appt.chief_complaint ?? appointmentTypeLabel(t, appt.type)}
+                              </p>
+                              <div className="mt-1.5 flex items-center gap-2">
+                                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusBadgeColor}`}>
+                                  {appointmentStatusLabel(t, appt.status)}
+                                </span>
+                                {appt.duration_minutes ? (
+                                  <span className="text-[11px] text-slate-400">{appt.duration_minutes} min</span>
+                                ) : null}
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
               </section>
             ) : null}
 
