@@ -215,6 +215,33 @@ export const DoctorPatients: React.FC = () => {
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Patient Records</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Manage and review your patient list, medical history and clinical records.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Total Patients</p>
+            <p className="text-2xl font-bold text-slate-900">{formatLocaleDigits(rawPatients.length, uiLang)}</p>
+          </div>
+          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-red-400">Critical</p>
+            <p className="text-2xl font-bold text-red-600">{formatLocaleDigits(criticalPatients, uiLang)}</p>
+          </div>
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-400">High Risk</p>
+            <p className="text-2xl font-bold text-amber-600">{formatLocaleDigits(highRiskPatients, uiLang)}</p>
+          </div>
+          <div className="rounded-xl border border-teal-200 bg-teal-50 px-4 py-2.5 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-teal-400">Today</p>
+            <p className="text-2xl font-bold text-teal-600">{formatLocaleDigits(todayPatients, uiLang)}</p>
+          </div>
+        </div>
+      </div>
+
       <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="relative mb-4">
           <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400 rtl:left-auto rtl:right-4" />
