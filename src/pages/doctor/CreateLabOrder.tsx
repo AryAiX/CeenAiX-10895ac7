@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Loader2, Plus, Search, TestTube2, Trash2 } from 'lucide-react';
+import { ChevronLeft, Loader2, Plus, Search, TestTube2, Trash2 } from 'lucide-react';
 import { LabTestNameDisplay } from '../../components/LabTestNameDisplay';
 import {
   useDoctorPatients,
@@ -751,10 +751,18 @@ export const CreateLabOrder: React.FC = () => {
 
   return (
     <>
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">{t('doctor.createLabOrder.title')}</h1>
-        <p className="mt-1 text-sm text-slate-500">{t('doctor.createLabOrder.subtitle')}</p>
-      </div>
+        <div>
+          <button
+            type="button"
+            onClick={() => navigate('/doctor/lab-orders')}
+            className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-900"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back to Lab Orders
+          </button>
+          <h1 className="text-2xl font-bold text-slate-900">{t('doctor.createLabOrder.title')}</h1>
+          <p className="mt-1 text-sm text-slate-500">{t('doctor.createLabOrder.subtitle')}</p>
+        </div>
 
       <div className="mx-auto w-full max-w-5xl space-y-6">
         {feedback ? (
