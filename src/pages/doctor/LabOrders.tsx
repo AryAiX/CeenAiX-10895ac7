@@ -174,28 +174,42 @@ export const DoctorLabOrders: React.FC = () => {
         ) : null}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-2xl border border-red-100 bg-white p-5 shadow-sm">
+          <button
+            type="button"
+            onClick={() => setActiveTab('critical')}
+            className="rounded-2xl border border-red-100 bg-white p-5 shadow-sm cursor-pointer transition hover:shadow-md hover:border-red-300 text-left w-full"
+          >
             <p className="text-sm font-medium text-slate-500">Critical results</p>
             <p className="mt-2 text-2xl font-bold text-red-600">{formatLocaleDigits(criticalCount, uiLang)}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+            <p className="mt-1 text-xs text-red-400">Click to review</p>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('results')}
+            className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm cursor-pointer transition hover:shadow-md hover:border-teal-200 text-left w-full"
+          >
             <p className="text-sm font-medium text-slate-500">{t('doctor.labOrders.totalOrders')}</p>
-            <p className="mt-2 text-2xl font-bold text-slate-900">
-              {formatLocaleDigits(labOrders.length, uiLang)}
-            </p>
-          </div>
-          <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+            <p className="mt-2 text-2xl font-bold text-slate-900">{formatLocaleDigits(labOrders.length, uiLang)}</p>
+            <p className="mt-1 text-xs text-teal-400">Click to view all</p>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('pending')}
+            className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm cursor-pointer transition hover:shadow-md hover:border-amber-200 text-left w-full"
+          >
             <p className="text-sm font-medium text-slate-500">{t('doctor.labOrders.pendingResults')}</p>
-            <p className="mt-2 text-2xl font-bold text-slate-900">
-              {formatLocaleDigits(pendingResults, uiLang)}
-            </p>
-          </div>
-          <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+            <p className="mt-2 text-2xl font-bold text-slate-900">{formatLocaleDigits(pendingResults, uiLang)}</p>
+            <p className="mt-1 text-xs text-amber-400">Click to view pending</p>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('scheduled')}
+            className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm cursor-pointer transition hover:shadow-md hover:border-blue-200 text-left w-full"
+          >
             <p className="text-sm font-medium text-slate-500">{t('doctor.labOrders.linkedPatients')}</p>
-            <p className="mt-2 text-2xl font-bold text-slate-900">
-              {formatLocaleDigits(uniquePatients, uiLang)}
-            </p>
-          </div>
+            <p className="mt-2 text-2xl font-bold text-slate-900">{formatLocaleDigits(uniquePatients, uiLang)}</p>
+            <p className="mt-1 text-xs text-blue-400">Click to view scheduled</p>
+          </button>
         </div>
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
