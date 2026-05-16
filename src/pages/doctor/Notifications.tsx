@@ -45,6 +45,26 @@ export const DoctorNotifications: React.FC = () => {
     }
   };
 
+  const getNotificationTypeBadge = (type: string) => {
+    switch (type?.toLowerCase()) {
+      case 'appointment':
+        return { label: '📅 Appointment', className: 'bg-teal-100 text-teal-700 border border-teal-200' };
+      case 'lab':
+      case 'lab_result':
+        return { label: '🔬 Lab Result', className: 'bg-cyan-100 text-cyan-700 border border-cyan-200' };
+      case 'medication':
+        return { label: '💊 Medication', className: 'bg-violet-100 text-violet-700 border border-violet-200' };
+      case 'message':
+        return { label: '💬 Message', className: 'bg-blue-100 text-blue-700 border border-blue-200' };
+      case 'system':
+        return { label: '⚙️ System', className: 'bg-slate-100 text-slate-600 border border-slate-200' };
+      case 'alert':
+        return { label: '🚨 Alert', className: 'bg-red-100 text-red-700 border border-red-200' };
+      default:
+        return { label: '🔔 General', className: 'bg-slate-100 text-slate-600 border border-slate-200' };
+    }
+  };
+
   if (loading) {
     return (
       <>
@@ -160,6 +180,14 @@ export const DoctorNotifications: React.FC = () => {
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="font-semibold text-slate-900">{notification.title}</p>
+                        {(() => {
+                          const badge = getNotificationTypeBadge(notification.type);
+                          return (
+                            <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${badge.className}`}>
+                              {badge.label}
+                            </span>
+                          );
+                        })()}
                         {!notification.is_read ? (
                           <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
                             {t('doctor.notifications.unreadBadge')}
