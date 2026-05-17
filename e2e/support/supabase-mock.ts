@@ -16,7 +16,11 @@ type JsonRecord = Record<string, unknown>;
 const SUPABASE_URL = 'https://placeholder.supabase.co';
 const AUTH_STORAGE_KEY = 'sb-placeholder-auth-token';
 
-const now = new Date('2026-05-10T12:00:00.000Z');
+// Wall-clock `now` so date-driven fixtures (appointments, lab orders) never
+// roll into the past and silently disable date-pickers / cancel buttons in the
+// browser UI. The previous frozen scenario date (2026-05-10) caused multiple
+// specs to break as soon as the calendar passed that day.
+const now = new Date();
 const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
 const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
 

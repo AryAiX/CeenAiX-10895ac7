@@ -695,6 +695,7 @@ export const BookAppointment: React.FC = () => {
                           )
                         }
                         className="rounded-lg p-2 transition hover:bg-gray-100"
+                        aria-label={t('patient.book.previousMonth', { defaultValue: 'Previous month' })}
                       >
                         <ChevronLeft className="h-5 w-5 text-gray-700" />
                       </button>
@@ -709,6 +710,7 @@ export const BookAppointment: React.FC = () => {
                           )
                         }
                         className="rounded-lg p-2 transition hover:bg-gray-100"
+                        aria-label={t('patient.book.nextMonth', { defaultValue: 'Next month' })}
                       >
                         <ChevronRight className="h-5 w-5 text-gray-700" />
                       </button>

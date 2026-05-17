@@ -31,6 +31,18 @@ const scenarioNow = new Date('2026-05-10T12:00:00.000Z');
 const scenarioTomorrow = new Date(scenarioNow.getTime() + 24 * 60 * 60 * 1000).toISOString();
 const scenarioYesterday = new Date(scenarioNow.getTime() - 24 * 60 * 60 * 1000).toISOString();
 
+// The mocked doctor exposes Monday availability only. Compute the very next
+// Monday from the wall clock so date-driven assertions in the booking flow do
+// not rot as the calendar advances past hardcoded fixtures.
+const nextMondayDate = (() => {
+  const today = new Date();
+  const offset = ((1 - today.getDay() + 7) % 7) || 7;
+  const result = new Date(today);
+  result.setDate(today.getDate() + offset);
+  return result;
+})();
+const nextMondayDay = String(nextMondayDate.getDate());
+
 const seedAppointment = (
   state: E2EWorkflowState,
   overrides: Record<string, unknown> = {}
@@ -183,7 +195,12 @@ test('admin, patient, doctor, lab, and patient complete a clinical order journey
   const patientBookingPage = await openRolePage(browser, state, 'patient', '/patient/appointments/book');
   await patientBookingPage.getByPlaceholder(/name, specialty, or city/i).fill('Omar');
   await patientBookingPage.getByRole('button', { name: /Dr\. Omar Doctor/i }).click();
-  await patientBookingPage.getByRole('button', { name: /^11$/ }).click();
+  if (nextMondayDate.getMonth() !== new Date().getMonth()) {
+    await patientBookingPage.getByRole('button', { name: /next month/i }).click();
+  }
+  await patientBookingPage
+    .getByRole('button', { name: new RegExp(`^${nextMondayDay}$`) })
+    .click();
   await patientBookingPage.getByRole('button', { name: /9:00/i }).first().click();
   await patientBookingPage.locator('textarea').first().fill('Workflow headache consult');
   await patientBookingPage.locator('textarea').nth(1).fill('Light sensitivity and nausea for the past week.');
@@ -442,7 +459,12 @@ test('patient cannot confirm appointment until a reason is entered', async ({ br
   const page = await openRolePage(browser, state, 'patient', '/patient/appointments/book');
 
   await page.getByRole('button', { name: /Dr\. Omar Doctor/i }).click();
-  await page.getByRole('button', { name: /^11$/ }).click();
+  if (nextMondayDate.getMonth() !== new Date().getMonth()) {
+    await page.getByRole('button', { name: /next month/i }).click();
+  }
+  await page
+    .getByRole('button', { name: new RegExp(`^${nextMondayDay}$`) })
+    .click();
   await page.getByRole('button', { name: /9:00/i }).first().click();
 
   await expect(page.getByRole('button', { name: /confirm appointment/i })).toBeDisabled();
