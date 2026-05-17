@@ -434,6 +434,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (event === 'SIGNED_OUT') {
         clearPreviewAccess();
+        // Clear the per-device language preference so a shared device does
+        // not leak the previous user's selection to the next visitor.
+        try {
+          if (typeof window !== 'undefined') {
+            window.localStorage.removeItem('ceenaix.lang');
+          }
+        } catch {
+          // localStorage may be disabled (private mode); the sign-out path
+          // must not throw.
+        }
       }
 
       void syncSession(nextSession);

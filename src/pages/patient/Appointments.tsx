@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -183,9 +183,21 @@ export const PatientAppointments: React.FC = () => {
     [preVisitAssessments]
   );
 
-  const isUpcoming = (appointment: Appointment) =>
-    UPCOMING_STATUSES.has(appointment.status) &&
-    new Date(appointment.scheduled_at).getTime() >= Date.now();
+  // Tick once a minute so memos that depend on "now" (upcoming / past
+  // classification, next teleconsult banner) refresh without needing the
+  // user to navigate away and back.
+  const [nowTick, setNowTick] = useState(() => Date.now());
+  useEffect(() => {
+    const id = window.setInterval(() => setNowTick(Date.now()), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const isUpcoming = useCallback(
+    (appointment: Appointment) =>
+      UPCOMING_STATUSES.has(appointment.status) &&
+      new Date(appointment.scheduled_at).getTime() >= nowTick,
+    [nowTick]
+  );
 
   const filteredAppointments = useMemo(() => {
     const normalizedSpecialty = specialtyQuery.trim().toLowerCase();
@@ -228,11 +240,11 @@ export const PatientAppointments: React.FC = () => {
 
       return true;
     });
-  }, [appointments, statusFilter, typeFilter, specialtyQuery, providerQuery, dateFrom, dateTo, doctorProfileById]);
+  }, [appointments, statusFilter, typeFilter, specialtyQuery, providerQuery, dateFrom, dateTo, doctorProfileById, isUpcoming]);
 
   const upcomingAppointments = useMemo(
     () => filteredAppointments.filter(isUpcoming),
-    [filteredAppointments]
+    [filteredAppointments, isUpcoming]
   );
 
   // "Past" means the visit's scheduled time has gone by AND it isn't sitting
@@ -244,9 +256,9 @@ export const PatientAppointments: React.FC = () => {
       filteredAppointments.filter(
         (appointment) =>
           !isUpcoming(appointment) &&
-          new Date(appointment.scheduled_at).getTime() < Date.now()
+          new Date(appointment.scheduled_at).getTime() < nowTick
       ),
-    [filteredAppointments]
+    [filteredAppointments, isUpcoming, nowTick]
   );
 
   const appointmentDaysInMonth = useMemo(() => {

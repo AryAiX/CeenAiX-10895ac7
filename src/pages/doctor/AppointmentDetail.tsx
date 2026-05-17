@@ -112,7 +112,8 @@ export const DoctorAppointmentDetail: React.FC = () => {
       .from('appointments')
       .update({ status })
       .eq('id', data.appointment.id)
-      .eq('doctor_id', user.id);
+      .eq('doctor_id', user.id)
+      .eq('is_deleted', false);
 
     setUpdatingAppointment(false);
 

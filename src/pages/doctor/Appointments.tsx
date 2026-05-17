@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Bell, Calendar, CalendarCheck, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, ClipboardList, Clock, Download, List, MapPin, PlayCircle, Plus, TrendingUp, User, UserX, Video } from 'lucide-react';
@@ -187,7 +187,18 @@ export const DoctorAppointments: React.FC = () => {
     () => routeAppointments.filter((appointment) => ['scheduled', 'confirmed'].includes(appointment.status)).length,
     [routeAppointments]
   );
+  // Re-evaluate the calendar windows every minute so the "today / this
+  // week / this month" KPIs and queue filters do not get stuck on the
+  // first mount's calendar day after a midnight rollover.
+  const [calendarTick, setCalendarTick] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => setCalendarTick((tick) => tick + 1), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
   const { startOfToday, endOfToday, startOfWeek, endOfWeek, startOfMonth, endOfMonth } = useMemo(() => {
+    // calendarTick is intentionally read so we re-derive the window after
+    // a real-world clock change without forcing a full route remount.
+    void calendarTick;
     const now = new Date();
     const todayStart = new Date(now);
     todayStart.setHours(0, 0, 0, 0);
@@ -206,7 +217,7 @@ export const DoctorAppointments: React.FC = () => {
       startOfMonth: new Date(now.getFullYear(), now.getMonth(), 1),
       endOfMonth: new Date(now.getFullYear(), now.getMonth() + 1, 1),
     };
-  }, []);
+  }, [calendarTick]);
   const todayAppointmentsForStats = useMemo(
     () =>
       appointments.filter((appointment) => {

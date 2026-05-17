@@ -819,6 +819,7 @@ export const BookAppointment: React.FC = () => {
                           value={chiefComplaint}
                           onChange={(event) => setChiefComplaint(event.target.value)}
                           rows={4}
+                          maxLength={500}
                           className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
                           placeholder={t('patient.book.reasonPh')}
                         />
@@ -830,6 +831,7 @@ export const BookAppointment: React.FC = () => {
                           value={notes}
                           onChange={(event) => setNotes(event.target.value)}
                           rows={3}
+                          maxLength={2000}
                           className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
                           placeholder={t('patient.book.notesPh')}
                         />
