@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -230,6 +231,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [doctorProfile, setDoctorProfile] = useState<DoctorProfile | null>(null);
   const [role, setRole] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // Monotonically-increasing generation used to ignore stale profile loads
+  // when the auth state changes rapidly (sign in / sign out / token refresh
+  // happening back-to-back). Each new syncSession or refreshProfile call
+  // bumps the generation; async branches only apply their state updates if
+  // their captured generation still matches the latest.
+  const profileLoadGenerationRef = useRef(0);
 
   const loadExtensionProfiles = useCallback(async (nextRole: UserRole, userId: string) => {
     const patientRequest =
@@ -368,6 +375,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const syncSession = useCallback(
     async (nextSession: Session | null) => {
+      profileLoadGenerationRef.current += 1;
+      const generation = profileLoadGenerationRef.current;
       setIsLoading(true);
 
       if (!nextSession?.user) {
@@ -385,6 +394,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(nextSession.user);
 
       const nextState = await loadProfileState(nextSession.user);
+      if (profileLoadGenerationRef.current !== generation) {
+        // A newer auth event has superseded us; drop the result instead of
+        // overwriting whatever state the newer call already wrote.
+        return;
+      }
       setProfile(nextState.profile);
       setPatientProfile(nextState.patientProfile);
       setDoctorProfile(nextState.doctorProfile);
@@ -576,7 +590,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
+    profileLoadGenerationRef.current += 1;
+    const generation = profileLoadGenerationRef.current;
     const nextState = await loadProfileState(user);
+    if (profileLoadGenerationRef.current !== generation) {
+      return;
+    }
     setProfile(nextState.profile);
     setPatientProfile(nextState.patientProfile);
     setDoctorProfile(nextState.doctorProfile);

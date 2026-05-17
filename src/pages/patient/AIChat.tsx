@@ -100,8 +100,11 @@ const classifyHba1c = (latest: number | null | undefined, previous: number | nul
     return null;
   }
 
+  // First reading: we have nothing to compare against, so call it out as a
+  // baseline rather than mislabelling it 'stable' (which implied a trend
+  // when there was none).
   if (previous === null || previous === undefined) {
-    return 'stable' as const;
+    return 'baseline' as const;
   }
 
   const delta = latest - previous;
@@ -199,6 +202,34 @@ export const PatientAIChat: React.FC = () => {
 
     return typeof update.metadata.sessionId === 'string' && update.metadata.sessionId === selectedSessionId;
   });
+
+  // Track the last user-driven session selection so the "clear stale
+  // messages" effect can fire on real session-switches (sidebar click) but
+  // skip the synthetic session id change that happens inside
+  // `handleSendMessage` when a brand-new session is created.
+  const lastSelectedSessionRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (isSending) {
+      // Mid-send a new session id may be assigned by the server response;
+      // keep the optimistic message + assistant reply visible until the
+      // refetch lands.
+      lastSelectedSessionRef.current = selectedSessionId;
+      return;
+    }
+    if (selectedSessionId === null) {
+      setMessages([starterMessage]);
+      lastSelectedSessionRef.current = null;
+      return;
+    }
+    if (lastSelectedSessionRef.current === selectedSessionId) {
+      return;
+    }
+    lastSelectedSessionRef.current = selectedSessionId;
+    // The user switched threads — wipe the previous transcript so no message
+    // from the prior session leaks into the new one while the fetch is in
+    // flight.
+    setMessages([]);
+  }, [isSending, selectedSessionId, starterMessage]);
 
   useEffect(() => {
     if (loading || isSending) {
@@ -306,6 +337,7 @@ export const PatientAIChat: React.FC = () => {
         mode: 'chat',
       });
 
+      const previousSessionId = selectedSessionId;
       setSelectedSessionId(response.sessionId);
       setRecordUpdateFeedback(null);
       setMessages((currentMessages) => [
@@ -319,7 +351,11 @@ export const PatientAIChat: React.FC = () => {
         },
       ]);
 
-      if (selectedSessionId !== null) {
+      // Always refresh after a successful exchange: when previousSessionId was
+      // null the call we just made *created* the session, so the session list
+      // needs to pick it up. When it was not null we may also have advanced
+      // the same thread; either way the panel should reload.
+      if (previousSessionId !== null || response.sessionId) {
         await refetch();
       }
 
@@ -399,7 +435,11 @@ export const PatientAIChat: React.FC = () => {
         ? `↑ ${t('patient.aiChat.hba1cRising')}`
         : hba1cTrend === 'stable'
           ? t('patient.aiChat.hba1cStable')
-          : null;
+          : hba1cTrend === 'baseline'
+            ? t('patient.aiChat.hba1cBaseline', {
+                defaultValue: 'Baseline reading on file',
+              })
+            : null;
 
   const bpStatusText =
     bpClass === 'controlled'

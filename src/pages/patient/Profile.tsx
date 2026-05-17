@@ -32,6 +32,7 @@ export const Profile: React.FC = () => {
   const [emiratesIdBack, setEmiratesIdBack] = useState<string>('');
   const [isEditingPersonal, setIsEditingPersonal] = useState(false);
   const [isEditingInsurance, setIsEditingInsurance] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const [personalInfo, setPersonalInfo] = useState({
     fullName: '',
@@ -111,7 +112,8 @@ export const Profile: React.FC = () => {
 
   const savePersonalInfo = async () => {
     if (!user?.id) return;
-    await supabase
+    setSaveError(null);
+    const { error: profileError } = await supabase
       .from('user_profiles')
       .update({
         full_name: personalInfo.fullName,
@@ -120,7 +122,11 @@ export const Profile: React.FC = () => {
         avatar_url: profileImage || null,
       })
       .eq('user_id', user.id);
-    await supabase.from('patient_profiles').upsert(
+    if (profileError) {
+      setSaveError(profileError.message);
+      return;
+    }
+    const { error: patientError } = await supabase.from('patient_profiles').upsert(
       {
         user_id: user.id,
         blood_type: personalInfo.bloodType || null,
@@ -129,6 +135,10 @@ export const Profile: React.FC = () => {
       },
       { onConflict: 'user_id' }
     );
+    if (patientError) {
+      setSaveError(patientError.message);
+      return;
+    }
     await refetchProfile();
     setPatientProfile({
       blood_type: personalInfo.bloodType || null,
@@ -143,7 +153,8 @@ export const Profile: React.FC = () => {
       setIsEditingInsurance(false);
       return;
     }
-    await supabase
+    setSaveError(null);
+    const { error: insuranceError } = await supabase
       .from('patient_insurance')
       .update({
         policy_number: insuranceInfo.policyNumber || null,
@@ -153,6 +164,10 @@ export const Profile: React.FC = () => {
         valid_until: insuranceInfo.validUntil || null,
       })
       .eq('id', insurance.primaryPlan.id);
+    if (insuranceError) {
+      setSaveError(insuranceError.message);
+      return;
+    }
     setIsEditingInsurance(false);
   };
 
@@ -215,6 +230,18 @@ export const Profile: React.FC = () => {
         </h1>
         <p className="mt-2 text-[15px] text-slate-400">{t('patient.profile.subtitle')}</p>
       </div>
+
+      {saveError ? (
+        <div
+          role="alert"
+          className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
+        >
+          {t('patient.profile.saveError', {
+            defaultValue: 'We could not save your changes: {{message}}',
+            message: saveError,
+          })}
+        </div>
+      ) : null}
 
       <div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
