@@ -291,7 +291,7 @@ const InsuranceShell = ({ data, children }: { data: InsurancePortalData | null; 
 
         {!collapsed ? (
           <div className="mx-3 mb-3 rounded-xl border border-white/[0.05] bg-black/20 p-3">
-            <div className="mb-1 font-mono text-[10px] text-[#93C5E8]">{formatCurrency(claimValue)} claims · current seed period</div>
+            <div className="mb-1 font-mono text-[10px] text-[#93C5E8]">{formatCurrency(claimValue)} claims · live workspace total</div>
             <div className="mb-1.5 flex items-center gap-1">
               <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
               <span className="text-[9px] text-red-300">{openFraud} fraud alerts open</span>

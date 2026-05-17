@@ -19,6 +19,7 @@ import { usePharmacyPrescriptionQueue } from '../../hooks';
 import type { PharmacyQueuePrescriptionItem } from '../../hooks/use-pharmacy-prescription-queue';
 import { formatLocaleDigits } from '../../lib/i18n-ui';
 import { PHARMACY_NAV_ITEMS } from './navItems';
+import { compareStockAlerts } from './stock-alerts';
 
 const formatNumber = (value: number | null | undefined, language: string) =>
   typeof value === 'number' ? formatLocaleDigits(value, language) : '—';
@@ -168,12 +169,11 @@ export const PharmacyDashboard = () => {
           severity: item.status,
           expiryMonth: item.expiryMonth,
         }))
-        .sort((a, b) => {
-          const order = ['atorvastatin', 'metformin', 'bisoprolol', 'warfarin'];
-          const aIndex = order.findIndex((name) => a.item.toLowerCase().includes(name));
-          const bIndex = order.findIndex((name) => b.item.toLowerCase().includes(name));
-          return (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex);
-        }) ?? [],
+        // Sort by clinical urgency (out → low → near_expiry), then by
+        // remaining stock ascending. The previous ordering keyed off a
+        // hardcoded drug-name priority list (atorvastatin/metformin/…) which
+        // reshuffled real low-stock alerts based on Bolt prototype copy.
+        .sort(compareStockAlerts) ?? [],
     [data?.inventory]
   );
   const onHold = onHoldPrescriptions.length;
@@ -187,7 +187,7 @@ export const PharmacyDashboard = () => {
           .slice(0, 4)
           .map((alert) => {
             if (alert.severity === 'out') {
-              return `${alert.item}${/atorvastatin/i.test(alert.item) && !/20mg/i.test(alert.item) ? ' 20mg' : ''} OUT OF STOCK`;
+              return `${alert.item} OUT OF STOCK`;
             }
 
             if (alert.severity === 'near_expiry') {

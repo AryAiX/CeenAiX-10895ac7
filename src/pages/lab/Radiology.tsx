@@ -56,6 +56,11 @@ export const LabRadiology = () => {
           <p className="mt-4 text-3xl font-bold text-slate-900">
             {loading ? '…' : formatNumber(data?.metrics.totalActiveTests)}
           </p>
+          <p className="mt-1 text-[11px] text-slate-400">
+            {t('lab.radiology.kpiAcrossAllOrders', {
+              defaultValue: 'Across all lab orders (radiology-specific metrics arrive with imaging Phase).',
+            })}
+          </p>
         </article>
 
         <article className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -74,6 +79,11 @@ export const LabRadiology = () => {
           <p className="mt-4 text-3xl font-bold text-slate-900">
             {loading ? '…' : formatNumber(data?.metrics.pendingOrders)}
           </p>
+          <p className="mt-1 text-[11px] text-slate-400">
+            {t('lab.radiology.kpiAcrossAllOrders', {
+              defaultValue: 'Across all lab orders (radiology-specific metrics arrive with imaging Phase).',
+            })}
+          </p>
         </article>
 
         <article className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -91,6 +101,11 @@ export const LabRadiology = () => {
           </div>
           <p className="mt-4 text-3xl font-bold text-slate-900">
             {loading ? '…' : formatNumber(data?.metrics.completedToday)}
+          </p>
+          <p className="mt-1 text-[11px] text-slate-400">
+            {t('lab.radiology.kpiAcrossAllOrders', {
+              defaultValue: 'Across all lab orders (radiology-specific metrics arrive with imaging Phase).',
+            })}
           </p>
         </article>
       </section>
