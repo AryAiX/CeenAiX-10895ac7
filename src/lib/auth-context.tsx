@@ -201,8 +201,14 @@ export const getDefaultRouteForRole = (role: UserRole | null | undefined) => {
     return '/insurance/dashboard';
   }
 
-  if (role === 'super_admin') {
+  if (role === 'super_admin' || role === 'facility_admin') {
     return '/admin/dashboard';
+  }
+
+  // Roles without a portal (nurse and other non-MVP staff) should land on the
+  // public home rather than be bounced back to onboarding indefinitely.
+  if (role) {
+    return '/';
   }
 
   return '/auth/onboarding';

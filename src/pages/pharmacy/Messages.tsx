@@ -201,16 +201,30 @@ export const PharmacyMessages = () => {
                   defaultValue: 'Type a secure pharmacy response...',
                 })}
                 className="flex-1 rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-emerald-400 focus:outline-none"
+                aria-label={t('pharmacy.messages.responsePlaceholder', {
+                  defaultValue: 'Type a secure pharmacy response...',
+                })}
               />
               <button
                 type="button"
                 onClick={() => setDraft('')}
-                className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600 text-white hover:bg-emerald-700"
+                disabled={draft.trim().length === 0}
+                title={t('pharmacy.messages.sendComingSoon', {
+                  defaultValue:
+                    'Outbound pharmacy replies are coming in a later release. Drafts are kept locally for now.',
+                })}
+                className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600 text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500"
                 aria-label={t('messaging.sendMessage', { defaultValue: 'Send message' })}
               >
                 <Send className="h-4 w-4" />
               </button>
             </div>
+            <p className="mt-2 text-[11px] text-slate-400">
+              {t('pharmacy.messages.sendComingSoon', {
+                defaultValue:
+                  'Outbound pharmacy replies are coming in a later release. Drafts are kept locally for now.',
+              })}
+            </p>
           </div>
         </main>
       </div>

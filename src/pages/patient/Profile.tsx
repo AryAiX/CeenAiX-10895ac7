@@ -175,7 +175,11 @@ export const Profile: React.FC = () => {
   };
 
   const handleScanEmiratesId = () => {
-    alert(t('patient.profile.scanAlert'));
+    // True ID-card OCR is a Phase 2 capability; until then, route the
+    // user through the standard image-upload picker so that the action
+    // remains useful (capture / attach photo) rather than firing a
+    // dead-end alert that blocks the page.
+    handleImageUpload('emiratesFront');
   };
 
   const addFamilyMember = () => {

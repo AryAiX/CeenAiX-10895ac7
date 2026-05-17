@@ -560,7 +560,15 @@ export const DoctorAppointments: React.FC = () => {
 
                   <div className="flex items-center gap-2 overflow-x-auto">
                     <div className="flex rounded-lg border border-slate-200 bg-white p-0.5">
-                      <button type="button" className="rounded px-3 py-1.5 text-[12px] font-bold text-slate-500 transition-colors hover:text-slate-700">
+                      <button
+                        type="button"
+                        disabled
+                        title={t('doctor.appointments.dayViewComingSoon', {
+                          defaultValue: 'Day view is coming in a later release.',
+                        })}
+                        aria-disabled="true"
+                        className="rounded px-3 py-1.5 text-[12px] font-bold text-slate-300 cursor-not-allowed"
+                      >
                         📅 Day
                       </button>
                       <button
@@ -575,7 +583,15 @@ export const DoctorAppointments: React.FC = () => {
                       >
                         📆 Week ●
                       </button>
-                      <button type="button" className="rounded px-3 py-1.5 text-[12px] font-bold text-slate-500 transition-colors hover:text-slate-700">
+                      <button
+                        type="button"
+                        disabled
+                        title={t('doctor.appointments.monthViewComingSoon', {
+                          defaultValue: 'Month view is coming in a later release.',
+                        })}
+                        aria-disabled="true"
+                        className="rounded px-3 py-1.5 text-[12px] font-bold text-slate-300 cursor-not-allowed"
+                      >
                         📅 Month
                       </button>
                     </div>
@@ -646,7 +662,7 @@ export const DoctorAppointments: React.FC = () => {
                                     ? 'border-emerald-200 bg-emerald-50'
                                     : appointment.status === 'in_progress'
                                       ? 'border-teal-200 bg-teal-100'
-                                      : (appointment.status as string) === 'checked_in'
+                                      : appointment.status === 'confirmed'
                                         ? 'border-blue-200 bg-blue-50'
                                         : 'border-white bg-white'
                                 }`}
