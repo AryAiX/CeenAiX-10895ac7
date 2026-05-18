@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bell, BookOpen, Bug, Globe, HelpCircle, Lock, Mail, MessageSquare, Phone, PlayCircle, Settings as SettingsIcon, ShieldCheck, User, X } from 'lucide-react';
 import { Skeleton } from '../../components/Skeleton';
@@ -50,6 +51,7 @@ function normalizePrefs(value: unknown): Preferences {
 
 export const PatientSettings = () => {
   const { t, i18n } = useTranslation('common');
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { data: profile, loading, error, refetch } = useUserProfile();
   const [section, setSection] = useState<SettingsSection>('account');
@@ -139,7 +141,17 @@ export const PatientSettings = () => {
       return (
         <div className="space-y-4">
           <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <h3 className="mb-4 text-lg font-bold text-slate-900">{t('patient.settings.accountSummary')}</h3>
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-slate-900">{t('patient.settings.accountSummary')}</h3>
+              <button
+                type="button"
+                onClick={() => navigate('/patient/profile')}
+                className="inline-flex items-center gap-2 rounded-xl bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-700"
+              >
+                <User className="h-4 w-4" />
+                Edit Profile
+              </button>
+            </div>
             <dl className="grid gap-4 md:grid-cols-2">
               <div>
                 <dt className="text-sm text-slate-400">{t('patient.settings.fullName')}</dt>
@@ -158,6 +170,9 @@ export const PatientSettings = () => {
                 <dd className="font-semibold text-slate-900">{profile?.city ?? t('patient.profile.notSet')}</dd>
               </div>
             </dl>
+            <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-500">
+              To update your personal information, visit your full profile page.
+            </div>
           </div>
         </div>
       );
