@@ -140,8 +140,9 @@ test('multi-role interaction: patient booking propagates to doctor, lab, insuran
     '/doctor/appointments'
   );
   trackErrors(doctorAppointmentsPage, 'doctor');
+  await doctorAppointmentsPage.getByRole('button', { name: /list view/i }).click();
   await expect(
-    doctorAppointmentsPage.getByText('Multi-role workflow consultation')
+    doctorAppointmentsPage.getByText('Multi-role workflow consultation').first()
   ).toBeVisible();
   await expect(
     doctorAppointmentsPage.getByText(e2eUsers.patient.fullName).first()

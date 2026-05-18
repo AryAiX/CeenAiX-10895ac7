@@ -288,7 +288,8 @@ test('admin, patient, doctor, lab, and patient complete a clinical order journey
   );
 
   const doctorAppointmentsPage = await openRolePage(browser, state, 'doctor', '/doctor/appointments');
-  await expect(doctorAppointmentsPage.getByText('Workflow headache consult')).toBeVisible();
+  await doctorAppointmentsPage.getByRole('button', { name: /list view/i }).click();
+  await expect(doctorAppointmentsPage.getByText('Workflow headache consult').first()).toBeVisible();
   await expect(doctorAppointmentsPage.getByText(e2eUsers.patient.fullName).first()).toBeVisible();
   await closePage(doctorAppointmentsPage);
 
@@ -534,7 +535,6 @@ test('patient no-show appears in cancelled appointments', async ({ browser }) =>
   const page = await openRolePage(browser, state, 'patient', '/patient/appointments');
 
   await page.getByRole('button', { name: /cancelled/i }).click();
-  await page.getByRole('button', { name: /past activity/i }).click();
 
   await expect(page.getByText('Missed monthly no-show')).toBeVisible();
   await expect(page.getByText(/no show/i).first()).toBeVisible();

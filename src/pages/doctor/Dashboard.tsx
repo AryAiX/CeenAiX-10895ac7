@@ -781,11 +781,20 @@ export const DoctorDashboard: React.FC = () => {
                 </div>
                 <button
                   type="button"
-                  disabled
-                  title={localCopy.unavailable}
-                  className="mt-4 rounded-xl bg-violet-100 px-4 py-2 text-sm font-semibold text-violet-700 opacity-60 disabled:cursor-not-allowed"
+                  disabled={!featuredAppointment}
+                  title={featuredAppointment ? localCopy.openAppointment : localCopy.unavailable}
+                  onClick={() => {
+                    if (featuredAppointment) {
+                      navigate(`/doctor/appointments/${featuredAppointment.id}`);
+                    }
+                  }}
+                  className={`mt-4 rounded-xl px-4 py-2 text-sm font-semibold ${
+                    featuredAppointment
+                      ? 'bg-violet-600 text-white hover:bg-violet-700'
+                      : 'cursor-not-allowed bg-violet-100 text-violet-700 opacity-60'
+                  }`}
                 >
-                  {localCopy.comingSoon}
+                  {featuredAppointment ? localCopy.openAppointment : localCopy.comingSoon}
                 </button>
               </div>
             </div>

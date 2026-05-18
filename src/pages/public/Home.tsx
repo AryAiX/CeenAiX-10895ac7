@@ -821,7 +821,10 @@ export const Home = () => {
       </section>
 
       {/* Security */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-cyan-50 to-blue-50">
+      <section
+        id="security"
+        className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-cyan-50 to-blue-50"
+      >
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
           <div>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-100 border border-cyan-200 mb-6">
@@ -1110,9 +1113,16 @@ export const Home = () => {
                 {t('home.landing.footer.productHeading')}
               </h4>
               <ul className="space-y-3 text-slate-500 text-sm">
-                {(['features', 'pricing', 'security', 'integrations'] as const).map((key) => (
+                {(
+                  [
+                    { key: 'features' as const, href: '#features' },
+                    { key: 'pricing' as const, href: '#pricing' },
+                    { key: 'security' as const, href: '#security' },
+                    { key: 'integrations' as const, href: '#features' },
+                  ] as const
+                ).map(({ key, href }) => (
                   <li key={key}>
-                    <a href="#" className="hover:text-cyan-400 transition-colors">
+                    <a href={href} className="hover:text-cyan-400 transition-colors">
                       {t(`home.landing.footer.links.${key}`)}
                     </a>
                   </li>
@@ -1124,9 +1134,16 @@ export const Home = () => {
                 {t('home.landing.footer.companyHeading')}
               </h4>
               <ul className="space-y-3 text-slate-500 text-sm">
-                {(['about', 'careers', 'contact', 'blog'] as const).map((key) => (
+                {(
+                  [
+                    { key: 'about' as const, href: '#' },
+                    { key: 'careers' as const, href: '#contact' },
+                    { key: 'contact' as const, href: '#contact' },
+                    { key: 'blog' as const, href: '#contact' },
+                  ] as const
+                ).map(({ key, href }) => (
                   <li key={key}>
-                    <a href="#" className="hover:text-cyan-400 transition-colors">
+                    <a href={href} className="hover:text-cyan-400 transition-colors">
                       {t(`home.landing.footer.links.${key}`)}
                     </a>
                   </li>
@@ -1138,9 +1155,16 @@ export const Home = () => {
                 {t('home.landing.footer.legalHeading')}
               </h4>
               <ul className="space-y-3 text-slate-500 text-sm">
-                {(['privacy', 'terms', 'compliance', 'nabidh'] as const).map((key) => (
+                {(
+                  [
+                    { key: 'privacy' as const, href: '#security' },
+                    { key: 'terms' as const, href: '#security' },
+                    { key: 'compliance' as const, href: '#security' },
+                    { key: 'nabidh' as const, href: '#security' },
+                  ] as const
+                ).map(({ key, href }) => (
                   <li key={key}>
-                    <a href="#" className="hover:text-cyan-400 transition-colors">
+                    <a href={href} className="hover:text-cyan-400 transition-colors">
                       {t(`home.landing.footer.links.${key}`)}
                     </a>
                   </li>

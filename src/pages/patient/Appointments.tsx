@@ -251,10 +251,16 @@ export const PatientAppointments: React.FC = () => {
   // in an active status (scheduled/confirmed/in_progress). Without the time
   // check, a future cancelled appointment would otherwise be misfiled as
   // past instead of cancelled-and-upcoming.
+  const cancelledAppointments = useMemo(
+    () => filteredAppointments.filter((appointment) => CANCELLED_STATUSES.has(appointment.status)),
+    [filteredAppointments]
+  );
+
   const pastAppointments = useMemo(
     () =>
       filteredAppointments.filter(
         (appointment) =>
+          !CANCELLED_STATUSES.has(appointment.status) &&
           !isUpcoming(appointment) &&
           new Date(appointment.scheduled_at).getTime() < nowTick
       ),
@@ -934,7 +940,10 @@ export const PatientAppointments: React.FC = () => {
   const showPreVisitCompletedBanner = searchParams.get('previsit') === 'completed';
   const isLoadingPage = loading || doctorProfilesLoading;
   const totalFilteredEmpty =
-    !isLoadingPage && upcomingAppointments.length === 0 && pastAppointments.length === 0;
+    !isLoadingPage &&
+    upcomingAppointments.length === 0 &&
+    cancelledAppointments.length === 0 &&
+    pastAppointments.length === 0;
   const hasAnyAppointments = appointments.length > 0;
 
   return (
@@ -1098,6 +1107,24 @@ export const PatientAppointments: React.FC = () => {
                     </div>
                   )}
                 </section>
+
+                {cancelledAppointments.length > 0 ? (
+                  <section>
+                    <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <h2 className="font-playfair text-2xl md:text-3xl font-bold text-slate-900">
+                          {t('patient.appointments.filterCancelled')}
+                        </h2>
+                        <span className="rounded-full bg-rose-100 px-3 py-1 text-sm font-semibold text-rose-700">
+                          {cancelledAppointments.length}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      {cancelledAppointments.map(renderAppointmentCard)}
+                    </div>
+                  </section>
+                ) : null}
 
                 {renderPastTable()}
               </div>
