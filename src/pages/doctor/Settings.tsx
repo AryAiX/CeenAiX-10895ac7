@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Bell, CalendarRange, Palette, Settings as SettingsIcon, ShieldCheck, Stethoscope, User } from 'lucide-react';
+import { Bell, CalendarRange, LayoutDashboard, Palette, Settings as SettingsIcon, ShieldCheck, Stethoscope, User } from 'lucide-react';
 import { Skeleton } from '../../components/Skeleton';
 import { useDoctorSchedule, useUserProfile } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
@@ -284,6 +284,45 @@ export const DoctorSettings = () => {
 
               <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
                 ⚠️ Appearance settings are UI preferences only and will be saved to your browser locally. Full theme support coming soon.
+              </div>
+            </div>
+          ) : activeSection === 'dashboard' ? (
+            <div className="rounded-2xl bg-white p-6 shadow-sm space-y-5">
+              <div className="flex items-center gap-3 mb-2">
+                <LayoutDashboard className="h-6 w-6 text-cyan-600" />
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900">Dashboard</h2>
+                  <p className="text-sm text-slate-500">Choose which widgets appear on your dashboard.</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {[
+                  { key: 'showRevenue', label: 'Revenue Widget', description: 'Show estimated revenue and consultation fee stats.' },
+                  { key: 'showAppointments', label: 'Appointments Widget', description: 'Show today and weekly appointment counts.' },
+                  { key: 'showLabResults', label: 'Lab Results Widget', description: 'Show critical and recent lab results.' },
+                  { key: 'showMessages', label: 'Messages Widget', description: 'Show recent unread patient messages.' },
+                  { key: 'showPendingReviews', label: 'Pending Reviews Widget', description: 'Show pending pre-visit assessments and notes.' },
+                  { key: 'showPatientQueue', label: 'Patient Queue Widget', description: 'Show today patient queue and schedule.' },
+                ].map((widget) => (
+                  <div key={widget.key} className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <div>
+                      <p className="font-semibold text-slate-900">{widget.label}</p>
+                      <p className="text-sm text-slate-500">{widget.description}</p>
+                    </div>
+                    <button
+                      type="button"
+                      className="relative h-7 w-12 rounded-full bg-cyan-600 transition"
+                      aria-pressed={true}
+                    >
+                      <span className="absolute left-6 top-1 h-5 w-5 rounded-full bg-white shadow transition" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                ⚠️ Dashboard widget preferences will be saved to your browser locally. Full persistence coming soon.
               </div>
             </div>
           ) : activeSection !== 'notifications' ? (
