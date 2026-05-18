@@ -325,6 +325,54 @@ export const DoctorSettings = () => {
                 ⚠️ Dashboard widget preferences will be saved to your browser locally. Full persistence coming soon.
               </div>
             </div>
+          ) : activeSection === 'privacy' ? (
+            <div className="rounded-2xl bg-white p-6 shadow-sm space-y-5">
+              <div className="flex items-center gap-3 mb-2">
+                <ShieldCheck className="h-6 w-6 text-cyan-600" />
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900">Privacy</h2>
+                  <p className="text-sm text-slate-500">Control your profile visibility and data sharing preferences.</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {[
+                  { label: 'Show profile to patients', description: 'Allow patients to view your public profile when booking appointments.' },
+                  { label: 'Show availability to patients', description: 'Allow patients to see your available time slots for booking.' },
+                  { label: 'Share anonymized data for research', description: 'Allow CeenAiX to use anonymized clinical data to improve AI features.' },
+                  { label: 'Allow patient feedback and ratings', description: 'Let patients leave ratings and reviews after consultations.' },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <div>
+                      <p className="font-semibold text-slate-900">{item.label}</p>
+                      <p className="text-sm text-slate-500">{item.description}</p>
+                    </div>
+                    <button
+                      type="button"
+                      className="relative h-7 w-12 rounded-full bg-cyan-600 transition"
+                      aria-pressed={true}
+                    >
+                      <span className="absolute left-6 top-1 h-5 w-5 rounded-full bg-white shadow transition" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-3">
+                <p className="text-sm font-semibold text-slate-900">Data & Privacy</p>
+                <p className="text-sm text-slate-500">Your patient data is stored securely in compliance with UAE PDPL and HIPAA standards. CeenAiX never sells your data to third parties.</p>
+                <a
+                  href="#"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-600 hover:text-cyan-700"
+                >
+                  Read our Privacy Policy →
+                </a>
+              </div>
+
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                ⚠️ Privacy preferences will be saved to your browser locally. Full persistence coming soon.
+              </div>
+            </div>
           ) : activeSection !== 'notifications' ? (
             <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500 shadow-sm">
               This section is reserved for real profile, security, device, integration, and clinical workspace settings as those tables become available. Notifications below remain fully persisted.
