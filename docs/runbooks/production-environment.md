@@ -72,14 +72,18 @@ If you ever need to rebuild the prod project from scratch (DR scenario), follow 
 
 ## Ongoing release (CI-driven)
 
-Every push to `main` runs the **Release** workflow (`.github/workflows/deploy.yml`):
+**Release** (`.github/workflows/deploy.yml`) has two triggers:
 
-1. **`supabase` job** — `scripts/prod-release-supabase.sh`: `db push`, `prod-demo-cleanup.sql`, `prod-release-verify.sql` (reference data guards), edge functions via `scripts/deploy-edge-functions.mjs`, auth platform via `scripts/sync-prod-auth-platform.sh` (branded templates, `site_url`, redirect allow-list).
-2. **`deploy` job** — Vercel production build and deploy (after Supabase succeeds).
+| Trigger | Target | What runs |
+| --- | --- | --- |
+| Push to `main` | **Dev** — `https://dev.ceenaix.com` + Supabase `lgfaucsfiyxvmsghnpey` | `dev-release-supabase.sh` → preview Vercel build → alias `dev.ceenaix.com` |
+| **Run workflow** (manual) | **Prod** — `https://www.ceenaix.com` + Supabase `ziykaxyadcdmyakzvjff` | `prod-release-supabase.sh` (migrations, demo cleanup, ref-data verify, functions, auth) → Vercel `--prod` |
+
+Merges to `main` never deploy prod. Use **Actions → Release → Run workflow** when you want production.
 
 PRs that touch migrations run **`.github/workflows/migrations.yml` dry-run** only (lists pending migrations on prod).
 
-The `supabase` job uses the GitHub `production` environment so you can require approvals (Settings → Environments → production → Required reviewers).
+The manual prod `prod-supabase` job uses the GitHub `production` environment so you can require approvals (Settings → Environments → production → Required reviewers).
 
 ## Required GitHub secrets
 
@@ -89,7 +93,9 @@ These are configured in **Repository → Settings → Secrets and variables → 
 | --- | --- | --- |
 | `SUPABASE_ACCESS_TOKEN` | Lets the CLI authenticate non-interactively | Configured from the logged-in Supabase CLI token |
 | `SUPABASE_PROD_PROJECT_REF` | Identifies the prod project to migrations.yml | `ziykaxyadcdmyakzvjff` |
-| `SUPABASE_PROD_DB_PASSWORD` | Lets `supabase db push` authenticate | Configured from the generated prod DB password |
+| `SUPABASE_PROD_DB_PASSWORD` | Lets `supabase db push` authenticate (manual prod release) | Configured from the generated prod DB password |
+| `SUPABASE_DEV_PROJECT_REF` | Dev project for main-push deploys | `lgfaucsfiyxvmsghnpey` |
+| `SUPABASE_DEV_DB_PASSWORD` | Lets dev `supabase db push` authenticate | Dev project database password |
 | `VITE_SUPABASE_PROD_URL` | Injected into the production Vite build in deploy.yml | `https://ziykaxyadcdmyakzvjff.supabase.co` |
 | `VITE_SUPABASE_PROD_ANON_KEY` | Injected into the production Vite build in deploy.yml | Prod anon / publishable key |
 | `VITE_SUPABASE_URL` | Used by the `Build` step in `ci.yml` | `https://lgfaucsfiyxvmsghnpey.supabase.co` (dev — CI builds use dev) |
@@ -117,9 +123,9 @@ VITE_SUPABASE_ANON_KEY     = <dev anon key>
 
 This way PR preview deployments hit dev and never accidentally write to prod.
 
-Manual production deploys are available via GitHub Actions → **Release** →
-**Run workflow**. Pushes to `main` still deploy automatically. Verified manual
-deploy on 2026-05-11: `https://www.ceenaix.com` aliased to the new prod build.
+Production deploys: GitHub Actions → **Release** → **Run workflow** (prod only).
+
+Dev deploys: automatic on every push to `main` → `https://dev.ceenaix.com`.
 
 ## Local development against prod (rare, read-only debugging)
 
