@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Bell, CalendarRange, HelpCircle, LayoutDashboard, Palette, Plug, Settings as SettingsIcon, ShieldCheck, Stethoscope, TestTube2, User } from 'lucide-react';
+import { Bell, CalendarRange, HelpCircle, LayoutDashboard, Loader2, Palette, Plug, Save, Settings as SettingsIcon, ShieldCheck, Stethoscope, TestTube2, User } from 'lucide-react';
 import { Skeleton } from '../../components/Skeleton';
 import { useDoctorSchedule, useUserProfile } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
@@ -46,6 +46,12 @@ export const DoctorSettings = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('medium');
   const [compactMode, setCompactMode] = useState(false);
+  const [consultationFee, setConsultationFee] = useState('');
+  const [yearsOfExperience, setYearsOfExperience] = useState('');
+  const [languagesSpoken, setLanguagesSpoken] = useState<string[]>([]);
+  const [clinicalToolsSaving, setClinicalToolsSaving] = useState(false);
+  const [clinicalToolsSuccess, setClinicalToolsSuccess] = useState<string | null>(null);
+  const [clinicalToolsError, setClinicalToolsError] = useState<string | null>(null);
   const settingsSections = [
     'General',
     'Appearance',
@@ -65,6 +71,35 @@ export const DoctorSettings = () => {
       setPrefs(normalize(profile.notification_preferences));
     }
   }, [profile]);
+
+  useEffect(() => {
+    if (doctorProfile) {
+      setConsultationFee(doctorProfile.consultation_fee?.toString() ?? '');
+      setYearsOfExperience(doctorProfile.years_of_experience?.toString() ?? '');
+      setLanguagesSpoken(doctorProfile.languages_spoken ?? ['English']);
+    }
+  }, [doctorProfile]);
+
+  const saveClinicalTools = async () => {
+    if (!user?.id) return;
+    setClinicalToolsSaving(true);
+    setClinicalToolsError(null);
+    setClinicalToolsSuccess(null);
+    const { error } = await supabase
+      .from('doctor_profiles')
+      .update({
+        consultation_fee: consultationFee ? parseFloat(consultationFee) : null,
+        years_of_experience: yearsOfExperience ? parseInt(yearsOfExperience) : null,
+        languages_spoken: languagesSpoken.length > 0 ? languagesSpoken : ['English'],
+      })
+      .eq('user_id', user.id);
+    setClinicalToolsSaving(false);
+    if (error) {
+      setClinicalToolsError(error.message);
+    } else {
+      setClinicalToolsSuccess('Clinical tools settings saved successfully!');
+    }
+  };
 
   const save = async (nextPrefs: DoctorSettingsPrefs) => {
     if (!user?.id) return;
@@ -622,6 +657,84 @@ export const DoctorSettings = () => {
                   Submit Report
                 </button>
               </div>
+            </div>
+          ) : activeSection === 'clinical-tools' ? (
+            <div className="rounded-2xl bg-white p-6 shadow-sm space-y-5">
+              <div className="flex items-center gap-3 mb-2">
+                <Stethoscope className="h-6 w-6 text-cyan-600" />
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900">Clinical Tools</h2>
+                  <p className="text-sm text-slate-500">Configure your clinical preferences and practice details.</p>
+                </div>
+              </div>
+
+              {clinicalToolsError ? (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{clinicalToolsError}</div>
+              ) : null}
+              {clinicalToolsSuccess ? (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{clinicalToolsSuccess}</div>
+              ) : null}
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-sm font-semibold text-slate-700">Consultation Fee (AED)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={consultationFee}
+                    onChange={(e) => setConsultationFee(e.target.value)}
+                    placeholder="e.g. 300"
+                    className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                  />
+                  <p className="mt-1 text-xs text-slate-400">Used to calculate revenue estimates on your dashboard.</p>
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-semibold text-slate-700">Years of Experience</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={yearsOfExperience}
+                    onChange={(e) => setYearsOfExperience(e.target.value)}
+                    placeholder="e.g. 10"
+                    className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">Languages Spoken</label>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {['English', 'Arabic', 'French', 'Urdu', 'Hindi', 'Tagalog', 'Persian'].map((lang) => (
+                    <button
+                      key={lang}
+                      type="button"
+                      onClick={() => {
+                        setLanguagesSpoken((prev) =>
+                          prev.includes(lang) ? prev.filter((l) => l !== lang) : [...prev, lang]
+                        );
+                      }}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                        languagesSpoken.includes(lang)
+                          ? 'border-cyan-500 bg-cyan-50 text-cyan-700'
+                          : 'border-slate-200 bg-white text-slate-600 hover:border-cyan-300'
+                      }`}
+                    >
+                      {lang}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-slate-400">Select all languages you can consult in.</p>
+              </div>
+
+              <button
+                type="button"
+                onClick={saveClinicalTools}
+                disabled={clinicalToolsSaving}
+                className="inline-flex items-center gap-2 rounded-xl bg-cyan-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-cyan-700 disabled:opacity-60"
+              >
+                {clinicalToolsSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                {clinicalToolsSaving ? 'Saving...' : 'Save Clinical Tools'}
+              </button>
             </div>
           ) : activeSection !== 'notifications' ? (
             <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500 shadow-sm">
