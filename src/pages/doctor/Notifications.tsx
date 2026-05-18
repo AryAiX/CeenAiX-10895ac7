@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Bell, CheckCheck, Loader2, MessageSquare, RefreshCcw, Trash2 } from 'lucide-react';
+import { Bell, CheckCheck, Loader2, MessageSquare, RefreshCcw, Search, Trash2 } from 'lucide-react';
 import { Skeleton } from '../../components/Skeleton';
 import { useDoctorNotifications } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
@@ -15,6 +15,9 @@ export const DoctorNotifications: React.FC = () => {
   const { data, loading, error, refetch } = useDoctorNotifications(user?.id);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [readFilter, setReadFilter] = useState<'all' | 'unread' | 'read'>('all');
 
   const markRead = async (notificationId: string) => {
     setBusyId(notificationId);
@@ -81,6 +84,24 @@ export const DoctorNotifications: React.FC = () => {
     }
   };
 
+  const storedNotifications = data?.notifications ?? [];
+  const unreadCount = storedNotifications.filter((notification) => !notification.is_read).length;
+  const liveAttentionItems = data?.derivedNotifications ?? [];
+
+  const filteredNotifications = useMemo(() => {
+    return storedNotifications.filter((notification) => {
+      if (readFilter === 'unread' && notification.is_read) return false;
+      if (readFilter === 'read' && !notification.is_read) return false;
+      if (typeFilter !== 'all' && notification.type !== typeFilter) return false;
+      if (searchQuery.trim()) {
+        const query = searchQuery.trim().toLowerCase();
+        const haystack = [notification.title, notification.body].filter(Boolean).join(' ').toLowerCase();
+        if (!haystack.includes(query)) return false;
+      }
+      return true;
+    });
+  }, [storedNotifications, readFilter, typeFilter, searchQuery]);
+
   if (loading) {
     return (
       <>
@@ -96,10 +117,6 @@ export const DoctorNotifications: React.FC = () => {
       </>
     );
   }
-
-  const storedNotifications = data?.notifications ?? [];
-  const unreadCount = storedNotifications.filter((notification) => !notification.is_read).length;
-  const liveAttentionItems = data?.derivedNotifications ?? [];
 
   return (
     <>
@@ -199,11 +216,46 @@ export const DoctorNotifications: React.FC = () => {
                 <h2 className="text-base font-semibold text-slate-900">{t('doctor.notifications.logTitle')}</h2>
               </div>
 
-              {storedNotifications.length === 0 ? (
-                <p className="text-sm text-slate-600">{t('doctor.notifications.emptyLog')}</p>
+              <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search notifications..."
+                    className="w-full rounded-lg border border-slate-200 py-2 pl-9 pr-4 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                  />
+                </div>
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                >
+                  <option value="all">All Types</option>
+                  <option value="appointment">📅 Appointment</option>
+                  <option value="lab">🔬 Lab Result</option>
+                  <option value="medication">💊 Medication</option>
+                  <option value="message">💬 Message</option>
+                  <option value="system">⚙️ System</option>
+                  <option value="alert">🚨 Alert</option>
+                </select>
+                <select
+                  value={readFilter}
+                  onChange={(e) => setReadFilter(e.target.value as 'all' | 'unread' | 'read')}
+                  className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                >
+                  <option value="all">All</option>
+                  <option value="unread">Unread only</option>
+                  <option value="read">Read only</option>
+                </select>
+              </div>
+
+              {filteredNotifications.length === 0 ? (
+                <p className="text-sm text-slate-600">No notifications match your filters.</p>
               ) : (
                 <div className="space-y-3">
-                  {storedNotifications.map((notification) => (
+                  {filteredNotifications.map((notification) => (
                     <div
                       key={notification.id}
                       className={`rounded-2xl border p-4 ${
