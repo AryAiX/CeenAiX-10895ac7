@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Bell, CalendarRange, LayoutDashboard, Palette, Settings as SettingsIcon, ShieldCheck, Stethoscope, User } from 'lucide-react';
+import { Bell, CalendarRange, LayoutDashboard, Palette, Settings as SettingsIcon, ShieldCheck, Stethoscope, TestTube2, User } from 'lucide-react';
 import { Skeleton } from '../../components/Skeleton';
 import { useDoctorSchedule, useUserProfile } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
@@ -446,6 +446,68 @@ export const DoctorSettings = () => {
                 >
                   Deactivate Account
                 </button>
+              </div>
+            </div>
+          ) : activeSection === 'lab-and-imaging' ? (
+            <div className="rounded-2xl bg-white p-6 shadow-sm space-y-5">
+              <div className="flex items-center gap-3 mb-2">
+                <TestTube2 className="h-6 w-6 text-cyan-600" />
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900">Lab & Imaging</h2>
+                  <p className="text-sm text-slate-500">Configure your preferred lab and imaging providers and default settings.</p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-sm font-semibold text-slate-900 mb-3">Preferred Lab Provider</p>
+                  <select className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-700 outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20">
+                    <option value="">Select a lab provider</option>
+                    <option value="aster">Aster Laboratories</option>
+                    <option value="nmc">NMC Healthcare Labs</option>
+                    <option value="burjeel">Burjeel Medical Labs</option>
+                    <option value="mediclinic">Mediclinic Labs</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-sm font-semibold text-slate-900 mb-3">Preferred Imaging Center</p>
+                  <select className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-700 outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20">
+                    <option value="">Select an imaging center</option>
+                    <option value="aster">Aster Radiology</option>
+                    <option value="nmc">NMC Radiology</option>
+                    <option value="burjeel">Burjeel Imaging</option>
+                    <option value="mediclinic">Mediclinic Radiology</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                <div className="space-y-3">
+                  {[
+                    { label: 'Auto-notify patient when lab results are ready', description: 'Send an automatic notification to the patient when their lab results are available.' },
+                    { label: 'Flag abnormal results automatically', description: 'Automatically highlight abnormal lab results in red on the dashboard.' },
+                    { label: 'Require confirmation before ordering imaging', description: 'Show a confirmation dialog before submitting imaging orders.' },
+                  ].map((item) => (
+                    <div key={item.label} className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4">
+                      <div>
+                        <p className="font-semibold text-slate-900">{item.label}</p>
+                        <p className="text-sm text-slate-500">{item.description}</p>
+                      </div>
+                      <button
+                        type="button"
+                        className="relative h-7 w-12 rounded-full bg-cyan-600 transition"
+                        aria-pressed={true}
+                      >
+                        <span className="absolute left-6 top-1 h-5 w-5 rounded-full bg-white shadow transition" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                ⚠️ Lab and imaging preferences will be saved locally. Full persistence coming soon.
               </div>
             </div>
           ) : activeSection !== 'notifications' ? (
