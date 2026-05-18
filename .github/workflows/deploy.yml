@@ -1,12 +1,11 @@
 name: Release
 
-# Full production release on every main merge (and manual dispatch):
-# 1. Supabase — migrations, demo cleanup, reference-data verify, edge functions, auth platform
-# 2. Vercel — production frontend build + deploy
+# push to main     → dev only (https://dev.ceenaix.com + dev Supabase lgfaucsfiyxvmsghnpey)
+# workflow_dispatch → prod only (https://www.ceenaix.com + prod Supabase ziykaxyadcdmyakzvjff)
 #
-# Required GitHub secrets: SUPABASE_ACCESS_TOKEN, SUPABASE_PROD_PROJECT_REF,
-# SUPABASE_PROD_DB_PASSWORD, VERCEL_* , VITE_SUPABASE_PROD_* .
-# Optional: SUPABASE_RESEND_SMTP_PASSWORD (applies Resend SMTP via Management API).
+# Secrets: SUPABASE_ACCESS_TOKEN, SUPABASE_DEV_* , SUPABASE_PROD_* , VERCEL_* ,
+# VITE_SUPABASE_URL/ANON_KEY (dev), VITE_SUPABASE_PROD_* (prod).
+# Optional: SUPABASE_RESEND_SMTP_PASSWORD
 
 on:
   push:
@@ -14,13 +13,105 @@ on:
   workflow_dispatch:
 
 jobs:
-  supabase:
+  dev-supabase:
+    name: Dev Supabase
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Install jq
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq jq
+
+      - name: Sync dev Supabase
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DEV_PROJECT_REF: ${{ secrets.SUPABASE_DEV_PROJECT_REF }}
+          SUPABASE_DEV_DB_PASSWORD: ${{ secrets.SUPABASE_DEV_DB_PASSWORD }}
+          SUPABASE_RESEND_SMTP_PASSWORD: ${{ secrets.SUPABASE_RESEND_SMTP_PASSWORD }}
+        run: bash scripts/dev-release-supabase.sh
+
+  dev-deploy:
+    name: Dev Deploy (dev.ceenaix.com)
+    needs: dev-supabase
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Pull Vercel preview environment
+        run: |
+          VERCEL_TOKEN_CLEAN="$(python - <<'PY'
+          import base64
+          import os
+          print(base64.b64decode(os.environ["VERCEL_TOKEN_B64"]).decode().strip())
+          PY
+          )"
+          export VERCEL_TOKEN="$VERCEL_TOKEN_CLEAN"
+          npx vercel@50.1.3 pull --yes --environment=preview --token "$VERCEL_TOKEN_CLEAN"
+        env:
+          VERCEL_TOKEN_B64: ${{ secrets.VERCEL_TOKEN_B64 }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Build preview artifacts (dev Supabase)
+        run: |
+          VERCEL_TOKEN_CLEAN="$(python - <<'PY'
+          import base64
+          import os
+          print(base64.b64decode(os.environ["VERCEL_TOKEN_B64"]).decode().strip())
+          PY
+          )"
+          export VERCEL_TOKEN="$VERCEL_TOKEN_CLEAN"
+          npx vercel@50.1.3 build --token "$VERCEL_TOKEN_CLEAN"
+        env:
+          VERCEL_TOKEN_B64: ${{ secrets.VERCEL_TOKEN_B64 }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+      - name: Deploy to dev.ceenaix.com
+        run: |
+          VERCEL_TOKEN_CLEAN="$(python - <<'PY'
+          import base64
+          import os
+          print(base64.b64decode(os.environ["VERCEL_TOKEN_B64"]).decode().strip())
+          PY
+          )"
+          export VERCEL_TOKEN="$VERCEL_TOKEN_CLEAN"
+          DEPLOY_URL="$(npx vercel@50.1.3 deploy --prebuilt --token "$VERCEL_TOKEN_CLEAN")"
+          echo "Deployment URL: ${DEPLOY_URL}"
+          npx vercel@50.1.3 alias set "${DEPLOY_URL}" dev.ceenaix.com --token "$VERCEL_TOKEN_CLEAN"
+        env:
+          VERCEL_TOKEN_B64: ${{ secrets.VERCEL_TOKEN_B64 }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+  prod-supabase:
     name: Production Supabase
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch'
     environment:
       name: production
-      # Static URL — GitHub does not allow secrets in environment.url
       url: https://supabase.com/dashboard/project/ziykaxyadcdmyakzvjff
 
     steps:
@@ -38,7 +129,7 @@ jobs:
       - name: Install jq
         run: sudo apt-get update -qq && sudo apt-get install -y -qq jq
 
-      - name: Sync Supabase production (schema, ref data, functions, auth)
+      - name: Sync production Supabase
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROD_PROJECT_REF: ${{ secrets.SUPABASE_PROD_PROJECT_REF }}
@@ -46,11 +137,11 @@ jobs:
           SUPABASE_RESEND_SMTP_PASSWORD: ${{ secrets.SUPABASE_RESEND_SMTP_PASSWORD }}
         run: bash scripts/prod-release-supabase.sh
 
-  deploy:
-    name: Production Deploy
-    needs: supabase
+  prod-deploy:
+    name: Production Deploy (www.ceenaix.com)
+    needs: prod-supabase
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch'
 
     steps:
       - uses: actions/checkout@v4
@@ -62,7 +153,7 @@ jobs:
 
       - run: npm ci
 
-      - name: Pull Vercel Environment Information
+      - name: Pull Vercel production environment
         run: |
           VERCEL_TOKEN_CLEAN="$(python - <<'PY'
           import base64
@@ -70,7 +161,6 @@ jobs:
           print(base64.b64decode(os.environ["VERCEL_TOKEN_B64"]).decode().strip())
           PY
           )"
-          echo "Decoded Vercel token length: ${#VERCEL_TOKEN_CLEAN}"
           export VERCEL_TOKEN="$VERCEL_TOKEN_CLEAN"
           npx vercel@50.1.3 pull --yes --environment=production --token "$VERCEL_TOKEN_CLEAN"
         env:
@@ -78,7 +168,7 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - name: Build Project Artifacts
+      - name: Build production artifacts
         run: |
           VERCEL_TOKEN_CLEAN="$(python - <<'PY'
           import base64
@@ -96,7 +186,7 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_PROD_ANON_KEY }}
           VITE_PREVIEW_PIN_GATE: "false"
 
-      - name: Deploy to Vercel
+      - name: Deploy to Vercel production
         run: |
           VERCEL_TOKEN_CLEAN="$(python - <<'PY'
           import base64

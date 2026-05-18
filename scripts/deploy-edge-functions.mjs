@@ -37,7 +37,8 @@ if (selectedDeployables.length === 0) {
   process.exit(1);
 }
 
-const projectRef = process.env.SUPABASE_PROD_PROJECT_REF?.trim();
+const projectRef =
+  process.env.SUPABASE_PROD_PROJECT_REF?.trim() || process.env.SUPABASE_DEV_PROJECT_REF?.trim();
 
 for (const deployable of selectedDeployables) {
   console.log(`\nDeploying ${deployable.name} from ${deployable.path}`);
