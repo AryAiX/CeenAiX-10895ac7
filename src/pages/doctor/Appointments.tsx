@@ -71,6 +71,8 @@ export const DoctorAppointments: React.FC = () => {
   const [exportRange, setExportRange] = useState<'today' | 'week' | 'month'>('today');
   const [exportType, setExportType] = useState<'administrative' | 'personal' | 'billing'>('administrative');
   const [exportSuccess, setExportSuccess] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancellingAppointmentId, setCancellingAppointmentId] = useState<string | null>(null);
 
   const patientIds = useMemo(
     () => Array.from(new Set((routeAppointments ?? []).map((appointment) => appointment.patient_id))),
@@ -1203,13 +1205,14 @@ export const DoctorAppointments: React.FC = () => {
                             {canCancel ? (
                               <button
                                 type="button"
-                                onClick={() => handleCancelAppointment(appointment.id)}
+                                onClick={() => {
+                                  setCancellingAppointmentId(appointment.id);
+                                  setShowCancelModal(true);
+                                }}
                                 disabled={busyAppointmentId === appointment.id}
                                 className="rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
                               >
-                                {busyAppointmentId === appointment.id
-                                  ? t('doctor.appointments.cancelling')
-                                  : t('doctor.appointments.cancel')}
+                                {t('doctor.appointments.cancel')}
                               </button>
                             ) : null}
                           </div>
@@ -1345,6 +1348,74 @@ export const DoctorAppointments: React.FC = () => {
         </div>,
         document.body
       )}
+      {showCancelModal && cancellingAppointmentId ? createPortal(
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => { setShowCancelModal(false); setCancellingAppointmentId(null); }}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl bg-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+              <h2 className="text-lg font-bold text-slate-900">Cancel Appointment</h2>
+              <button
+                type="button"
+                onClick={() => { setShowCancelModal(false); setCancellingAppointmentId(null); }}
+                className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              {(() => {
+                const appt = appointments.find((a) => a.id === cancellingAppointmentId);
+                if (!appt) return null;
+                const patientName = patientNameById.get(appt.patient_id) ?? t('shared.patient');
+                const apptDate = new Date(appt.scheduled_at);
+                return (
+                  <>
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                      <p className="font-semibold text-slate-900">{patientName}</p>
+                      <p className="mt-1 text-sm text-slate-600">
+                        {apptDate.toLocaleDateString(locale, dtOpts({ weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }))}
+                        {' · '}
+                        {apptDate.toLocaleTimeString(locale, dtOpts({ hour: 'numeric', minute: '2-digit' }))}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                      ⚠️ Cancelling this appointment will notify the patient immediately.
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+            <div className="flex gap-3 border-t border-slate-200 px-6 py-4">
+              <button
+                type="button"
+                onClick={() => { setShowCancelModal(false); setCancellingAppointmentId(null); }}
+                className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                Keep Appointment
+              </button>
+              <button
+                type="button"
+                disabled={busyAppointmentId === cancellingAppointmentId}
+                onClick={async () => {
+                  if (!cancellingAppointmentId) return;
+                  await handleCancelAppointment(cancellingAppointmentId);
+                  setShowCancelModal(false);
+                  setCancellingAppointmentId(null);
+                }}
+                className="flex-1 rounded-xl bg-red-600 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
+              >
+                {busyAppointmentId === cancellingAppointmentId ? 'Cancelling...' : 'Cancel Appointment'}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      ) : null}
     </>
   );
 };
