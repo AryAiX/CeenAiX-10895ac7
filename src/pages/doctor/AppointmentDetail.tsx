@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -11,6 +12,7 @@ import {
   Save,
   TestTube2,
   User,
+  X,
 } from 'lucide-react';
 import { Skeleton } from '../../components/Skeleton';
 import { LabTestNameDisplay } from '../../components/LabTestNameDisplay';
@@ -63,6 +65,8 @@ export const DoctorAppointmentDetail: React.FC = () => {
   const [savingNote, setSavingNote] = useState(false);
   const [updatingAppointment, setUpdatingAppointment] = useState(false);
   const [reviewingAssessment, setReviewingAssessment] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancellingAppointment, setCancellingAppointment] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   useEffect(() => {
@@ -114,6 +118,23 @@ export const DoctorAppointmentDetail: React.FC = () => {
     }
 
     setFeedback({ type: 'success', message: t('doctor.appointmentDetail.statusSaved') });
+    refetch();
+  };
+
+  const handleCancelAppointment = async () => {
+    if (!data) return;
+    setFeedback(null);
+    setCancellingAppointment(true);
+    const { error: cancelError } = await supabase.rpc('cancel_doctor_appointment', {
+      p_appointment_id: data.appointment.id,
+    });
+    setCancellingAppointment(false);
+    if (cancelError) {
+      setFeedback({ type: 'error', message: cancelError.message });
+      return;
+    }
+    setShowCancelModal(false);
+    setFeedback({ type: 'success', message: 'Appointment cancelled successfully.' });
     refetch();
   };
 
@@ -316,7 +337,7 @@ export const DoctorAppointmentDetail: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid gap-4 p-6 md:grid-cols-5">
+          <div className={`grid gap-4 p-6 ${['scheduled', 'confirmed', 'in_progress'].includes(data.appointment.status) ? 'md:grid-cols-6' : 'md:grid-cols-5'}`}>
             <button
               type="button"
               disabled={updatingAppointment}
@@ -389,6 +410,21 @@ export const DoctorAppointmentDetail: React.FC = () => {
                 <p className="mt-1 text-[10px] font-medium text-red-600">✗ Patient did not attend</p>
               ) : null}
             </button>
+            {['scheduled', 'confirmed', 'in_progress'].includes(data.appointment.status) ? (
+              <button
+                type="button"
+                onClick={() => setShowCancelModal(true)}
+                disabled={updatingAppointment}
+                className="rounded-2xl border border-red-200 bg-red-50 px-4 py-4 text-left transition hover:border-red-400 hover:bg-red-100 disabled:opacity-60"
+              >
+                <div className="flex items-center gap-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-red-600">
+                    Cancel Appointment
+                  </p>
+                </div>
+                <p className="mt-1 text-[10px] font-medium text-red-500">Notify patient and cancel</p>
+              </button>
+            ) : null}
             <div className="rounded-2xl bg-slate-50 p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                 {t('doctor.appointmentDetail.noteCoverage')}
@@ -711,6 +747,60 @@ export const DoctorAppointmentDetail: React.FC = () => {
           </section>
         </div>
       </div>
+
+      {showCancelModal ? createPortal(
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setShowCancelModal(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl bg-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+              <h2 className="text-lg font-bold text-slate-900">Cancel Appointment</h2>
+              <button
+                type="button"
+                onClick={() => setShowCancelModal(false)}
+                className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="space-y-4 px-6 py-5">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p className="font-semibold text-slate-900">{patientName}</p>
+                <p className="mt-1 text-sm text-slate-600">
+                  {new Date(data.appointment.scheduled_at).toLocaleDateString(locale, dtOpts({ weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }))}
+                  {' · '}
+                  {new Date(data.appointment.scheduled_at).toLocaleTimeString(locale, dtOpts({ hour: 'numeric', minute: '2-digit' }))}
+                </p>
+              </div>
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                ⚠️ Cancelling this appointment will notify the patient immediately. This action cannot be undone.
+              </div>
+            </div>
+            <div className="flex gap-3 border-t border-slate-200 px-6 py-4">
+              <button
+                type="button"
+                onClick={() => setShowCancelModal(false)}
+                className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                Keep Appointment
+              </button>
+              <button
+                type="button"
+                disabled={cancellingAppointment}
+                onClick={handleCancelAppointment}
+                className="flex-1 rounded-xl bg-red-600 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
+              >
+                {cancellingAppointment ? 'Cancelling...' : 'Cancel Appointment'}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      ) : null}
     </>
   );
 };
