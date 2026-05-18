@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Bell, CheckCheck, Loader2, MessageSquare, RefreshCcw } from 'lucide-react';
+import { Bell, CheckCheck, Loader2, MessageSquare, RefreshCcw, Trash2 } from 'lucide-react';
 import { Skeleton } from '../../components/Skeleton';
 import { useDoctorNotifications } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
@@ -14,6 +14,7 @@ export const DoctorNotifications: React.FC = () => {
   const { user } = useAuth();
   const { data, loading, error, refetch } = useDoctorNotifications(user?.id);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const markRead = async (notificationId: string) => {
     setBusyId(notificationId);
@@ -41,6 +42,21 @@ export const DoctorNotifications: React.FC = () => {
     setBusyId(null);
 
     if (!updateError) {
+      refetch();
+    }
+  };
+
+  const deleteNotification = async (notificationId: string) => {
+    setDeletingId(notificationId);
+    const { error: deleteError } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('id', notificationId)
+      .eq('user_id', user?.id ?? '');
+
+    setDeletingId(null);
+
+    if (!deleteError) {
       refetch();
     }
   };
@@ -246,6 +262,19 @@ export const DoctorNotifications: React.FC = () => {
                               <span>{t('doctor.notifications.markRead')}</span>
                             </button>
                           ) : null}
+                          <button
+                            type="button"
+                            onClick={() => deleteNotification(notification.id)}
+                            disabled={deletingId === notification.id}
+                            className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100 disabled:opacity-60"
+                          >
+                            {deletingId === notification.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
+                            <span>Delete</span>
+                          </button>
                         </div>
                       </div>
                     </div>
