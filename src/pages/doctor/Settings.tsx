@@ -193,7 +193,7 @@ export const DoctorSettings = () => {
           <div className="space-y-1">
             {settingsSections.map((section) => {
               const key = section.toLowerCase().replace(/&/g, 'and').replace(/\s+/g, '-');
-              const active = activeSection === key || (section === 'Notifications' && activeSection === 'notifications');
+              const active = activeSection === key;
               return (
                 <button
                   key={section}
