@@ -91,4 +91,35 @@ if [[ "${HTTP_CODE}" != "200" ]]; then
   exit 1
 fi
 
+if [[ -n "${SUPABASE_RESEND_SMTP_PASSWORD:-}" ]]; then
+  echo "Resend SMTP settings applied from SUPABASE_RESEND_SMTP_PASSWORD."
+else
+  echo "WARNING: SUPABASE_RESEND_SMTP_PASSWORD not set — confirmation emails will not send via Resend." >&2
+  echo "Add the Resend SMTP password to GitHub Actions secrets and re-run Build." >&2
+fi
+
+AUTH_CONFIG="$(
+  curl -sS "https://api.supabase.com/v1/projects/${PROJECT_REF}/config/auth" \
+    -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}"
+)"
+
+EXTERNAL_EMAIL="$(echo "${AUTH_CONFIG}" | jq -r '.external_email_enabled // false')"
+SMTP_HOST="$(echo "${AUTH_CONFIG}" | jq -r '.smtp_host // empty')"
+CONFIRM_PREVIEW="$(echo "${AUTH_CONFIG}" | jq -r '.mailer_templates_confirmation_content[0:80] // "missing"')"
+SITE_URL_NOW="$(echo "${AUTH_CONFIG}" | jq -r '.site_url // empty')"
+
+echo "Auth config: site_url=${SITE_URL_NOW} external_email=${EXTERNAL_EMAIL} smtp_host=${SMTP_HOST}"
+
+if [[ "${CONFIRM_PREVIEW}" != *"CeenAiX"* ]]; then
+  echo "Warning: confirmation template may not include branding." >&2
+fi
+
+if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
+  if [[ "${EXTERNAL_EMAIL}" != "true" ]] || [[ "${SMTP_HOST}" != "smtp.resend.com" ]]; then
+    echo "ERROR: Dev project is not using Resend SMTP. Set GitHub secret SUPABASE_RESEND_SMTP_PASSWORD" >&2
+    echo "  (Resend → SMTP → password = your Resend API key, user resend, host smtp.resend.com:587)" >&2
+    exit 1
+  fi
+fi
+
 echo "Dev auth platform sync complete for ${PROJECT_REF} (${DEV_SITE_URL})."

@@ -94,9 +94,11 @@ These are configured in **Repository → Settings → Secrets and variables → 
 | `SUPABASE_PROD_DB_PASSWORD` | Lets `supabase db push` authenticate (manual prod release) | Configured from the generated prod DB password |
 | `SUPABASE_DEV_PROJECT_REF` | Dev project for main-push deploys | `lgfaucsfiyxvmsghnpey` |
 | `SUPABASE_DEV_DB_PASSWORD` | Dev Postgres password (URL-encoded automatically in CI) | Dashboard → Database password for `lgfaucsfiyxvmsghnpey` |
-| `SUPABASE_DEV_DATABASE_URL` | Optional full URL override | Prefer `SUPABASE_DEV_DB_PASSWORD`; CI builds `postgresql://postgres.<ref>:***@aws-0-us-west-2.pooler.supabase.com:5432/postgres` (session pooler, encoded password) |
+| `SUPABASE_DEV_DATABASE_URL` | Optional full URL override | Prefer `SUPABASE_DEV_DB_PASSWORD`; CI builds pooler URL (session mode, encoded password) |
+| `SUPABASE_RESEND_SMTP_PASSWORD` | **Required for signup emails on dev** | Resend API key used as SMTP password (`resend` / `smtp.resend.com:587`). Same value as prod. Build fails dev auth sync if missing. |
 | `VITE_SUPABASE_PROD_URL` | Injected into the production Vite build in deploy.yml | `https://ziykaxyadcdmyakzvjff.supabase.co` |
 | `VITE_SUPABASE_PROD_ANON_KEY` | Injected into the production Vite build in deploy.yml | Prod anon / publishable key |
+| `SUPABASE_RESEND_SMTP_PASSWORD` | Applied to prod + dev auth via Release / Build | Resend SMTP password (API key); required for confirmation emails |
 | `VITE_SUPABASE_URL` | Used by the `Build` step in `ci.yml` | `https://lgfaucsfiyxvmsghnpey.supabase.co` (dev — CI builds use dev) |
 | `VITE_SUPABASE_ANON_KEY` | Used by the `Build` step in `ci.yml` | dev project anon key |
 | `VERCEL_TOKEN_B64`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | Used by `deploy.yml` to deploy to Vercel | Already configured |
