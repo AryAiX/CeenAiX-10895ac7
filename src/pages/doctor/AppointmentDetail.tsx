@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { Skeleton } from '../../components/Skeleton';
 import { LabTestNameDisplay } from '../../components/LabTestNameDisplay';
-import { useDoctorAppointmentDetail } from '../../hooks';
+import { useDoctorAppointmentDetail, useQuery } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
 import { supabase } from '../../lib/supabase';
 import {
@@ -57,6 +57,34 @@ export const DoctorAppointmentDetail: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data, loading, error, refetch } = useDoctorAppointmentDetail(user?.id, appointmentId);
+
+  const prescriptionIds = useMemo(
+    () => (data?.prescriptions ?? []).map((p) => p.id),
+    [data?.prescriptions]
+  );
+
+  const { data: prescriptionItemsData } = useQuery(
+    async () => {
+      if (prescriptionIds.length === 0) return [];
+      const { data: items, error: itemsError } = await supabase
+        .from('prescription_items')
+        .select('id, prescription_id, medication_name, dosage, frequency, duration_days')
+        .in('prescription_id', prescriptionIds);
+      if (itemsError) throw itemsError;
+      return items ?? [];
+    },
+    [prescriptionIds.join(',')]
+  );
+
+  const prescriptionItemsById = useMemo(() => {
+    const map = new Map<string, NonNullable<typeof prescriptionItemsData>>();
+    for (const item of prescriptionItemsData ?? []) {
+      const existing = map.get(item.prescription_id) ?? [];
+      map.set(item.prescription_id, [...existing, item]);
+    }
+    return map;
+  }, [prescriptionItemsData]);
+
   const locale = resolveLocale(i18n.language);
   const uiLang = i18n.language ?? 'en';
   const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(uiLang, options);
@@ -609,19 +637,47 @@ export const DoctorAppointmentDetail: React.FC = () => {
                   <p className="text-sm font-semibold text-slate-900">{t('doctor.patientDetail.prescriptions')}</p>
                   <div className="mt-3 space-y-2 text-sm text-slate-600">
                     {data.prescriptions.length > 0 ? (
-                      data.prescriptions.map((prescription) => (
-                        <div key={prescription.id} className="rounded-xl bg-white px-3 py-3">
-                          <p className="font-semibold text-slate-900">
-                            {prescriptionStatusLabel(t, prescription.status)}
-                          </p>
-                          <p className="mt-1 text-xs text-slate-500">
-                            {new Date(prescription.prescribed_at).toLocaleDateString(
-                              locale,
-                              dtOpts({ year: 'numeric', month: 'short', day: 'numeric' })
+                      data.prescriptions.map((prescription) => {
+                        const items = prescriptionItemsById.get(prescription.id) ?? [];
+                        return (
+                          <div key={prescription.id} className="space-y-2 rounded-xl bg-white px-3 py-3">
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="font-semibold text-slate-900">
+                                {prescriptionStatusLabel(t, prescription.status)}
+                              </p>
+                              <p className="text-xs text-slate-500">
+                                {new Date(prescription.prescribed_at).toLocaleDateString(
+                                  locale,
+                                  dtOpts({ year: 'numeric', month: 'short', day: 'numeric' })
+                                )}
+                              </p>
+                            </div>
+                            {items.length > 0 ? (
+                              <div className="space-y-1.5 border-t border-slate-100 pt-2">
+                                {items.map((item) => (
+                                  <div key={item.id} className="flex items-start gap-2">
+                                    <span className="text-sm">💊</span>
+                                    <div>
+                                      <p className="text-sm font-semibold text-slate-800">{item.medication_name}</p>
+                                      {(item.dosage || item.frequency || item.duration_days) ? (
+                                        <p className="text-xs text-slate-500">
+                                          {[
+                                            item.dosage,
+                                            item.frequency,
+                                            item.duration_days ? `${item.duration_days} days` : null,
+                                          ].filter(Boolean).join(' · ')}
+                                        </p>
+                                      ) : null}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="border-t border-slate-100 pt-2 text-xs text-slate-400">No medication details available</p>
                             )}
-                          </p>
-                        </div>
-                      ))
+                          </div>
+                        );
+                      })
                     ) : (
                       <p>{t('doctor.patientDetail.noneRecorded')}</p>
                     )}
