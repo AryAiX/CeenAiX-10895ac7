@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Bell, CalendarRange, LayoutDashboard, Palette, Settings as SettingsIcon, ShieldCheck, Stethoscope, TestTube2, User } from 'lucide-react';
+import { Bell, CalendarRange, LayoutDashboard, Palette, Plug, Settings as SettingsIcon, ShieldCheck, Stethoscope, TestTube2, User } from 'lucide-react';
 import { Skeleton } from '../../components/Skeleton';
 import { useDoctorSchedule, useUserProfile } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
@@ -508,6 +508,48 @@ export const DoctorSettings = () => {
 
               <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
                 ⚠️ Lab and imaging preferences will be saved locally. Full persistence coming soon.
+              </div>
+            </div>
+          ) : activeSection === 'integrations' ? (
+            <div className="rounded-2xl bg-white p-6 shadow-sm space-y-5">
+              <div className="flex items-center gap-3 mb-2">
+                <Plug className="h-6 w-6 text-cyan-600" />
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900">Integrations</h2>
+                  <p className="text-sm text-slate-500">Connect CeenAiX with your favorite tools and services.</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {[
+                  { name: 'Google Calendar', description: 'Sync your appointments with Google Calendar automatically.', icon: '📅', status: 'coming_soon' },
+                  { name: 'Apple Calendar', description: 'Sync your appointments with Apple Calendar on your devices.', icon: '🍎', status: 'coming_soon' },
+                  { name: 'Microsoft Outlook', description: 'Connect your Outlook calendar and email for appointment sync.', icon: '📧', status: 'coming_soon' },
+                  { name: 'Zoom', description: 'Launch Zoom meetings directly from teleconsultation appointments.', icon: '🎥', status: 'coming_soon' },
+                  { name: 'WhatsApp Business', description: 'Send appointment reminders and notifications via WhatsApp.', icon: '💬', status: 'coming_soon' },
+                  { name: 'DHA ePrescription', description: 'Submit prescriptions directly to the DHA ePrescription system.', icon: '💊', status: 'coming_soon' },
+                ].map((integration) => (
+                  <div key={integration.name} className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <div className="flex items-center gap-4">
+                      <span className="text-2xl">{integration.icon}</span>
+                      <div>
+                        <p className="font-semibold text-slate-900">{integration.name}</p>
+                        <p className="text-sm text-slate-500">{integration.description}</p>
+                      </div>
+                    </div>
+                    <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 whitespace-nowrap">
+                      Coming Soon
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-sm font-semibold text-slate-900 mb-1">Need a custom integration?</p>
+                <p className="text-sm text-slate-500">Contact our team to discuss custom EMR or HIS integrations for your clinic.</p>
+                <a href="mailto:support@ceenaix.com" className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-cyan-600 hover:text-cyan-700">
+                  Contact Support →
+                </a>
               </div>
             </div>
           ) : activeSection !== 'notifications' ? (
