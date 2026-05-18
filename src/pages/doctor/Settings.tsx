@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Bell, CalendarRange, HelpCircle, LayoutDashboard, Loader2, Palette, Plug, Save, Settings as SettingsIcon, ShieldCheck, Stethoscope, TestTube2, User } from 'lucide-react';
+import { Bell, CalendarRange, Globe, HelpCircle, LayoutDashboard, Loader2, Palette, Plug, Save, Settings as SettingsIcon, ShieldCheck, Stethoscope, TestTube2, User } from 'lucide-react';
 import { Skeleton } from '../../components/Skeleton';
 import { useDoctorSchedule, useUserProfile } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
@@ -35,7 +35,7 @@ function normalize(value: unknown): DoctorSettingsPrefs {
 }
 
 export const DoctorSettings = () => {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const navigate = useNavigate();
   const { user, doctorProfile } = useAuth();
   const { data: profile, loading, refetch } = useUserProfile();
@@ -52,6 +52,7 @@ export const DoctorSettings = () => {
   const [clinicalToolsSaving, setClinicalToolsSaving] = useState(false);
   const [clinicalToolsSuccess, setClinicalToolsSuccess] = useState<string | null>(null);
   const [clinicalToolsError, setClinicalToolsError] = useState<string | null>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language ?? 'en');
   const settingsSections = [
     'General',
     'Appearance',
@@ -99,6 +100,12 @@ export const DoctorSettings = () => {
     } else {
       setClinicalToolsSuccess('Clinical tools settings saved successfully!');
     }
+  };
+
+  const saveLanguage = (lang: string) => {
+    setSelectedLanguage(lang);
+    void i18n.changeLanguage(lang);
+    localStorage.setItem('ceenaix_language', lang);
   };
 
   const save = async (nextPrefs: DoctorSettingsPrefs) => {
@@ -735,6 +742,49 @@ export const DoctorSettings = () => {
                 {clinicalToolsSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 {clinicalToolsSaving ? 'Saving...' : 'Save Clinical Tools'}
               </button>
+            </div>
+          ) : activeSection === 'language' ? (
+            <div className="rounded-2xl bg-white p-6 shadow-sm space-y-5">
+              <div className="flex items-center gap-3 mb-2">
+                <Globe className="h-6 w-6 text-cyan-600" />
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900">Language</h2>
+                  <p className="text-sm text-slate-500">Choose your preferred language for the CeenAiX portal.</p>
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                {[
+                  { code: 'en', label: 'English', native: 'English', flag: '🇬🇧' },
+                  { code: 'ar', label: 'Arabic', native: 'العربية', flag: '🇦🇪' },
+                ].map((lang) => (
+                  <button
+                    key={lang.code}
+                    type="button"
+                    onClick={() => saveLanguage(lang.code)}
+                    className={`flex items-center gap-4 rounded-xl border p-4 text-left transition ${
+                      selectedLanguage === lang.code
+                        ? 'border-cyan-500 bg-cyan-50 ring-2 ring-cyan-400'
+                        : 'border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/40'
+                    }`}
+                  >
+                    <span className="text-3xl">{lang.flag}</span>
+                    <div>
+                      <p className={`font-bold ${selectedLanguage === lang.code ? 'text-cyan-700' : 'text-slate-900'}`}>
+                        {lang.label}
+                      </p>
+                      <p className="text-sm text-slate-500">{lang.native}</p>
+                    </div>
+                    {selectedLanguage === lang.code ? (
+                      <span className="ml-auto rounded-full bg-cyan-600 px-2.5 py-1 text-xs font-bold text-white">Active</span>
+                    ) : null}
+                  </button>
+                ))}
+              </div>
+
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                ⚠️ Changing the language will update the entire portal interface immediately.
+              </div>
             </div>
           ) : activeSection !== 'notifications' ? (
             <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500 shadow-sm">
