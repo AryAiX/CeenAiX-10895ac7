@@ -2,6 +2,8 @@ import { expect, test, type Browser, type Page } from '@playwright/test';
 import {
   createE2EWorkflowState,
   e2eUsers,
+  e2eScenarioTomorrow,
+  e2eScenarioYesterday,
   installSupabaseMocks,
   seedAuthenticatedRole,
   workflowIds,
@@ -27,9 +29,8 @@ const closePage = async (page: Page) => {
   await page.close({ runBeforeUnload: true });
 };
 
-const scenarioNow = new Date('2026-05-10T12:00:00.000Z');
-const scenarioTomorrow = new Date(scenarioNow.getTime() + 24 * 60 * 60 * 1000).toISOString();
-const scenarioYesterday = new Date(scenarioNow.getTime() - 24 * 60 * 60 * 1000).toISOString();
+const scenarioTomorrow = e2eScenarioTomorrow;
+const scenarioYesterday = e2eScenarioYesterday;
 
 // The mocked doctor exposes Monday availability only. Compute the very next
 // Monday from the wall clock so date-driven assertions in the booking flow do
@@ -42,6 +43,11 @@ const nextMondayDate = (() => {
   return result;
 })();
 const nextMondayDay = String(nextMondayDate.getDate());
+const nextMondayRescheduleIso = (() => {
+  const slot = new Date(nextMondayDate);
+  slot.setHours(9, 0, 0, 0);
+  return slot.toISOString();
+})();
 
 const seedAppointment = (
   state: E2EWorkflowState,
@@ -487,7 +493,7 @@ test('patient can reschedule a future appointment', async ({ browser }) => {
   const state = createE2EWorkflowState({ includeBaselineData: true });
   const page = await openRolePage(browser, state, 'patient', '/patient/appointments');
 
-  await page.evaluate(async () => {
+  await page.evaluate(async (scheduledAt) => {
     await fetch('https://placeholder.supabase.co/rest/v1/rpc/reschedule_patient_appointment', {
       method: 'POST',
       headers: {
@@ -497,13 +503,13 @@ test('patient can reschedule a future appointment', async ({ browser }) => {
       },
       body: JSON.stringify({
         p_appointment_id: '00000000-0000-4000-8000-000000000601',
-        p_scheduled_at: '2026-05-18T09:00:00.000Z',
+        p_scheduled_at: scheduledAt,
         p_duration_minutes: 30,
         p_chief_complaint: 'Rescheduled follow-up consultation',
         p_notes: 'Rescheduled from patient portal.',
       }),
     });
-  });
+  }, nextMondayRescheduleIso);
   await page.reload();
 
   await expect(page.getByText('Rescheduled follow-up consultation')).toBeVisible();
@@ -511,7 +517,7 @@ test('patient can reschedule a future appointment', async ({ browser }) => {
     expect.objectContaining({
       status: 'scheduled',
       chief_complaint: 'Rescheduled follow-up consultation',
-      scheduled_at: '2026-05-18T09:00:00.000Z',
+      scheduled_at: nextMondayRescheduleIso,
     })
   );
   await closePage(page);

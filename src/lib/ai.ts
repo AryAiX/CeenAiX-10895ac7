@@ -95,6 +95,19 @@ export async function invokeAiChat(input: {
     );
   }
 
+  const payload = data as Record<string, unknown>;
+  const assistantMessage = payload.assistantMessage;
+  if (
+    typeof payload.sessionId !== 'string' ||
+    !assistantMessage ||
+    typeof assistantMessage !== 'object' ||
+    typeof (assistantMessage as { content?: unknown }).content !== 'string'
+  ) {
+    throw new Error(
+      i18n.t('ai.errors.invalidChatResponse', { defaultValue: 'AI chat returned an invalid response.' })
+    );
+  }
+
   return data as AiChatResponsePayload;
 }
 

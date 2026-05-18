@@ -52,6 +52,7 @@ export const FindClinic: React.FC = () => {
   const navigate = useNavigate();
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [selectedCity, setSelectedCity] = useState<string>('all');
@@ -70,6 +71,7 @@ export const FindClinic: React.FC = () => {
 
   const fetchHospitals = async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const { data, error } = await supabase
         .from('hospitals')
@@ -80,6 +82,8 @@ export const FindClinic: React.FC = () => {
       setHospitals(data || []);
     } catch (error) {
       console.error('Error fetching hospitals:', error);
+      setLoadError(error instanceof Error ? error.message : 'Unable to load clinics.');
+      setHospitals([]);
     } finally {
       setLoading(false);
     }
@@ -145,13 +149,13 @@ export const FindClinic: React.FC = () => {
 
   const openGoogleMaps = (hospital: Hospital) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${hospital.latitude},${hospital.longitude}`;
-    window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener,noreferrer');
     setShowNavMenu(null);
   };
 
   const openWaze = (hospital: Hospital) => {
     const url = `https://waze.com/ul?ll=${hospital.latitude},${hospital.longitude}&navigate=yes`;
-    window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener,noreferrer');
     setShowNavMenu(null);
   };
 
@@ -208,6 +212,19 @@ export const FindClinic: React.FC = () => {
             Discover top-rated hospitals and clinics with experienced doctors near you
           </p>
         </div>
+
+        {loadError ? (
+          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">
+            <p>{loadError}</p>
+            <button
+              type="button"
+              onClick={() => void fetchHospitals()}
+              className="mt-2 text-sm font-semibold text-red-700 underline"
+            >
+              Retry
+            </button>
+          </div>
+        ) : null}
 
         <div className="mb-6 rounded-[2rem] border border-slate-200 bg-white/95 p-6 shadow-sm backdrop-blur transition-all">
           <div className="flex flex-col md:flex-row gap-4">

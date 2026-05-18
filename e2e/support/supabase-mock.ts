@@ -20,9 +20,13 @@ const AUTH_STORAGE_KEY = 'sb-placeholder-auth-token';
 // roll into the past and silently disable date-pickers / cancel buttons in the
 // browser UI. The previous frozen scenario date (2026-05-10) caused multiple
 // specs to break as soon as the calendar passed that day.
-const now = new Date();
-const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
-const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+export const e2eScenarioNow = new Date();
+export const e2eScenarioTomorrow = new Date(e2eScenarioNow.getTime() + 24 * 60 * 60 * 1000).toISOString();
+export const e2eScenarioYesterday = new Date(e2eScenarioNow.getTime() - 24 * 60 * 60 * 1000).toISOString();
+
+const now = e2eScenarioNow;
+const tomorrow = e2eScenarioTomorrow;
+const yesterday = e2eScenarioYesterday;
 
 export const e2eUsers: Record<E2ERole, E2EUser> = {
   patient: {

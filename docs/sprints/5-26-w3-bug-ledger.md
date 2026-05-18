@@ -43,3 +43,67 @@ Severity: **P0** broken auth/data loss · **P1** user blocked · **P2** wrong da
 | 34 | Hooks/messaging | P2 | Rapid thread switches could show another conversation’s messages | `loadMessages` had no stale-response guard | `src/hooks/use-messaging-hub.ts` — monotonic request id; mark-read failures surface `threadError` | manual |
 | 35 | Patient/Insurance | P2 | Documents tab action buttons were inert (“upload coming soon”) | Bolt CTAs never wired | `src/pages/patient/Insurance.tsx` — card opens URL or profile upload; policy/annual → benefits; EOB → claims | manual |
 | 36 | Patient/Dashboard + Appointments | P3 | Medication/appointment lists jumped height when loading finished | Skeleton blocks shorter than loaded/empty states | `min-h` on medication list + appointment skeleton container | manual |
+| 37 | Patient/Settings | P2 | Preference save ignored Supabase `updateError` | No error branch after `user_profiles` update | `src/pages/patient/Settings.tsx` — `saveError` banner; saved timeout ref + cleanup | manual |
+| 38 | Hooks/insurance | P2 | Cancelled/no_show appointments showed as insurance `pending` | Binary completed vs pending mapping | `src/hooks/use-patient-insurance.ts` — `denied` for cancelled/no_show; type extended | manual |
+| 39 | Hooks/appointments | P3 | `useAppointments` accepted any `status` string | Untyped filter caused silent empty lists | `src/hooks/use-appointments.ts` — `AppointmentStatus` union | manual |
+| 40 | E2E | P1 | `clinical-workflows` used frozen `2026-05-10` scenario dates | Diverged from wall-clock mock | `e2e/clinical-workflows.spec.ts` + `e2e/support/supabase-mock.ts` — shared `e2eScenarioTomorrow/Yesterday` | e2e |
+| 41 | E2E | P2 | Reschedule RPC test hardcoded `2026-05-18` | Static ISO rotted | `e2e/clinical-workflows.spec.ts` — `nextMondayRescheduleIso` passed into `page.evaluate` | e2e |
+| 42 | AI/lib | P2 | `invokeAiChat` accepted malformed JSON objects | Cast-only validation | `src/lib/ai.ts` — checks `sessionId` + `assistantMessage.content` | manual |
+| 43 | Public/AIChat | P2 | Guest chat `setTimeout` leaked on unmount | No cleanup | `src/pages/public/AIChat.tsx` — `replyTimeoutRef` + `useEffect` cleanup | manual |
+| 44 | Insurance/Portal | P3 | Risk analytics subtitle said "Current seeded period" | Demo copy | `src/pages/insurance/Portal.tsx` — "Reporting window (live workspace)" | manual |
+| 45 | Doctor/Appointments | P2 | Export button had no handler | Dead CTA | `src/pages/doctor/Appointments.tsx` — CSV download of `routeAppointments` | manual |
+| 46 | Doctor/Appointments | P3 | KPI stat cards looked clickable but did nothing | Buttons without `onClick` | `src/pages/doctor/Appointments.tsx` — `handleKpiCardAction` → today/week/pending/analytics/profile | manual |
+| 47 | Doctor/Appointments | P2 | "New Appointment" sent doctors to patient booking route | Wrong RBAC path | `src/pages/doctor/Appointments.tsx` — `/doctor/patients` | manual |
+| 48 | Patient/Profile | P2 | Core profile text fields lacked `maxLength` | Oversize payload risk | `src/pages/patient/Profile.tsx` + `src/lib/form-field-limits.ts` | manual |
+| 49 | Patient/Profile | P3 | Overlay edit controls missing `type="button"` | Implicit submit risk | `src/pages/patient/Profile.tsx` — `type="button"` on edit chips | manual |
+| 50 | Patient/AIChat | P2 | Composer textarea unbounded | Huge Edge payloads | `src/pages/patient/AIChat.tsx` — `FORM_FIELD_LIMITS.chatMessage` | manual |
+| 51 | Public/FindClinic | P2 | Hospital fetch failures only logged to console | Empty UI on error | `src/pages/public/FindClinic.tsx` — `loadError` + Retry | manual |
+| 52 | Public/FindClinic | P3 | Maps links opened without `noopener` | Tab-nabbing risk | `src/pages/public/FindClinic.tsx` — `noopener,noreferrer` | manual |
+| 53 | Public/Laboratories | P2 | Fetch failure silently swapped in sample labs | Users thought samples were live | `src/pages/public/Laboratories.tsx` — `loadError` + explicit demo banner | manual |
+| 54 | Public/Laboratories | P3 | Search input unbounded | Query hygiene | `src/pages/public/Laboratories.tsx` — search `maxLength` | manual |
+| 55 | Pharmacy/Revenue | P3 | Claim "View" used blocking `window.alert` | Poor UX | `src/pages/pharmacy/Revenue.tsx` — expandable inline claim detail | manual |
+| 56 | Shared | P3 | Field limits lived only on Records | Inconsistent caps | `src/lib/form-field-limits.ts` — shared limits; `patient-records.ts` re-exports | manual |
+| 57 | Pharmacy/Inventory | P3 | Batch view used `window.alert` | Blocking stub | `src/pages/pharmacy/Inventory.tsx` — inline batch panel | manual |
+| 58 | Pharmacy/Inventory | P3 | Inventory search unbounded; CSV export had no error UI | Silent export failures | `src/pages/pharmacy/Inventory.tsx` — `maxLength` + export error banner | manual |
+| 59 | Public/FindDoctor | P3 | Directory search unbounded | Query hygiene | `src/pages/public/FindDoctor.tsx` — search `maxLength` | manual |
+| 60 | Insurance/Portal | P3 | Four workspace search fields unbounded | Query hygiene | `src/pages/insurance/Portal.tsx` — search `maxLength` on filters | manual |
+| 61 | Hooks/doctor-notifications | P2 | Loaded all conversations globally | Scale + privacy | `src/hooks/use-doctor-notifications.ts` — participant filter + limits | manual |
+| 62 | Hooks/patient-notifications | P3 | Unbounded notification/message queries | Performance | `src/hooks/use-patient-notifications.ts` — `limit(25)` / `limit(15)` | manual |
+| 63 | Patient/Insurance | P3 | `denied` claims had no distinct styling/filter | New status unused in UI | `src/pages/patient/Insurance.tsx` — rose styling + filter chip | manual |
+| 64 | Patient/Insurance | P2 | Download card / contact insurer inert | Dead CTAs | `src/pages/patient/Insurance.tsx` — download summary + mailto | manual |
+| 65 | Doctor/Profile | P2 | Professional + template fields lacked `maxLength` | Oversize payloads | `src/pages/doctor/Profile.tsx` — `FORM_FIELD_LIMITS` | manual |
+| 66 | Auth/Login | P1 | Hung auth calls could stall UI forever | No timeout | `src/lib/with-timeout.ts` + `src/pages/auth/Login.tsx` | manual |
+| 67 | Auth/Login | P3 | Recovery redirect timer not cleared on unmount | Orphan timeout | `src/pages/auth/Login.tsx` — ref + cleanup | manual |
+| 68 | Auth/Forgot+Verify+Register | P2 | Auth forms lacked timeouts and `maxLength` | Same class as login | `ForgotPassword.tsx`, `VerifyOTP.tsx`, `Register.tsx` | manual |
+| 69 | Patient/Book | P3 | Doctor search unbounded | Query hygiene | `src/pages/patient/BookAppointment.tsx` — search `maxLength` | manual |
+| 70 | Admin/Portal | P3 | Org-created toast timers could stack | Orphan timeouts | `src/pages/admin/Portal.tsx` — toast ref + cleanup | manual |
+| 71 | Admin/Portal | P3 | Org search / onboard modal fields unbounded | Oversize payloads | `src/pages/admin/Portal.tsx` — `maxLength` | manual |
+| 72 | AI/lib | P1 | Failed AI uploads left orphan storage objects | No rollback on invoke failure | `src/lib/ai.ts` — rollback attachments when Edge invoke fails | manual |
+| 73 | Auth | P1 | Rapid auth events applied stale profile state | No generation guard | `src/lib/auth-context.tsx` — `profileLoadGenerationRef` | `auth-context.test.ts` |
+| 74 | Auth | P3 | Language preference persisted after sign-out | Privacy on shared devices | `src/lib/auth-context.tsx` — clear `ceenaix.lang` on `SIGNED_OUT` | manual |
+| 75 | Patient/AIChat | P1 | Session switch showed previous thread messages | Missing reset on `selectedSessionId` | `src/pages/patient/AIChat.tsx` — clear messages on switch | manual |
+| 76 | Patient/AIChat | P2 | Optimistic send skipped refetch for new sessions | Stale closure | `src/pages/patient/AIChat.tsx` — conditional `refetch()` | manual |
+| 77 | Pre-visit | P1 | `setAnswers({})` used object instead of array | Type/runtime bug | `src/pages/patient/PreVisitAssessment.tsx` — `setAnswers([])` | manual |
+| 78 | Pre-visit/lib | P2 | Autofill matched generic "phone" before specific fields | Wrong autofill source order | `src/lib/pre-visit.ts` — reorder `inferAutofillSourceFromQuestion` | `pre-visit.test.ts` |
+| 79 | Doctor/patient-detail | P1 | Hook returned null when no shared appointments | Blocked messaging workflows | `src/hooks/use-doctor-patient-detail.ts` — removed early return | manual |
+| 80 | Doctor/CreateRx+Lab | P2 | Catalog suggestions could insert null `created_by` | Missing guard | `CreatePrescription.tsx`, `CreateLabOrder.tsx` — `userId` check | manual |
+| 81 | Pharmacy/Messages | P2 | Send was a no-op clearing draft | Bolt stub | `src/pages/pharmacy/Messages.tsx` — `sendPharmacyResponse` persistence | manual |
+| 82 | Pharmacy/Settings | P2 | Setting toggles were visual only | No Supabase write | `src/pages/pharmacy/Settings.tsx` — `setPharmacySettingEnabled` | manual |
+| 83 | Insurance/Portal | P1 | Bulk approve / single approve were inert | Bolt stub | `use-insurance-portal.ts` + `Portal.tsx` — real approve mutations | manual |
+| 84 | Insurance/Portal | P2 | Export header had no handler | Dead CTA | `src/pages/insurance/Portal.tsx` — client CSV export | manual |
+| 85 | Lab/Portal | P1 | Dozens of CTAs were placeholders | Bolt shell | `src/pages/lab/Portal.tsx` — queue/orders/results/radiology/NABIDH/analytics wired | manual |
+| 86 | Lab/hooks | P2 | `lab_order_items` missing `id` in select | Bulk actions failed | `src/hooks/use-lab-ops-portal.ts` — select `id`; types updated | manual |
+| 87 | Admin/Portal | P2 | Doctor verify OK/Reject inert | Bolt buttons | `src/pages/admin/Portal.tsx` — updates `dha_license_verified` | manual |
+| 88 | Patient/Documents | P2 | Upload/Download/Share dead | Bolt stub | `src/pages/patient/Documents.tsx` — real download/share + routes | manual |
+| 89 | Patient/Imaging | P3 | Share studies unwired | Bolt stub | `src/pages/patient/Imaging.tsx` — Web Share / mailto fallback | manual |
+| 90 | Doctor/Appointments | P2 | Day/Month calendar toggles inert | Bolt stub | `src/pages/doctor/Appointments.tsx` — functional day/month views | manual |
+| 91 | Doctor/Dashboard | P2 | Upcoming badge omitted `in_progress` | Wrong KPI | `src/pages/doctor/Dashboard.tsx` — includes in_progress | manual |
+| 92 | Patient/Appointments | P2 | Upcoming/past lists stale after midnight | No clock tick | `src/pages/patient/Appointments.tsx` — `nowTick` interval | manual |
+| 93 | Medication/lib | P2 | Unknown frequency defaulted to 1 dose/day | Wrong supply math | `src/lib/medication-schedule.ts` — parse more patterns; null when unknown | `medication-schedule.test.ts` |
+| 94 | Booking/lib | P2 | Slot exactly at "now" marked past | Off-by-one minute | `src/lib/appointment-booking.ts` — `<` instead of `<=` for past | `appointment-booking.test.ts` |
+| 95 | Pharmacy/Dashboard | P2 | Stock alerts sorted by hardcoded drug names | Wrong urgency order | `src/pages/pharmacy/stock-alerts.ts` — severity then quantity | `Dashboard.test.ts` |
+| 96 | Patient/Profile | P2 | Save errors swallowed on profile/insurance | Silent failures | `src/pages/patient/Profile.tsx` — `saveError` banners | manual |
+| 97 | Doctor/Settings | P2 | Notification prefs save ignored errors | Silent failure | `src/pages/doctor/Settings.tsx` — `saveError` banner | manual |
+| 98 | Hooks/messaging | P2 | Conversation timestamp update only warned | Hidden inconsistency | `src/hooks/use-messaging-hub.ts` — `setActionError` on failure | manual |
+| 99 | Hooks/doctor-patients | P3 | Sort crashed on null `scheduled_at` | Unsafe compare | `src/hooks/use-doctor-patients.ts` — null-safe localeCompare | manual |
+| 100 | E2E | P1 | No multi-role journey coverage | Sprint gap | `e2e/multi-role-interactions.spec.ts` — patient→doctor→lab→insurance→admin | spec |

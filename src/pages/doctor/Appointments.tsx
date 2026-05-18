@@ -331,6 +331,51 @@ export const DoctorAppointments: React.FC = () => {
     }
   };
 
+  const downloadAppointmentsCsv = () => {
+    const header = ['id', 'patient', 'scheduled_at', 'status', 'type', 'chief_complaint'];
+    const lines = routeAppointments.map((appointment) => {
+      const patient = patientNameById.get(appointment.patient_id) ?? '';
+      const cells = [
+        appointment.id,
+        patient,
+        appointment.scheduled_at,
+        appointment.status,
+        appointment.type,
+        appointment.chief_complaint ?? '',
+      ];
+      return cells.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',');
+    });
+    const csv = [header.join(','), ...lines].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `doctor-appointments-${todayDateKey}.csv`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleKpiCardAction = (action: 'today' | 'week' | 'pending' | 'analytics' | 'profile') => {
+    if (action === 'today') {
+      navigate('/doctor/today');
+      return;
+    }
+    if (action === 'week') {
+      setCalendarScale('week');
+      handleTabChange('calendar');
+      return;
+    }
+    if (action === 'pending') {
+      handleTabChange('pending');
+      return;
+    }
+    if (action === 'analytics') {
+      handleTabChange('analytics');
+      return;
+    }
+    navigate('/doctor/profile');
+  };
+
   const handleMonthChange = (offset: number) => {
     const nextMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + offset, 1);
     setCurrentMonth(nextMonth);
@@ -370,7 +415,7 @@ export const DoctorAppointments: React.FC = () => {
             <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
-                onClick={() => navigate('/patient/book-appointment')}
+                onClick={() => navigate('/doctor/patients')}
                 className="flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2.5 text-[13px] font-bold text-white transition-colors hover:bg-teal-700"
               >
                 <Plus className="h-4 w-4" />
@@ -378,6 +423,7 @@ export const DoctorAppointments: React.FC = () => {
               </button>
               <button
                 type="button"
+                onClick={downloadAppointmentsCsv}
                 className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-[13px] font-bold text-slate-700 transition-colors hover:bg-slate-50"
               >
                 <Download className="h-4 w-4" />
@@ -436,6 +482,7 @@ export const DoctorAppointments: React.FC = () => {
             {[
               {
                 label: "Today's Appointments",
+                action: 'today' as const,
                 value: todayAppointmentsForStats.length,
                 sub: `${formatLocaleDigits(todayDone, uiLang)} done · ${formatLocaleDigits(todayActive, uiLang)} active · ${formatLocaleDigits(todayUpcoming, uiLang)} upcoming`,
                 icon: CalendarCheck,
@@ -445,6 +492,7 @@ export const DoctorAppointments: React.FC = () => {
               },
               {
                 label: 'This Week',
+                action: 'week' as const,
                 value: weekAppointments.length,
                 sub: `${formatLocaleDigits(weekDone, uiLang)} done · ${formatLocaleDigits(weekRemaining, uiLang)} remaining`,
                 icon: Calendar,
@@ -453,6 +501,7 @@ export const DoctorAppointments: React.FC = () => {
               },
               {
                 label: 'Pending Requests',
+                action: 'pending' as const,
                 value: pendingRequestCount,
                 sub: `${formatLocaleDigits(pendingRequestCount, uiLang)} live from scheduled/confirmed bookings`,
                 icon: Bell,
@@ -462,6 +511,7 @@ export const DoctorAppointments: React.FC = () => {
               },
               {
                 label: 'No-Shows This Month',
+                action: 'analytics' as const,
                 value: monthNoShows,
                 sub: `${monthAppointments.length > 0 ? formatLocaleDigits(Math.round((monthNoShows / monthAppointments.length) * 1000) / 10, uiLang) : '0'}% rate · Live status`,
                 icon: UserX,
@@ -470,6 +520,7 @@ export const DoctorAppointments: React.FC = () => {
               },
               {
                 label: 'Week Revenue',
+                action: 'profile' as const,
                 value: consultationFee > 0 ? `AED ${formatLocaleDigits(weekRevenue, uiLang)}` : 'AED --',
                 sub: consultationFee > 0 ? `AED ${formatLocaleDigits(todayRemainingRevenue, uiLang)} remaining today` : 'Set consultation fee in profile',
                 icon: TrendingUp,
@@ -483,6 +534,7 @@ export const DoctorAppointments: React.FC = () => {
                 <button
                   key={card.label}
                   type="button"
+                  onClick={() => handleKpiCardAction(card.action)}
                   className={`cursor-pointer rounded-xl border bg-white p-5 text-left transition-transform hover:scale-[1.02] ${
                     card.urgent ? 'animate-pulse border-2 border-amber-200' : 'border-slate-200'
                   }`}

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { MapPin, Clock, Star, Search, Filter, Beaker, TestTube } from 'lucide-react';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
+import { FORM_FIELD_LIMITS } from '../../lib/form-field-limits';
 import { supabase } from '../../lib/supabase';
 import { formatLocaleDecimal, formatLocaleDigits } from '../../lib/i18n-ui';
 import {
@@ -30,6 +31,8 @@ export const Laboratories: React.FC = () => {
   const navigate = useNavigate();
   const [laboratories, setLaboratories] = useState<Laboratory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [usingDemoData, setUsingDemoData] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('all');
 
@@ -99,6 +102,8 @@ export const Laboratories: React.FC = () => {
   }, []);
 
   const fetchLaboratories = useCallback(async () => {
+    setLoadError(null);
+    setUsingDemoData(false);
     try {
       const { data, error } = await supabase
         .from('laboratories')
@@ -113,7 +118,9 @@ export const Laboratories: React.FC = () => {
       }
     } catch (error) {
       console.error('Error fetching laboratories:', error);
+      setLoadError(error instanceof Error ? error.message : 'Unable to load laboratories.');
       setLaboratories(getSampleLaboratories());
+      setUsingDemoData(true);
     } finally {
       setLoading(false);
     }
@@ -164,12 +171,21 @@ export const Laboratories: React.FC = () => {
           <p className="mx-auto max-w-3xl text-xl text-slate-600">{t('laboratoryPage.heroLead')}</p>
         </div>
 
+        {loadError ? (
+          <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" role="alert">
+            {usingDemoData
+              ? `${loadError} Showing sample directory for preview.`
+              : loadError}
+          </div>
+        ) : null}
+
         <div className="mb-8 rounded-2xl bg-white p-6 shadow-lg">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="relative">
               <Search className="pointer-events-none absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
+                maxLength={FORM_FIELD_LIMITS.searchQuery}
                 placeholder={t('laboratoryPage.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CircleDollarSign, CreditCard, Download, FileCheck2, ReceiptText } from 'lucide-react';
 import { OpsShell } from '../../components/OpsShell';
@@ -32,6 +32,7 @@ export const PharmacyRevenue = () => {
   const { t, i18n } = useTranslation('common');
   const uiLang = i18n.language ?? 'en';
   const { data, loading } = usePharmacyPrescriptionQueue();
+  const [selectedClaimId, setSelectedClaimId] = useState<string | null>(null);
   const rows = useMemo<RevenuePrescription[]>(
     () =>
       (data?.claims ?? []).map((claim) => ({
@@ -44,6 +45,7 @@ export const PharmacyRevenue = () => {
       })),
     [data?.claims]
   );
+  const selectedClaim = rows.find((row) => row.id === selectedClaimId) ?? null;
   const paid = rows.filter((item) => item.status === 'paid');
   const review = rows.filter((item) => item.status === 'review');
   const pending = rows.filter((item) => item.status === 'pending');
@@ -234,11 +236,7 @@ export const PharmacyRevenue = () => {
                   </span>
                   <button
                     type="button"
-                    onClick={() => {
-                      window.alert(
-                        `${row.id} · ${row.patientName}\n${row.medication}\n${formatCurrency(row.amount, uiLang)} · ${row.insurer}\nStatus: ${row.status}`
-                      );
-                    }}
+                    onClick={() => setSelectedClaimId((current) => (current === row.id ? null : row.id))}
                     className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200"
                   >
                     {t('pharmacy.revenue.view', { defaultValue: 'View' })}
@@ -246,6 +244,18 @@ export const PharmacyRevenue = () => {
                 </div>
               ))}
             </div>
+            {selectedClaim ? (
+              <div className="border-t border-slate-100 bg-slate-50 px-5 py-4 text-sm text-slate-700">
+                <p className="font-semibold text-slate-900">{selectedClaim.patientName}</p>
+                <p className="mt-1">
+                  {selectedClaim.id} · {selectedClaim.medication} · {formatCurrency(selectedClaim.amount, uiLang)} ·{' '}
+                  {selectedClaim.insurer}
+                </p>
+                <p className="mt-1 capitalize">
+                  {t(`pharmacy.revenue.status.${selectedClaim.status}`, { defaultValue: selectedClaim.status })}
+                </p>
+              </div>
+            ) : null}
           </article>
         </section>
       </div>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bell, Globe, HelpCircle, Lock, Settings as SettingsIcon, ShieldCheck, User } from 'lucide-react';
 import { Skeleton } from '../../components/Skeleton';
@@ -55,6 +55,8 @@ export const PatientSettings = () => {
   const [prefs, setPrefs] = useState<Preferences>(DEFAULT_PREFS);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const savedTimeoutRef = useRef<number | null>(null);
   const [sendingPasswordReset, setSendingPasswordReset] = useState(false);
   const [passwordResetMessage, setPasswordResetMessage] = useState<
     { kind: 'success' | 'error'; text: string } | null
@@ -80,20 +82,37 @@ export const PatientSettings = () => {
 
   const currentSection = sections.find((item) => item.id === section) ?? sections[0];
 
+  useEffect(() => {
+    return () => {
+      if (savedTimeoutRef.current !== null) {
+        window.clearTimeout(savedTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const savePreferences = async (nextPrefs = prefs) => {
     if (!user?.id) return;
     setSaving(true);
     setSaved(false);
+    setSaveError(null);
     const { error: updateError } = await supabase
       .from('user_profiles')
       .update({ notification_preferences: nextPrefs })
       .eq('user_id', user.id);
     setSaving(false);
-    if (!updateError) {
-      setSaved(true);
-      refetch();
-      window.setTimeout(() => setSaved(false), 2500);
+    if (updateError) {
+      setSaveError(updateError.message);
+      return;
     }
+    setSaved(true);
+    refetch();
+    if (savedTimeoutRef.current !== null) {
+      window.clearTimeout(savedTimeoutRef.current);
+    }
+    savedTimeoutRef.current = window.setTimeout(() => {
+      setSaved(false);
+      savedTimeoutRef.current = null;
+    }, 2500);
   };
 
   const updatePref = <K extends keyof Preferences>(key: K, value: Preferences[K]) => {
@@ -327,6 +346,11 @@ export const PatientSettings = () => {
             <p className="mt-1 text-sm text-slate-500">{currentSection.desc}</p>
             <div className="mt-2 h-5 text-sm">
               {saving ? <span className="text-slate-500">{t('patient.settings.saving')}</span> : null}
+              {saveError ? (
+                <span className="font-medium text-rose-600" role="alert">
+                  {saveError}
+                </span>
+              ) : null}
               {saved ? <span className="font-medium text-emerald-600">{t('patient.settings.saved')}</span> : null}
             </div>
           </div>

@@ -41,6 +41,7 @@ import {
   fetchCanonicalUpdateRequests,
   formatCanonicalValueForReview,
 } from '../../lib/canonical-record-updates';
+import { FORM_FIELD_LIMITS } from '../../lib/form-field-limits';
 
 interface ChatMessage {
   id: string;
@@ -1065,6 +1066,7 @@ export const PatientAIChat: React.FC = () => {
                     <textarea
                       ref={textareaRef}
                       value={input}
+                      maxLength={FORM_FIELD_LIMITS.chatMessage}
                       onChange={(event) => setInput(event.target.value)}
                       rows={1}
                       placeholder={t('patient.aiChat.inputPhLong')}

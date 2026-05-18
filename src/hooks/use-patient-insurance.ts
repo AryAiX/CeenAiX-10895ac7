@@ -30,7 +30,7 @@ export interface PatientInsuranceActivity {
   totalEstimate: number;
   patientShareEstimate: number;
   coveredEstimate: number;
-  status: 'approved' | 'pending' | 'review';
+  status: 'approved' | 'pending' | 'review' | 'denied';
   source: 'appointments' | 'lab_orders' | 'prescriptions';
 }
 
@@ -188,7 +188,12 @@ export function usePatientInsurance(userId: string | null | undefined) {
         totalEstimate: total,
         patientShareEstimate: split.patientShare,
         coveredEstimate: split.covered,
-        status: row.status === 'completed' ? 'approved' : 'pending',
+        status:
+          row.status === 'completed'
+            ? 'approved'
+            : row.status === 'cancelled' || row.status === 'no_show'
+              ? 'denied'
+              : 'pending',
         source: 'appointments',
       };
     });
