@@ -296,6 +296,14 @@ export const DoctorSchedule: React.FC = () => {
     refetch();
   };
 
+  const calculateSlots = (startTime: string, endTime: string, slotDurationMinutes: number): number => {
+    const [startHour, startMin] = startTime.split(':').map(Number);
+    const [endHour, endMin] = endTime.split(':').map(Number);
+    const totalMinutes = (endHour * 60 + endMin) - (startHour * 60 + startMin);
+    if (totalMinutes <= 0 || slotDurationMinutes <= 0) return 0;
+    return Math.floor(totalMinutes / slotDurationMinutes);
+  };
+
   return (
     <>
       <div>
@@ -461,7 +469,9 @@ export const DoctorSchedule: React.FC = () => {
                       <div className="mb-3 flex items-center justify-between">
                         <h3 className="font-semibold text-gray-900">{day.label}</h3>
                         <span className="text-xs font-medium text-gray-500">
-                          {day.entries.length === 0 ? 'Unavailable' : `${day.entries.length} window${day.entries.length === 1 ? '' : 's'}`}
+                          {day.entries.length === 0
+                            ? 'Unavailable'
+                            : `${day.entries.length} window${day.entries.length === 1 ? '' : 's'} · ${day.entries.reduce((total, entry) => total + calculateSlots(entry.start_time, entry.end_time, entry.slot_duration_minutes), 0)} slots`}
                         </span>
                       </div>
 
@@ -486,9 +496,12 @@ export const DoctorSchedule: React.FC = () => {
                                       <p className="font-semibold text-gray-900">
                                         {formatTimeLabel(entry.start_time, i18n.language)} to {formatTimeLabel(entry.end_time, i18n.language)}
                                       </p>
-                                      <p className="mt-1 text-sm text-gray-600">
-                                        {entry.slot_duration_minutes} minute slots
-                                      </p>
+                                    <p className="mt-1 text-sm text-gray-600">
+                                      {entry.slot_duration_minutes} minute slots
+                                      <span className='ml-2 rounded-full bg-teal-100 px-2 py-0.5 text-xs font-semibold text-teal-700'>
+                                        {calculateSlots(entry.start_time, entry.end_time, entry.slot_duration_minutes)} slots available
+                                      </span>
+                                    </p>
                                     </div>
                                   </div>
 
