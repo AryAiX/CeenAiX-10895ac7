@@ -198,7 +198,7 @@ export const DoctorDashboard: React.FC = () => {
       sub: `${formatLocaleDigits(data?.criticalResults.length ?? 0, uiLang)} critical pending · ${formatLocaleDigits(recentLabResults.length, uiLang)} recent results`,
       color: 'indigo',
       critical: (data?.criticalResults.length ?? 0) > 0,
-      onClick: () => navigate('/doctor/labs'),
+      onClick: () => navigate('/doctor/lab-orders'),
     },
     {
       icon: MessageSquare,
@@ -232,8 +232,8 @@ export const DoctorDashboard: React.FC = () => {
     },
   ];
   const quickActions = [
-    { icon: ClipboardList, label: 'Write Prescription', color: 'purple', onClick: () => navigate('/doctor/prescribe') },
-    { icon: TestTube, label: 'Order Lab Test', color: 'indigo', badge: (data?.criticalResults.length ?? 0) > 0 ? `${data?.criticalResults.length} critical` : undefined, onClick: () => navigate('/doctor/labs') },
+    { icon: ClipboardList, label: 'Write Prescription', color: 'purple', onClick: () => navigate('/doctor/prescriptions/new') },
+    { icon: TestTube, label: 'Order Lab Test', color: 'indigo', badge: (data?.criticalResults.length ?? 0) > 0 ? `${data?.criticalResults.length} critical` : undefined, onClick: () => navigate('/doctor/lab-orders/new') },
     { icon: Calendar, label: 'Block Time Off', color: 'slate', onClick: () => navigate('/doctor/schedule') },
     { icon: Send, label: 'Send Referral', color: 'teal', onClick: () => navigate('/doctor/messages') },
     { icon: FileText, label: 'Write Certificate', color: 'blue', onClick: () => navigate('/doctor/patients') },
@@ -339,7 +339,7 @@ export const DoctorDashboard: React.FC = () => {
             <div className="flex shrink-0 flex-col space-y-2">
               <button
                 type="button"
-                onClick={() => navigate('/doctor/labs')}
+                onClick={() => navigate('/doctor/lab-orders')}
                 className="whitespace-nowrap rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-700"
               >
                 🏥 View Lab Result
@@ -698,7 +698,7 @@ export const DoctorDashboard: React.FC = () => {
             )}
           </div>
           <div className="border-t border-slate-200 px-6 py-3">
-            <button type="button" onClick={() => navigate('/doctor/labs')} className="text-xs font-medium text-teal-600 hover:underline">
+            <button type="button" onClick={() => navigate('/doctor/lab-orders')} className="text-xs font-medium text-teal-600 hover:underline">
               View All Lab Results →
             </button>
           </div>
