@@ -92,6 +92,7 @@ export const DoctorAppointmentDetail: React.FC = () => {
   const [hasHydratedNote, setHasHydratedNote] = useState(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [savingNote, setSavingNote] = useState(false);
+  const [noteSaved, setNoteSaved] = useState(false);
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [updatingAppointment, setUpdatingAppointment] = useState(false);
   const [reviewingAssessment, setReviewingAssessment] = useState(false);
@@ -205,13 +206,9 @@ export const DoctorAppointmentDetail: React.FC = () => {
   };
 
   const saveConsultationNote = async () => {
-    if (!data || !user?.id) {
-      return;
-    }
-
+    if (!data || !user?.id) return;
     setFeedback(null);
     setSavingNote(true);
-
     const payload = {
       appointment_id: data.appointment.id,
       doctor_id: user.id,
@@ -222,20 +219,17 @@ export const DoctorAppointmentDetail: React.FC = () => {
       doctor_approved: noteDraft.doctorApproved,
       is_deleted: false,
     };
-
     const operation = data.consultationNote
       ? supabase.from('consultation_notes').update(payload).eq('id', data.consultationNote.id)
       : supabase.from('consultation_notes').insert(payload);
-
     const { error: noteError } = await operation;
-
     setSavingNote(false);
-
     if (noteError) {
       setFeedback({ type: 'error', message: noteError.message });
       return;
     }
-
+    setNoteSaved(true);
+    window.setTimeout(() => setNoteSaved(false), 3000);
     setFeedback({ type: 'success', message: t('doctor.appointmentDetail.noteSaved') });
     refetch();
   };
@@ -774,15 +768,25 @@ export const DoctorAppointmentDetail: React.FC = () => {
                   )}
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={saveConsultationNote}
-                disabled={savingNote}
-                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
-              >
-                {savingNote ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                <span>{savingNote ? t('doctor.appointmentDetail.saving') : t('doctor.appointmentDetail.saveNote')}</span>
-              </button>
+              <div className="flex items-center gap-3">
+                {noteSaved ? (
+                  <span className="flex items-center gap-1.5 text-sm font-semibold text-emerald-600">
+                    <CheckCircle2 className="h-4 w-4" />
+                    Saved!
+                  </span>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={saveConsultationNote}
+                  disabled={savingNote}
+                  className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition disabled:opacity-60 ${
+                    noteSaved ? 'bg-emerald-700' : 'bg-emerald-600 hover:bg-emerald-700'
+                  }`}
+                >
+                  {savingNote ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                  <span>{savingNote ? t('doctor.appointmentDetail.saving') : t('doctor.appointmentDetail.saveNote')}</span>
+                </button>
+              </div>
             </div>
 
             <div className="space-y-4">
