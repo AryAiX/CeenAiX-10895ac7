@@ -1057,7 +1057,9 @@ export const CreatePrescription: React.FC = () => {
     setSaving(false);
     setShowValidationErrors(false);
     setFeedback({ type: 'success', message: t('doctor.createPrescription.saveSuccess') });
-    navigate('/doctor/prescriptions');
+    window.setTimeout(() => {
+      navigate('/doctor/prescriptions');
+    }, 2000);
   };
 
   return (
