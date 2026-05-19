@@ -858,6 +858,7 @@ export const CreatePrescription: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const [showRenewModal, setShowRenewModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
   const selectedPatient = useMemo(
     () => patients.find((patient) => patient.id === patientId) ?? null,
     [patientId, patients]
@@ -1227,7 +1228,11 @@ export const CreatePrescription: React.FC = () => {
                   <RefreshCw className="h-4 w-4" />
                   <span>Renew Existing</span>
                 </button>
-                <button className="flex items-center space-x-2 rounded-lg bg-slate-100 px-4 py-2 text-[13px] font-medium text-slate-700 transition-colors hover:bg-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setShowHistoryModal(true)}
+                  className="flex items-center space-x-2 rounded-lg bg-slate-100 px-4 py-2 text-[13px] font-medium text-slate-700 transition-colors hover:bg-slate-200"
+                >
                   <ClipboardList className="h-4 w-4" />
                   <span>History</span>
                 </button>
@@ -1404,6 +1409,79 @@ export const CreatePrescription: React.FC = () => {
                     className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                   >
                     Cancel
+                  </button>
+                </div>
+              </div>
+            </div>,
+            document.body
+          )
+        : null}
+      {showHistoryModal
+        ? createPortal(
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+              onClick={() => setShowHistoryModal(false)}
+            >
+              <div
+                className="w-full max-w-lg rounded-2xl bg-white shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <ClipboardList className="h-5 w-5 text-emerald-600" />
+                    <h2 className="text-lg font-bold text-slate-900">Prescription History</h2>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowHistoryModal(false)}
+                    className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="max-h-[60vh] space-y-3 overflow-y-auto px-6 py-5">
+                  {activeMedications.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center text-sm text-slate-500">
+                      No prescription history found for this patient.
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-sm text-slate-600">Current active medications for this patient:</p>
+                      {activeMedications.map((medication) => (
+                        <div
+                          key={medication.id}
+                          className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4"
+                        >
+                          <Pill className="h-5 w-5 shrink-0 text-emerald-600" />
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-slate-900">{medication.medicationName}</p>
+                            <p className="text-xs text-slate-500">
+                              {[medication.dose, medication.frequency].filter(Boolean).join(' · ')}
+                            </p>
+                            <p className="mt-0.5 text-xs text-slate-400">{medication.prescriber}</p>
+                          </div>
+                          <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                            Active
+                          </span>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                </div>
+                <div className="flex gap-3 border-t border-slate-200 px-6 py-4">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/doctor/prescriptions')}
+                    className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                  >
+                    View All Prescriptions
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowHistoryModal(false)}
+                    className="flex-1 rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                  >
+                    Close
                   </button>
                 </div>
               </div>
