@@ -218,6 +218,54 @@ export const PharmacyInventory = () => {
 
   const lowOrCritical = counts.low + counts.critical;
 
+  const handleExportCSV = () => {
+    const headers = [
+      'Drug Name',
+      'Brand',
+      'Strength',
+      'Form',
+      'ATC Code',
+      'Category',
+      'Stock Qty',
+      'Unit',
+      'Reorder Level',
+      'Days Supply',
+      'Status',
+      'Controlled',
+      'DHA Formulary',
+      'Next Expiry',
+    ];
+
+    const csvRows = filtered.map((item) => [
+      item.genericName,
+      item.brandName,
+      item.strength,
+      item.form,
+      item.atcCode,
+      item.category,
+      item.stockQty,
+      item.unit,
+      item.reorderLevel,
+      item.daysSupply ?? '—',
+      stockConfig[item.stockStatus].label,
+      item.isControlled ? 'Yes' : 'No',
+      item.isDHAFormulary ? 'Yes' : 'No',
+      item.nextExpiry ?? '—',
+    ]);
+
+    const csvContent = [headers, ...csvRows]
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `inventory-report-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <OpsShell
       title={t('pharmacy.inventory.title')}
@@ -241,6 +289,7 @@ export const PharmacyInventory = () => {
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
+              onClick={handleExportCSV}
               className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50"
             >
               <Download className="h-4 w-4" />
