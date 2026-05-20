@@ -259,7 +259,7 @@ export const PharmacyReports = () => {
             {[
               ['Total dispensing records', totalPrescriptions],
               ['Submitted to DHA', `${data?.reportMetrics.dhaSubmittedCount ?? 0} ✅`],
-              ['Controlled substance records', data?.inventory.filter((item) => /warfarin/i.test(item.name)).length ?? 0],
+              ['Controlled substance records', data?.inventory.filter((item) => item.isControlled).length ?? 0],
               ['Last submitted', data?.reportMetrics.lastSubmittedLabel ?? 'No submissions'],
             ].map(([label, value]) => (
               <div key={label as string} className="rounded-xl bg-slate-50 p-3">
