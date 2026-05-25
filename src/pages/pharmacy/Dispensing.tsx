@@ -8,6 +8,7 @@ import { updatePharmacyDispensingTaskStatus, usePharmacyPrescriptionQueue } from
 import type { PharmacyQueuePrescriptionItem } from '../../hooks';
 import { FORM_FIELD_LIMITS } from '../../lib/form-field-limits';
 import { formatLocaleDigits } from '../../lib/i18n-ui';
+import { supabase } from '../../lib/supabase';
 import { PHARMACY_NAV_ITEMS } from './navItems';
 import { inferPrescriptionWorkflowStatus } from './prescription-status';
 
@@ -216,6 +217,35 @@ export const PharmacyDispensing = () => {
             ? 'dispensed'
             : 'on_hold';
       await Promise.all(row.taskIds.map((taskId) => updatePharmacyDispensingTaskStatus(taskId, workflowStatus)));
+
+      if (nextStatus === 'dispensed') {
+        const { data: task } = await supabase
+          .from('pharmacy_dispensing_tasks')
+          .select('prescription_id')
+          .eq('id', row.taskIds[0])
+          .limit(1)
+          .single();
+
+        if (task?.prescription_id) {
+          const { data: prescription } = await supabase
+            .from('prescriptions')
+            .select('patient_id')
+            .eq('id', task.prescription_id)
+            .limit(1)
+            .single();
+
+          if (prescription?.patient_id) {
+            await supabase.from('notifications').insert({
+              user_id: prescription.patient_id,
+              type: 'medication',
+              title: '💊 Your medication is ready for pickup!',
+              body: `Your prescription for ${row.drugs.join(', ')} is ready at ${data?.profile?.displayName ?? data?.organization?.name ?? 'the pharmacy'}. Please visit to collect your medication.`,
+              action_url: '/patient/prescriptions',
+            });
+          }
+        }
+      }
+
       refetch();
     } catch (error) {
       setActionError(
