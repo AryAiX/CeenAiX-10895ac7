@@ -35,6 +35,7 @@ export const PharmacyRevenue = () => {
   const uiLang = i18n.language ?? 'en';
   const { data, loading, error, refetch } = usePharmacyPrescriptionQueue();
   const [selectedClaimId, setSelectedClaimId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(8);
   const rows = useMemo<RevenuePrescription[]>(
     () =>
       (data?.claims ?? []).map((claim) => ({
@@ -221,7 +222,7 @@ export const PharmacyRevenue = () => {
               </div>
             </div>
             <div className="divide-y divide-slate-100">
-              {rows.slice(0, 8).map((row) => (
+              {rows.slice(0, visibleCount).map((row) => (
                 <div key={row.id} className="grid grid-cols-[minmax(0,1fr)_100px_90px_90px] items-center gap-3 px-5 py-3">
                   <div className="min-w-0">
                     <div className="truncate text-sm font-semibold text-slate-800">{row.patientName}</div>
@@ -251,6 +252,17 @@ export const PharmacyRevenue = () => {
                 </div>
               ))}
             </div>
+            {rows.length > visibleCount ? (
+              <div className="border-t border-slate-100 px-5 py-3 text-center">
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount((current) => current + 8)}
+                  className="rounded-lg bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-200"
+                >
+                  Show More ({rows.length - visibleCount} remaining)
+                </button>
+              </div>
+            ) : null}
             {selectedClaim ? (
               <div className="border-t border-slate-100 bg-slate-50 px-5 py-4 text-sm text-slate-700">
                 <p className="font-semibold text-slate-900">{selectedClaim.patientName}</p>
