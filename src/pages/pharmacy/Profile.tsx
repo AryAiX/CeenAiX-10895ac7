@@ -47,7 +47,7 @@ export const PharmacyProfile = () => {
     >
       <PortalQueryBanner error={error} onRetry={() => void refetch()} />
       <div className="min-h-full bg-slate-50 p-6">
-        <div className="max-w-4xl">
+        <div className="w-full">
           <h2 className="mb-5 text-[20px] font-bold text-slate-900">
             {t('pharmacy.profile.title', { defaultValue: 'My Pharmacy' })}
           </h2>
