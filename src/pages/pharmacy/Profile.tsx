@@ -122,11 +122,20 @@ export const PharmacyProfile = () => {
           </section>
 
           <section className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_0.8fr]">
-            <article className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
-              <h4 className="mb-4 text-[15px] font-bold text-slate-800">
-                {t('pharmacy.profile.staffHeading', { defaultValue: 'Staff' })}
-              </h4>
-              {(data?.staff ?? []).map((staff) => (
+<article className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
+          <h4 className="mb-4 text-[15px] font-bold text-slate-800">
+            {t('pharmacy.profile.staffHeading', { defaultValue: 'Staff' })}
+          </h4>
+          {(data?.staff ?? []).length === 0 ? (
+            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 py-8 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+                <UserRound className="h-6 w-6 text-slate-400" />
+              </div>
+              <p className="mt-3 text-sm font-semibold text-slate-600">No staff members found</p>
+              <p className="mt-1 text-xs text-slate-400">Staff will appear here once added by an admin</p>
+            </div>
+          ) : null}
+          {(data?.staff ?? []).map((staff) => (
                 <div key={staff.id} className="flex items-center gap-3 border-b border-slate-100 py-3 last:border-0">
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-sm font-bold text-emerald-700">
                     {staff.fullName
