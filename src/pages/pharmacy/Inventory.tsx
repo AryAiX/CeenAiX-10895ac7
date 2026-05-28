@@ -8,6 +8,7 @@ import {
   Plus,
   Search,
   ShoppingCart,
+  X,
 } from 'lucide-react';
 import { PortalQueryBanner } from '../../components/PortalQueryBanner';
 import { OpsShell } from '../../components/OpsShell';
@@ -347,8 +348,18 @@ export const PharmacyInventory = () => {
               placeholder={t('pharmacy.inventory.searchPh', {
                 defaultValue: 'Drug name, brand, ATC code, category...',
               })}
-              className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-4 text-sm text-slate-700 transition-colors focus:border-emerald-400 focus:outline-none"
+              className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-9 text-sm text-slate-700 transition-colors focus:border-emerald-400 focus:outline-none"
             />
+            {search ? (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                aria-label="Clear search"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            ) : null}
           </div>
           <div className="flex flex-wrap items-center gap-1.5">
             {(Object.keys(filterLabels) as FilterType[]).map((key) => (
