@@ -5,6 +5,7 @@ import { OpsShell } from '../../components/OpsShell';
 import { usePharmacyPrescriptionQueue } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
 import { formatLocaleDigits } from '../../lib/i18n-ui';
+import { Link } from 'react-router-dom';
 import { PHARMACY_NAV_ITEMS } from './navItems';
 
 export const PharmacyProfile = () => {
@@ -20,15 +21,16 @@ export const PharmacyProfile = () => {
     user?.email?.split('@')[0] ||
     fallbackName;
   const pharmacyName = data?.profile?.displayName ?? data?.organization?.name ?? fallbackName;
-  const operationRows: Array<[string, string | number, LucideIcon]> = [
-    [t('pharmacy.profile.opPending', { defaultValue: 'Pending prescriptions' }), formatLocaleDigits(data?.pendingPrescriptions ?? 0, uiLang), UserRound],
-    [t('pharmacy.profile.opAlerts', { defaultValue: 'Inventory alerts' }), formatLocaleDigits(data?.lowStockAlerts ?? 0, uiLang), ShieldCheck],
+  const operationRows: Array<[string, string | number, LucideIcon, string]> = [
+    [t('pharmacy.profile.opPending', { defaultValue: 'Pending prescriptions' }), formatLocaleDigits(data?.pendingPrescriptions ?? 0, uiLang), UserRound, '/pharmacy/dispensing'],
+    [t('pharmacy.profile.opAlerts', { defaultValue: 'Inventory alerts' }), formatLocaleDigits(data?.lowStockAlerts ?? 0, uiLang), ShieldCheck, '/pharmacy/inventory'],
     [
       t('pharmacy.profile.opDhaSync', { defaultValue: 'DHA sync' }),
       data?.profile?.dhaConnected
         ? t('pharmacy.profile.ready', { defaultValue: 'Ready' })
         : t('pharmacy.profile.needsSetup', { defaultValue: 'Needs setup' }),
       ShieldCheck,
+      '/pharmacy/reports',
     ],
   ];
 
@@ -185,14 +187,14 @@ export const PharmacyProfile = () => {
                 </div>
               </div>
               <div className="space-y-3">
-                {operationRows.map(([label, value, Icon]) => (
-                  <div key={label as string} className="flex items-center justify-between rounded-xl bg-slate-50 p-3">
+                {operationRows.map(([label, value, Icon, route]) => (
+                  <Link key={label as string} to={route as string} className="flex items-center justify-between rounded-xl bg-slate-50 p-3 transition hover:ring-2 hover:ring-emerald-300">
                     <div className="flex items-center gap-2 text-sm font-medium text-slate-600">
                       <Icon className="h-4 w-4 text-emerald-600" />
                       {label as string}
                     </div>
                     <div className="font-mono text-sm font-bold text-slate-800">{value as string | number}</div>
-                  </div>
+                  </Link>
                 ))}
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
