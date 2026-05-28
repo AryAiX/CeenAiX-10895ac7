@@ -236,7 +236,7 @@ export const PharmacyDispensing = () => {
     }
   };
 
-  const handleOnHold = async (row: PrescriptionListRow, _reason: string, _note: string) => {
+  const handleOnHold = async (row: PrescriptionListRow) => {
     setActionError(null);
     setBusyId(row.id);
     try {
@@ -655,7 +655,7 @@ export const PharmacyDispensing = () => {
               <button
                 type="button"
                 disabled={!holdReason || busyId === holdModalRow.id}
-                onClick={() => void handleOnHold(holdModalRow, holdReason, holdNote)}
+                onClick={() => void handleOnHold(holdModalRow)}
                 className="flex-1 rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {busyId === holdModalRow.id ? 'Saving...' : 'Confirm Hold'}
