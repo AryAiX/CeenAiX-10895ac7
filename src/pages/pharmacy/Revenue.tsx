@@ -237,7 +237,9 @@ export const PharmacyRevenue = () => {
                         ? 'bg-emerald-50 text-emerald-700'
                         : row.status === 'review'
                           ? 'bg-amber-50 text-amber-700'
-                          : 'bg-blue-50 text-blue-700'
+                          : row.status === 'denied'
+                            ? 'bg-red-50 text-red-700'
+                            : 'bg-blue-50 text-blue-700'
                     }`}
                   >
                     {t(`pharmacy.revenue.status.${row.status}`, { defaultValue: row.status })}
