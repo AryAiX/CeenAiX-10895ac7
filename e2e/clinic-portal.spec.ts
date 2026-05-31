@@ -1,6 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
 import {
-  e2eClinicFacilityId,
   e2eClinicStaffId,
   e2eUsers,
   installSupabaseMocks,
