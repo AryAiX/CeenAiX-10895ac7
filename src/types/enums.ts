@@ -88,3 +88,24 @@ export type PatientCanonicalUpdateStrategy =
   | 'patient_reported_medications_replace';
 
 export type PatientReportedMedicationReviewStatus = 'pending_review' | 'reviewed';
+
+export type ConsultationRecordingStatus =
+  | 'recording'
+  | 'processing'
+  | 'ready'
+  | 'approved'
+  | 'discarded';
+
+export type ConsultationConsentMethod = 'verbal' | 'signed';
+
+export type TranscriptSpeaker = 'doctor' | 'patient' | 'unknown';
+
+export type SmartSuggestionKind = 'lab_order' | 'medication' | 'allergy' | 'referral' | 'follow_up';
+
+export type ClinicalNotePromptTemplate =
+  | 'general'
+  | 'pediatric'
+  | 'cardiology'
+  | 'brief';
+
+export type ClinicalNoteOutputLanguage = 'en' | 'ar';
