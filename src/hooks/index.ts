@@ -20,6 +20,18 @@ export { useDoctorPortalChrome } from './use-doctor-portal-chrome';
 export { useDoctorPatients } from './use-doctor-patients';
 export { useDoctorPatientDetail } from './use-doctor-patient-detail';
 export { useDoctorAppointmentDetail } from './use-doctor-appointment-detail';
+export { useAudioRecorder } from './use-audio-recorder';
+export type {
+  AudioRecorderStatus,
+  AudioInputDevice,
+  UseAudioRecorderResult,
+} from './use-audio-recorder';
+export { useConsultationScribe } from './use-consultation-scribe';
+export type {
+  ConsultationScribeData,
+  ConsultationScribeActions,
+  CreateRecordingInput,
+} from './use-consultation-scribe';
 export { useDoctorPrescriptions } from './use-doctor-prescriptions';
 export { useDoctorLabOrders } from './use-doctor-lab-orders';
 export { useDoctorNotifications } from './use-doctor-notifications';

@@ -26,6 +26,12 @@ import type {
   PatientCanonicalUpdateStatus,
   PatientCanonicalUpdateStrategy,
   PatientReportedMedicationReviewStatus,
+  ConsultationRecordingStatus,
+  ConsultationConsentMethod,
+  TranscriptSpeaker,
+  ClinicalNotePromptTemplate,
+  ClinicalNoteOutputLanguage,
+  SmartSuggestionKind,
 } from './enums';
 
 /** Base fields present on most tables */
@@ -1006,4 +1012,112 @@ export interface AdminAiDashboardPayload {
   languages: AdminAiBreakdownRow[];
   topics: AdminAiBreakdownRow[];
   portals: AdminAiBreakdownRow[];
+}
+
+// ---------------------------------------------------------------------------
+// AI Consultation Recording (Phase 2)
+// ---------------------------------------------------------------------------
+
+export interface ConsultationRecording extends BaseRecord, SoftDeletable {
+  appointment_id: string;
+  doctor_id: string;
+  patient_id: string;
+  clinic_id: string | null;
+  audio_storage_path: string | null;
+  audio_mime_type: string | null;
+  duration_seconds: number;
+  language_detected: string | null;
+  status: ConsultationRecordingStatus;
+  started_at: string;
+  ended_at: string | null;
+}
+
+export interface TranscriptSegment {
+  speaker: TranscriptSpeaker;
+  start_ms: number;
+  end_ms: number;
+  text: string;
+  confidence: number;
+}
+
+export interface ConsultationTranscript extends BaseRecord {
+  recording_id: string;
+  full_text: string | null;
+  segments: TranscriptSegment[];
+  language: string | null;
+  model_used: string | null;
+}
+
+export interface ClinicalNoteMedication {
+  name: string;
+  dosage: string | null;
+  frequency: string | null;
+  notes: string | null;
+}
+
+export interface ClinicalNoteDiagnosis {
+  description: string;
+  icd10_code: string | null;
+}
+
+export interface ClinicalNoteFollowUp {
+  action: string;
+  category: 'lab_order' | 'referral' | 'appointment' | 'other';
+}
+
+export interface AiClinicalNote extends BaseRecord, SoftDeletable {
+  recording_id: string;
+  appointment_id: string;
+  doctor_id: string;
+  patient_id: string;
+  chief_complaint: string | null;
+  soap_subjective: string | null;
+  soap_objective: string | null;
+  soap_assessment: string | null;
+  soap_plan: string | null;
+  symptoms: string[];
+  medications: ClinicalNoteMedication[];
+  diagnoses: ClinicalNoteDiagnosis[];
+  follow_up: ClinicalNoteFollowUp[];
+  education_points: string[];
+  output_language: ClinicalNoteOutputLanguage;
+  model_used: string | null;
+  prompt_template: ClinicalNotePromptTemplate;
+  custom_instructions: string | null;
+  generated_at: string;
+  approved_by: string | null;
+  approved_at: string | null;
+}
+
+export interface ConsultationConsentLog {
+  id: string;
+  appointment_id: string;
+  recording_id: string | null;
+  doctor_id: string;
+  patient_id: string;
+  consent_method: ConsultationConsentMethod;
+  informed_patient: boolean;
+  verbal_consent: boolean;
+  signature_image_url: string | null;
+  consented_at: string;
+  created_at: string;
+}
+
+export interface ConsultationRecordingAuditEntry {
+  id: string;
+  recording_id: string | null;
+  appointment_id: string | null;
+  actor_id: string;
+  action: string;
+  metadata: Record<string, unknown>;
+  ip_address: string | null;
+  occurred_at: string;
+}
+
+export interface SmartSuggestion {
+  id: string;
+  kind: SmartSuggestionKind;
+  label: string;
+  detail: string | null;
+  value: Record<string, unknown>;
 }
