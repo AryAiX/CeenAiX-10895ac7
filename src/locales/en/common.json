@@ -1010,6 +1010,11 @@
       "successSaved": "Onboarding saved. Redirecting to your dashboard..."
     }
   },
+  "doctorProfile": {
+    "clinicManagedBadge": "Clinic managed",
+    "clinicManagedTitle": "Pricing & services",
+    "clinicManagedHint": "Your consultation fees are managed by {{clinic}}. Contact them to request changes."
+  },
   "accountSecurity": {
     "title": "Account Security",
     "subtitle": "Update your password or remove a test account that has no retained care data.",

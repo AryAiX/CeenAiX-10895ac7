@@ -80,8 +80,31 @@ export const useClinicPortalActions = () => {
     [],
   );
 
+  const logPricingFieldChange = useCallback(
+    async (
+      facilityId: string,
+      staffId: string,
+      fieldName: string,
+      oldValue: unknown,
+      newValue: unknown,
+    ) => {
+      if (oldValue === newValue) return;
+      const { error } = await supabase.rpc('log_clinic_pricing_change', {
+        p_facility_id: facilityId,
+        p_entity_type: 'facility_staff',
+        p_entity_id: staffId,
+        p_field_name: fieldName,
+        p_old_value: oldValue ?? null,
+        p_new_value: newValue ?? null,
+      });
+      if (error) throw error;
+    },
+    [],
+  );
+
   const updateStaffPricing = useCallback(
     async (
+      facilityId: string,
       staffId: string,
       patch: {
         consultation_fee?: number;
@@ -90,11 +113,25 @@ export const useClinicPortalActions = () => {
         invitation_status?: string;
         is_available?: boolean;
       },
+      previous?: {
+        consultation_fee?: number | null;
+        telemedicine_fee?: number | null;
+        follow_up_fee?: number | null;
+      },
     ) => {
       const { error } = await supabase.from('facility_staff').update(patch).eq('id', staffId);
       if (error) throw error;
+
+      const pricingFields = ['consultation_fee', 'telemedicine_fee', 'follow_up_fee'] as const;
+      await Promise.all(
+        pricingFields
+          .filter((field) => patch[field] !== undefined)
+          .map((field) =>
+            logPricingFieldChange(facilityId, staffId, field, previous?.[field] ?? null, patch[field] ?? null),
+          ),
+      );
     },
-    [],
+    [logPricingFieldChange],
   );
 
   const updateAppointmentStatus = useCallback(async (appointmentId: string, status: string, notes?: string) => {

@@ -40,11 +40,23 @@ export const ClinicDoctorDetail = () => {
     setSaving(true);
     setMessage(null);
     try {
-      await actions.updateStaffPricing(doctor.staff_id, {
-        consultation_fee: fees.consultation,
-        telemedicine_fee: fees.telemedicine,
-        follow_up_fee: fees.follow_up,
-      });
+      if (!data?.facility?.id) {
+        throw new Error(t('clinic.errors.generic'));
+      }
+      await actions.updateStaffPricing(
+        data.facility.id,
+        doctor.staff_id,
+        {
+          consultation_fee: fees.consultation,
+          telemedicine_fee: fees.telemedicine,
+          follow_up_fee: fees.follow_up,
+        },
+        {
+          consultation_fee: doctor.consultation_fee ?? doctor.profile_consultation_fee,
+          telemedicine_fee: doctor.telemedicine_fee,
+          follow_up_fee: doctor.follow_up_fee,
+        },
+      );
       setMessage(t('clinic.doctors.pricingSaved'));
       await refetch();
     } catch (err) {

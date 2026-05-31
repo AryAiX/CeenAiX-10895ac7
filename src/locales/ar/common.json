@@ -1010,6 +1010,11 @@
       "successSaved": "تم حفظ الإعداد. جاري التوجيه إلى لوحة التحكم..."
     }
   },
+  "doctorProfile": {
+    "clinicManagedBadge": "تديرها العيادة",
+    "clinicManagedTitle": "التسعير والخدمات",
+    "clinicManagedHint": "رسوم الاستشارة الخاصة بك تديرها {{clinic}}. تواصل معهم لطلب أي تغيير."
+  },
   "accountSecurity": {
     "title": "أمان الحساب",
     "subtitle": "حدّث كلمة المرور أو احذف حساب تجريبي لا يحتفظ ببيانات رعاية.",
