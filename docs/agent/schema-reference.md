@@ -181,6 +181,39 @@ appointment_pre_visit_summaries
   - generated_by, generated_at
 ```
 
+### AI Consultation Recording (Phase 2 — implemented)
+
+> Doctor Portal AI Scribe. Audio is captured in the Consultation Workspace, transcribed (Whisper), and turned into a reviewable SOAP note (GPT-4o) via the `consultation-scribe` Edge Function. Consent and every recording event are logged immutably. Audio lives in the private `consultation-audio` Storage bucket (signed URLs only).
+
+```
+consultation_recordings
+  - id (PK), appointment_id (FK), doctor_id (FK), patient_id (FK), clinic_id (nullable, mirrors appointments.facility_id)
+  - audio_storage_path, audio_mime_type, duration_seconds, language_detected
+  - status (enum: recording/processing/ready/approved/discarded)
+  - started_at, ended_at, is_deleted, deleted_at
+
+consultation_transcripts
+  - id (PK), recording_id (FK), full_text
+  - segments (JSONB array of {speaker, start_ms, end_ms, text, confidence}), language, model_used
+
+ai_clinical_notes
+  - id (PK), recording_id (FK), appointment_id (FK), doctor_id (FK), patient_id (FK)
+  - chief_complaint, soap_subjective, soap_objective, soap_assessment, soap_plan
+  - symptoms/medications/diagnoses/follow_up/education_points (JSONB)
+  - output_language, model_used, prompt_template, custom_instructions
+  - generated_at, approved_by, approved_at, is_deleted, deleted_at
+
+consultation_consent_log  (append-only)
+  - id (PK), appointment_id (FK), recording_id (FK, nullable), doctor_id, patient_id
+  - consent_method (enum: verbal/signed), informed_patient, verbal_consent, signature_image_url, consented_at
+
+consultation_recordings_audit  (append-only)
+  - id (PK), recording_id (FK, nullable), appointment_id (FK, nullable), actor_id
+  - action (started/stopped/discarded/transcribed/note_generated/note_approved/...), metadata (JSONB), ip_address, occurred_at
+```
+
+RLS: treating doctor manages rows where `doctor_id = auth.uid()`; patient can read their own; `super_admin` can read. Consent + audit tables are insert/select only. Storage objects are namespaced `{doctor_id}/{appointment_id}/{file}` with matching policies.
+
 ## Canonical Record Update Notes
 
 - Canonical demographic/profile updates are staged in `patient_canonical_update_requests` first, then applied only after patient confirmation.
