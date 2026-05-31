@@ -278,14 +278,15 @@ export const PatientPrescriptions: React.FC = () => {
     setPharmacyModalPrescriptionId(prescriptionId);
     setLoadingPharmacies(true);
     try {
-      const { data, error } = await supabase
-        .from('organizations')
-        .select('id, name, city')
-        .eq('kind', 'pharmacy')
-        .eq('status', 'active')
-        .order('name', { ascending: true });
+      const { data, error } = await supabase.rpc('list_active_pharmacies');
       if (!error && data) {
-        setPharmacyList(data);
+        setPharmacyList(
+          data.map((row: { id: string; name: string; city: string | null }) => ({
+            id: row.id,
+            name: row.name,
+            city: row.city ?? '',
+          }))
+        );
       }
     } finally {
       setLoadingPharmacies(false);
@@ -296,10 +297,10 @@ export const PatientPrescriptions: React.FC = () => {
     if (!pharmacyModalPrescriptionId) return;
     setSendingToPharmacy(true);
     try {
-      const { error } = await supabase
-        .from('prescriptions')
-        .update({ pharmacy_organization_id: pharmacyId })
-        .match({ id: pharmacyModalPrescriptionId, patient_id: user?.id });
+      const { error } = await supabase.rpc('assign_prescription_pharmacy', {
+        p_prescription_id: pharmacyModalPrescriptionId,
+        p_pharmacy_organization_id: pharmacyId,
+      });
       if (!error) {
         setPharmacySentId(pharmacyModalPrescriptionId);
         setPharmacyModalPrescriptionId(null);
@@ -308,6 +309,46 @@ export const PatientPrescriptions: React.FC = () => {
     } finally {
       setSendingToPharmacy(false);
     }
+  };
+
+  const pharmacyStatusCopy = (
+    status: PatientPrescriptionRecord['pharmacyStatus'],
+    justSent: boolean
+  ): { title: string; body: string } => {
+    if (status === 'dispensed') {
+      return {
+        title: t('patient.prescriptions.pharmacyStatusDispensedTitle'),
+        body: t('patient.prescriptions.pharmacyStatusDispensedBody'),
+      };
+    }
+    if (status === 'in_progress') {
+      return {
+        title: t('patient.prescriptions.pharmacyStatusInProgressTitle'),
+        body: t('patient.prescriptions.pharmacyStatusInProgressBody'),
+      };
+    }
+    if (status === 'on_hold') {
+      return {
+        title: t('patient.prescriptions.pharmacyStatusOnHoldTitle'),
+        body: t('patient.prescriptions.pharmacyStatusOnHoldBody'),
+      };
+    }
+    if (status === 'cancelled') {
+      return {
+        title: t('patient.prescriptions.pharmacyStatusCancelledTitle'),
+        body: t('patient.prescriptions.pharmacyStatusCancelledBody'),
+      };
+    }
+    if (status === 'new' || justSent) {
+      return {
+        title: t('patient.prescriptions.pharmacyStatusNewTitle'),
+        body: t('patient.prescriptions.pharmacyStatusNewBody'),
+      };
+    }
+    return {
+      title: t('patient.prescriptions.pharmacyFollowUpTitle'),
+      body: t('patient.prescriptions.pharmacyFollowUpBody'),
+    };
   };
 
   const activePlanCount = activePrescriptions.length;
@@ -1280,32 +1321,23 @@ export const PatientPrescriptions: React.FC = () => {
                 <div className="mb-1.5 flex items-start gap-2">
                   <div className="text-sm" aria-hidden>🏪</div>
                   <div className="flex-1">
-                    <div className="text-xs font-medium text-slate-600">
-                      {rx.pharmacyStatus === 'dispensed'
-                        ? '💊 Ready for Pickup!'
-                        : rx.pharmacyStatus === 'in_progress'
-                          ? '⚙️ Pharmacy is preparing your medication'
-                          : rx.pharmacyStatus === 'on_hold'
-                            ? '⚠️ Pharmacy has a question about your prescription'
-                            : rx.pharmacyStatus === 'cancelled'
-                              ? '❌ Prescription cancelled — contact your doctor'
-                              : rx.pharmacyStatus === 'new' || pharmacySentId === rx.id
-                                ? '✅ Prescription received by pharmacy — being reviewed'
-                                : t('patient.prescriptions.pharmacyFollowUpTitle')}
-                    </div>
-                    <div className="text-[11px] text-slate-400">
-                      {rx.pharmacyStatus === 'dispensed'
-                        ? 'Your medication is ready. Please visit the pharmacy to collect it.'
-                        : rx.pharmacyStatus === 'in_progress'
-                          ? 'The pharmacist is currently preparing your medication.'
-                          : rx.pharmacyStatus === 'on_hold'
-                            ? 'The pharmacy may contact you or your doctor for clarification.'
-                            : rx.pharmacyStatus === 'cancelled'
-                              ? 'This prescription was cancelled by the pharmacy.'
-                              : rx.pharmacyStatus === 'new' || pharmacySentId === rx.id
-                                ? 'The pharmacist will verify your prescription and check stock availability.'
-                                : t('patient.prescriptions.pharmacyFollowUpBody')}
-                    </div>
+                    {(() => {
+                      const copy = pharmacyStatusCopy(
+                        rx.pharmacyStatus,
+                        pharmacySentId === rx.id
+                      );
+                      return (
+                        <>
+                          <div className="text-xs font-medium text-slate-600">{copy.title}</div>
+                          <div className="text-[11px] text-slate-400">{copy.body}</div>
+                          {rx.pharmacyName ? (
+                            <div className="mt-1 text-[11px] font-medium text-teal-700">
+                              {t('patient.prescriptions.pharmacyAtName', { name: rx.pharmacyName })}
+                            </div>
+                          ) : null}
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
                 {rx.pharmacyStatus === 'not_sent' && pharmacySentId !== rx.id ? (
@@ -1314,7 +1346,7 @@ export const PatientPrescriptions: React.FC = () => {
                     onClick={() => void handleOpenPharmacyModal(rx.id)}
                     className="mt-2 w-full rounded-lg bg-teal-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-teal-700"
                   >
-                    🏪 Send to Pharmacy
+                    {t('patient.prescriptions.sendToPharmacy')}
                   </button>
                 ) : null}
               </div>
@@ -1669,8 +1701,8 @@ export const PatientPrescriptions: React.FC = () => {
               <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
                 <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
                   <div>
-                    <h2 className="text-base font-semibold text-slate-900">Select a Pharmacy</h2>
-                    <p className="mt-0.5 text-xs text-slate-500">Choose where to send your prescription</p>
+                    <h2 className="text-base font-semibold text-slate-900">{t('patient.prescriptions.pharmacyAssignTitle')}</h2>
+                    <p className="mt-0.5 text-xs text-slate-500">{t('patient.prescriptions.pharmacyAssignSubtitle')}</p>
                   </div>
                   <button
                     type="button"
@@ -1682,9 +1714,9 @@ export const PatientPrescriptions: React.FC = () => {
                 </div>
                 <div className="divide-y divide-slate-100 px-4 py-3">
                   {loadingPharmacies ? (
-                    <div className="py-8 text-center text-sm text-slate-400">Loading pharmacies...</div>
+                    <div className="py-8 text-center text-sm text-slate-400">{t('patient.prescriptions.pharmacyAssignLoading')}</div>
                   ) : pharmacyList.length === 0 ? (
-                    <div className="py-8 text-center text-sm text-slate-400">No pharmacies available</div>
+                    <div className="py-8 text-center text-sm text-slate-400">{t('patient.prescriptions.pharmacyAssignEmpty')}</div>
                   ) : (
                     pharmacyList.map((pharmacy) => (
                       <button
@@ -1702,7 +1734,9 @@ export const PatientPrescriptions: React.FC = () => {
                           </div>
                         </div>
                         <span className="rounded-lg bg-teal-600 px-3 py-1.5 text-xs font-semibold text-white">
-                          {sendingToPharmacy ? 'Sending...' : 'Select'}
+                          {sendingToPharmacy
+                            ? t('patient.prescriptions.pharmacyAssignSending')
+                            : t('patient.prescriptions.pharmacyAssignSelect')}
                         </span>
                       </button>
                     ))
@@ -1714,7 +1748,7 @@ export const PatientPrescriptions: React.FC = () => {
                     onClick={() => setPharmacyModalPrescriptionId(null)}
                     className="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                   >
-                    Cancel
+                    {t('patient.prescriptions.pharmacyAssignCancel')}
                   </button>
                 </div>
               </div>
