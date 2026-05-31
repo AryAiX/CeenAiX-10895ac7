@@ -21,7 +21,12 @@ import {
 } from 'lucide-react';
 import { AccountSecurityPanel } from '../../components/AccountSecurityPanel';
 import { SpecializationMultiSelect } from '../../components/SpecializationMultiSelect';
-import { useDoctorPreVisitTemplates, useDoctorSpecializationIds, useSpecializations } from '../../hooks';
+import {
+  useDoctorClinicMembership,
+  useDoctorPreVisitTemplates,
+  useDoctorSpecializationIds,
+  useSpecializations,
+} from '../../hooks';
 import { dateTimeFormatWithNumerals, resolveLocale } from '../../lib/i18n-ui';
 import { useAuth } from '../../lib/auth-context';
 import { extractPreVisitQuestionnaire, uploadPreVisitTemplateSource } from '../../lib/ai';
@@ -109,10 +114,11 @@ const createEmptyTemplateDraft = (): PreVisitTemplateEditorState => ({
 });
 
 export const DoctorProfile: React.FC = () => {
-  const { i18n } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const locale = resolveLocale(i18n.language);
   const dtOpts = (options: Intl.DateTimeFormatOptions) => dateTimeFormatWithNumerals(i18n.language, options);
   const { doctorProfile, isLoading, profile, refreshProfile, user } = useAuth();
+  const { data: clinicMembership } = useDoctorClinicMembership(user?.id);
   const isPhoneManagedByOtp = Boolean(user?.phone && !user?.email);
   const templateFileInputRef = useRef<HTMLInputElement | null>(null);
   const {
@@ -690,6 +696,63 @@ export const DoctorProfile: React.FC = () => {
               {successMessage ? (
                 <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
                   {successMessage}
+                </div>
+              ) : null}
+
+              {clinicMembership ? (
+                <div className="mb-6 rounded-2xl border border-teal-200 bg-teal-50/70 p-5">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wide text-teal-700">
+                        {t('doctorProfile.clinicManagedBadge')}
+                      </p>
+                      <h3 className="mt-1 text-lg font-semibold text-slate-900">
+                        {t('doctorProfile.clinicManagedTitle')}
+                      </h3>
+                      <p className="mt-1 text-sm text-slate-600">
+                        {t('doctorProfile.clinicManagedHint', {
+                          clinic:
+                            clinicMembership.facilities?.name_en ??
+                            clinicMembership.facilities?.name ??
+                            t('clinic.facilityFallback'),
+                        })}
+                      </p>
+                    </div>
+                    {(clinicMembership.facilities?.phone || clinicMembership.facilities?.email) && (
+                      <div className="text-sm text-slate-600">
+                        {clinicMembership.facilities?.phone ? (
+                          <p>{clinicMembership.facilities.phone}</p>
+                        ) : null}
+                        {clinicMembership.facilities?.email ? (
+                          <p>{clinicMembership.facilities.email}</p>
+                        ) : null}
+                      </div>
+                    )}
+                  </div>
+                  <dl className="mt-4 grid gap-4 sm:grid-cols-3">
+                    <div>
+                      <dt className="text-sm font-medium text-slate-500">{t('clinic.doctors.fieldConsultFee')}</dt>
+                      <dd className="mt-1 font-mono text-base text-slate-900">
+                        {clinicMembership.consultation_fee != null
+                          ? `AED ${clinicMembership.consultation_fee}`
+                          : '—'}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-slate-500">{t('clinic.doctors.fieldTeleFee')}</dt>
+                      <dd className="mt-1 font-mono text-base text-slate-900">
+                        {clinicMembership.telemedicine_fee != null
+                          ? `AED ${clinicMembership.telemedicine_fee}`
+                          : '—'}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-medium text-slate-500">{t('clinic.doctors.fieldFollowUpFee')}</dt>
+                      <dd className="mt-1 font-mono text-base text-slate-900">
+                        {clinicMembership.follow_up_fee != null ? `AED ${clinicMembership.follow_up_fee}` : '—'}
+                      </dd>
+                    </div>
+                  </dl>
                 </div>
               ) : null}
 
