@@ -11,6 +11,8 @@ import { supabase } from '../../lib/supabase';
 import { formatLocaleDigits } from '../../lib/i18n-ui';
 import { PHARMACY_NAV_ITEMS } from './navItems';
 
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
 export const PharmacyProfile = () => {
   const { t, i18n } = useTranslation('common');
   const uiLang = i18n.language ?? 'en';
@@ -24,6 +26,10 @@ export const PharmacyProfile = () => {
     user?.email?.split('@')[0] ||
     fallbackName;
   const pharmacyName = data?.profile?.displayName ?? data?.organization?.name ?? fallbackName;
+
+  const [workingHours, setWorkingHours] = useState<Record<string, { open: string; close: string; closed: boolean }>>(() =>
+    Object.fromEntries(DAYS.map((day) => [day, { open: '08:00', close: '22:00', closed: false }]))
+  );
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editSaving, setEditSaving] = useState(false);
@@ -71,6 +77,11 @@ export const PharmacyProfile = () => {
       dha_connected: data?.profile?.dhaConnected ?? false,
       nabidh_connected: data?.profile?.nabidhConnected ?? false,
     });
+    if (data?.profile?.workingHoursJson) {
+      setWorkingHours(data.profile.workingHoursJson as Record<string, { open: string; close: string; closed: boolean }>);
+    } else {
+      setWorkingHours(Object.fromEntries(DAYS.map((day) => [day, { open: '08:00', close: '22:00', closed: false }])));
+    }
     setEditError(null);
     setEditSuccess(false);
     setEditModalOpen(true);
@@ -95,6 +106,7 @@ export const PharmacyProfile = () => {
           emergency_contact: editForm.emergency_contact || null,
           dha_connected: editForm.dha_connected,
           nabidh_connected: editForm.nabidh_connected,
+          working_hours_json: workingHours,
         })
         .eq('organization_id', data?.organization?.id);
       if (error) throw error;
@@ -262,7 +274,9 @@ export const PharmacyProfile = () => {
                 ],
                 [
                   t('pharmacy.profile.fieldHours', { defaultValue: 'Operating Hours' }),
-                  data?.profile?.operatingHours ?? pendingLabel,
+                  data?.profile?.workingHoursJson
+                    ? `${Object.values(data.profile.workingHoursJson as Record<string, { closed: boolean }>).filter((d) => !d.closed).length} days/week`
+                    : data?.profile?.operatingHours ?? pendingLabel,
                 ],
                 [
                   t('pharmacy.profile.fieldPicName', { defaultValue: 'Pharmacist-in-Charge' }),
@@ -441,7 +455,51 @@ export const PharmacyProfile = () => {
                 { label: 'DHA License Number', key: 'license_number', type: 'text', placeholder: 'DHA-PHARM-2019-003481' },
                 { label: 'License Valid Until', key: 'license_valid_until', type: 'date', placeholder: '' },
                 { label: 'Address', key: 'address', type: 'text', placeholder: 'Al Barsha 1, Dubai, UAE' },
-                { label: 'Operating Hours', key: 'operating_hours', type: 'text', placeholder: '8 AM - 10 PM (Sun-Sat)' },
+              ].map((field) => (
+                <div key={field.key}>
+                  <label className="mb-1 block text-xs font-semibold text-slate-600">{field.label}</label>
+                  <input
+                    type={field.type}
+                    value={editForm[field.key as keyof typeof editForm] as string}
+                    onChange={(e) => setEditForm((prev) => ({ ...prev, [field.key]: e.target.value }))}
+                    placeholder={field.placeholder}
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-emerald-400 focus:outline-none"
+                  />
+                </div>
+              ))}
+              <div>
+                <label className="mb-2 block text-xs font-semibold text-slate-600">Working Hours</label>
+                <div className="space-y-2">
+                  {DAYS.map((day) => (
+                    <div key={day} className="flex items-center gap-2">
+                      <div className="w-24 text-xs font-medium text-slate-600">{day}</div>
+                      <input
+                        type="time"
+                        value={workingHours[day].open}
+                        disabled={workingHours[day].closed}
+                        onChange={(e) => setWorkingHours((prev) => ({ ...prev, [day]: { ...prev[day], open: e.target.value } }))}
+                        className="rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-700 focus:border-emerald-400 focus:outline-none disabled:opacity-40"
+                      />
+                      <span className="text-xs text-slate-400">to</span>
+                      <input
+                        type="time"
+                        value={workingHours[day].close}
+                        disabled={workingHours[day].closed}
+                        onChange={(e) => setWorkingHours((prev) => ({ ...prev, [day]: { ...prev[day], close: e.target.value } }))}
+                        className="rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-700 focus:border-emerald-400 focus:outline-none disabled:opacity-40"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setWorkingHours((prev) => ({ ...prev, [day]: { ...prev[day], closed: !prev[day].closed } }))}
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-semibold transition ${workingHours[day].closed ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'}`}
+                      >
+                        {workingHours[day].closed ? 'Closed' : 'Open'}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {[
                 { label: 'Pharmacist-in-Charge', key: 'pharmacist_in_charge', type: 'text', placeholder: 'Rania Hassan' },
                 { label: 'Phone', key: 'phone', type: 'tel', placeholder: '+971 4 123 4567' },
                 { label: 'Email', key: 'email', type: 'email', placeholder: 'info@alshifapharmacy.ae' },
