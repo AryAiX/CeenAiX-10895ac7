@@ -553,10 +553,19 @@ export const PharmacyDispensing = () => {
                       ) : null}
                       <button
                         type="button"
-                        onClick={() => navigate('/pharmacy/messages')}
-                        aria-label="Message the prescribing clinician"
-                        title="Open pharmacy messages"
-                        className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+                        onClick={() => {
+                          const patientId = data?.queue?.find(
+                            (item) => item.prescriptionId === row.id
+                          )?.assignedTo ?? null;
+                          if (patientId) {
+                            navigate(`/pharmacy/messages?patient=${patientId}`);
+                          } else {
+                            navigate('/pharmacy/messages');
+                          }
+                        }}
+                        aria-label="Message patient about this prescription"
+                        title="Message patient"
+                        className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-emerald-600"
                       >
                         <MessageSquare className="h-3.5 w-3.5" />
                       </button>
