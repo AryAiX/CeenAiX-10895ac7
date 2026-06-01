@@ -40,6 +40,8 @@ export const PharmacyProfile = () => {
     email: '',
     website: '',
     emergency_contact: '',
+    dha_connected: false,
+    nabidh_connected: false,
   });
 
   const [staffModalOpen, setStaffModalOpen] = useState(false);
@@ -66,6 +68,8 @@ export const PharmacyProfile = () => {
       email: data?.profile?.email ?? '',
       website: data?.profile?.website ?? '',
       emergency_contact: data?.profile?.emergencyContact ?? '',
+      dha_connected: data?.profile?.dhaConnected ?? false,
+      nabidh_connected: data?.profile?.nabidhConnected ?? false,
     });
     setEditError(null);
     setEditSuccess(false);
@@ -89,6 +93,8 @@ export const PharmacyProfile = () => {
           email: editForm.email || null,
           website: editForm.website || null,
           emergency_contact: editForm.emergency_contact || null,
+          dha_connected: editForm.dha_connected,
+          nabidh_connected: editForm.nabidh_connected,
         })
         .eq('organization_id', data?.organization?.id);
       if (error) throw error;
@@ -446,13 +452,39 @@ export const PharmacyProfile = () => {
                   <label className="mb-1 block text-xs font-semibold text-slate-600">{field.label}</label>
                   <input
                     type={field.type}
-                    value={editForm[field.key as keyof typeof editForm]}
+                    value={editForm[field.key as keyof typeof editForm] as string}
                     onChange={(e) => setEditForm((prev) => ({ ...prev, [field.key]: e.target.value }))}
                     placeholder={field.placeholder}
                     className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-emerald-400 focus:outline-none"
                   />
                 </div>
               ))}
+              <div className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
+                <div>
+                  <div className="text-xs font-semibold text-slate-600">DHA Licensed</div>
+                  <div className="text-xs text-slate-400">Dubai Health Authority license status</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditForm((prev) => ({ ...prev, dha_connected: !prev.dha_connected }))}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${editForm.dha_connected ? 'bg-emerald-600' : 'bg-slate-200'}`}
+                >
+                  <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${editForm.dha_connected ? 'translate-x-4' : 'translate-x-1'}`} />
+                </button>
+              </div>
+              <div className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
+                <div>
+                  <div className="text-xs font-semibold text-slate-600">NABIDH Connected</div>
+                  <div className="text-xs text-slate-400">National unified medical records connection</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditForm((prev) => ({ ...prev, nabidh_connected: !prev.nabidh_connected }))}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${editForm.nabidh_connected ? 'bg-teal-600' : 'bg-slate-200'}`}
+                >
+                  <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${editForm.nabidh_connected ? 'translate-x-4' : 'translate-x-1'}`} />
+                </button>
+              </div>
             </div>
             <div className="flex gap-3 border-t border-slate-100 px-6 py-4">
               <button
