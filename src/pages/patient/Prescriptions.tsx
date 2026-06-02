@@ -179,6 +179,7 @@ export const PatientPrescriptions: React.FC = () => {
   const [deletedReminderIds, setDeletedReminderIds] = useState<Set<string>>(new Set());
   const [undoReminderId, setUndoReminderId] = useState<string | null>(null);
   const [showMissedDoseAnalysis, setShowMissedDoseAnalysis] = useState(false);
+  const [locallyTakenScheduleIds, setLocallyTakenScheduleIds] = useState<Set<string>>(new Set());
 
   const prescriptions = useMemo(() => data ?? [], [data]);
 
@@ -447,6 +448,11 @@ export const PatientPrescriptions: React.FC = () => {
     primaryInsurance?.coPayPercent == null ? null : Math.max(0, 100 - primaryInsurance.coPayPercent);
   const insuranceCoPayPercent = primaryInsurance?.coPayPercent ?? null;
 
+  const handleMarkScheduleTaken = (itemId: string, doseIndex: number) => {
+    const key = `${itemId}-${doseIndex}`;
+    setLocallyTakenScheduleIds((prev) => new Set([...prev, key]));
+  };
+
   const toggleExpanded = (id: string) => {
     setExpandedLineIds((prev) => {
       const next = new Set(prev);
@@ -677,6 +683,8 @@ export const PatientPrescriptions: React.FC = () => {
               <div className="space-y-3">
                 {block.doses.map(({ row, doseIndex }) => {
                   const accent = lineAccent(row.item.medication_name);
+                  const doseKey = `${row.item.id}-${doseIndex}`;
+                  const isTaken = locallyTakenScheduleIds.has(doseKey);
                   return (
                     <div
                       key={`${row.item.id}-${doseIndex}`}
@@ -710,18 +718,20 @@ export const PatientPrescriptions: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        disabled
-                        className={`rounded-full px-4 py-2 text-xs font-bold ${
-                          block.status === 'pending'
-                            ? 'bg-slate-100 text-slate-400'
-                            : 'cursor-not-allowed border-2 border-slate-300 text-slate-400'
-                        }`}
-                        title={t('patient.prescriptions.scheduleMarkTakenDisabled')}
-                      >
-                        {t('patient.prescriptions.scheduleMarkTaken')}
-                      </button>
+                      {isTaken ? (
+                        <div className="flex items-center gap-1.5 rounded-full bg-emerald-100 px-4 py-2 text-xs font-bold text-emerald-700">
+                          <CheckCircle className="h-3.5 w-3.5" />
+                          {t('patient.prescriptions.dispensed', { defaultValue: 'Taken ✓' })}
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleMarkScheduleTaken(row.item.id, doseIndex)}
+                          className="rounded-full bg-teal-600 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-teal-700"
+                        >
+                          {t('patient.prescriptions.scheduleMarkTaken')}
+                        </button>
+                      )}
                     </div>
                   );
                 })}
