@@ -627,9 +627,8 @@ export const PatientDashboard: React.FC = () => {
               </span>
               <button
                 type="button"
-                disabled
-                title={localCopy.unavailable}
-                className="rounded-lg border border-teal-200 px-3 py-1.5 text-xs font-semibold text-teal-600 opacity-50 transition-colors disabled:cursor-not-allowed"
+                onClick={() => navigate('/patient/records')}
+                className="rounded-lg border border-teal-200 px-3 py-1.5 text-xs font-semibold text-teal-600 transition-colors hover:bg-teal-50"
               >
                 {isArabic ? '+ إضافة قراءة' : '+ Add Reading'}
               </button>
