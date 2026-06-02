@@ -100,6 +100,7 @@ export const BookAppointment: React.FC = () => {
   const [didInitializeAiPrefill, setDidInitializeAiPrefill] = useState(false);
   const [appointmentType, setAppointmentType] = useState<'in_person' | 'virtual'>('in_person');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showCancelWarning, setShowCancelWarning] = useState(false);
 
   const isDoctorSelectionLocked = useMemo(
     () =>
@@ -930,7 +931,13 @@ export const BookAppointment: React.FC = () => {
                     <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                       <button
                         type="button"
-                        onClick={() => navigate('/patient/appointments')}
+                        onClick={() => {
+                          if (chiefComplaint.trim() || notes.trim() || selectedSlot) {
+                            setShowCancelWarning(true);
+                          } else {
+                            navigate('/patient/appointments');
+                          }
+                        }}
                         className="rounded-xl border border-gray-200 px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
                       >
                         {t('patient.book.cancel')}
@@ -956,6 +963,43 @@ export const BookAppointment: React.FC = () => {
           </section>
         </div>
       </div>
+      {showCancelWarning ? createPortal(
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setShowCancelWarning(false)}
+        >
+          <div
+            className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-6 py-5">
+              <h2 className="text-base font-semibold text-slate-900">
+                Discard booking?
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                You have unsaved information. Are you sure you want to leave? Your changes will be lost.
+              </p>
+            </div>
+            <div className="flex gap-3 border-t border-slate-100 px-6 py-4">
+              <button
+                type="button"
+                onClick={() => setShowCancelWarning(false)}
+                className="flex-1 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                Keep Editing
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/patient/appointments')}
+                className="flex-1 rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
+              >
+                Discard
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      ) : null}
       {showConfirmModal && selectedSlot && selectedDoctor ? createPortal(
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
