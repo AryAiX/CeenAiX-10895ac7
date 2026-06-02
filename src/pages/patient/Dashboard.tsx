@@ -853,7 +853,7 @@ export const PatientDashboard: React.FC = () => {
                       <div
                         key={msg.id}
                         className="cursor-pointer rounded-xl bg-slate-50 p-3 transition-colors hover:bg-slate-100"
-                        onClick={() => navigate('/patient/messages')}
+                        onClick={() => navigate(`/patient/messages/${msg.conversationId}`)}
                       >
                         <div className="mb-0.5 flex items-center justify-between">
                           <p className="truncate text-xs font-semibold text-slate-900">{messageTitle}</p>
