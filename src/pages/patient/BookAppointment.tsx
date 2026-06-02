@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -10,6 +11,7 @@ import {
   Video,
   Search,
   Stethoscope,
+  X,
 } from 'lucide-react';
 import { Skeleton } from '../../components/Skeleton';
 import { SpecializationMultiSelect } from '../../components/SpecializationMultiSelect';
@@ -97,6 +99,7 @@ export const BookAppointment: React.FC = () => {
   const [didInitializeReschedule, setDidInitializeReschedule] = useState(false);
   const [didInitializeAiPrefill, setDidInitializeAiPrefill] = useState(false);
   const [appointmentType, setAppointmentType] = useState<'in_person' | 'virtual'>('in_person');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const isDoctorSelectionLocked = useMemo(
     () =>
@@ -933,19 +936,15 @@ export const BookAppointment: React.FC = () => {
                       </button>
                       <button
                         type="button"
-                        onClick={handleBooking}
+                        onClick={() => setShowConfirmModal(true)}
                         disabled={isSubmitting || !selectedSlot || !chiefComplaint.trim()}
                         className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ceenai-navy via-ceenai-blue to-ceenai-cyan px-5 py-3 font-semibold text-white shadow-md transition hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         <Calendar className="h-4 w-4" />
                         <span>
-                          {isSubmitting
-                            ? isRescheduling
-                              ? t('patient.book.rescheduling')
-                              : t('patient.book.booking')
-                            : isRescheduling
-                              ? t('patient.book.confirmReschedule')
-                              : t('patient.book.confirmBook')}
+                          {isRescheduling
+                            ? t('patient.book.confirmReschedule')
+                            : t('patient.book.confirmBook')}
                         </span>
                       </button>
                     </div>
@@ -956,6 +955,102 @@ export const BookAppointment: React.FC = () => {
           </section>
         </div>
       </div>
+      {showConfirmModal && selectedSlot && selectedDoctor ? createPortal(
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setShowConfirmModal(false)}
+        >
+          <div
+            className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-teal-600" />
+                <h2 className="text-base font-semibold text-slate-900">
+                  {isRescheduling ? 'Confirm Reschedule' : 'Confirm Booking'}
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowConfirmModal(false)}
+                className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4 px-6 py-4">
+              <div className="rounded-xl bg-slate-50 p-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-500">Doctor</span>
+                  <span className="font-semibold text-slate-800">{selectedDoctor.fullName}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-500">Specialty</span>
+                  <span className="font-semibold text-slate-800">
+                    {selectedDoctor.specialty ?? t('shared.generalPractice')}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-500">Date & Time</span>
+                  <span className="font-semibold text-slate-800">
+                    {new Date(selectedSlot.iso).toLocaleString(locale, dtOpts({
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit',
+                    }))}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-500">Type</span>
+                  <span className="font-semibold text-slate-800">
+                    {appointmentType === 'virtual'
+                      ? t('patient.appointments.filterTeleconsult', { defaultValue: 'Teleconsult' })
+                      : t('patient.appointments.filterInPerson', { defaultValue: 'In Person' })}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-500">Duration</span>
+                  <span className="font-semibold text-slate-800">
+                    {t('shared.minutesUnit', { count: selectedSlot.durationMinutes })}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-500">Reason</span>
+                  <span className="font-semibold text-slate-800 text-right max-w-[60%] truncate">
+                    {chiefComplaint}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 border-t border-slate-100 px-6 py-4">
+              <button
+                type="button"
+                onClick={() => setShowConfirmModal(false)}
+                className="flex-1 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                Go Back
+              </button>
+              <button
+                type="button"
+                disabled={isSubmitting}
+                onClick={async () => {
+                  setShowConfirmModal(false);
+                  await handleBooking();
+                }}
+                className="flex-1 rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isSubmitting ? 'Booking...' : isRescheduling ? 'Confirm Reschedule' : 'Confirm Booking'}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      ) : null}
     </>
   );
 };
