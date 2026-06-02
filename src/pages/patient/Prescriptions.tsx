@@ -1523,7 +1523,13 @@ export const PatientPrescriptions: React.FC = () => {
         className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 animate-slideUp xl:grid-cols-5"
         style={{ animationDelay: '80ms' }}
       >
-        <div className="cursor-pointer rounded-2xl bg-white p-6 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md">
+        <div
+          className="cursor-pointer rounded-2xl bg-white p-6 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md"
+          onClick={() => setActiveTab('active')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveTab('active'); } }}
+        >
           <div className="mb-3 flex items-center gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
               <Pill className="h-7 w-7 text-blue-600" />
@@ -1540,7 +1546,13 @@ export const PatientPrescriptions: React.FC = () => {
           </div>
         </div>
 
-        <div className="cursor-pointer rounded-2xl bg-white p-6 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md">
+        <div
+          className="cursor-pointer rounded-2xl bg-white p-6 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md"
+          onClick={() => setActiveTab('schedule')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveTab('schedule'); } }}
+        >
           <div className="mb-3 flex items-center gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
               <CheckCircle className="h-7 w-7 text-emerald-600" />
@@ -1567,7 +1579,13 @@ export const PatientPrescriptions: React.FC = () => {
           </div>
         </div>
 
-        <div className="cursor-pointer rounded-2xl bg-white p-6 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md">
+        <div
+          className="cursor-pointer rounded-2xl bg-white p-6 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md"
+          onClick={() => setActiveTab('reminders')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveTab('reminders'); } }}
+        >
           <div className="mb-3 flex items-center gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-teal-100">
               <TrendingUp className="h-7 w-7 text-teal-600" />
@@ -1584,7 +1602,13 @@ export const PatientPrescriptions: React.FC = () => {
           </div>
         </div>
 
-        <div className="cursor-pointer rounded-2xl bg-white p-6 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md">
+        <div
+          className="cursor-pointer rounded-2xl bg-white p-6 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md"
+          onClick={() => setActiveTab('active')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveTab('active'); } }}
+        >
           <div className="mb-3 flex items-center gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
               <RefreshCw className="h-7 w-7 text-amber-600" />
