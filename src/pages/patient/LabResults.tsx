@@ -571,7 +571,7 @@ export const PatientLabResults: React.FC = () => {
               {latestVisit.doctorName ? (
                 <button
                   type="button"
-                  onClick={() => navigate('/patient/messages')}
+                  onClick={() => navigate(`/patient/messages?doctor=${latestVisit.doctor_id}`)}
                   className="mt-2 inline-flex items-center gap-2 rounded-lg border-2 border-teal-600 px-4 py-2 text-sm font-medium text-teal-600 transition-all hover:bg-teal-600 hover:text-white"
                 >
                   <MessageCircle className="h-4 w-4" />
