@@ -1560,11 +1560,15 @@ export const PatientLabResults: React.FC = () => {
                           onChange={(event) => setBookingTime(event.target.value)}
                           className="w-full rounded-lg border border-slate-300 px-3 py-2"
                         >
-                          <option value="08:00">08:00</option>
-                          <option value="08:30">08:30</option>
-                          <option value="09:00">09:00</option>
-                          <option value="09:30">09:30</option>
-                          <option value="10:00">10:00</option>
+                          {Array.from({ length: 28 }).map((_, i) => {
+                            const totalMinutes = 7 * 60 + i * 30;
+                            const hours = Math.floor(totalMinutes / 60);
+                            const minutes = totalMinutes % 60;
+                            const value = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                            return (
+                              <option key={value} value={value}>{value}</option>
+                            );
+                          })}
                         </select>
                       </div>
                       <button
