@@ -173,6 +173,11 @@ export const PatientPrescriptions: React.FC = () => {
   const [loadingPharmacies, setLoadingPharmacies] = useState(false);
   const [sendingToPharmacy, setSendingToPharmacy] = useState(false);
   const [pharmacySentId, setPharmacySentId] = useState<string | null>(null);
+  const [editingReminderId, setEditingReminderId] = useState<string | null>(null);
+  const [editingReminderTime, setEditingReminderTime] = useState('');
+  const [pausedReminderIds, setPausedReminderIds] = useState<Set<string>>(new Set());
+  const [deletedReminderIds, setDeletedReminderIds] = useState<Set<string>>(new Set());
+  const [undoReminderId, setUndoReminderId] = useState<string | null>(null);
 
   const prescriptions = useMemo(() => data ?? [], [data]);
 
@@ -451,6 +456,45 @@ export const PatientPrescriptions: React.FC = () => {
       }
       return next;
     });
+  };
+
+  const handleEditReminder = (reminderId: string, currentTime: string) => {
+    setEditingReminderId(reminderId);
+    setEditingReminderTime(currentTime);
+  };
+
+  const handleSaveReminderTime = (_reminderId: string) => {
+    setEditingReminderId(null);
+    setEditingReminderTime('');
+  };
+
+  const handlePauseReminder = (reminderId: string) => {
+    setPausedReminderIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(reminderId)) {
+        next.delete(reminderId);
+      } else {
+        next.add(reminderId);
+      }
+      return next;
+    });
+  };
+
+  const handleDeleteReminder = (reminderId: string) => {
+    setDeletedReminderIds((prev) => new Set([...prev, reminderId]));
+    setUndoReminderId(reminderId);
+    setTimeout(() => {
+      setUndoReminderId(null);
+    }, 5000);
+  };
+
+  const handleUndoDeleteReminder = (reminderId: string) => {
+    setDeletedReminderIds((prev) => {
+      const next = new Set(prev);
+      next.delete(reminderId);
+      return next;
+    });
+    setUndoReminderId(null);
   };
 
   if (loading) {
@@ -796,11 +840,29 @@ export const PatientPrescriptions: React.FC = () => {
           <div className="space-y-4">
             {reminderRows.map((reminder, idx) => {
               const accent = lineAccent(reminder.row.item.medication_name);
+              const isPaused = pausedReminderIds.has(reminder.id);
+              const isDeleted = deletedReminderIds.has(reminder.id);
+
+              if (isDeleted) {
+                return undoReminderId === reminder.id ? (
+                  <div key={reminder.id} className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                    <span className="text-sm text-amber-700">Reminder deleted</span>
+                    <button
+                      type="button"
+                      onClick={() => handleUndoDeleteReminder(reminder.id)}
+                      className="text-sm font-bold text-amber-700 underline transition hover:text-amber-900"
+                    >
+                      Undo
+                    </button>
+                  </div>
+                ) : null;
+              }
+
               return (
                 <div
                   key={reminder.id}
                   style={{ animationDelay: `${idx * 80}ms`, borderLeftColor: accent.hex }}
-                  className="animate-slideUp rounded-xl border-l-4 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md"
+                  className={`animate-slideUp rounded-xl border-l-4 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md ${isPaused ? 'opacity-50' : ''}`}
                 >
                   <div className="mb-3 flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3">
@@ -848,13 +910,55 @@ export const PatientPrescriptions: React.FC = () => {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
-                    <button type="button" className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-teal-600 transition-all hover:bg-teal-50">
-                      <CreditCard className="h-3.5 w-3.5" /> {t('patient.prescriptions.reminderEdit')}
+                    {editingReminderId === reminder.id ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="time"
+                          value={editingReminderTime}
+                          onChange={(e) => setEditingReminderTime(e.target.value)}
+                          className="rounded-lg border border-slate-200 px-2 py-1 text-xs text-slate-700 focus:border-teal-400 focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleSaveReminderTime(reminder.id)}
+                          className="rounded-lg bg-teal-600 px-2 py-1 text-xs font-semibold text-white hover:bg-teal-700"
+                        >
+                          Save
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingReminderId(null)}
+                          className="rounded-lg px-2 py-1 text-xs font-medium text-slate-500 hover:bg-slate-100"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleEditReminder(reminder.id, reminder.time)}
+                        className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-teal-600 transition-all hover:bg-teal-50"
+                      >
+                        <CreditCard className="h-3.5 w-3.5" /> {t('patient.prescriptions.reminderEdit')}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => handlePauseReminder(reminder.id)}
+                      className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                        isPaused
+                          ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+                          : 'text-amber-600 hover:bg-amber-50'
+                      }`}
+                    >
+                      <Pause className="h-3.5 w-3.5" />
+                      {isPaused ? t('patient.prescriptions.reminderResume', { defaultValue: 'Resume' }) : t('patient.prescriptions.reminderPause')}
                     </button>
-                    <button type="button" className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-amber-600 transition-all hover:bg-amber-50">
-                      <Pause className="h-3.5 w-3.5" /> {t('patient.prescriptions.reminderPause')}
-                    </button>
-                    <button type="button" className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 transition-all hover:bg-red-50">
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteReminder(reminder.id)}
+                      className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 transition-all hover:bg-red-50"
+                    >
                       <Trash2 className="h-3.5 w-3.5" /> {t('patient.prescriptions.reminderDelete')}
                     </button>
                   </div>
