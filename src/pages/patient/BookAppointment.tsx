@@ -466,6 +466,7 @@ export const BookAppointment: React.FC = () => {
       <div>
         {feedback ? (
           <div
+            role="alert"
             className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
               feedback.type === 'success'
                 ? 'border-emerald-100 bg-emerald-50 text-emerald-700'
