@@ -36,6 +36,7 @@ export const Profile: React.FC = () => {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [savingPersonal, setSavingPersonal] = useState(false);
   const [savingInsurance, setSavingInsurance] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
 
   const [personalInfo, setPersonalInfo] = useState({
     fullName: '',
@@ -116,6 +117,12 @@ export const Profile: React.FC = () => {
     }));
   }, [insurance?.primaryPlan, patientProfile, profile, records?.allergies, records?.conditions]);
 
+  useEffect(() => {
+    if (!saveSuccess) return;
+    const timer = setTimeout(() => setSaveSuccess(null), 4000);
+    return () => clearTimeout(timer);
+  }, [saveSuccess]);
+
   const savePersonalInfo = async () => {
     if (!user?.id) return;
     setSaveError(null);
@@ -155,6 +162,7 @@ export const Profile: React.FC = () => {
       emergency_contact_phone: personalInfo.emergencyContactPhone || null,
     });
     setIsEditingPersonal(false);
+    setSaveSuccess(t('patient.profile.saveSuccessPersonal', { defaultValue: 'Personal information saved successfully!' }));
     setSavingPersonal(false);
   };
 
@@ -181,6 +189,7 @@ export const Profile: React.FC = () => {
       return;
     }
     setIsEditingInsurance(false);
+    setSaveSuccess(t('patient.profile.saveSuccessInsurance', { defaultValue: 'Insurance information saved successfully!' }));
     setSavingInsurance(false);
   };
 
@@ -253,6 +262,15 @@ export const Profile: React.FC = () => {
             defaultValue: 'We could not save your changes: {{message}}',
             message: saveError,
           })}
+        </div>
+      ) : null}
+
+      {saveSuccess ? (
+        <div
+          role="status"
+          className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
+        >
+          {saveSuccess}
         </div>
       ) : null}
 
