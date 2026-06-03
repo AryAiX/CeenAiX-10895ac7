@@ -364,10 +364,68 @@ export const PatientDocuments = () => {
                 </div>
               </div>
               <div className="text-sm text-slate-500">{formatDate(doc.date)}</div>
-              <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4 text-cyan-600" />
-                <Download className="h-4 w-4 text-slate-400" />
-                <Share2 className="h-4 w-4 text-slate-400" />
+              <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedId(doc.id);
+                  }}
+                  title={t('patient.documents.view')}
+                  className="rounded-lg p-1.5 text-cyan-600 transition hover:bg-cyan-50"
+                >
+                  <Eye className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const lines = [
+                      doc.name,
+                      `Issued by: ${doc.issuedBy}`,
+                      `Date: ${formatDate(doc.date)}`,
+                      `Contents: ${doc.contains}`,
+                      '',
+                      'View the live, signed source via the CeenAiX patient portal:',
+                      `${window.location.origin}${
+                        doc.source === 'lab_orders'
+                          ? '/patient/lab-results'
+                          : doc.source === 'prescriptions'
+                            ? '/patient/prescriptions'
+                            : '/patient/insurance'
+                      }`,
+                    ];
+                    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = doc.fileName.replace(/\.pdf$/i, '.txt');
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                  }}
+                  title={t('patient.documents.download')}
+                  className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+                >
+                  <Download className="h-4 w-4" />
+                </button>
+                <a
+                  href={`mailto:?subject=${encodeURIComponent(doc.name)}&body=${encodeURIComponent(
+                    `${doc.name}\nIssued by: ${doc.issuedBy}\nDate: ${formatDate(doc.date)}\n\nView the live source: ${window.location.origin}${
+                      doc.source === 'lab_orders'
+                        ? '/patient/lab-results'
+                        : doc.source === 'prescriptions'
+                          ? '/patient/prescriptions'
+                          : '/patient/insurance'
+                    }`
+                  )}`}
+                  onClick={(e) => e.stopPropagation()}
+                  title={t('patient.documents.share')}
+                  className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+                >
+                  <Share2 className="h-4 w-4" />
+                </a>
               </div>
             </button>
           ))}
