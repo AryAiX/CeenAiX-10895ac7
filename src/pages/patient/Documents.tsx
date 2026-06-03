@@ -16,6 +16,7 @@ import {
   Share2,
   ShieldCheck,
   Upload,
+  X,
 } from 'lucide-react';
 import { Skeleton } from '../../components/Skeleton';
 import { usePatientInsurance, usePatientLabResults, usePatientPrescriptions } from '../../hooks';
@@ -448,8 +449,13 @@ export const PatientDocuments = () => {
                 <h2 className="text-xl font-bold text-slate-900">{selectedDocument.name}</h2>
                 <p className="mt-1 text-sm text-slate-500">{selectedDocument.fileName}</p>
               </div>
-              <button type="button" onClick={() => setSelectedId(null)} className="rounded-lg px-3 py-1 text-sm text-slate-500 hover:bg-slate-100">
-                {t('shared.close')}
+              <button
+                type="button"
+                onClick={() => setSelectedId(null)}
+                aria-label={t('shared.close')}
+                className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+              >
+                <X className="h-5 w-5" />
               </button>
             </div>
             <div className="rounded-xl bg-slate-50 p-5">
