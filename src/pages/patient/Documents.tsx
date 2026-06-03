@@ -207,23 +207,47 @@ export const PatientDocuments = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
-        <div className="rounded-2xl bg-white p-5 shadow-sm">
+        <div
+          className="cursor-pointer rounded-2xl bg-white p-5 shadow-sm transition-all hover:scale-[1.02] hover:shadow-md"
+          onClick={() => setCategory('all')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCategory('all'); } }}
+        >
           <div className="text-xs uppercase tracking-wide text-slate-400">{t('patient.documents.totalDocs')}</div>
           <div className="mt-2 text-3xl font-bold text-slate-900">{formatLocaleDigits(documents.length, uiLang)}</div>
         </div>
-        <div className="rounded-2xl bg-white p-5 shadow-sm">
+        <div
+          className="cursor-pointer rounded-2xl bg-white p-5 shadow-sm transition-all hover:scale-[1.02] hover:shadow-md"
+          onClick={() => setCategory('lab-report')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCategory('lab-report'); } }}
+        >
           <div className="text-xs uppercase tracking-wide text-violet-500">{t('patient.documents.labReports')}</div>
           <div className="mt-2 text-3xl font-bold text-violet-600">
             {formatLocaleDigits(categories.find((item) => item.id === 'lab-report')?.count ?? 0, uiLang)}
           </div>
         </div>
-        <div className="rounded-2xl bg-white p-5 shadow-sm">
+        <div
+          className="cursor-pointer rounded-2xl bg-white p-5 shadow-sm transition-all hover:scale-[1.02] hover:shadow-md"
+          onClick={() => setCategory('prescription')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCategory('prescription'); } }}
+        >
           <div className="text-xs uppercase tracking-wide text-teal-500">{t('patient.documents.prescriptions')}</div>
           <div className="mt-2 text-3xl font-bold text-teal-600">
             {formatLocaleDigits(categories.find((item) => item.id === 'prescription')?.count ?? 0, uiLang)}
           </div>
         </div>
-        <div className="rounded-2xl bg-white p-5 shadow-sm">
+        <div
+          className="cursor-pointer rounded-2xl bg-white p-5 shadow-sm transition-all hover:scale-[1.02] hover:shadow-md"
+          onClick={() => { setCategory('all'); setSearch(''); }}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCategory('all'); setSearch(''); } }}
+        >
           <div className="text-xs uppercase tracking-wide text-amber-500">{t('patient.documents.needsAction')}</div>
           <div className="mt-2 text-3xl font-bold text-amber-600">
             {formatLocaleDigits(documents.filter((doc) => doc.status === 'pending').length, uiLang)}
