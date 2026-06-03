@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
@@ -373,9 +374,17 @@ export const PatientDocuments = () => {
         </div>
       )}
 
-      {selectedDocument ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4" role="dialog" aria-modal="true">
-          <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl">
+      {selectedDocument ? createPortal(
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setSelectedId(null)}
+        >
+          <div
+            className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="mb-4 flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-xl font-bold text-slate-900">{selectedDocument.name}</h2>
@@ -485,7 +494,7 @@ export const PatientDocuments = () => {
             </div>
           </div>
         </div>
-      ) : null}
+      , document.body) : null}
 
       <div className="rounded-xl border border-cyan-100 bg-cyan-50 px-4 py-3 text-sm text-cyan-700">
         {t('patient.documents.dataNote')}
