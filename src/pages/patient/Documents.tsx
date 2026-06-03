@@ -34,6 +34,7 @@ export const PatientDocuments = () => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<'all' | PatientDocument['category']>('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | 'alphabetical'>('newest');
 
   const uiLang = i18n.language ?? 'en';
   const locale = resolveLocale(uiLang);
@@ -120,7 +121,7 @@ export const PatientDocuments = () => {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return documents.filter((doc) => {
+    const result = documents.filter((doc) => {
       const matchesCategory = category === 'all' || doc.category === category;
       const matchesSearch =
         !q ||
@@ -129,7 +130,13 @@ export const PatientDocuments = () => {
         doc.contains.toLowerCase().includes(q);
       return matchesCategory && matchesSearch;
     });
-  }, [category, documents, search]);
+
+    return result.sort((a, b) => {
+      if (sortOrder === 'alphabetical') return a.name.localeCompare(b.name);
+      if (sortOrder === 'oldest') return new Date(a.date).getTime() - new Date(b.date).getTime();
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
+  }, [category, documents, search, sortOrder]);
 
   const selectedDocument = filtered.find((doc) => doc.id === selectedId) ?? null;
   const loading = labsLoading || prescriptionsLoading || insuranceLoading;
@@ -283,6 +290,15 @@ export const PatientDocuments = () => {
               </button>
             ))}
           </div>
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest' | 'alphabetical')}
+            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+          >
+            <option value="newest">{t('patient.records.sortNewest', { defaultValue: 'Newest First' })}</option>
+            <option value="oldest">{t('patient.records.sortOldest', { defaultValue: 'Oldest First' })}</option>
+            <option value="alphabetical">{t('patient.records.sortAlpha', { defaultValue: 'A → Z' })}</option>
+          </select>
           <div className="flex rounded-xl bg-slate-100 p-1">
             <button
               type="button"
