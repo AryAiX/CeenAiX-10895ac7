@@ -124,6 +124,8 @@ export const PatientAppointments: React.FC = () => {
   const [addressCopied, setAddressCopied] = useState(false);
   const [showIntakeModal, setShowIntakeModal] = useState(false);
   const [intakeAppointmentId, setIntakeAppointmentId] = useState<string | null>(null);
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [calendarAppointmentId, setCalendarAppointmentId] = useState<string | null>(null);
   const { data: preVisitAssessmentsData } = usePatientPreVisitAssessments(user?.id);
   const preVisitAssessments = useMemo(
     () => preVisitAssessmentsData ?? [],
@@ -370,6 +372,11 @@ export const PatientAppointments: React.FC = () => {
     setAddressCopied(false);
   };
 
+  const resetCalendarModal = () => {
+    setShowCalendarModal(false);
+    setCalendarAppointmentId(null);
+  };
+
   const isWithin10Min = (appointment: Appointment) => {
     const diff = new Date(appointment.scheduled_at).getTime() - Date.now();
     return diff <= 10 * 60 * 1000 && diff > -appointment.duration_minutes * 60 * 1000;
@@ -572,17 +579,10 @@ export const PatientAppointments: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() =>
-                  downloadIcs(
-                    appointment,
-                    doctorProfile?.fullName ?? t('shared.doctor'),
-                    [clinicName, clinicAddress].filter(Boolean).join(', '),
-                    {
-                      summary: t('patient.appointments.icsSummary', { doctor: '{doctor}' }),
-                      description: t('shared.scheduledConsultation'),
-                    }
-                  )
-                }
+                onClick={() => {
+                  setCalendarAppointmentId(appointment.id);
+                  setShowCalendarModal(true);
+                }}
                 className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
               >
                 {t('patient.appointments.addToCalendar')}
@@ -1212,6 +1212,142 @@ export const PatientAppointments: React.FC = () => {
     );
   };
 
+  const renderCalendarModal = () => {
+    if (!showCalendarModal || !calendarAppointmentId) return null;
+
+    const appointment = appointments.find((a) => a.id === calendarAppointmentId);
+    if (!appointment) return null;
+
+    const doctorProfile = doctorProfileById.get(appointment.doctor_id);
+    const clinicName = doctorProfile?.city ?? t('shared.clinicPending');
+    const clinicAddress = doctorProfile?.address ?? '';
+    const location = [clinicName, clinicAddress].filter(Boolean).join(', ');
+    const doctorName = doctorProfile?.fullName ?? t('shared.doctor');
+
+    const icsLabels = {
+      summary: t('patient.appointments.icsSummary', { doctor: '{doctor}' }),
+      description: t('shared.scheduledConsultation'),
+    };
+
+    const startDate = new Date(appointment.scheduled_at);
+    const endDate = new Date(startDate.getTime() + appointment.duration_minutes * 60_000);
+    const formatGoogleDate = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Appointment with ${doctorName}`)}&dates=${formatGoogleDate(startDate)}/${formatGoogleDate(endDate)}&details=${encodeURIComponent(appointment.chief_complaint ?? t('shared.scheduledConsultation'))}&location=${encodeURIComponent(location)}`;
+    const outlookUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(`Appointment with ${doctorName}`)}&startdt=${startDate.toISOString()}&enddt=${endDate.toISOString()}&body=${encodeURIComponent(appointment.chief_complaint ?? t('shared.scheduledConsultation'))}&location=${encodeURIComponent(location)}`;
+
+    const calendarApps = [
+      {
+        name: 'Google Calendar',
+        icon: (
+          <svg viewBox="0 0 24 24" className="w-6 h-6">
+            <path fill="#4285F4" d="M19.5 3h-3V1.5h-1.5V3h-6V1.5H7.5V3h-3C3.675 3 3 3.675 3 4.5v15c0 .825.675 1.5 1.5 1.5h15c.825 0 1.5-.675 1.5-1.5v-15c0-.825-.675-1.5-1.5-1.5zm0 16.5h-15V9h15v10.5zM7.5 6H6V4.5h1.5V6zm9 0H15V4.5h1.5V6z"/>
+          </svg>
+        ),
+        onClick: () => window.open(googleCalendarUrl, '_blank', 'noopener,noreferrer'),
+      },
+      {
+        name: 'Apple Calendar',
+        icon: (
+          <svg viewBox="0 0 24 24" className="w-6 h-6">
+            <path fill="#000000" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+          </svg>
+        ),
+        onClick: () => downloadIcs(appointment, doctorName, location, icsLabels),
+      },
+      {
+        name: 'Outlook',
+        icon: (
+          <svg viewBox="0 0 24 24" className="w-6 h-6">
+            <path fill="#0078D4" d="M24 7.387v13.276A1.34 1.34 0 0 1 22.661 22H7.339A1.34 1.34 0 0 1 6 20.663V18h10.605a1.79 1.79 0 0 0 1.777-1.777V7.5l.72.55zm-7.612-.5H1.339A1.34 1.34 0 0 0 0 8.224v9.553A1.34 1.34 0 0 0 1.339 19.1h15.049A1.34 1.34 0 0 0 17.727 17.777V8.224A1.34 1.34 0 0 0 16.388 6.887z"/>
+          </svg>
+        ),
+        onClick: () => window.open(outlookUrl, '_blank', 'noopener,noreferrer'),
+      },
+      {
+        name: 'Download ICS',
+        icon: (
+          <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        ),
+        onClick: () => downloadIcs(appointment, doctorName, location, icsLabels),
+      },
+    ];
+
+    return createPortal(
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        onClick={resetCalendarModal}
+      >
+        <div
+          className="bg-white rounded-xl shadow-xl w-full max-w-sm"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between p-5 border-b border-gray-200">
+            <div className="flex items-center gap-3">
+              <Calendar className="h-5 w-5 text-teal-600" />
+              <h2 className="text-lg font-semibold text-gray-900">Add to Calendar</h2>
+            </div>
+            <button
+              type="button"
+              onClick={resetCalendarModal}
+              aria-label="Close"
+              className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X className="h-5 w-5 text-gray-500" />
+            </button>
+          </div>
+
+          <div className="p-5 space-y-4">
+            <div className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <Calendar className="h-4 w-4 text-teal-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-slate-900 text-sm">{doctorName}</p>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {startDate.toLocaleDateString(locale, dtOpts({ weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }))}
+                  {' · '}
+                  {startDate.toLocaleTimeString(locale, dtOpts({ hour: 'numeric', minute: '2-digit' }))}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-sm font-semibold text-gray-900 mb-3">
+                Choose your calendar app
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {calendarApps.map((app) => (
+                  <button
+                    key={app.name}
+                    type="button"
+                    onClick={app.onClick}
+                    className="flex flex-col items-center gap-2 rounded-xl border border-gray-200 bg-white p-4 text-center text-sm font-medium text-gray-700 transition-all hover:border-teal-400 hover:bg-teal-50/40 hover:shadow-sm"
+                  >
+                    {app.icon}
+                    <span className="text-xs leading-tight">{app.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="px-5 pb-5">
+            <button
+              type="button"
+              onClick={resetCalendarModal}
+              className="w-full px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-colors text-sm"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>,
+      document.body
+    );
+  };
+
   const renderIntakeModal = () => {
     if (!showIntakeModal || !intakeAppointmentId) return null;
 
@@ -1587,6 +1723,7 @@ export const PatientAppointments: React.FC = () => {
       {renderCancelModal()}
       {renderDirectionsModal()}
       {renderIntakeModal()}
+      {renderCalendarModal()}
     </>
   );
 };
