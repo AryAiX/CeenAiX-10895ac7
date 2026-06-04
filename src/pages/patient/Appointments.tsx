@@ -1742,24 +1742,6 @@ export const PatientAppointments: React.FC = () => {
                   </section>
                 ) : null}
 
-                {statusFilter === 'cancelled' && cancelledAppointments.length > 0 ? (
-                  <section>
-                    <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <h2 className="font-playfair text-2xl md:text-3xl font-bold text-slate-900">
-                          {t('patient.appointments.filterCancelled')}
-                        </h2>
-                        <span className="rounded-full bg-rose-100 px-3 py-1 text-sm font-semibold text-rose-700">
-                          {cancelledAppointments.length}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="space-y-4">
-                      {cancelledAppointments.map(renderAppointmentCard)}
-                    </div>
-                  </section>
-                ) : null}
-
                 {statusFilter !== 'upcoming' && statusFilter !== 'cancelled' ? (
                   statusFilter === 'completed' ? (
                     <section>
