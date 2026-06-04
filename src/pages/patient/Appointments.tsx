@@ -1544,6 +1544,15 @@ export const PatientAppointments: React.FC = () => {
   const showSuccessBanner = searchParams.get('booked') === '1';
   const showRescheduledBanner = searchParams.get('rescheduled') === '1';
   const showPreVisitCompletedBanner = searchParams.get('previsit') === 'completed';
+
+  useEffect(() => {
+    if (!showSuccessBanner && !showRescheduledBanner && !showPreVisitCompletedBanner) return;
+    const timer = setTimeout(() => {
+      navigate('/patient/appointments', { replace: true });
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [showSuccessBanner, showRescheduledBanner, showPreVisitCompletedBanner, navigate]);
+
   const isLoadingPage = loading || doctorProfilesLoading;
   const totalFilteredEmpty =
     !isLoadingPage &&
