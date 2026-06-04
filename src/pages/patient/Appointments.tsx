@@ -1438,7 +1438,7 @@ export const PatientAppointments: React.FC = () => {
         onClick={closeIntakeModal}
       >
         <div
-          className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+          className="bg-white rounded-xl shadow-xl w-full max-w-lg"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
@@ -1516,13 +1516,15 @@ export const PatientAppointments: React.FC = () => {
                         <CheckCircle className="h-4 w-4 text-green-500" />
                         Assessment completed
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => { navigate(`/patient/pre-visit/${preVisitAssessment.id}`); closeIntakeModal(); }}
-                        className="rounded-lg border border-teal-200 bg-white px-3 py-1.5 text-xs font-semibold text-teal-700 transition hover:bg-teal-50"
-                      >
-                        ✏️ Edit Intake Form
-                      </button>
+                      {isUpcoming(appointment) ? (
+                        <button
+                          type="button"
+                          onClick={() => { navigate(`/patient/pre-visit/${preVisitAssessment.id}`); closeIntakeModal(); }}
+                          className="rounded-lg border border-teal-200 bg-white px-3 py-1.5 text-xs font-semibold text-teal-700 transition hover:bg-teal-50"
+                        >
+                          ✏️ Edit Intake Form
+                        </button>
+                      ) : null}
                     </div>
                   ) : (
                     <div className="space-y-2">
