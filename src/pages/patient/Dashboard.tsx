@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -34,6 +34,7 @@ import {
 } from '../../lib/i18n-ui';
 import { formatMedicationDetailLine } from '../../lib/medication-display';
 import { DEFAULT_CARE_CONVERSATION_SUBJECT, getMessagePreviewText } from '../../lib/messaging';
+import { supabase } from '../../lib/supabase';
 
 const getDisplayName = (fullName: string | null | undefined, firstName: string | null | undefined, email?: string) => {
   if (firstName?.trim()) {
@@ -86,9 +87,39 @@ export const PatientDashboard: React.FC = () => {
   } = usePatientDashboard(user?.id, i18n.language);
 
   const [locallyTakenIds, setLocallyTakenIds] = useState<Set<string>>(new Set());
+  const [dbTakenIds, setDbTakenIds] = useState<Set<string>>(new Set());
 
-  const handleMarkTaken = (medicationId: string) => {
+  useEffect(() => {
+    if (!user?.id) return;
+    const today = new Date().toISOString().split('T')[0];
+    void supabase
+      .from('medication_logs')
+      .select('prescription_item_id')
+      .eq('patient_id', user.id)
+      .eq('taken_date', today)
+      .then(({ data }) => {
+        if (data) {
+          setDbTakenIds(new Set(data.map((row) => row.prescription_item_id)));
+        }
+      });
+  }, [user?.id]);
+
+  const handleMarkTaken = async (medicationId: string) => {
+    if (!user?.id) return;
     setLocallyTakenIds((prev) => new Set([...prev, medicationId]));
+    const today = new Date().toISOString().split('T')[0];
+    const { error } = await supabase.from('medication_logs').upsert(
+      {
+        patient_id: user.id,
+        prescription_item_id: medicationId,
+        taken_date: today,
+        taken_at: new Date().toISOString(),
+      },
+      { onConflict: 'patient_id,prescription_item_id,taken_date' }
+    );
+    if (!error) {
+      setDbTakenIds((prev) => new Set([...prev, medicationId]));
+    }
   };
 
   const [bpModalOpen, setBpModalOpen] = useState(false);
@@ -253,7 +284,7 @@ export const PatientDashboard: React.FC = () => {
   );
   const healthScoreValue = dashboardData?.healthScore ?? (profile?.profile_completed ? 78 : 64);
   const adherenceValue = dashboardData?.adherencePercentage ?? (medications.length > 0 ? 87 : 72);
-  const takenCount = medications.filter((medication) => medication.isDispensed || locallyTakenIds.has(medication.id)).length;
+  const takenCount = medications.filter((medication) => medication.isDispensed || locallyTakenIds.has(medication.id) || dbTakenIds.has(medication.id)).length;
   const insuranceProgress =
     insurance?.annualLimit && insurance.annualLimit > 0
       ? Math.min(100, Math.round(((insurance.annualLimitUsed ?? 0) / insurance.annualLimit) * 100))
@@ -536,7 +567,7 @@ export const PatientDashboard: React.FC = () => {
                 </>
               ) : medications.length > 0 ? (
                 medications.map((medication) => {
-                  const isTaken = medication.isDispensed || locallyTakenIds.has(medication.id);
+                  const isTaken = medication.isDispensed || locallyTakenIds.has(medication.id) || dbTakenIds.has(medication.id);
                   return (
                     <div key={medication.id} className="flex items-center gap-3 px-6 py-4">
                       <div className={`h-2.5 w-2.5 shrink-0 rounded-full ${isTaken ? 'bg-emerald-500' : 'bg-amber-400'}`} />
@@ -571,7 +602,7 @@ export const PatientDashboard: React.FC = () => {
                       ) : (
                         <button
                           type="button"
-                          onClick={() => handleMarkTaken(medication.id)}
+                          onClick={() => void handleMarkTaken(medication.id)}
                           className="flex items-center gap-1 rounded-lg bg-teal-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-teal-700"
                         >
                           <CheckCircle2 className="h-3 w-3" />
