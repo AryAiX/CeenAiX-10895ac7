@@ -294,6 +294,26 @@ export const PatientAppointments: React.FC = () => {
     return days;
   }, [appointments, calendarMonth]);
 
+  const isDateRangeInPast = useMemo(() => {
+    if (!dateFrom) return false;
+    const today = new Date();
+    const currentDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const [y, m, d] = dateFrom.split('-').map(Number);
+    if (!y || !m || !d) return false;
+    const selectedDay = new Date(y, m - 1, d);
+    return selectedDay < currentDay;
+  }, [dateFrom]);
+
+  const isDateRangeInFuture = useMemo(() => {
+    if (!dateFrom) return false;
+    const today = new Date();
+    const currentDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const [y, m, d] = dateFrom.split('-').map(Number);
+    if (!y || !m || !d) return false;
+    const selectedDay = new Date(y, m - 1, d);
+    return selectedDay > currentDay;
+  }, [dateFrom]);
+
   const nextTeleconsult = useMemo(() => {
     const now = Date.now();
     const horizon = now + 24 * 60 * 60 * 1000;
@@ -345,6 +365,12 @@ export const PatientAppointments: React.FC = () => {
       setIsPastExpanded(true);
     }
   }, [statusFilter]);
+
+  useEffect(() => {
+    if (isDateRangeInPast) {
+      setIsPastExpanded(true);
+    }
+  }, [isDateRangeInPast]);
 
   const handleCancelAppointment = async (appointmentId: string, _reason?: string) => {
     setFeedback(null);
@@ -1703,7 +1729,7 @@ export const PatientAppointments: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-8 animate-slideUp" style={{ animationDelay: '80ms' }}>
-                {statusFilter !== 'completed' && statusFilter !== 'cancelled' ? (
+                {statusFilter !== 'completed' && statusFilter !== 'cancelled' && !isDateRangeInPast ? (
                   <section>
                     <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
                       <div className="flex items-center gap-3">
@@ -1755,8 +1781,8 @@ export const PatientAppointments: React.FC = () => {
                   </section>
                 ) : null}
 
-                {statusFilter !== 'upcoming' && statusFilter !== 'cancelled' ? (
-                  statusFilter === 'completed' ? (
+                {statusFilter !== 'upcoming' && statusFilter !== 'cancelled' && !isDateRangeInFuture ? (
+                  statusFilter === 'completed' || isDateRangeInPast ? (
                     <section>
                       <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
                         <div className="flex items-center gap-3">
