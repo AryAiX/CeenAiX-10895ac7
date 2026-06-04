@@ -707,7 +707,14 @@ export const PatientRecords: React.FC = () => {
               </div>
               <button
                 type="button"
-                onClick={resetForms}
+                onClick={() => {
+                  if (hasUnsavedFormData()) {
+                    setShowFormSwitchWarning(true);
+                    setPendingForm(null);
+                  } else {
+                    resetForms();
+                  }
+                }}
                 className="rounded-xl border border-gray-200 p-2 text-gray-500 transition hover:bg-gray-50 hover:text-gray-700"
                 aria-label={t('patient.records.closeForm')}
               >
@@ -792,7 +799,14 @@ export const PatientRecords: React.FC = () => {
               </button>
               <button
                 type="button"
-                onClick={resetForms}
+                onClick={() => {
+                  if (hasUnsavedFormData()) {
+                    setShowFormSwitchWarning(true);
+                    setPendingForm(null);
+                  } else {
+                    resetForms();
+                  }
+                }}
                 className="rounded-xl border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
               >
                 {t('patient.records.cancel')}
@@ -810,7 +824,14 @@ export const PatientRecords: React.FC = () => {
               </div>
               <button
                 type="button"
-                onClick={resetForms}
+                onClick={() => {
+                  if (hasUnsavedFormData()) {
+                    setShowFormSwitchWarning(true);
+                    setPendingForm(null);
+                  } else {
+                    resetForms();
+                  }
+                }}
                 className="rounded-xl border border-gray-200 p-2 text-gray-500 transition hover:bg-gray-50 hover:text-gray-700"
                 aria-label={t('patient.records.closeForm')}
               >
@@ -886,7 +907,14 @@ export const PatientRecords: React.FC = () => {
               </button>
               <button
                 type="button"
-                onClick={resetForms}
+                onClick={() => {
+                  if (hasUnsavedFormData()) {
+                    setShowFormSwitchWarning(true);
+                    setPendingForm(null);
+                  } else {
+                    resetForms();
+                  }
+                }}
                 className="rounded-xl border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
               >
                 {t('patient.records.cancel')}
@@ -904,7 +932,14 @@ export const PatientRecords: React.FC = () => {
               </div>
               <button
                 type="button"
-                onClick={resetForms}
+                onClick={() => {
+                  if (hasUnsavedFormData()) {
+                    setShowFormSwitchWarning(true);
+                    setPendingForm(null);
+                  } else {
+                    resetForms();
+                  }
+                }}
                 className="rounded-xl border border-gray-200 p-2 text-gray-500 transition hover:bg-gray-50 hover:text-gray-700"
                 aria-label={t('patient.records.closeForm')}
               >
@@ -990,7 +1025,14 @@ export const PatientRecords: React.FC = () => {
               </button>
               <button
                 type="button"
-                onClick={resetForms}
+                onClick={() => {
+                  if (hasUnsavedFormData()) {
+                    setShowFormSwitchWarning(true);
+                    setPendingForm(null);
+                  } else {
+                    resetForms();
+                  }
+                }}
                 className="rounded-xl border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
               >
                 {t('patient.records.cancel')}
