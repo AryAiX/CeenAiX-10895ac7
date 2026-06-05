@@ -182,6 +182,7 @@ export const PatientPrescriptions: React.FC = () => {
   const [locallyTakenScheduleIds, setLocallyTakenScheduleIds] = useState<Set<string>>(new Set());
   const [dbTakenScheduleIds, setDbTakenScheduleIds] = useState<Set<string>>(new Set());
   const [pickedUpIds, setPickedUpIds] = useState<Set<string>>(new Set());
+  const [dbReminders, setDbReminders] = useState<Map<string, { time: string; isPaused: boolean; isDeleted: boolean }>>(new Map());
   const [pharmacyError, setPharmacyError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -195,6 +196,29 @@ export const PatientPrescriptions: React.FC = () => {
       .then(({ data }) => {
         if (data) {
           setDbTakenScheduleIds(new Set(data.map((row) => row.prescription_item_id)));
+        }
+      });
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    void supabase
+      .from('medication_reminders')
+      .select('prescription_item_id, slot, reminder_time, is_paused, is_deleted')
+      .eq('patient_id', user.id)
+      .eq('is_deleted', false)
+      .then(({ data }) => {
+        if (data) {
+          const map = new Map<string, { time: string; isPaused: boolean; isDeleted: boolean }>();
+          data.forEach((row) => {
+            const key = `${row.prescription_item_id}-${row.slot}-0`;
+            map.set(key, {
+              time: row.reminder_time,
+              isPaused: row.is_paused,
+              isDeleted: row.is_deleted,
+            });
+          });
+          setDbReminders(map);
         }
       });
   }, [user?.id]);
@@ -535,12 +559,35 @@ export const PatientPrescriptions: React.FC = () => {
     setEditingReminderTime(currentTime);
   };
 
-  const handleSaveReminderTime = (_reminderId: string) => {
+  const handleSaveReminderTime = async (reminderId: string) => {
+    if (!user?.id) return;
+    const reminder = reminderRows.find((r) => r.id === reminderId);
+    if (!reminder) return;
+    await supabase
+      .from('medication_reminders')
+      .upsert({
+        patient_id: user.id,
+        prescription_item_id: reminder.row.item.id,
+        slot: reminder.slot,
+        reminder_time: editingReminderTime,
+        is_paused: false,
+        is_deleted: false,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'patient_id,prescription_item_id,slot' });
+    setDbReminders((prev) => {
+      const next = new Map(prev);
+      next.set(reminderId, { time: editingReminderTime, isPaused: false, isDeleted: false });
+      return next;
+    });
     setEditingReminderId(null);
     setEditingReminderTime('');
   };
 
-  const handlePauseReminder = (reminderId: string) => {
+  const handlePauseReminder = async (reminderId: string) => {
+    if (!user?.id) return;
+    const reminder = reminderRows.find((r) => r.id === reminderId);
+    if (!reminder) return;
+    const isPaused = !pausedReminderIds.has(reminderId);
     setPausedReminderIds((prev) => {
       const next = new Set(prev);
       if (next.has(reminderId)) {
@@ -550,14 +597,40 @@ export const PatientPrescriptions: React.FC = () => {
       }
       return next;
     });
+    await supabase
+      .from('medication_reminders')
+      .upsert({
+        patient_id: user.id,
+        prescription_item_id: reminder.row.item.id,
+        slot: reminder.slot,
+        reminder_time: dbReminders.get(reminderId)?.time ?? reminder.time,
+        is_paused: isPaused,
+        is_deleted: false,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'patient_id,prescription_item_id,slot' });
   };
 
   const handleDeleteReminder = (reminderId: string) => {
     setDeletedReminderIds((prev) => new Set([...prev, reminderId]));
     setUndoReminderId(reminderId);
-    setTimeout(() => {
+    const timer = setTimeout(async () => {
       setUndoReminderId(null);
+      if (!user?.id) return;
+      const reminder = reminderRows.find((r) => r.id === reminderId);
+      if (!reminder) return;
+      await supabase
+        .from('medication_reminders')
+        .upsert({
+          patient_id: user.id,
+          prescription_item_id: reminder.row.item.id,
+          slot: reminder.slot,
+          reminder_time: dbReminders.get(reminderId)?.time ?? reminder.time,
+          is_paused: false,
+          is_deleted: true,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'patient_id,prescription_item_id,slot' });
     }, 5000);
+    return () => clearTimeout(timer);
   };
 
   const handleUndoDeleteReminder = (reminderId: string) => {
@@ -916,7 +989,7 @@ export const PatientPrescriptions: React.FC = () => {
           <div className="space-y-4">
             {reminderRows.map((reminder, idx) => {
               const accent = lineAccent(reminder.row.item.medication_name);
-              const isPaused = pausedReminderIds.has(reminder.id);
+              const isPaused = pausedReminderIds.has(reminder.id) || (dbReminders.get(reminder.id)?.isPaused ?? false);
               const isDeleted = deletedReminderIds.has(reminder.id);
 
               if (isDeleted) {
@@ -955,7 +1028,7 @@ export const PatientPrescriptions: React.FC = () => {
                           />{' '}
                           — {reminder.doseLabel}
                         </h4>
-                        <div className="mt-1 text-sm text-slate-600">⏰ {reminder.time}</div>
+                        <div className="mt-1 text-sm text-slate-600">⏰ {dbReminders.get(reminder.id)?.time ?? reminder.time}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
@@ -996,7 +1069,7 @@ export const PatientPrescriptions: React.FC = () => {
                         />
                         <button
                           type="button"
-                          onClick={() => handleSaveReminderTime(reminder.id)}
+                          onClick={() => void handleSaveReminderTime(reminder.id)}
                           className="rounded-lg bg-teal-600 px-2 py-1 text-xs font-semibold text-white hover:bg-teal-700"
                         >
                           Save
@@ -1020,7 +1093,7 @@ export const PatientPrescriptions: React.FC = () => {
                     )}
                     <button
                       type="button"
-                      onClick={() => handlePauseReminder(reminder.id)}
+                      onClick={() => void handlePauseReminder(reminder.id)}
                       className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
                         isPaused
                           ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
