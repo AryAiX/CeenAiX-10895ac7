@@ -181,6 +181,7 @@ export const PatientPrescriptions: React.FC = () => {
   const [showMissedDoseAnalysis, setShowMissedDoseAnalysis] = useState(false);
   const [locallyTakenScheduleIds, setLocallyTakenScheduleIds] = useState<Set<string>>(new Set());
   const [dbTakenScheduleIds, setDbTakenScheduleIds] = useState<Set<string>>(new Set());
+  const [pickedUpIds, setPickedUpIds] = useState<Set<string>>(new Set());
   const [pharmacyError, setPharmacyError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -358,6 +359,28 @@ export const PatientPrescriptions: React.FC = () => {
     }
   };
 
+  const handleMarkPickedUp = async (prescriptionId: string, items: PrescriptionItem[]) => {
+    if (!user?.id) return;
+    try {
+      await Promise.all([
+        ...items.map((item) =>
+          supabase
+            .from('prescription_items')
+            .update({ is_dispensed: true })
+            .eq('id', item.id)
+        ),
+        supabase
+          .from('pharmacy_dispensing_tasks')
+          .update({ workflow_status: 'picked_up', updated_at: new Date().toISOString() })
+          .eq('prescription_id', prescriptionId),
+      ]);
+      setPickedUpIds((prev) => new Set([...prev, prescriptionId]));
+      void refetch();
+    } catch {
+      // silently fail
+    }
+  };
+
   const pharmacyStatusCopy = (
     status: PatientPrescriptionRecord['pharmacyStatus'],
     justSent: boolean
@@ -384,6 +407,12 @@ export const PatientPrescriptions: React.FC = () => {
       return {
         title: t('patient.prescriptions.pharmacyStatusCancelledTitle'),
         body: t('patient.prescriptions.pharmacyStatusCancelledBody'),
+      };
+    }
+    if (status === 'picked_up') {
+      return {
+        title: '✅ Picked Up',
+        body: 'You have collected this medication. Take it as prescribed.',
       };
     }
     if (status === 'new' || justSent) {
@@ -1543,6 +1572,20 @@ export const PatientPrescriptions: React.FC = () => {
                   >
                     {t('patient.prescriptions.sendToPharmacy')}
                   </button>
+                ) : null}
+                {rx.pharmacyStatus === 'dispensed' && !pickedUpIds.has(rx.id) ? (
+                  <button
+                    type="button"
+                    onClick={() => void handleMarkPickedUp(rx.id, rx.items)}
+                    className="mt-2 w-full rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-emerald-700"
+                  >
+                    ✅ Mark as Picked Up
+                  </button>
+                ) : null}
+                {(rx.pharmacyStatus === 'picked_up' || pickedUpIds.has(rx.id)) ? (
+                  <div className="mt-2 w-full rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-1.5 text-xs font-semibold text-emerald-700 text-center">
+                    ✅ Picked Up — Thank you!
+                  </div>
                 ) : null}
               </div>
             </div>
