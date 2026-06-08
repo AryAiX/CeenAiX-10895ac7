@@ -571,8 +571,12 @@ export const DoctorPatientDetail: React.FC = () => {
                             <p className="mt-2 text-sm text-slate-500">{medication.instructions}</p>
                           ) : null}
                         </div>
-                        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700">
-                          {medication.review_status}
+                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                          medication.review_status === 'reviewed'
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'bg-amber-100 text-amber-700'
+                        }`}>
+                          {medication.review_status === 'reviewed' ? '✅ Reviewed' : '⏳ Pending Review'}
                         </span>
                       </div>
                       {medication.review_status !== 'reviewed' ? (
