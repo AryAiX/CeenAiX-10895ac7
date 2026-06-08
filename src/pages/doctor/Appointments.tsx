@@ -60,6 +60,9 @@ export const DoctorAppointments: React.FC = () => {
   const [listSearchQuery, setListSearchQuery] = useState('');
   const [listStatusFilter, setListStatusFilter] = useState<string>('all');
   const [listSortOrder, setListSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [pendingSearchQuery, setPendingSearchQuery] = useState('');
+  const [pendingStatusFilter, setPendingStatusFilter] = useState<string>('all');
+  const [pendingSortOrder, setPendingSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const patientIds = useMemo(
     () => Array.from(new Set((routeAppointments ?? []).map((appointment) => appointment.patient_id))),
@@ -185,6 +188,30 @@ export const DoctorAppointments: React.FC = () => {
 
     return result;
   }, [activeTab, visibleAppointments, listStatusFilter, listSearchQuery, listSortOrder, patientNameById]);
+
+  const filteredPendingAppointments = useMemo(() => {
+    if (activeTab !== 'pending') return visibleAppointments;
+
+    let result = [...visibleAppointments];
+
+    if (pendingStatusFilter !== 'all') {
+      result = result.filter((appointment) => appointment.status === pendingStatusFilter);
+    }
+
+    if (pendingSearchQuery.trim()) {
+      const query = pendingSearchQuery.trim().toLowerCase();
+      result = result.filter((appointment) =>
+        (patientNameById.get(appointment.patient_id) ?? '').toLowerCase().includes(query)
+      );
+    }
+
+    result.sort((a, b) => {
+      const diff = new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime();
+      return pendingSortOrder === 'asc' ? diff : -diff;
+    });
+
+    return result;
+  }, [activeTab, visibleAppointments, pendingStatusFilter, pendingSearchQuery, pendingSortOrder, patientNameById]);
 
   // Use canonical AppointmentStatus values only. The previous list mixed in
   // 'fulfilled', 'finished', 'checked_in' which are not in the enum, so the
@@ -1052,6 +1079,51 @@ export const DoctorAppointments: React.FC = () => {
               </div>
             </div>
 
+            {activeTab === 'pending' ? (
+              <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="relative flex-1">
+                  <input
+                    type="search"
+                    value={pendingSearchQuery}
+                    onChange={(e) => setPendingSearchQuery(e.target.value)}
+                    placeholder="Search by patient name..."
+                    className="w-full rounded-lg border border-slate-200 py-2 pl-4 pr-4 text-sm text-slate-700 outline-none transition focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20"
+                  />
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <select
+                    value={pendingStatusFilter}
+                    onChange={(e) => setPendingStatusFilter(e.target.value)}
+                    className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 outline-none transition focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20"
+                  >
+                    <option value="all">All Pending</option>
+                    <option value="scheduled">Scheduled</option>
+                    <option value="confirmed">Confirmed</option>
+                  </select>
+                  <select
+                    value={pendingSortOrder}
+                    onChange={(e) => setPendingSortOrder(e.target.value as 'asc' | 'desc')}
+                    className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 outline-none transition focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20"
+                  >
+                    <option value="asc">Nearest First</option>
+                    <option value="desc">Furthest First</option>
+                  </select>
+                  {(pendingSearchQuery || pendingStatusFilter !== 'all') ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPendingSearchQuery('');
+                        setPendingStatusFilter('all');
+                      }}
+                      className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-500 transition hover:bg-slate-50"
+                    >
+                      Clear
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+
             {activeTab === 'list' ? (
               <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="relative flex-1">
@@ -1150,7 +1222,7 @@ export const DoctorAppointments: React.FC = () => {
                   <p className="mt-2 text-sm text-slate-500">Live from appointment status values.</p>
                 </div>
               </div>
-            ) : filteredVisibleAppointments.length === 0 ? (
+            ) : (activeTab === 'pending' ? filteredPendingAppointments : filteredVisibleAppointments).length === 0 ? (
               <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center shadow-sm">
                 <CalendarDays className="mx-auto mb-4 h-10 w-10 text-gray-400" />
                 <h3 className="text-xl font-bold text-gray-900">{t('doctor.appointments.noDayTitle')}</h3>
@@ -1158,7 +1230,7 @@ export const DoctorAppointments: React.FC = () => {
               </div>
             ) : (
               <div className="grid gap-6">
-                {filteredVisibleAppointments.map((appointment) => (
+                {(activeTab === 'pending' ? filteredPendingAppointments : filteredVisibleAppointments).map((appointment) => (
                   (() => {
                     const canCancel =
                       ['scheduled', 'confirmed'].includes(appointment.status) &&
