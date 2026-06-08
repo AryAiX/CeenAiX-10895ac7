@@ -186,9 +186,9 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
 
   // Cancel any pending delete timers on unmount to prevent stale Supabase calls
   useEffect(() => {
-    const timers = undoTimers.current;
     return () => {
-      Object.values(timers).forEach(clearTimeout);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      Object.values(undoTimers.current).forEach(clearTimeout);
     };
   }, []);
 
