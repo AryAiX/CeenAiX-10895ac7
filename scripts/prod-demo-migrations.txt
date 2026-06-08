@@ -1,7 +1,7 @@
 # Demo / seed-only migrations that should be SKIPPED in production.
-# Used by scripts/setup-prod-supabase.sh: each version listed here is marked
-# `--status applied` in the prod project before `supabase db push --linked`,
-# so the seed never runs.
+# Used by production release/setup scripts: each version listed here is skipped
+# or marked `--status applied` before direct migration push, so the seed never
+# runs in prod.
 #
 # Rules:
 #   - Lines starting with `#` are comments.
@@ -14,6 +14,8 @@
 #   20260427054000  add_pharmacy_insurance_ops_portal_data  (mixed, run)
 #   20260503133000  add_lab_admin_week1_portal_data         (mixed, run)
 #   20260510010000  add_admin_portal_parity_data            (mixed, run)
+#   20260601120000  clinic_portal_backend                   (mixed, run)
+#   20260602120000  admin_clinics_and_doctor_invites        (mixed, run)
 #
 # Reference data we KEEP (lookup tables, vocab, catalogs):
 #   20260315193000  add_specializations_lookup
@@ -62,3 +64,6 @@
 # Lab inbox demo rows (3 imaging + 3 lab orders for the demo lab portal)
 20260510020000
 20260510030000
+
+# Clinic demo login repair (clinic1@aryaix.com)
+20260603120000

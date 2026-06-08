@@ -1,6 +1,7 @@
 -- Production demo-data cleanup.
 --
--- The "mixed" migrations (20260427054000, 20260503133000, 20260510010000)
+-- The "mixed" migrations (20260427054000, 20260503133000, 20260510010000,
+-- 20260601120000, 20260602120000)
 -- ship both schema (CREATE TABLE / RLS / RPCs) and demo INSERTs. For
 -- production we want the schema but NOT the demo INSERTs. Marking those
 -- migrations as `applied` would skip the schema too (bad). So we let them
@@ -82,6 +83,78 @@ DELETE FROM auth.users WHERE id IN (
   '9a1f5c7c-4f74-4c5e-8d6e-7b2a1a111001',  -- lab1 demo
   '9a1f5c7c-4f74-4c5e-8d6e-7b2a1a111002'   -- admin1 demo
 );
+
+-- Remove clinic portal demo rows from mixed clinic migrations while keeping the
+-- clinic portal schema/RPCs.
+DO $$
+DECLARE
+  clinic_user_id uuid := '729ebc60-093f-412a-bb5e-8c748b30ec7b';
+  clinic_facility_id uuid := 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'clinic_doctor_invitations'
+  ) THEN
+    DELETE FROM public.clinic_doctor_invitations
+    WHERE facility_id = clinic_facility_id
+       OR lower(email) IN ('clinic1@aryaix.com', 'doctor1@aryaix.com');
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'facility_services'
+  ) THEN
+    DELETE FROM public.facility_services WHERE facility_id = clinic_facility_id;
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'clinic_portal_members'
+  ) THEN
+    DELETE FROM public.clinic_portal_members
+    WHERE facility_id = clinic_facility_id
+       OR user_id = clinic_user_id;
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'facility_staff'
+  ) THEN
+    DELETE FROM public.facility_staff WHERE facility_id = clinic_facility_id;
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'facilities'
+  ) THEN
+    DELETE FROM public.facilities
+    WHERE id = clinic_facility_id
+       OR lower(email) = 'admin@alnoorclinic.ae'
+       OR lower(name) = 'al noor family clinic';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'organizations'
+  ) THEN
+    DELETE FROM public.organizations
+    WHERE slug = 'al-noor-family-clinic'
+       OR notes = 'Demo clinic seed';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'user_profiles'
+  ) THEN
+    DELETE FROM public.user_profiles
+    WHERE user_id = clinic_user_id
+       OR lower(email) = 'clinic1@aryaix.com';
+  END IF;
+END $$;
+
+DELETE FROM auth.users
+WHERE id = '729ebc60-093f-412a-bb5e-8c748b30ec7b'
+   OR lower(email) = 'clinic1@aryaix.com';
 
 -- Sanity check
 SELECT 'auth.users' AS t, COUNT(*) AS n FROM auth.users

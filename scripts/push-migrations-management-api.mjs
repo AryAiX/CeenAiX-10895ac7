@@ -15,6 +15,7 @@ const MAX_API_ATTEMPTS = 3;
 const RETRY_DELAYS_MS = [5000, 10000];
 
 const dryRun = process.argv.includes('--dry-run');
+const skipDemoMigrations = process.env.SUPABASE_SKIP_DEMO_MIGRATIONS === 'true';
 
 const projectRef =
   process.argv.find((arg, index) => process.argv[index - 1] === '--project-ref') ||
@@ -23,6 +24,7 @@ const projectRef =
 
 const accessToken = process.env.SUPABASE_ACCESS_TOKEN?.trim();
 const migrationsDir = resolve(process.cwd(), 'supabase/migrations');
+const demoMigrationsPath = resolve(process.cwd(), 'scripts/prod-demo-migrations.txt');
 
 if (!accessToken) {
   console.error('SUPABASE_ACCESS_TOKEN is required');
@@ -109,6 +111,17 @@ const listRemoteMigrations = async () => {
 };
 
 const listLocalMigrations = async () => {
+  const skippedVersions = new Set();
+  if (skipDemoMigrations) {
+    const skipFile = await readFile(demoMigrationsPath, 'utf8');
+    for (const rawLine of skipFile.split(/\r?\n/)) {
+      const version = rawLine.split('#', 1)[0].trim();
+      if (/^\d{14}$/.test(version)) {
+        skippedVersions.add(version);
+      }
+    }
+  }
+
   const files = (await readdir(migrationsDir))
     .filter((name) => name.endsWith('.sql'))
     .sort();
@@ -123,6 +136,7 @@ const listLocalMigrations = async () => {
       version: match[1],
       name: match[2],
       path: join(migrationsDir, filename),
+      skipInProduction: skippedVersions.has(match[1]),
     };
   });
 };
@@ -155,10 +169,19 @@ const main = async () => {
   const remoteNames = new Set(remote.map((row) => String(row.name)));
 
   const local = await listLocalMigrations();
+  const skipped = local.filter((migration) => migration.skipInProduction);
   const pending = local.filter(
     (migration) =>
+      !migration.skipInProduction &&
       !remoteVersions.has(migration.version) && !remoteNames.has(migration.name),
   );
+
+  if (skipped.length > 0) {
+    console.log(`Skipping ${skipped.length} production demo-only migration(s):`);
+    for (const migration of skipped) {
+      console.log(`  - ${migration.filename}`);
+    }
+  }
 
   if (pending.length === 0) {
     console.log('No pending migrations to apply.');
