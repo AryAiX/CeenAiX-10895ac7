@@ -142,7 +142,11 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
       );
 
       if (nextConversationId) {
-        navigate(`/${role}/messages/${nextConversationId}`, { replace: true });
+        const draftValue = searchParams.get('draft');
+        const target = draftValue
+          ? `/${role}/messages/${nextConversationId}?draft=${draftValue}`
+          : `/${role}/messages/${nextConversationId}`;
+        navigate(target, { replace: true });
       }
     })();
   }, [composeParam, composeTargetId, ensureDirectConversation, namespace, navigate, role, t, user?.id]);
@@ -151,8 +155,18 @@ export const MessagesWorkspace = ({ role }: MessagesWorkspaceProps) => {
     if (!draftParam || !activeConversationId) return;
     if (draftPrefillRef.current === activeConversationId) return;
     draftPrefillRef.current = activeConversationId;
-    setDraft(decodeURIComponent(draftParam));
-  }, [draftParam, activeConversationId]);
+    const decoded = decodeURIComponent(draftParam);
+    if (role === 'doctor') {
+      setDoctorComposerBody(decoded);
+      setTimeout(() => {
+        if (doctorComposerRef.current) {
+          doctorComposerRef.current.innerText = decoded;
+        }
+      }, 100);
+    } else {
+      setDraft(decoded);
+    }
+  }, [draftParam, activeConversationId, role]);
 
   useEffect(() => {
     setSentAttachments((prev) => {
