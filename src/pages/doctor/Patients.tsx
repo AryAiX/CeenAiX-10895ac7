@@ -411,10 +411,9 @@ export const DoctorPatients: React.FC = () => {
 
                   <div className="col-span-2">
                     <div className="font-mono text-[12px] text-slate-600">
-                      {formatPatientDate(
-                        patient.nextAppointment,
-                        t('doctor.patients.notScheduled', { defaultValue: 'Not scheduled' })
-                      )}
+                      {patient.nextAppointment && new Date(patient.nextAppointment).getTime() >= Date.now()
+                        ? formatPatientDate(patient.nextAppointment, t('doctor.patients.notScheduled', { defaultValue: 'Not scheduled' }))
+                        : t('doctor.patients.notScheduled', { defaultValue: 'Not scheduled' })}
                     </div>
                   </div>
 
@@ -714,10 +713,9 @@ export const DoctorPatients: React.FC = () => {
                     {t('doctor.patients.nextAppt', { defaultValue: 'Next Appt' })}
                   </p>
                   <p className="mt-1 font-mono">
-                    {formatPatientDate(
-                      patient.nextAppointment,
-                      t('doctor.patients.notScheduled', { defaultValue: 'Not scheduled' })
-                    )}
+                    {patient.nextAppointment && new Date(patient.nextAppointment).getTime() >= Date.now()
+                      ? formatPatientDate(patient.nextAppointment, t('doctor.patients.notScheduled', { defaultValue: 'Not scheduled' }))
+                      : t('doctor.patients.notScheduled', { defaultValue: 'Not scheduled' })}
                   </p>
                 </div>
               </div>
