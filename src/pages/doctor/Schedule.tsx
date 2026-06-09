@@ -361,7 +361,7 @@ export const DoctorSchedule: React.FC = () => {
 
           <div className="rounded-2xl bg-white p-5 shadow-sm">
             <p className="text-sm font-medium text-gray-500">Upcoming blocked slots</p>
-            {loading ? <Skeleton className="mt-3 h-8 w-12" /> : <p className="mt-3 text-3xl font-bold text-gray-900">{blockedSlots.length}</p>}
+            {loading ? <Skeleton className="mt-3 h-8 w-12" /> : <p className="mt-3 text-3xl font-bold text-gray-900">{blockedSlots.filter((slot) => slot.blocked_date >= getTodayDate()).length}</p>}
             <p className="mt-2 text-sm text-gray-600">Use blocked slots for leave, meetings, and time away from clinic.</p>
           </div>
 
