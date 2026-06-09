@@ -658,9 +658,20 @@ export const DoctorAppointmentDetail: React.FC = () => {
         <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
           <section className="space-y-6">
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="mb-4 flex items-center gap-2">
-                <User className="h-5 w-5 text-emerald-700" />
-                <h3 className="text-xl font-bold text-slate-900">{t('doctor.appointmentDetail.patientContext')}</h3>
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-emerald-700" />
+                  <h3 className="text-xl font-bold text-slate-900">{t('doctor.appointmentDetail.patientContext')}</h3>
+                </div>
+                <a
+                  href={`/doctor/patients/${data.appointment.patient_id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-100"
+                >
+                  <User className="h-4 w-4" />
+                  View Full Record ↗
+                </a>
               </div>
               <div className="grid gap-4 text-sm text-slate-600 sm:grid-cols-2">
                 <div>
