@@ -700,16 +700,6 @@ export const DoctorProfile: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-900">Doctor Profile</h1>
           <p className="mt-1 text-sm text-slate-500">Review and update the profile information patients will rely on.</p>
         </div>
-        {!isEditing ? (
-          <button
-            type="button"
-            onClick={() => setIsEditing(true)}
-            className="flex items-center gap-2 rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-700"
-          >
-            <Edit2 className="w-4 h-4" />
-            Edit profile
-          </button>
-        ) : null}
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -882,7 +872,19 @@ export const DoctorProfile: React.FC = () => {
                 </div>
               ) : null}
 
-              <h3 className="mb-4 text-lg font-semibold text-gray-900">Professional Information</h3>
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <h3 className="text-lg font-semibold text-gray-900">Professional Information</h3>
+                {!isEditing ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(true)}
+                    className="flex items-center gap-2 rounded-lg border border-teal-200 bg-teal-50 px-3 py-1.5 text-sm font-semibold text-teal-700 transition hover:bg-teal-100"
+                  >
+                    <Edit2 className="h-3.5 w-3.5" />
+                    Edit Profile
+                  </button>
+                ) : null}
+              </div>
 
               {isEditing ? (
                 <div className="space-y-4">
