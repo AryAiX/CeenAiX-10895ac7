@@ -878,6 +878,7 @@ export const CreatePrescription: React.FC = () => {
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const [showRenewModal, setShowRenewModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [patientAutoSelected, setPatientAutoSelected] = useState(false);
   const navigateAfterSaveTimer = useRef<number | null>(null);
   const selectedPatient = useMemo(
     () => patients.find((patient) => patient.id === patientId) ?? null,
@@ -887,6 +888,7 @@ export const CreatePrescription: React.FC = () => {
   useEffect(() => {
     if (!patientId && patients.length > 0) {
       setPatientId(patients[0].id);
+      setPatientAutoSelected(true);
     }
   }, [patientId, patients]);
 
@@ -1163,6 +1165,26 @@ export const CreatePrescription: React.FC = () => {
                 <div className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
                   PRESCRIBING FOR
                 </div>
+              {patientAutoSelected && selectedPatient ? (
+                <div className="mb-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">⚠️</span>
+                      <p className="text-xs font-semibold text-amber-800">
+                        Patient auto-selected — please verify before saving!
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setPatientAutoSelected(false)}
+                      className="rounded-full p-0.5 text-amber-600 transition hover:bg-amber-100 hover:text-amber-800"
+                      aria-label="Dismiss warning"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ) : null}
               {selectedPatient ? (
                 <div className="mb-3 rounded-xl border-2 border-teal-200 bg-teal-50 p-4">
                   <div className="mb-3 flex items-center space-x-3">
@@ -1191,6 +1213,7 @@ export const CreatePrescription: React.FC = () => {
                       onChange={(event) => {
                         setPatientId(event.target.value);
                         setAppointmentId('');
+                        setPatientAutoSelected(false);
                       }}
                       className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                     >
