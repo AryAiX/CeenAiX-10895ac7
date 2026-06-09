@@ -879,6 +879,9 @@ export const CreatePrescription: React.FC = () => {
   const [showRenewModal, setShowRenewModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [patientAutoSelected, setPatientAutoSelected] = useState(false);
+  const [savedPrescriptionId, setSavedPrescriptionId] = useState<string | null>(null);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [pendingNavigateTo, setPendingNavigateTo] = useState<string | null>(null);
   const navigateAfterSaveTimer = useRef<number | null>(null);
   const selectedPatient = useMemo(
     () => patients.find((patient) => patient.id === patientId) ?? null,
@@ -1024,6 +1027,23 @@ export const CreatePrescription: React.FC = () => {
   );
   const appointments = useMemo(() => appointmentsData ?? [], [appointmentsData]);
   const activeMedications = useMemo(() => activeMedicationsData ?? [], [activeMedicationsData]);
+
+  const hasUnsavedChanges = useMemo(() => {
+    if (savedPrescriptionId) return false;
+    return items.some(
+      (item) => item.medicationName.trim() || item.dosage.trim() || item.instructions.trim()
+    );
+  }, [items, savedPrescriptionId]);
+
+  const handleNavigateAway = (to: string) => {
+    if (hasUnsavedChanges) {
+      setPendingNavigateTo(to);
+      setShowLeaveConfirm(true);
+    } else {
+      navigate(to);
+    }
+  };
+
   const selectedAppointment = useMemo(
     () => appointments.find((appointment) => appointment.id === appointmentId) ?? null,
     [appointmentId, appointments]
@@ -1125,25 +1145,22 @@ export const CreatePrescription: React.FC = () => {
 
     setSaving(false);
     setShowValidationErrors(false);
+    setSavedPrescriptionId(insertedPrescription.id);
     setFeedback({ type: 'success', message: t('doctor.createPrescription.saveSuccess') });
-    if (navigateAfterSaveTimer.current) clearTimeout(navigateAfterSaveTimer.current);
-    navigateAfterSaveTimer.current = window.setTimeout(() => {
-      navigate('/doctor/prescriptions');
-    }, 2000);
   };
 
   return (
     <div className="-mx-6 -my-5 min-h-[calc(100vh-64px)] overflow-y-auto bg-slate-50 p-6 xl:h-[calc(100vh-64px)] xl:overflow-hidden">
       <div className="flex min-h-full flex-col gap-4 xl:h-full">
         <div>
-          <button
-            type="button"
-            onClick={() => navigate('/doctor/prescriptions')}
-            className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-900"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Back to Prescriptions
-          </button>
+        <button
+          type="button"
+          onClick={() => handleNavigateAway('/doctor/prescriptions')}
+          className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-900"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          Back to Prescriptions
+        </button>
         </div>
         {feedback ? (
           <div
@@ -1155,6 +1172,49 @@ export const CreatePrescription: React.FC = () => {
             }`}
           >
             {feedback.message}
+          </div>
+        ) : null}
+
+        {savedPrescriptionId && feedback?.type === 'success' ? (
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+            <p className="mb-3 text-sm font-semibold text-emerald-800">
+              What would you like to do next?
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const doctorName = profile?.full_name ?? user?.email ?? 'Your Doctor';
+                  const medicationLines = items
+                    .map((item) => `• ${item.medicationName}${item.dosage ? ` — ${item.dosage}` : ''}${item.frequencyCode ? ` — ${resolveClinicalVocabLabel(vocabRows, 'frequency', item.frequencyCode, null, 'en')}` : ''}`)
+                    .join('\n');
+                  const draft = `Hi ${selectedPatient?.name ?? 'there'},\n\nYour prescription has been issued.\n\nMedications:\n${medicationLines}\n\nPlease take your medications as prescribed. If you have any questions, feel free to message me here.\n\nDr. ${doctorName}`;
+                  navigate(`/doctor/messages?patient=${patientId}&draft=${encodeURIComponent(draft)}`);
+                }}
+                className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-100"
+              >
+                💬 Message Patient
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSavedPrescriptionId(null);
+                  setFeedback(null);
+                  setItems([createDraftPrescriptionItem()]);
+                  setAppointmentId('');
+                }}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                ➕ New Prescription
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/doctor/prescriptions')}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                📋 Back to Prescriptions
+              </button>
+            </div>
           </div>
         ) : null}
 
@@ -1601,6 +1661,41 @@ export const CreatePrescription: React.FC = () => {
             document.body
           )
         : null}
+      {showLeaveConfirm ? createPortal(
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl bg-white shadow-2xl">
+            <div className="px-6 py-5">
+              <h3 className="text-lg font-bold text-slate-900">Leave without saving?</h3>
+              <p className="mt-2 text-sm text-slate-500">
+                You have unsaved prescription changes. If you leave now all your work will be lost.
+              </p>
+            </div>
+            <div className="flex gap-3 border-t border-slate-100 px-6 py-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLeaveConfirm(false);
+                  setPendingNavigateTo(null);
+                }}
+                className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                Keep Editing
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLeaveConfirm(false);
+                  if (pendingNavigateTo) navigate(pendingNavigateTo);
+                }}
+                className="flex-1 rounded-xl bg-red-600 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
+              >
+                Leave Anyway
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      ) : null}
     </div>
   );
 };
