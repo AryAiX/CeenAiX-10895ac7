@@ -1096,14 +1096,24 @@ export const PatientAppointments: React.FC = () => {
               </div>
             </div>
 
-            <textarea
-              value={cancelCustomReason}
-              onChange={(e) => setCancelCustomReason(e.target.value)}
-              placeholder="Add additional details (optional)..."
-              required={cancelReason === 'Other'}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
-            />
+            {cancelReason === 'Other' ? (
+              <textarea
+                value={cancelCustomReason}
+                onChange={(e) => setCancelCustomReason(e.target.value)}
+                placeholder="Please describe your reason..."
+                required
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+              />
+            ) : cancelReason !== '' ? (
+              <textarea
+                value={cancelCustomReason}
+                onChange={(e) => setCancelCustomReason(e.target.value)}
+                placeholder="Add additional details (optional)..."
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+              />
+            ) : null}
 
             <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
               ⚠️ Cancelling within 24 hours of your appointment may incur a cancellation fee.
