@@ -82,6 +82,16 @@ export const Profile: React.FC = () => {
         }
         setPatientProfile(data);
       });
+    supabase
+      .from('user_profiles')
+      .select('emirates_id_front_url, emirates_id_back_url')
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!mounted) return;
+        if (data?.emirates_id_front_url) setEmiratesIdFront(data.emirates_id_front_url);
+        if (data?.emirates_id_back_url) setEmiratesIdBack(data.emirates_id_back_url);
+      });
     return () => {
       mounted = false;
     };
@@ -257,6 +267,10 @@ export const Profile: React.FC = () => {
             .from('documents')
             .getPublicUrl(path);
           setEmiratesIdFront(urlData.publicUrl);
+          await supabase
+            .from('user_profiles')
+            .update({ emirates_id_front_url: urlData.publicUrl })
+            .eq('user_id', user.id);
         }
       } else if (type === 'emiratesBack') {
         const path = `${user.id}/emirates_back_${timestamp}.${ext}`;
@@ -268,6 +282,10 @@ export const Profile: React.FC = () => {
             .from('documents')
             .getPublicUrl(path);
           setEmiratesIdBack(urlData.publicUrl);
+          await supabase
+            .from('user_profiles')
+            .update({ emirates_id_back_url: urlData.publicUrl })
+            .eq('user_id', user.id);
         }
       } else if (type === 'insurance') {
         const path = `${user.id}/insurance_card_${timestamp}.${ext}`;
@@ -296,6 +314,21 @@ export const Profile: React.FC = () => {
       .update({ avatar_url: null })
       .eq('user_id', user.id);
     setProfileImage('');
+  };
+
+  const removeEmiratesImage = async (type: 'emiratesFront' | 'emiratesBack') => {
+    if (!user?.id) return;
+    if (type === 'emiratesFront') {
+      const path = emiratesIdFront.split('/documents/')[1];
+      if (path) await supabase.storage.from('documents').remove([path]);
+      await supabase.from('user_profiles').update({ emirates_id_front_url: null }).eq('user_id', user.id);
+      setEmiratesIdFront('');
+    } else {
+      const path = emiratesIdBack.split('/documents/')[1];
+      if (path) await supabase.storage.from('documents').remove([path]);
+      await supabase.from('user_profiles').update({ emirates_id_back_url: null }).eq('user_id', user.id);
+      setEmiratesIdBack('');
+    }
   };
 
   const handleScanEmiratesId = () => {
@@ -716,7 +749,17 @@ export const Profile: React.FC = () => {
                       className="group relative border-2 border-dashed border-gray-300 rounded-2xl p-10 text-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/50 transition-all duration-300"
                     >
                       {emiratesIdFront ? (
-                        <img src={emiratesIdFront} alt={t('patient.profile.altEmiratesFront')} className="max-h-48 mx-auto rounded-xl shadow-lg" />
+                        <div className="relative inline-block">
+                          <img src={emiratesIdFront} alt={t('patient.profile.altEmiratesFront')} className="max-h-48 mx-auto rounded-xl shadow-lg" />
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); void removeEmiratesImage('emiratesFront'); }}
+                            className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full shadow-lg transition-all"
+                            aria-label="Remove front image"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
                       ) : (
                         <div className="space-y-3">
                           <div className="w-16 h-16 mx-auto bg-gray-100 rounded-2xl flex items-center justify-center group-hover:bg-emerald-100 transition-colors duration-300">
@@ -737,7 +780,17 @@ export const Profile: React.FC = () => {
                       className="group relative border-2 border-dashed border-gray-300 rounded-2xl p-10 text-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/50 transition-all duration-300"
                     >
                       {emiratesIdBack ? (
-                        <img src={emiratesIdBack} alt={t('patient.profile.altEmiratesBack')} className="max-h-48 mx-auto rounded-xl shadow-lg" />
+                        <div className="relative inline-block">
+                          <img src={emiratesIdBack} alt={t('patient.profile.altEmiratesBack')} className="max-h-48 mx-auto rounded-xl shadow-lg" />
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); void removeEmiratesImage('emiratesBack'); }}
+                            className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full shadow-lg transition-all"
+                            aria-label="Remove back image"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
                       ) : (
                         <div className="space-y-3">
                           <div className="w-16 h-16 mx-auto bg-gray-100 rounded-2xl flex items-center justify-center group-hover:bg-emerald-100 transition-colors duration-300">
