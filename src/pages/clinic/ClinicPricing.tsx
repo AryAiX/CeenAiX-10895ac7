@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth-context';
-import { Plus, CreditCard as Edit2, Trash2, DollarSign, Clock, X, Save, ToggleLeft, ToggleRight, Search } from 'lucide-react';
+import { Plus, Pencil as Edit2, Trash2, DollarSign, Clock, X, Save, ToggleLeft, ToggleRight, Search, Tag, TrendingUp, Activity } from 'lucide-react';
 
 interface PricingItem {
   id: string;
@@ -292,10 +292,10 @@ export default function ClinicPricing() {
       {/* KPIs */}
       <div className="grid grid-cols-4 gap-4">
         {[
-          { label: 'Total Services', value: items.length, icon: DollarSign, color: 'text-teal-600', bg: 'bg-teal-50' },
-          { label: 'Active Services', value: totalActive, icon: DollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: 'Total Services', value: items.length, icon: Tag, color: 'text-teal-600', bg: 'bg-teal-50' },
+          { label: 'Active Services', value: totalActive, icon: Activity, color: 'text-emerald-600', bg: 'bg-emerald-50' },
           { label: 'Avg. Price (AED)', value: avgPrice.toLocaleString(), icon: DollarSign, color: 'text-blue-600', bg: 'bg-blue-50' },
-          { label: 'Highest Fee (AED)', value: maxPrice === 1 ? '—' : maxPrice.toLocaleString(), icon: DollarSign, color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: 'Highest Fee (AED)', value: maxPrice === 1 ? '—' : maxPrice.toLocaleString(), icon: TrendingUp, color: 'text-amber-600', bg: 'bg-amber-50' },
         ].map(k => {
           const Icon = k.icon;
           return (
