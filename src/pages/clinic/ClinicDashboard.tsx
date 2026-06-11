@@ -47,6 +47,7 @@ interface DashboardData {
   todayAppts: TodayAppointment[];
   doctors: DoctorRow[];
   statusBreakdown: { label: string; count: number; color: string }[];
+  nabidhActive: boolean;
 }
 
 export default function ClinicDashboard() {
@@ -88,6 +89,14 @@ export default function ClinicDashboard() {
       if (!memberData?.facility_id) throw new Error('No clinic facility found for this user.');
 
       const facilityId = memberData.facility_id;
+
+      const { data: facilitySettings } = await supabase
+        .from('facilities')
+        .select('settings')
+        .eq('id', facilityId)
+        .maybeSingle();
+
+      const nabidhActive = (facilitySettings?.settings as Record<string, boolean>)?.nabidh ?? false;
 
       // Today's appointments filtered by facility
       const { data: appts, error: apptsError } = await supabase
@@ -229,6 +238,7 @@ export default function ClinicDashboard() {
         todayAppts: todayApptRows,
         doctors: doctorRows,
         statusBreakdown,
+        nabidhActive,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load dashboard data.');
@@ -477,13 +487,15 @@ export default function ClinicDashboard() {
                 </div>
               </div>
             ) : null}
-            <div className="flex items-start gap-3 p-3 bg-emerald-50 rounded-xl">
-              <CheckCircle size={16} className="text-emerald-500 shrink-0 mt-0.5" />
-              <div>
-                <div className="text-sm font-semibold text-slate-800">NABIDH Sync Active</div>
-                <div className="text-xs text-slate-500 mt-0.5">Records syncing automatically</div>
+            {data.nabidhActive && (
+              <div className="flex items-start gap-3 p-3 bg-emerald-50 rounded-xl">
+                <CheckCircle size={16} className="text-emerald-500 shrink-0 mt-0.5" />
+                <div>
+                  <div className="text-sm font-semibold text-slate-800">NABIDH Sync Active</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Records syncing automatically</div>
+                </div>
               </div>
-            </div>
+            )}
             {data.pendingApproval === 0 && data.todayApptCount > 0 ? (
               <div className="flex items-start gap-3 p-3 bg-teal-50 rounded-xl">
                 <CheckCircle size={16} className="text-teal-500 shrink-0 mt-0.5" />
