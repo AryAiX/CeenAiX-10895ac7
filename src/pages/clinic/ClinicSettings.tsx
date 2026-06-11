@@ -20,7 +20,7 @@ export default function ClinicSettings() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [, setFacilityId] = useState<string | null>(null);
+  const [facilityId, setFacilityId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [clinicName, setClinicName] = useState('');
   const [clinicType, setClinicType] = useState('');
@@ -76,6 +76,30 @@ export default function ClinicSettings() {
       setError(err instanceof Error ? err.message : 'Failed to load clinic settings.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveClinicInfo = async () => {
+    if (!facilityId) return;
+    setFeedback(null);
+    try {
+      const { error: updateError } = await supabase
+        .from('facilities')
+        .update({
+          name: clinicName,
+          facility_type: clinicType,
+          license_number: license,
+          phone: phone,
+          email: email,
+          address: address,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', facilityId);
+
+      if (updateError) throw updateError;
+      setFeedback({ type: 'success', message: 'Clinic information saved successfully.' });
+    } catch (err) {
+      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to save changes.' });
     }
   };
 
@@ -137,7 +161,10 @@ export default function ClinicSettings() {
             {feedback.message}
           </div>
         ) : null}
-        <button onClick={() => setFeedback({ type: 'success', message: 'Clinic information saved' })} className="flex items-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-semibold transition-colors">
+        <button
+          onClick={() => void handleSaveClinicInfo()}
+          className="flex items-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-semibold transition-colors"
+        >
           <Save size={15} /> Save Changes
         </button>
       </div>
