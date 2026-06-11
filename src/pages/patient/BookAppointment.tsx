@@ -364,21 +364,34 @@ export const BookAppointment: React.FC = () => {
             p_chief_complaint: chiefComplaint.trim(),
             p_notes: notes.trim(),
           })
-        : await supabase
-            .from('appointments')
-            .insert({
-              patient_id: user.id,
-              doctor_id: selectedDoctor.userId,
-              facility_id: null,
-              type: appointmentType,
-              status: 'scheduled',
-              scheduled_at: selectedSlot.iso,
-              duration_minutes: selectedSlot.durationMinutes,
-              chief_complaint: chiefComplaint.trim(),
-              notes: notes.trim() || null,
-            })
-            .select('id')
-            .single();
+        : await (async () => {
+            // Look up doctor's facility
+            let doctorFacilityId: string | null = null;
+            const { data: staffData } = await supabase
+              .from('facility_staff')
+              .select('facility_id')
+              .eq('doctor_user_id', selectedDoctor.userId)
+              .eq('is_active', true)
+              .eq('invitation_status', 'accepted')
+              .maybeSingle();
+            doctorFacilityId = staffData?.facility_id ?? null;
+
+            return supabase
+              .from('appointments')
+              .insert({
+                patient_id: user.id,
+                doctor_id: selectedDoctor.userId,
+                facility_id: doctorFacilityId,
+                type: appointmentType,
+                status: 'scheduled',
+                scheduled_at: selectedSlot.iso,
+                duration_minutes: selectedSlot.durationMinutes,
+                chief_complaint: chiefComplaint.trim(),
+                notes: notes.trim() || null,
+              })
+              .select('id')
+              .single();
+          })()
 
       if (bookingResult.error) {
         setFeedback({ type: 'error', message: bookingResult.error.message });
