@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth-context';
-import { Search, Users, Phone, Mail, Calendar, Clock, ChevronRight } from 'lucide-react';
+import { Search, Users, Phone, Mail, Calendar, Clock, ChevronRight, X, BookOpen, MessageSquare, User } from 'lucide-react';
 
 interface Patient {
   id: string;
@@ -15,12 +17,165 @@ interface Patient {
   balance: number;
 }
 
+const apptStatusConfig: Record<string, { label: string; color: string }> = {
+  scheduled:     { label: 'Scheduled',   color: 'bg-slate-100 text-slate-600' },
+  confirmed:     { label: 'Confirmed',   color: 'bg-teal-50 text-teal-700' },
+  'in-progress': { label: 'In Progress', color: 'bg-blue-50 text-blue-700' },
+  in_progress:   { label: 'In Progress', color: 'bg-blue-50 text-blue-700' },
+  completed:     { label: 'Completed',   color: 'bg-emerald-50 text-emerald-700' },
+  cancelled:     { label: 'Cancelled',   color: 'bg-red-50 text-red-600' },
+  'no-show':     { label: 'No Show',     color: 'bg-amber-50 text-amber-700' },
+  no_show:       { label: 'No Show',     color: 'bg-amber-50 text-amber-700' },
+};
+
+function PatientModal({ patient, appts, onClose, onBook, onMessage }: {
+  patient: Patient;
+  appts: { id?: string; scheduled_at: string; status: string }[];
+  onClose: () => void;
+  onBook: () => void;
+  onMessage: () => void;
+}) {
+  const initials = patient.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase();
+
+  return createPortal(
+    <div className="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
+              {initials}
+            </div>
+            <div>
+              <h3 className="font-bold text-slate-900">{patient.name}</h3>
+              <p className="text-xs text-slate-400">Patient Profile</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg">
+            <X size={18} className="text-slate-400" />
+          </button>
+        </div>
+
+        <div className="overflow-y-auto flex-1 p-6 space-y-6">
+
+          {/* Patient Info */}
+          <div>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">Patient Info</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-center gap-2 text-sm text-slate-600">
+                <Phone size={14} className="text-slate-400" /> {patient.phone}
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-600">
+                <Mail size={14} className="text-slate-400" /> {patient.email}
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-600">
+                <User size={14} className="text-slate-400" /> DOB: {patient.dob}
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-600">
+                <Calendar size={14} className="text-slate-400" /> Last Visit: {patient.lastVisit}
+              </div>
+            </div>
+          </div>
+
+          {/* Clinical Summary */}
+          <div>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">Clinical Summary</p>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-slate-50 rounded-xl p-3 text-center">
+                <div className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Mono, monospace' }}>{patient.totalVisits}</div>
+                <div className="text-xs text-slate-500 mt-0.5">Total Visits</div>
+              </div>
+              <div className="bg-slate-50 rounded-xl p-3 text-center">
+                <div className="text-sm font-semibold text-slate-700">{patient.doctor}</div>
+                <div className="text-xs text-slate-500 mt-0.5">Primary Doctor</div>
+              </div>
+              <div className="bg-slate-50 rounded-xl p-3 text-center">
+                {patient.balance > 0 ? (
+                  <>
+                    <div className="text-xl font-bold text-amber-600" style={{ fontFamily: 'DM Mono, monospace' }}>AED {patient.balance}</div>
+                    <div className="text-xs text-slate-500 mt-0.5">Outstanding</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-xl font-bold text-emerald-600">✓</div>
+                    <div className="text-xs text-slate-500 mt-0.5">Balance Cleared</div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Appointment History */}
+          <div>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">Appointment History</p>
+            {appts.length === 0 ? (
+              <div className="text-center py-8 text-slate-400">
+                <Calendar size={28} className="mx-auto mb-2 opacity-30" />
+                <p className="text-sm">No appointments found.</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {appts.map((a, idx) => {
+                  const s = apptStatusConfig[a.status] ?? apptStatusConfig.scheduled;
+                  const date = new Date(a.scheduled_at);
+                  return (
+                    <div key={a.id ?? idx} className="flex items-center justify-between px-4 py-3 bg-slate-50 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-white rounded-lg border border-slate-200 flex items-center justify-center">
+                          <Calendar size={13} className="text-teal-600" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-slate-800">
+                            {date.toLocaleDateString('en-AE', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </div>
+                          <div className="text-xs text-slate-400">
+                            {date.toLocaleTimeString('en-AE', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                          </div>
+                        </div>
+                      </div>
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${s.color}`}>
+                        {s.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="flex gap-3 px-6 py-4 border-t border-slate-100">
+          <button
+            onClick={onMessage}
+            className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2"
+          >
+            <MessageSquare size={15} /> Send Message
+          </button>
+          <button
+            onClick={onBook}
+            className="flex-1 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+          >
+            <BookOpen size={15} /> Book Appointment
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
 export default function ClinicPatients() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [rawAppts, setRawAppts] = useState<{ id?: string; patient_id: string; doctor_id: string; scheduled_at: string; status: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [patientAppts, setPatientAppts] = useState<{ id?: string; scheduled_at: string; status: string }[]>([]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -31,7 +186,6 @@ export default function ClinicPatients() {
     setLoading(true);
     setError(null);
     try {
-      // Get facility_id
       const { data: memberData, error: memberError } = await supabase
         .from('clinic_portal_members')
         .select('facility_id')
@@ -44,29 +198,24 @@ export default function ClinicPatients() {
 
       const facilityId = memberData.facility_id;
 
-      // Get all appointments for this facility
       const { data: apptData, error: apptError } = await supabase
         .from('appointments')
-        .select('patient_id, doctor_id, scheduled_at, status')
+        .select('id, patient_id, doctor_id, scheduled_at, status')
         .eq('facility_id', facilityId)
         .eq('is_deleted', false);
 
       if (apptError) throw apptError;
 
-      // Get unique patient IDs
       const patientIds = [...new Set((apptData ?? []).map(a => a.patient_id))];
-      if (patientIds.length === 0) { setPatients([]); return; }
+      if (patientIds.length === 0) { setPatients([]); setRawAppts([]); return; }
 
-      // Get unique doctor IDs
       const doctorIds = [...new Set((apptData ?? []).map(a => a.doctor_id))];
 
-      // Fetch patient profiles
       const { data: patientProfiles } = await supabase
         .from('user_profiles')
         .select('user_id, full_name, phone, email, date_of_birth')
         .in('user_id', patientIds);
 
-      // Fetch doctor profiles
       const { data: doctorProfiles } = await supabase
         .from('user_profiles')
         .select('user_id, full_name')
@@ -74,11 +223,10 @@ export default function ClinicPatients() {
 
       const doctorMap = new Map((doctorProfiles ?? []).map(d => [d.user_id, d.full_name]));
 
-      // Build patient rows
       const rows: Patient[] = patientIds.map(pid => {
         const profile = (patientProfiles ?? []).find(p => p.user_id === pid);
-        const patientAppts = (apptData ?? []).filter(a => a.patient_id === pid);
-        const sorted = [...patientAppts].sort((a, b) =>
+        const patientApptList = (apptData ?? []).filter(a => a.patient_id === pid);
+        const sorted = [...patientApptList].sort((a, b) =>
           new Date(b.scheduled_at).getTime() - new Date(a.scheduled_at).getTime()
         );
         const lastAppt = sorted[0];
@@ -98,17 +246,26 @@ export default function ClinicPatients() {
           dob,
           lastVisit,
           doctor: doctorMap.get(primaryDoctorId) ? `Dr. ${doctorMap.get(primaryDoctorId)}` : '—',
-          totalVisits: patientAppts.length,
+          totalVisits: patientApptList.length,
           balance: 0,
         };
       });
 
       setPatients(rows);
+      setRawAppts(apptData ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load patients.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRowClick = (patient: Patient) => {
+    const appts = rawAppts
+      .filter(a => a.patient_id === patient.id)
+      .sort((a, b) => new Date(b.scheduled_at).getTime() - new Date(a.scheduled_at).getTime());
+    setPatientAppts(appts);
+    setSelectedPatient(patient);
   };
 
   const now = new Date();
@@ -190,7 +347,7 @@ export default function ClinicPatients() {
             {filtered.map(p => {
               const initials = p.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
               return (
-                <tr key={p.id} className="hover:bg-slate-50/50 transition-colors cursor-pointer">
+                <tr key={p.id} onClick={() => handleRowClick(p)} className="hover:bg-slate-50/50 transition-colors cursor-pointer">
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-gradient-to-br from-teal-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
@@ -230,6 +387,16 @@ export default function ClinicPatients() {
           </tbody>
         </table>
       </div>
+
+      {selectedPatient && (
+        <PatientModal
+          patient={selectedPatient}
+          appts={patientAppts}
+          onClose={() => setSelectedPatient(null)}
+          onBook={() => { setSelectedPatient(null); }}
+          onMessage={() => navigate('/clinic/messages')}
+        />
+      )}
     </div>
   );
 }
