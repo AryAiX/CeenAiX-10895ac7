@@ -40,7 +40,6 @@ const statusConfig = {
   suspended: { label: 'Suspended', color: 'bg-red-100 text-red-700 border-red-200' },
 };
 
-const specialties = ['All Specialties', 'Cardiology', 'Internal Medicine', 'General Practice', 'Endocrinology', 'Orthopedics', 'Pediatrics'];
 
 function AddDoctorModal({ onClose, onSave }: { onClose: () => void; onSave: (d: Partial<Doctor>) => void }) {
   const [form, setForm] = useState({ name: '', specialty: '', dhaLicense: '', phone: '', email: '', consultationFee: 0 });
@@ -198,6 +197,7 @@ function DoctorDetailDrawer({ doctor, onClose, onApprove, onReject, onSuspend }:
 export default function ClinicDoctors() {
   const { user } = useAuth();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [specialties, setSpecialties] = useState<string[]>(['All Specialties']);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [facilityId, setFacilityId] = useState<string | null>(null);
@@ -347,6 +347,8 @@ export default function ClinicDoctors() {
       });
 
       setDoctors(doctorRows);
+      const uniqueSpecialties = [...new Set(doctorRows.map(d => d.specialty).filter(Boolean))];
+      setSpecialties(['All Specialties', ...uniqueSpecialties]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load doctors.');
     } finally {
