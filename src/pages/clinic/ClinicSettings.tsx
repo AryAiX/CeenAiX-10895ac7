@@ -59,7 +59,7 @@ export default function ClinicSettings() {
 
       const { data: facilityData, error: facilityError } = await supabase
         .from('facilities')
-        .select('name, facility_type, license_number, phone, email, address, operating_hours')
+        .select('name, facility_type, license_number, phone, email, address, operating_hours, settings')
         .eq('id', fId)
         .maybeSingle();
 
@@ -85,6 +85,12 @@ export default function ClinicSettings() {
             if (open) setOpenTime(open);
             if (close) setCloseTime(close);
           }
+        }
+        if (facilityData.settings) {
+          const s = facilityData.settings as Record<string, boolean>;
+          if (s.notifAppt !== undefined) setNotifAppt(s.notifAppt);
+          if (s.notifPayment !== undefined) setNotifPayment(s.notifPayment);
+          if (s.notifLicense !== undefined) setNotifLicense(s.notifLicense);
         }
       }
     } catch (err) {
@@ -115,6 +121,29 @@ export default function ClinicSettings() {
       setFeedback({ type: 'success', message: 'Clinic information saved successfully.' });
     } catch (err) {
       setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to save changes.' });
+    }
+  };
+
+  const handleSaveNotifications = async () => {
+    if (!facilityId) return;
+    setFeedback(null);
+    try {
+      const { error: updateError } = await supabase
+        .from('facilities')
+        .update({
+          settings: {
+            notifAppt,
+            notifPayment,
+            notifLicense,
+          },
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', facilityId);
+
+      if (updateError) throw updateError;
+      setFeedback({ type: 'success', message: 'Notification preferences saved successfully.' });
+    } catch (err) {
+      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to save notifications.' });
     }
   };
 
@@ -268,6 +297,12 @@ export default function ClinicSettings() {
             <Toggle checked={n.val} onChange={n.set} />
           </div>
         ))}
+        <button
+          onClick={() => void handleSaveNotifications()}
+          className="flex items-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-semibold transition-colors"
+        >
+          <Save size={15} /> Save Notifications
+        </button>
       </div>
 
       {/* NABIDH */}
