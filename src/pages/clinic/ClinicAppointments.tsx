@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { useAuth } from '../../lib/auth-context';
 import { createPortal } from 'react-dom';
 import { Plus, Search, Calendar, Clock, X, Save, Check, DollarSign, Phone } from 'lucide-react';
@@ -38,10 +39,31 @@ const statusConfig: Record<string, { label: string; color: string; dot: string }
   no_show:      { label: 'No Show',     color: 'bg-amber-50 text-amber-700 border-amber-200',       dot: 'bg-amber-400' },
 };
 
-function BookModal({ onClose, onBook, doctors: doctorList }: { onClose: () => void; onBook: (a: Partial<Appointment>) => void; doctors: string[] }) {
+function BookModal({ onClose, onBook, doctors: doctorList, supabase: sb }: { onClose: () => void; onBook: (a: Partial<Appointment> & { patientId: string }) => void; doctors: string[]; supabase: SupabaseClient }) {
   const [form, setForm] = useState({ patientName: '', patientPhone: '', doctor: doctorList[0] ?? '', type: apptTypes[0], date: '', time: '', notes: '' });
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }));
+
+  const [patientSearch, setPatientSearch] = useState('');
+  const [patientResults, setPatientResults] = useState<{ userId: string; fullName: string; phone: string }[]>([]);
+  const [selectedPatient, setSelectedPatient] = useState<{ userId: string; fullName: string; phone: string } | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+
+  const searchPatients = async (query: string) => {
+    setPatientSearch(query);
+    setSelectedPatient(null);
+    setSearchError(null);
+    if (query.length < 2) { setPatientResults([]); setShowDropdown(false); return; }
+    const { data } = await sb
+      .from('user_profiles')
+      .select('user_id, full_name, phone')
+      .eq('role', 'patient')
+      .ilike('full_name', `%${query}%`)
+      .limit(8);
+    setPatientResults((data ?? []).map(p => ({ userId: p.user_id, fullName: p.full_name ?? 'Unknown', phone: p.phone ?? '—' })));
+    setShowDropdown(true);
+  };
 
   return createPortal(
     <div className="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4">
@@ -54,9 +76,43 @@ function BookModal({ onClose, onBook, doctors: doctorList }: { onClose: () => vo
           <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg"><X size={18} className="text-slate-400" /></button>
         </div>
         <div className="p-6 grid grid-cols-2 gap-4">
-          <div className="col-span-2">
+          <div className="col-span-2 relative">
             <label className="block text-xs font-semibold text-slate-600 mb-1">Patient Name</label>
-            <input type="text" value={form.patientName} onChange={set('patientName')} placeholder="Full name" className="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
+            <div className="relative">
+              <input
+                type="text"
+                value={patientSearch}
+                onChange={e => void searchPatients(e.target.value)}
+                placeholder="Search patient by name…"
+                className="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              />
+              {selectedPatient && (
+                <Check size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-teal-500" />
+              )}
+            </div>
+            {showDropdown && patientResults.length > 0 && (
+              <div className="absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                {patientResults.map(p => (
+                  <div
+                    key={p.userId}
+                    onClick={() => {
+                      setSelectedPatient(p);
+                      setPatientSearch(p.fullName);
+                      setForm(f => ({ ...f, patientName: p.fullName, patientPhone: p.phone }));
+                      setShowDropdown(false);
+                    }}
+                    className="px-3 py-2 hover:bg-teal-50 cursor-pointer text-sm"
+                  >
+                    <div className="font-medium text-slate-800">{p.fullName}</div>
+                    <div className="text-xs text-slate-400">{p.phone}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {patientSearch.length >= 2 && showDropdown && patientResults.length === 0 && !selectedPatient && (
+              <p className="text-xs text-slate-400 mt-1">No patients found.</p>
+            )}
+            {searchError && <p className="text-xs text-red-500 mt-1">{searchError}</p>}
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Patient Phone</label>
@@ -90,7 +146,14 @@ function BookModal({ onClose, onBook, doctors: doctorList }: { onClose: () => vo
         <div className="flex gap-3 px-6 pb-6">
           <button onClick={onClose} className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition-colors">Cancel</button>
           <button
-            onClick={() => { onBook(form); onClose(); }}
+            onClick={() => {
+              if (!selectedPatient) {
+                setSearchError('Please search and select a patient from the list.');
+                return;
+              }
+              onBook({ ...form, patientId: selectedPatient.userId });
+              onClose();
+            }}
             className="flex-1 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2"
           >
             <Save size={15} /> Book Appointment
@@ -243,7 +306,7 @@ export default function ClinicAppointments() {
     .filter(a => a.date === today && a.status === 'completed')
     .reduce((s, a) => s + a.price, 0);
 
-  const handleBook = async (data: Partial<Appointment>) => {
+  const handleBook = async (data: Partial<Appointment> & { patientId: string }) => {
     if (!facilityId) return;
     try {
       const selectedDoctor = doctorOptions.find(d => d.name === data.doctor);
@@ -256,7 +319,7 @@ export default function ClinicAppointments() {
         .insert({
           facility_id: facilityId,
           doctor_id: selectedDoctor.userId,
-          patient_id: user!.id,
+          patient_id: data.patientId,
           type: 'in_person',
           status: 'scheduled',
           scheduled_at: scheduledAt,
@@ -432,7 +495,7 @@ export default function ClinicAppointments() {
         )}
       </div>
 
-      {showBook && <BookModal onClose={() => setShowBook(false)} onBook={handleBook} doctors={doctorOptions.map(d => d.name)} />}
+      {showBook && <BookModal onClose={() => setShowBook(false)} onBook={handleBook} doctors={doctorOptions.map(d => d.name)} supabase={supabase} />}
     </div>
   );
 }
