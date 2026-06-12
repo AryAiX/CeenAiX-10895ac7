@@ -39,6 +39,15 @@ const statusConfig: Record<string, { label: string; color: string; dot: string }
   no_show:      { label: 'No Show',     color: 'bg-amber-50 text-amber-700 border-amber-200',       dot: 'bg-amber-400' },
 };
 
+const statusOptions = [
+  { value: 'scheduled',   label: 'Scheduled' },
+  { value: 'confirmed',   label: 'Confirmed' },
+  { value: 'in_progress', label: 'In Progress' },
+  { value: 'completed',   label: 'Completed' },
+  { value: 'cancelled',   label: 'Cancelled' },
+  { value: 'no_show',     label: 'No Show' },
+];
+
 function BookModal({ onClose, onBook, doctors: doctorList, supabase: sb }: { onClose: () => void; onBook: (a: Partial<Appointment> & { patientId: string }) => void; doctors: DoctorOption[]; supabase: SupabaseClient }) {
   const [form, setForm] = useState({ patientName: '', patientPhone: '', doctor: doctorList[0]?.userId ?? '', type: apptTypes[0], date: '', time: '', notes: '' });
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
@@ -431,7 +440,7 @@ export default function ClinicAppointments() {
         </div>
         <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white">
           <option value="all">All Status</option>
-          {Object.entries(statusConfig).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+          {statusOptions.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
         <select value={filterDoctor} onChange={e => setFilterDoctor(e.target.value)} className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white">
           <option>All Doctors</option>
@@ -479,7 +488,7 @@ export default function ClinicAppointments() {
                       onChange={e => changeStatus(a.id, e.target.value as Appointment['status'])}
                       className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
                     >
-                      {Object.entries(statusConfig).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                      {statusOptions.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
                     </select>
                   </td>
                 </tr>
