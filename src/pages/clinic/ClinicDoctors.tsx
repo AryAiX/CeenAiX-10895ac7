@@ -12,7 +12,7 @@ interface Doctor {
   dhaLicense: string;
   phone: string;
   email: string;
-  status: 'active' | 'pending' | 'inactive' | 'suspended';
+  status: 'active' | 'pending' | 'invited' | 'inactive' | 'suspended';
   initials: string;
   gradient: string;
   joinedDate: string;
@@ -37,6 +37,7 @@ const gradients = [
 const statusConfig = {
   active:    { label: 'Active',    color: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
   pending:   { label: 'Pending',   color: 'bg-amber-100 text-amber-700 border-amber-200' },
+  invited:   { label: 'Invited',   color: 'bg-blue-100 text-blue-700 border-blue-200' },
   inactive:  { label: 'Inactive',  color: 'bg-slate-100 text-slate-600 border-slate-200' },
   suspended: { label: 'Suspended', color: 'bg-red-100 text-red-700 border-red-200' },
 };
@@ -507,7 +508,9 @@ export default function ClinicDoctors() {
           ? 'active'
           : staff.invitation_status === 'pending'
             ? 'pending'
-            : 'inactive';
+            : staff.invitation_status === 'invited'
+              ? 'invited'
+              : 'inactive';
 
         const joinedDate = staff.created_at
           ? new Date(staff.created_at).toLocaleDateString('en-AE', { month: 'short', year: 'numeric' })
@@ -524,7 +527,7 @@ export default function ClinicDoctors() {
           status,
           initials,
           gradient: gradients[idx % gradients.length],
-          joinedDate: status === 'pending' ? 'Pending' : joinedDate,
+          joinedDate: status === 'pending' ? 'Pending' : status === 'invited' ? 'Invited' : joinedDate,
           todayAppts: todayApptCount.get(staff.doctor_user_id) ?? 0,
           totalAppts: totalApptCount.get(staff.doctor_user_id) ?? 0,
           rating: ratings?.average_rating ? Number(Number(ratings.average_rating).toFixed(1)) : 0,
@@ -618,6 +621,20 @@ export default function ClinicDoctors() {
       setDoctors(prev => prev.map(d => d.id === id ? { ...d, status: 'inactive' } : d));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to reject doctor.');
+    }
+  };
+
+  const handleCancelInvite = async (id: string) => {
+    try {
+      const { error: updateError } = await supabase
+        .from('facility_staff')
+        .update({ invitation_status: 'cancelled', is_active: false, is_available: false })
+        .eq('id', id);
+      if (updateError) throw updateError;
+      setDoctors(prev => prev.filter(d => d.id !== id));
+      setMenuOpen(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to cancel invitation.');
     }
   };
 
@@ -823,8 +840,15 @@ export default function ClinicDoctors() {
                           {d.status === 'pending' && (
                             <button onClick={() => { void handleReject(d.id); setMenuOpen(null); }} className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"><XCircle size={14} /> Reject</button>
                           )}
-                          <button onClick={() => handleStartEdit(d)} className="w-full px-4 py-2 text-left text-sm text-slate-600 hover:bg-slate-50 flex items-center gap-2"><Edit2 size={14} /> Edit Profile</button>
-                          <button onClick={() => { setConfirmDelete(d.id); setMenuOpen(null); }} className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"><Trash2 size={14} /> Remove</button>
+                          {d.status === 'invited' && (
+                            <button onClick={() => { void handleCancelInvite(d.id); setMenuOpen(null); }} className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"><XCircle size={14} /> Cancel Invite</button>
+                          )}
+                          {d.status !== 'invited' && (
+                            <button onClick={() => handleStartEdit(d)} className="w-full px-4 py-2 text-left text-sm text-slate-600 hover:bg-slate-50 flex items-center gap-2"><Edit2 size={14} /> Edit Profile</button>
+                          )}
+                          {d.status !== 'invited' && (
+                            <button onClick={() => { setConfirmDelete(d.id); setMenuOpen(null); }} className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"><Trash2 size={14} /> Remove</button>
+                          )}
                         </div>
                       )}
                     </div>
