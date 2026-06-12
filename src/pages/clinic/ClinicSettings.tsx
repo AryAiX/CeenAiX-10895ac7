@@ -326,6 +326,12 @@ export default function ClinicSettings() {
             ✅ NABIDH sync is active — records are being submitted automatically
           </div>
         )}
+        <button
+          onClick={() => void handleSaveNotifications()}
+          className="flex items-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-semibold transition-colors"
+        >
+          <Save size={15} /> Save NABIDH Settings
+        </button>
       </div>
 
 
