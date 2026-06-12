@@ -42,9 +42,69 @@ const statusConfig = {
 };
 
 
-function AddDoctorModal({ onClose, onSave }: { onClose: () => void; onSave: (d: Partial<Doctor>) => void }) {
-  const [form, setForm] = useState({ name: '', specialty: '', dhaLicense: '', phone: '', email: '', consultationFee: 0 });
-  const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm(f => ({ ...f, [k]: e.target.value }));
+function AddDoctorModal({ onClose, facilityId, existingDoctorIds, onInvited }: {
+  onClose: () => void;
+  facilityId: string;
+  existingDoctorIds: string[];
+  onInvited: () => void;
+}) {
+  const [search, setSearch] = useState('');
+  const [results, setResults] = useState<{ userId: string; name: string; email: string; specialty: string }[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [inviteError, setInviteError] = useState<string | null>(null);
+  const [invitedIds, setInvitedIds] = useState<string[]>([]);
+  const [invitingId, setInvitingId] = useState<string | null>(null);
+
+  const searchDoctors = async (query: string) => {
+    setSearch(query);
+    setInviteError(null);
+    if (query.length < 2) { setResults([]); return; }
+    setSearching(true);
+    const { data } = await supabase
+      .from('user_profiles')
+      .select('user_id, full_name, email')
+      .eq('role', 'doctor')
+      .ilike('full_name', `%${query}%`)
+      .limit(8);
+
+    const userIds = (data ?? []).map(d => d.user_id);
+    const { data: specData } = await supabase
+      .from('doctor_profiles')
+      .select('user_id, specialization')
+      .in('user_id', userIds);
+    const specMap = new Map((specData ?? []).map(s => [s.user_id, s.specialization]));
+
+    setResults((data ?? []).map(d => ({
+      userId: d.user_id,
+      name: d.full_name ?? 'Unknown Doctor',
+      email: d.email ?? '—',
+      specialty: specMap.get(d.user_id) ?? 'General Practice',
+    })));
+    setSearching(false);
+  };
+
+  const handleInvite = async (doctorUserId: string) => {
+    setInvitingId(doctorUserId);
+    setInviteError(null);
+    try {
+      const { error: insertError } = await supabase
+        .from('facility_staff')
+        .insert({
+          facility_id: facilityId,
+          doctor_user_id: doctorUserId,
+          invitation_status: 'invited',
+          is_active: false,
+          is_available: false,
+        });
+      if (insertError) throw insertError;
+      setInvitedIds(prev => [...prev, doctorUserId]);
+      onInvited();
+    } catch (err) {
+      setInviteError(err instanceof Error ? err.message : 'Failed to send invitation.');
+    } finally {
+      setInvitingId(null);
+    }
+  };
 
   return createPortal(
     <div className="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4">
@@ -52,39 +112,66 @@ function AddDoctorModal({ onClose, onSave }: { onClose: () => void; onSave: (d: 
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-teal-50 rounded-xl flex items-center justify-center"><Stethoscope size={18} className="text-teal-600" /></div>
-            <h3 className="font-bold text-slate-900">Add New Doctor</h3>
+            <h3 className="font-bold text-slate-900">Invite a Doctor</h3>
           </div>
           <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg"><X size={18} className="text-slate-400" /></button>
         </div>
-        <div className="p-6 grid grid-cols-2 gap-4">
-          {[
-            { label: 'Full Name', key: 'name', placeholder: 'Dr. First Last', col: 'col-span-2' },
-            { label: 'Specialty', key: 'specialty', placeholder: 'e.g. Cardiology' },
-            { label: 'DHA License #', key: 'dhaLicense', placeholder: 'DHA-PRAC-YYYY-XXXXXX' },
-            { label: 'Phone', key: 'phone', placeholder: '+971 XX XXX XXXX' },
-            { label: 'Email', key: 'email', placeholder: 'doctor@clinic.ae' },
-            { label: 'Consultation Fee (AED)', key: 'consultationFee', placeholder: '500' },
-          ].map(f => (
-            <div key={f.key} className={f.col || ''}>
-              <label className="block text-xs font-semibold text-slate-600 mb-1">{f.label}</label>
-              <input
-                type={f.key === 'email' ? 'email' : f.key === 'consultationFee' ? 'number' : 'text'}
-                value={(form as Record<string, string | number>)[f.key]}
-                onChange={set(f.key)}
-                placeholder={f.placeholder}
-                className="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-              />
+        <div className="p-6 space-y-4">
+          <div className="relative">
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={e => void searchDoctors(e.target.value)}
+              placeholder="Search doctor by name…"
+              className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+            />
+          </div>
+
+          {inviteError && <p className="text-xs text-red-500">{inviteError}</p>}
+          {searching && <p className="text-xs text-slate-400">Searching…</p>}
+
+          {results.length > 0 && (
+            <div className="border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-100 max-h-72 overflow-y-auto">
+              {results.map(d => {
+                const alreadyInClinic = existingDoctorIds.includes(d.userId);
+                const justInvited = invitedIds.includes(d.userId);
+                return (
+                  <div key={d.userId} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-teal-50 rounded-lg flex items-center justify-center">
+                        <Stethoscope size={14} className="text-teal-600" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-slate-800">{d.name}</div>
+                        <div className="text-xs text-slate-400">{d.specialty} · {d.email}</div>
+                      </div>
+                    </div>
+                    {alreadyInClinic || justInvited ? (
+                      <span className="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-semibold">
+                        {justInvited ? 'Invited ✓' : 'Already in Clinic'}
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => void handleInvite(d.userId)}
+                        disabled={invitingId === d.userId}
+                        className="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
+                      >
+                        {invitingId === d.userId ? 'Sending…' : 'Invite'}
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-          ))}
+          )}
+
+          {search.length >= 2 && !searching && results.length === 0 && (
+            <p className="text-xs text-slate-400">No doctors found for "{search}"</p>
+          )}
         </div>
         <div className="flex gap-3 px-6 pb-6">
-          <button onClick={onClose} className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition-colors">Cancel</button>
-          <button
-            onClick={() => { onSave(form); onClose(); }}
-            className="flex-1 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2"
-          >
-            <Save size={15} /> Add Doctor
-          </button>
+          <button onClick={onClose} className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition-colors">Close</button>
         </div>
       </div>
     </div>,
@@ -494,60 +581,6 @@ export default function ClinicDoctors() {
     pending: doctors.filter(d => d.status === 'pending').length,
   };
 
-  const handleAdd = async (data: Partial<Doctor>) => {
-    if (!facilityId || !user?.id) return;
-    try {
-      const { data: inserted, error: insertError } = await supabase
-        .from('clinic_doctor_invitations')
-        .insert({
-          facility_id: facilityId,
-          invited_by: user.id,
-          email: data.email || '',
-          full_name: data.name || '',
-          status: 'pending',
-          payload: {
-            specialty: data.specialty || '',
-            dha_license: data.dhaLicense || '',
-            phone: data.phone || '',
-            consultation_fee: Number(data.consultationFee) || 0,
-          },
-        })
-        .select('id')
-        .single();
-
-      if (insertError) throw insertError;
-
-      const nameParts = (data.name || 'DR').split(' ').filter(Boolean);
-      const initials = nameParts.length >= 2
-        ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase()
-        : (nameParts[0]?.[0] ?? 'D').toUpperCase();
-
-      const newDoc: Doctor = {
-        id: inserted.id,
-        doctorUserId: '',
-        name: data.name || '',
-        specialty: data.specialty || '',
-        dhaLicense: data.dhaLicense || '',
-        phone: data.phone || '',
-        email: data.email || '',
-        status: 'pending',
-        initials,
-        gradient: 'from-slate-600 to-slate-700',
-        joinedDate: 'Pending',
-        todayAppts: 0,
-        totalAppts: 0,
-        rating: 0,
-        consultationFee: Number(data.consultationFee) || 0,
-        weeklyAvailability: [],
-        upcomingBlockedSlots: [],
-        dhaVerified: false,
-      };
-      setDoctors(prev => [newDoc, ...prev]);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add doctor.');
-    }
-  };
-
   const handleApprove = async (id: string) => {
     try {
       const doctor = doctors.find(d => d.id === id);
@@ -809,7 +842,14 @@ export default function ClinicDoctors() {
         )}
       </div>
 
-      {showAdd && <AddDoctorModal onClose={() => setShowAdd(false)} onSave={handleAdd} />}
+      {showAdd && facilityId && (
+        <AddDoctorModal
+          onClose={() => setShowAdd(false)}
+          facilityId={facilityId}
+          existingDoctorIds={doctors.map(d => d.doctorUserId)}
+          onInvited={() => void fetchDoctors()}
+        />
+      )}
 
       {editingDoctor ? createPortal(
         <div className="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4">
