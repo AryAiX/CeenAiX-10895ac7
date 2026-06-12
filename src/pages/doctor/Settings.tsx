@@ -318,7 +318,7 @@ export const DoctorSettings = () => {
         </aside>
 
         <div className="space-y-6">
-          {activeSection !== 'notifications' ? (
+          {activeSection !== 'notifications' && activeSection !== 'my-clinic' ? (
             <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500 shadow-sm">
               {t('doctor.settings.placeholderSection', {
                 defaultValue:
