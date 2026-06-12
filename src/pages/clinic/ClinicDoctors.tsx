@@ -219,17 +219,17 @@ function AddDoctorModal({ onClose, facilityId, existingDoctorIds, onInvited }: {
 
 function DoctorDetailDrawer({ doctor, onClose, onApprove, onReject, onSuspend }: { doctor: Doctor; onClose: () => void; onApprove?: () => void; onReject?: () => void; onSuspend?: () => void }) {
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex">
-      <div className="flex-1 bg-black/30" onClick={onClose} />
-      <div className="w-[420px] bg-white h-full overflow-y-auto shadow-2xl flex flex-col">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
+    <div className="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 sticky top-0 bg-white z-10">
           <h3 className="font-bold text-slate-900">Doctor Profile</h3>
           <button onClick={onClose} className="p-1.5 hover:bg-slate-100 rounded-lg"><X size={18} className="text-slate-400" /></button>
         </div>
-        <div className="p-6 space-y-5">
+
+        <div className="p-6">
           {/* Hero */}
-          <div className="flex items-center gap-4">
-            <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${doctor.gradient} flex items-center justify-center text-white font-bold text-xl`}>
+          <div className="flex items-center gap-4 mb-6">
+            <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${doctor.gradient} flex items-center justify-center text-white font-bold text-xl shrink-0`}>
               {doctor.initials}
             </div>
             <div>
@@ -246,30 +246,8 @@ function DoctorDetailDrawer({ doctor, onClose, onApprove, onReject, onSuspend }:
             </div>
           </div>
 
-          {/* License */}
-          <div className="p-4 bg-slate-50 rounded-xl">
-            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">DHA License</div>
-            <div className="font-mono text-sm text-slate-800">{doctor.dhaLicense}</div>
-            <div className={`mt-2 inline-flex items-center gap-1 text-xs font-medium ${doctor.status === 'active' ? 'text-emerald-600' : 'text-amber-600'}`}>
-              <CheckCircle size={12} /> {doctor.status === 'active' ? 'Verified & Active' : 'Pending Verification'}
-            </div>
-          </div>
-
-          {/* Contact */}
-          <div className="space-y-2">
-            {[{ icon: Phone, value: doctor.phone }, { icon: Mail, value: doctor.email }].map(c => {
-              const Icon = c.icon;
-              return (
-                <div key={c.value} className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center"><Icon size={14} className="text-slate-500" /></div>
-                  <span className="text-sm text-slate-700">{c.value}</span>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-3">
+          {/* Stats row */}
+          <div className="grid grid-cols-3 gap-3 mb-6">
             {[
               { label: "Today's Appts", value: doctor.todayAppts },
               { label: 'Total Appts', value: doctor.totalAppts },
@@ -282,46 +260,74 @@ function DoctorDetailDrawer({ doctor, onClose, onApprove, onReject, onSuspend }:
             ))}
           </div>
 
-          {/* Weekly Availability */}
-          <div>
-            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Weekly Availability</div>
-            {doctor.weeklyAvailability.length === 0 ? (
-              <p className="text-sm text-slate-400">No recurring availability set by this doctor yet.</p>
-            ) : (
-              <div className="space-y-2">
-                {doctor.weeklyAvailability.map((a, idx) => (
-                  <div key={idx} className="flex items-center justify-between px-3 py-2 bg-slate-50 rounded-lg">
-                    <span className="text-sm font-medium text-slate-700">{a.day}</span>
-                    <span className="text-xs text-slate-500" style={{ fontFamily: 'DM Mono, monospace' }}>{a.start} – {a.end}</span>
-                  </div>
-                ))}
+          {/* Two-column main content */}
+          <div className="grid grid-cols-2 gap-6">
+            {/* Left column */}
+            <div className="space-y-5">
+              {/* License */}
+              <div className="p-4 bg-slate-50 rounded-xl">
+                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">DHA License</div>
+                <div className="font-mono text-sm text-slate-800">{doctor.dhaLicense}</div>
+                <div className={`mt-2 inline-flex items-center gap-1 text-xs font-medium ${doctor.status === 'active' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                  <CheckCircle size={12} /> {doctor.status === 'active' ? 'Verified & Active' : 'Pending Verification'}
+                </div>
               </div>
-            )}
-          </div>
 
-          {/* Upcoming Blocked Slots */}
-          <div>
-            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Upcoming Blocked Time</div>
-            {doctor.upcomingBlockedSlots.length === 0 ? (
-              <p className="text-sm text-slate-400">No upcoming blocked time.</p>
-            ) : (
+              {/* Contact */}
               <div className="space-y-2">
-                {doctor.upcomingBlockedSlots.map((b, idx) => (
-                  <div key={idx} className="px-3 py-2 bg-amber-50 rounded-lg border border-amber-100">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-slate-700">{b.date}</span>
-                      <span className="text-xs text-slate-500" style={{ fontFamily: 'DM Mono, monospace' }}>{b.start} – {b.end}</span>
+                {[{ icon: Phone, value: doctor.phone }, { icon: Mail, value: doctor.email }].map(c => {
+                  const Icon = c.icon;
+                  return (
+                    <div key={c.value} className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center shrink-0"><Icon size={14} className="text-slate-500" /></div>
+                      <span className="text-sm text-slate-700 truncate">{c.value}</span>
                     </div>
-                    {b.reason && <p className="text-xs text-slate-400 mt-1">{b.reason}</p>}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
-            )}
+
+              {/* Upcoming Blocked Slots */}
+              <div>
+                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Upcoming Blocked Time</div>
+                {doctor.upcomingBlockedSlots.length === 0 ? (
+                  <p className="text-sm text-slate-400">No upcoming blocked time.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {doctor.upcomingBlockedSlots.map((b, idx) => (
+                      <div key={idx} className="px-3 py-2 bg-amber-50 rounded-lg border border-amber-100">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-slate-700">{b.date}</span>
+                          <span className="text-xs text-slate-500" style={{ fontFamily: 'DM Mono, monospace' }}>{b.start} – {b.end}</span>
+                        </div>
+                        {b.reason && <p className="text-xs text-slate-400 mt-1">{b.reason}</p>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right column */}
+            <div>
+              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Weekly Availability</div>
+              {doctor.weeklyAvailability.length === 0 ? (
+                <p className="text-sm text-slate-400">No recurring availability set by this doctor yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {doctor.weeklyAvailability.map((a, idx) => (
+                    <div key={idx} className="flex items-center justify-between px-3 py-2 bg-slate-50 rounded-lg">
+                      <span className="text-sm font-medium text-slate-700">{a.day}</span>
+                      <span className="text-xs text-slate-500" style={{ fontFamily: 'DM Mono, monospace' }}>{a.start} – {a.end}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Actions */}
           {doctor.status === 'pending' && onApprove && (
-            <div className="space-y-2">
+            <div className="space-y-2 mt-6">
               <button onClick={() => { onApprove(); onClose(); }} className="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2">
                 <CheckCircle size={16} /> Approve Doctor
               </button>
@@ -333,7 +339,7 @@ function DoctorDetailDrawer({ doctor, onClose, onApprove, onReject, onSuspend }:
             </div>
           )}
           {doctor.status === 'active' && onSuspend && (
-            <button onClick={() => { onSuspend(); onClose(); }} className="w-full py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2">
+            <button onClick={() => { onSuspend(); onClose(); }} className="w-full py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2 mt-6">
               Suspend Doctor
             </button>
           )}
