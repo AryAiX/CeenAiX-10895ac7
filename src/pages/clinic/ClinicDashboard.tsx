@@ -155,6 +155,13 @@ export default function ClinicDashboard() {
 
       if (staffError) throw staffError;
 
+      // Pending/invited doctors are always is_active=false, so query separately
+      const { data: pendingStaff } = await supabase
+        .from('facility_staff')
+        .select('id, invitation_status')
+        .eq('facility_id', facilityId)
+        .in('invitation_status', ['pending', 'invited']);
+
       const doctorUserIds = (facilityStaff ?? []).map(s => s.doctor_user_id).filter(Boolean);
 
       // Get doctor names
@@ -177,7 +184,7 @@ export default function ClinicDashboard() {
 
       const activeDoctors = facilityStaff?.length ?? 0;
       const onDutyCount = facilityStaff?.filter(d => d.is_available).length ?? 0;
-      const pendingApproval = (facilityStaff ?? []).filter(d => d.invitation_status === 'pending').length;
+      const pendingApproval = (pendingStaff ?? []).filter(d => d.invitation_status === 'pending').length;
 
       // Count appointments per doctor today
       const doctorApptCount = new Map<string, number>();
