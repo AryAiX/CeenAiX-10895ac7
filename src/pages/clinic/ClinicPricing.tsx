@@ -196,7 +196,7 @@ export default function ClinicPricing() {
         category: s.category ?? 'Consultation',
         doctor: null,
         durationMinutes: s.default_duration_min ?? 30,
-        priceAed: Number(s.default_price) ?? 0,
+        priceAed: Number(s.default_price) || 0,
         description: s.description_en ?? '',
         isActive: s.is_active ?? true,
       }));
