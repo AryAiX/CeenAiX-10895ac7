@@ -684,4 +684,8 @@ export const router = createBrowserRouter([
     path: '/clinic/settings',
     element: <ProtectedRoute allowedRoles={['clinic']}><ClinicPortal /></ProtectedRoute>,
   },
+  {
+    path: '/clinic/notifications',
+    element: <ProtectedRoute allowedRoles={['clinic']}><ClinicPortal /></ProtectedRoute>,
+  },
 ]);

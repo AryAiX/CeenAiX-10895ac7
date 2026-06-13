@@ -9,9 +9,10 @@ import ClinicPatients from './ClinicPatients';
 import ClinicPricing from './ClinicPricing';
 import ClinicAnalytics from './ClinicAnalytics';
 import ClinicMessages from './ClinicMessages';
+import ClinicNotifications from './ClinicNotifications';
 import ClinicSettings from './ClinicSettings';
 
-type ClinicPage = 'dashboard' | 'doctors' | 'appointments' | 'patients' | 'pricing' | 'analytics' | 'messages' | 'settings';
+type ClinicPage = 'dashboard' | 'doctors' | 'appointments' | 'patients' | 'pricing' | 'analytics' | 'messages' | 'notifications' | 'settings';
 
 const pageMeta: Record<ClinicPage, { title: string; subtitle: string }> = {
   dashboard:    { title: 'Dashboard',           subtitle: 'Overview of Al Noor Medical Center' },
@@ -21,6 +22,7 @@ const pageMeta: Record<ClinicPage, { title: string; subtitle: string }> = {
   pricing:      { title: 'Pricing & Services',  subtitle: 'Set consultation fees and service catalog' },
   analytics:    { title: 'Analytics',           subtitle: 'Performance and revenue insights' },
   messages:     { title: 'Messages',            subtitle: 'Communication with staff and patients' },
+  notifications: { title: 'Notifications',      subtitle: 'Recent activity and updates' },
   settings:     { title: 'Settings',            subtitle: 'Clinic profile and configuration' },
 };
 
@@ -31,6 +33,7 @@ function getPageFromPath(path: string): ClinicPage {
   if (path.includes('/clinic/pricing'))      return 'pricing';
   if (path.includes('/clinic/analytics'))    return 'analytics';
   if (path.includes('/clinic/messages'))     return 'messages';
+  if (path.includes('/clinic/notifications')) return 'notifications';
   if (path.includes('/clinic/settings'))     return 'settings';
   return 'dashboard';
 }
@@ -55,6 +58,7 @@ export default function ClinicPortal() {
           {page === 'pricing'      && <ClinicPricing />}
           {page === 'analytics'    && <ClinicAnalytics />}
           {page === 'messages'     && <ClinicMessages />}
+          {page === 'notifications' && <ClinicNotifications />}
           {page === 'settings'     && <ClinicSettings />}
         </main>
       </div>
