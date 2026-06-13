@@ -17,6 +17,7 @@ interface Appointment {
   status: 'scheduled' | 'confirmed' | 'in-progress' | 'completed' | 'cancelled' | 'no-show';
   price: number;
   notes: string;
+  wasRescheduled: boolean;
 }
 
 const apptTypes = ['Consultation', 'Follow-up Visit', 'General Checkup', 'Diabetes Management', 'Lab Results Review', 'Radiology Review', 'Specialist Referral', 'Telemedicine'];
@@ -215,7 +216,7 @@ export default function ClinicAppointments() {
       // Fetch appointments
       const { data: apptData, error: apptError } = await supabase
         .from('appointments')
-        .select('id, patient_id, doctor_id, scheduled_at, status, type, chief_complaint, notes, duration_minutes')
+        .select('id, patient_id, doctor_id, scheduled_at, status, type, chief_complaint, notes, duration_minutes, created_at, updated_at')
         .eq('facility_id', fId)
         .eq('is_deleted', false)
         .order('scheduled_at', { ascending: false });
@@ -257,6 +258,9 @@ export default function ClinicAppointments() {
         const patient = profileMap.get(a.patient_id);
         const doctor = profileMap.get(a.doctor_id);
         const scheduledAt = new Date(a.scheduled_at);
+        const createdAt = new Date(a.created_at).getTime();
+        const updatedAt = new Date(a.updated_at).getTime();
+        const wasRescheduled = updatedAt - createdAt > 60000; // more than 1 minute apart
         return {
           id: a.id,
           patientName: patient?.full_name ?? 'Unknown Patient',
@@ -269,6 +273,7 @@ export default function ClinicAppointments() {
           status: a.status as Appointment['status'],
           price: feeMap.get(a.doctor_id) ?? 0,
           notes: a.notes ?? '',
+          wasRescheduled,
         };
       });
 
@@ -353,6 +358,7 @@ export default function ClinicAppointments() {
         status: 'scheduled',
         price: selectedDoctor.consultationFee,
         notes: data.notes || '',
+        wasRescheduled: false,
       };
       setAppts(prev => [newAppt, ...prev]);
     } catch (err) {
@@ -495,7 +501,12 @@ export default function ClinicAppointments() {
               return (
                 <tr key={a.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="px-5 py-4">
-                    <div className="font-bold text-slate-900 text-sm" style={{ fontFamily: 'DM Mono, monospace' }}>{a.time}</div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-slate-900 text-sm" style={{ fontFamily: 'DM Mono, monospace' }}>{a.time}</span>
+                      {a.wasRescheduled && (
+                        <span className="px-1.5 py-0.5 bg-violet-50 text-violet-600 rounded text-[10px] font-semibold border border-violet-200">↻ Rescheduled</span>
+                      )}
+                    </div>
                     <div className="text-xs text-slate-400">{a.date}</div>
                   </td>
                   <td className="px-5 py-4">
