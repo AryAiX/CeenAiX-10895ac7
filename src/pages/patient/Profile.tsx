@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FamilyTree } from '../../components/FamilyTree';
 import { AccountSecurityPanel } from '../../components/AccountSecurityPanel';
-import { Upload, Camera, User, Shield, Users, Plus, Trash2, CreditCard as Edit2, Save } from 'lucide-react';
+import { Upload, Camera, User, Shield, Users, Plus, Trash2, Pencil as Edit2, Save } from 'lucide-react';
 import { usePatientInsurance, usePatientRecords, useUserProfile } from '../../hooks';
 import { useAuth } from '../../lib/auth-context';
 import { FORM_FIELD_LIMITS } from '../../lib/form-field-limits';
@@ -64,6 +64,7 @@ export const Profile: React.FC = () => {
   const [showAddFamily, setShowAddFamily] = useState(false);
   const [newFamilyMember, setNewFamilyMember] = useState<Partial<FamilyMember>>({});
   const [confirmDeleteFamilyId, setConfirmDeleteFamilyId] = useState<string | null>(null);
+  const [loadingFamily, setLoadingFamily] = useState(false);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -80,6 +81,16 @@ export const Profile: React.FC = () => {
           return;
         }
         setPatientProfile(data);
+      });
+    supabase
+      .from('user_profiles')
+      .select('emirates_id_front_url, emirates_id_back_url')
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!mounted) return;
+        if (data?.emirates_id_front_url) setEmiratesIdFront(data.emirates_id_front_url);
+        if (data?.emirates_id_back_url) setEmiratesIdBack(data.emirates_id_back_url);
       });
     return () => {
       mounted = false;
@@ -123,6 +134,30 @@ export const Profile: React.FC = () => {
     const timer = setTimeout(() => setSaveSuccess(null), 4000);
     return () => clearTimeout(timer);
   }, [saveSuccess]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let mounted = true;
+    setLoadingFamily(true);
+    supabase
+      .from('patient_family_members')
+      .select('id, name, relationship, date_of_birth, emirates_id')
+      .eq('patient_id', user.id)
+      .then(({ data: familyData }) => {
+        if (!mounted) return;
+        setFamilyMembers(
+          (familyData ?? []).map((row) => ({
+            id: row.id,
+            name: row.name,
+            relationship: row.relationship,
+            dateOfBirth: row.date_of_birth ?? '',
+            emiratesId: row.emirates_id ?? '',
+          }))
+        );
+        setLoadingFamily(false);
+      });
+    return () => { mounted = false; };
+  }, [user?.id]);
 
   const savePersonalInfo = async () => {
     if (!user?.id) return;
@@ -232,6 +267,10 @@ export const Profile: React.FC = () => {
             .from('documents')
             .getPublicUrl(path);
           setEmiratesIdFront(urlData.publicUrl);
+          await supabase
+            .from('user_profiles')
+            .update({ emirates_id_front_url: urlData.publicUrl })
+            .eq('user_id', user.id);
         }
       } else if (type === 'emiratesBack') {
         const path = `${user.id}/emirates_back_${timestamp}.${ext}`;
@@ -243,6 +282,10 @@ export const Profile: React.FC = () => {
             .from('documents')
             .getPublicUrl(path);
           setEmiratesIdBack(urlData.publicUrl);
+          await supabase
+            .from('user_profiles')
+            .update({ emirates_id_back_url: urlData.publicUrl })
+            .eq('user_id', user.id);
         }
       } else if (type === 'insurance') {
         const path = `${user.id}/insurance_card_${timestamp}.${ext}`;
@@ -273,6 +316,21 @@ export const Profile: React.FC = () => {
     setProfileImage('');
   };
 
+  const removeEmiratesImage = async (type: 'emiratesFront' | 'emiratesBack') => {
+    if (!user?.id) return;
+    if (type === 'emiratesFront') {
+      const path = emiratesIdFront.split('/documents/')[1];
+      if (path) await supabase.storage.from('documents').remove([path]);
+      await supabase.from('user_profiles').update({ emirates_id_front_url: null }).eq('user_id', user.id);
+      setEmiratesIdFront('');
+    } else {
+      const path = emiratesIdBack.split('/documents/')[1];
+      if (path) await supabase.storage.from('documents').remove([path]);
+      await supabase.from('user_profiles').update({ emirates_id_back_url: null }).eq('user_id', user.id);
+      setEmiratesIdBack('');
+    }
+  };
+
   const handleScanEmiratesId = () => {
     // True ID-card OCR is a Phase 2 capability; until then, route the
     // user through the standard image-upload picker so that the action
@@ -281,24 +339,51 @@ export const Profile: React.FC = () => {
     handleImageUpload('emiratesFront');
   };
 
-  const addFamilyMember = () => {
-    if (!newFamilyMember.name || !newFamilyMember.relationship) return;
-    setFamilyMembers((prev) => [
-      ...prev,
-      {
-        id: Date.now().toString(),
-        name: newFamilyMember.name ?? '',
-        relationship: newFamilyMember.relationship ?? '',
-        dateOfBirth: newFamilyMember.dateOfBirth || '',
-        emiratesId: newFamilyMember.emiratesId || '',
-        profileImage: newFamilyMember.profileImage,
-      },
-    ]);
+  const addFamilyMember = async () => {
+    if (!newFamilyMember.name || !newFamilyMember.relationship || !user?.id) return;
+    const { data: inserted, error: insertError } = await supabase
+      .from('patient_family_members')
+      .insert({
+        patient_id: user.id,
+        name: newFamilyMember.name.trim(),
+        relationship: newFamilyMember.relationship,
+        date_of_birth: newFamilyMember.dateOfBirth || null,
+        emirates_id: newFamilyMember.emiratesId || null,
+      })
+      .select('id, name, relationship, date_of_birth, emirates_id')
+      .single();
+    if (insertError) {
+      setSaveError(insertError.message);
+      return;
+    }
+    if (inserted) {
+      setFamilyMembers((prev) => [
+        ...prev,
+        {
+          id: inserted.id,
+          name: inserted.name,
+          relationship: inserted.relationship,
+          dateOfBirth: inserted.date_of_birth ?? '',
+          emiratesId: inserted.emirates_id ?? '',
+        },
+      ]);
+    }
     setNewFamilyMember({});
     setShowAddFamily(false);
+    setSaveSuccess(t('patient.profile.saveFamilySuccess', { defaultValue: 'Family member added successfully!' }));
   };
 
-  const removeFamilyMember = (id: string) => {
+  const removeFamilyMember = async (id: string) => {
+    if (!user?.id) return;
+    const { error: deleteError } = await supabase
+      .from('patient_family_members')
+      .delete()
+      .eq('id', id)
+      .eq('patient_id', user.id);
+    if (deleteError) {
+      setSaveError(deleteError.message);
+      return;
+    }
     setFamilyMembers((prev) => prev.filter((member) => member.id !== id));
   };
 
@@ -664,7 +749,17 @@ export const Profile: React.FC = () => {
                       className="group relative border-2 border-dashed border-gray-300 rounded-2xl p-10 text-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/50 transition-all duration-300"
                     >
                       {emiratesIdFront ? (
-                        <img src={emiratesIdFront} alt={t('patient.profile.altEmiratesFront')} className="max-h-48 mx-auto rounded-xl shadow-lg" />
+                        <div className="relative inline-block">
+                          <img src={emiratesIdFront} alt={t('patient.profile.altEmiratesFront')} className="max-h-48 mx-auto rounded-xl shadow-lg" />
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); void removeEmiratesImage('emiratesFront'); }}
+                            className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full shadow-lg transition-all"
+                            aria-label="Remove front image"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
                       ) : (
                         <div className="space-y-3">
                           <div className="w-16 h-16 mx-auto bg-gray-100 rounded-2xl flex items-center justify-center group-hover:bg-emerald-100 transition-colors duration-300">
@@ -685,7 +780,17 @@ export const Profile: React.FC = () => {
                       className="group relative border-2 border-dashed border-gray-300 rounded-2xl p-10 text-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/50 transition-all duration-300"
                     >
                       {emiratesIdBack ? (
-                        <img src={emiratesIdBack} alt={t('patient.profile.altEmiratesBack')} className="max-h-48 mx-auto rounded-xl shadow-lg" />
+                        <div className="relative inline-block">
+                          <img src={emiratesIdBack} alt={t('patient.profile.altEmiratesBack')} className="max-h-48 mx-auto rounded-xl shadow-lg" />
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); void removeEmiratesImage('emiratesBack'); }}
+                            className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full shadow-lg transition-all"
+                            aria-label="Remove back image"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
                       ) : (
                         <div className="space-y-3">
                           <div className="w-16 h-16 mx-auto bg-gray-100 rounded-2xl flex items-center justify-center group-hover:bg-emerald-100 transition-colors duration-300">
@@ -863,7 +968,17 @@ export const Profile: React.FC = () => {
                   }}
                 />
 
-                {familyMembers.length > 0 && (
+                {loadingFamily && (
+                  <div className="mt-12 pt-8 border-t-2 border-gray-100">
+                    <div className="h-5 w-40 animate-pulse rounded bg-slate-200 mb-6" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      {[1, 2].map((i) => (
+                        <div key={i} className="h-24 animate-pulse rounded-2xl bg-slate-100" />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {!loadingFamily && familyMembers.length > 0 && (
                   <div className="mt-12 pt-8 border-t-2 border-gray-100">
                     <h4 className="font-bold text-gray-900 mb-6 text-lg flex items-center gap-2">
                       <Users className="w-5 h-5 text-orange-600" />
